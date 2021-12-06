@@ -1,0 +1,31 @@
+plugins {
+    id 'java-library'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Use JUnit Jupiter for testing.
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.1'
+
+    // https://mvnrepository.com/artifact/org.assertj/assertj-core
+    testImplementation 'org.assertj:assertj-core:3.21.0'
+
+    // https://github.com/Hakky54/log-captor#capture-logs
+    testImplementation 'io.github.hakky54:logcaptor:2.7.2'
+
+
+    // Will need to map structured logging arguments
+    //testImplementation "ch.qos.logback:logback-classic:1.2.6"
+    //testImplementation "net.logstash.logback:logstash-logback-encoder:7.0.1"
+
+    // This dependency is used internally, and not exposed to consumers on their own compile classpath.
+    implementation "org.slf4j:slf4j-api:1.7.32"
+}
+
+tasks.named('test') {
+    // Use JUnit Platform for unit tests.
+    useJUnitPlatform()
+}
