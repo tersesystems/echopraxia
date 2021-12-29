@@ -10,23 +10,41 @@ Echopraxia is based around three main concepts:
 * Contextual Logging (attached to a logger)
 * Conditions (attached to loggers, statement, and enabled checks)
 
+Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
+
 Please see the [blog posts](https://tersesystems.com/category/logging/) for more background.
 
 ## Logstash
 
 There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) implementation of [event specific custom fields](https://github.com/logfellow/logstash-logback-encoder#event-specific-custom-fields).
 
+Maven:
+
 ```
-MAVEN / GRADLE PATH GOES HERE
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>logstash</artifactId>
+  <version>0.0.1</version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:logstash:0.0.1" 
 ```
 
 ## Basic Usage
 
+For almost all use cases, you will be working with the API which is a single import:
+
+```
+import com.tersesystems.echopraxia.*;
+```
+
 First you get a logger:
 
 ```java
-import com.tersesystems.echopraxia.*;
-
 Logger<?> basicLogger = LoggerFactory.getLogger(getClass());
 ```
 
