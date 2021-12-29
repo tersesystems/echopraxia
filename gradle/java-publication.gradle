@@ -20,7 +20,7 @@ publishing { //https://docs.gradle.org/current/userguide/publishing_maven.html
 
             pom {
                 name = tasks.jar.archiveBaseName
-                description = ""
+                description = "Java Structured Logging API"
                 url = "https://github.com/tersesystems/echopraxia"
                 licenses {
                     license {
