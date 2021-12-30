@@ -5,6 +5,11 @@ import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerProvider;
 import org.slf4j.ILoggerFactory;
 
+/**
+ * Logstash implementation of a logger provider.
+ *
+ * <p>This is the main SPI hook into the ServiceLoader.
+ */
 public class LogstashLoggerProvider implements LoggerProvider {
 
   public Logger<Field.Builder> getLogger(Class<?> clazz) {

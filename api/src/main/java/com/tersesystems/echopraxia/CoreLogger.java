@@ -96,7 +96,16 @@ public interface CoreLogger {
   Condition condition();
 
   /**
-   * Adds the given fields to the logger context.
+   * Adds the given fields to the logger context. The given function will be evaluated only, when
+   * logging. If you are dependent on thread local data, you should check that you only call the
+   * logger when appropriate.
+   *
+   * <p>That is, don't put something like this in your function:
+   *
+   * <p>{@code HttpServletRequest request = ((ServletRequestAttributes)
+   * RequestContextHolder.getRequestAttributes()).getRequest();}
+   *
+   * <p>if you're exposing your logger outside the context of an HTTP request.
    *
    * @param f the field builder function
    * @param builder the field builder

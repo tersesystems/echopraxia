@@ -6,7 +6,6 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.Markers;
 import org.slf4j.Marker;
@@ -20,7 +19,7 @@ public class LogstashCoreLogger implements CoreLogger {
 
   protected LogstashCoreLogger(org.slf4j.Logger logger) {
     this.logger = logger;
-    this.context = new LogstashLoggingContext(Collections.emptyList(), Collections.emptyList());
+    this.context = new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
     this.condition = Condition.always();
   }
 
@@ -52,9 +51,9 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder) {
-    List<Field> newFields = f.apply(builder);
-    LogstashLoggingContext c = new LogstashLoggingContext(newFields, Collections.emptyList());
-    return new LogstashCoreLogger(logger, c.and(this.context), condition);
+    LogstashLoggingContext newContext =
+        new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
+    return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
   }
 
   @Override
@@ -63,12 +62,9 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   public CoreLogger withMarkers(Marker... markers) {
-    List<Marker> m =
-        Stream.of(Arrays.asList(markers), this.context.getMarkers())
-            .flatMap(Collection::stream)
-            .collect(Collectors.toList());
-    LogstashLoggingContext newContext = new LogstashLoggingContext(this.context.getFields(), m);
-    return new LogstashCoreLogger(logger, newContext, condition);
+    LogstashLoggingContext newContext =
+        new LogstashLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
+    return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
   }
 
   @Override
@@ -85,7 +81,7 @@ public class LogstashCoreLogger implements CoreLogger {
       case TRACE:
         return logger.isTraceEnabled() && condition.test(level, context);
     }
-    throw new IllegalStateException("Not found path for for level " + level);
+    throw new IllegalStateException("No branch found for level " + level);
   }
 
   @Override
@@ -102,7 +98,7 @@ public class LogstashCoreLogger implements CoreLogger {
       case TRACE:
         return logger.isTraceEnabled() && this.condition.and(condition).test(level, context);
     }
-    throw new IllegalStateException("Not found path for for level " + level);
+    throw new IllegalStateException("No branch found for level " + level);
   }
 
   @Override
@@ -111,65 +107,31 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
+    Marker m = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
-        if (context == null) {
-          if (logger.isErrorEnabled()) {
-            logger.error(message);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isErrorEnabled(m)) {
-            logger.error(m, message);
-          }
+        if (logger.isErrorEnabled(m)) {
+          logger.error(m, message);
         }
         break;
       case WARN:
-        if (context == null) {
-          if (logger.isWarnEnabled()) {
-            logger.warn(message);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isWarnEnabled(m)) {
-            logger.warn(m, message);
-          }
+        if (logger.isWarnEnabled(m)) {
+          logger.warn(m, message);
         }
         break;
       case INFO:
-        if (context == null) {
-          if (logger.isInfoEnabled()) {
-            logger.info(message);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isInfoEnabled(m)) {
-            logger.info(m, message);
-          }
+        if (logger.isInfoEnabled(m)) {
+          logger.info(m, message);
         }
         break;
       case DEBUG:
-        if (context == null) {
-          if (logger.isDebugEnabled()) {
-            logger.debug(message);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isDebugEnabled(m)) {
-            logger.debug(m, message);
-          }
+        if (logger.isDebugEnabled(m)) {
+          logger.debug(m, message);
         }
         break;
       case TRACE:
-        if (context == null) {
-          if (logger.isTraceEnabled()) {
-            logger.trace(message);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isTraceEnabled(m)) {
-            logger.trace(m, message);
-          }
+        if (logger.isTraceEnabled(m)) {
+          logger.trace(m, message);
         }
         break;
     }
@@ -182,76 +144,41 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
-    final List<Field> args = f.apply(builder);
+    final Marker m = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
-        if (context == null) {
-          if (logger.isErrorEnabled()) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.error(message, arguments);
-          }
-        } else {
-          final Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isErrorEnabled(m)) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.error(m, message, arguments);
-          }
+        if (logger.isErrorEnabled(m)) {
+          final List<Field> args = f.apply(builder);
+          final Object[] arguments = convertArguments(args, false);
+          logger.error(m, message, arguments);
         }
         break;
       case WARN:
-        if (context == null) {
-          if (logger.isWarnEnabled()) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.warn(message, arguments);
-          }
-        } else {
-          final Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isWarnEnabled(m)) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.warn(m, message, arguments);
-          }
+        if (logger.isWarnEnabled(m)) {
+          final List<Field> args = f.apply(builder);
+          final Object[] arguments = convertArguments(args, false);
+          logger.warn(m, message, arguments);
         }
         break;
       case INFO:
-        if (context == null) {
-          if (logger.isInfoEnabled()) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.info(message, arguments);
-          }
-        } else {
-          final Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isWarnEnabled(m)) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.info(m, message, arguments);
-          }
+        if (logger.isWarnEnabled(m)) {
+          final List<Field> args = f.apply(builder);
+          final Object[] arguments = convertArguments(args, false);
+          logger.info(m, message, arguments);
         }
         break;
       case DEBUG:
-        if (context == null) {
-          if (logger.isDebugEnabled()) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.debug(message, arguments);
-          }
-        } else {
-          final Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isDebugEnabled(m)) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.debug(m, message, arguments);
-          }
+        if (logger.isDebugEnabled(m)) {
+          final List<Field> args = f.apply(builder);
+          final Object[] arguments = convertArguments(args, false);
+          logger.debug(m, message, arguments);
         }
         break;
       case TRACE:
-        if (context == null) {
-          if (logger.isTraceEnabled()) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.trace(message, arguments);
-          }
-        } else {
-          final Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isTraceEnabled(m)) {
-            final Object[] arguments = convertArguments(args, false);
-            logger.trace(m, message, arguments);
-          }
+        if (logger.isTraceEnabled(m)) {
+          final List<Field> args = f.apply(builder);
+          final Object[] arguments = convertArguments(args, false);
+          logger.trace(m, message, arguments);
         }
         break;
     }
@@ -263,65 +190,31 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
+    Marker m = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
-        if (context == null) {
-          if (logger.isErrorEnabled()) {
-            logger.error(message, e);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isErrorEnabled(m)) {
-            logger.error(m, message, e);
-          }
+        if (logger.isErrorEnabled(m)) {
+          logger.error(m, message, e);
         }
         break;
       case WARN:
-        if (context == null) {
-          if (logger.isWarnEnabled()) {
-            logger.warn(message, e);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isWarnEnabled(m)) {
-            logger.warn(m, message, e);
-          }
+        if (logger.isWarnEnabled(m)) {
+          logger.warn(m, message, e);
         }
         break;
       case INFO:
-        if (context == null) {
-          if (logger.isInfoEnabled()) {
-            logger.info(message, e);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isInfoEnabled(m)) {
-            logger.info(m, message, e);
-          }
+        if (logger.isInfoEnabled(m)) {
+          logger.info(m, message, e);
         }
         break;
       case DEBUG:
-        if (context == null) {
-          if (logger.isDebugEnabled()) {
-            logger.debug(message, e);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isDebugEnabled(m)) {
-            logger.debug(m, message, e);
-          }
+        if (logger.isDebugEnabled(m)) {
+          logger.debug(m, message, e);
         }
         break;
       case TRACE:
-        if (context == null) {
-          if (logger.isTraceEnabled()) {
-            logger.trace(message, e);
-          }
-        } else {
-          Marker m = convertMarkers(context.getFields(), context.getMarkers());
-          if (logger.isTraceEnabled(m)) {
-            logger.trace(m, message, e);
-          }
+        if (logger.isTraceEnabled(m)) {
+          logger.trace(m, message, e);
         }
         break;
     }
@@ -382,7 +275,7 @@ public class LogstashCoreLogger implements CoreLogger {
     return arguments.toArray();
   }
 
-  private List<?> convertValues(List<Field.Value<?>> values) {
+  protected List<?> convertValues(List<Field.Value<?>> values) {
     return values.stream().map(Field.Value::raw).collect(Collectors.toList());
   }
 
@@ -401,7 +294,7 @@ public class LogstashCoreLogger implements CoreLogger {
     return result;
   }
 
-  private Object getRawValue(Field.Value<?> value) {
+  protected Object getRawValue(Field.Value<?> value) {
     if (value instanceof Field.Value.ArrayValue) {
       final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
       return convertValues(values);
