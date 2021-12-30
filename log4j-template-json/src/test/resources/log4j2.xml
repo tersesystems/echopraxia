@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+            <PatternLayout pattern="%m%n"/>
+            <!--
+              <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutCustom.json"/>
+            -->
+            <!--
+             https://github.com/apache/logging-log4j2/pull/335#issuecomment-684510122
+
+             We need to remove "stringified=true" from the layout, because otherwise it will
+             try to resolve the message internally.
+             -->
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>
