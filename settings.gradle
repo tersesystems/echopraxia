@@ -4,7 +4,7 @@ include('logstash')
 include('example')
 
 // Add extra behaviors as modules
-// include('scripting')
+include('scripting')
 // include('fluent')
 // include('semantic')
 // include('flow')
