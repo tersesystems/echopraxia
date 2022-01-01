@@ -1,17 +1,16 @@
 package fluent;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.fluent.FluentLogger;
 import com.tersesystems.echopraxia.fluent.FluentLoggerFactory;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 public class FluentLoggerTest {
 

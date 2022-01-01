@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.scripting;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.LoggingContext;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
