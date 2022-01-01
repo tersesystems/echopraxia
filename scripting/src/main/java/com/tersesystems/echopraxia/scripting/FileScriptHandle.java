@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.scripting;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,12 +49,16 @@ public class FileScriptHandle implements ScriptHandle {
   }
 
   @Override
-  public String script() throws IOException {
+  public String script() {
     if (!Files.exists(path)) {
-      throw new FileNotFoundException(path.toAbsolutePath().toString());
+      throw new ScriptException("No path found at " + path.toAbsolutePath());
     }
 
-    return readString(path);
+    try {
+      return readString(path);
+    } catch (IOException e) {
+      throw new ScriptException(e);
+    }
   }
 
   @Override
