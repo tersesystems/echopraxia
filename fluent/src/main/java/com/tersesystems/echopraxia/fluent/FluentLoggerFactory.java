@@ -5,6 +5,9 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 
+/**
+ * The factory for FluentLogger.
+ */
 public class FluentLoggerFactory {
 
   public static FluentLogger<Field.Builder> getLogger(Class<?> clazz) {

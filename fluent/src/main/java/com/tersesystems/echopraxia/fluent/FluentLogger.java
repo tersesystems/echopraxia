@@ -9,6 +9,11 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * FluentLogger class.
+ *
+ * @param <FB> the field builder type.
+ */
 public class FluentLogger<FB extends Field.Builder> {
 
   private final CoreLogger core;
