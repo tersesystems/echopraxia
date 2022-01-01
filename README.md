@@ -4,11 +4,12 @@
 
 Echopraxia is a sequel to the Scala logging API [Blindsight](https://github.com/tersesystems/blindsight), hence the name: "Echopraxia is the involuntary repetition or imitation of an observed action."
 
-Echopraxia is based around three main concepts:
+Echopraxia is based around several main concepts that build and leverage on each other:
 
 * Structured Logging (API based around structured fields and values)
 * Contextual Logging (API based around building state in loggers)
 * Conditions (API based around context-aware functions and dynamic scripting)
+* Semantic Logging (API based around typed arguments)
 
 For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
@@ -26,14 +27,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:logstash:0.0.2" 
+implementation "com.tersesystems.echopraxia:logstash:0.0.3" 
 ```
 
 ## Basic Usage
@@ -275,6 +276,28 @@ ScriptHandle handle = new ScriptHandle() {
 };
 ScriptCondition.create(false, handle);
 ```
+
+## Semantic Logging
+
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>semantic</artifactId>
+  <version>0.0.3</version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:semantic:0.0.3" 
+```
+
+TODO Fill this out.
+
 
 ## SLF4J API
 
