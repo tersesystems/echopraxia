@@ -4,11 +4,12 @@
 
 Echopraxia is a sequel to the Scala logging API [Blindsight](https://github.com/tersesystems/blindsight), hence the name: "Echopraxia is the involuntary repetition or imitation of an observed action."
 
-Echopraxia is based around three main concepts:
+Echopraxia is based around several main concepts that build and leverage on each other:
 
 * Structured Logging (API based around structured fields and values)
 * Contextual Logging (API based around building state in loggers)
 * Conditions (API based around context-aware functions and dynamic scripting)
+* Semantic Logging (API based around typed arguments)
 
 For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
@@ -26,14 +27,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:logstash:0.0.2" 
+implementation "com.tersesystems.echopraxia:logstash:0.0.3" 
 ```
 
 ## Basic Usage
@@ -274,6 +275,80 @@ ScriptHandle handle = new ScriptHandle() {
   // ...report / path etc 
 };
 ScriptCondition.create(false, handle);
+```
+
+## Semantic Logging
+
+Semantic Loggers are strongly typed, and will only log a particular kind of argument.  All the work of field building and
+setting up a message is done from setup.
+
+### Basic Usage
+
+To set up a logger for a `Person` with `name` and `age` properties, you would do the following:
+
+```java
+import com.tersesystems.echopraxia.semantic.*;
+
+SemanticLogger<Person> logger =
+    SemanticLoggerFactory.getLogger(
+        getClass(),
+        Person.class,
+        person -> "person.name = {}, person.age = {}",
+        p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)));
+
+Person person = new Person("Eloise", 1);
+logger.info(person);
+```
+
+### Conditions
+
+Semantic loggers take conditions in the same way that other loggers do, either through predicate:
+
+```java
+if (logger.isInfoEnabled(condition)) {
+  logger.info(person);
+}
+```
+
+or directly on the method:
+
+```java
+logger.info(condition, person);
+```
+
+or on the logger:
+
+```java
+logger.withCondition(condition).info(person);
+```
+
+### Context
+
+Semantic loggers can add fields to context in the same way other loggers do.
+
+```java
+SemanticLogger<Person> loggerWithContext =
+  logger.withFields(fb -> fb.onlyString("some_context_field", contextValue));
+```
+
+### Installation
+
+Semantic Loggers have a dependency on the `api` module, but do not have any implementation dependencies.
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>semantic</artifactId>
+  <version>0.0.3</version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:semantic:0.0.3" 
 ```
 
 ## SLF4J API

@@ -14,4 +14,6 @@ java {
 
 dependencies {
     implementation project(":logstash")
+    implementation project(":scripting")
+    implementation project(":semantic")
 }

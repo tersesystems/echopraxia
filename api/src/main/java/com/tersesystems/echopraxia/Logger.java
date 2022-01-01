@@ -5,7 +5,7 @@ import static com.tersesystems.echopraxia.Level.*;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * An echopraxia logger.
+ * An echopraxia logger built around a field builder.
  *
  * @param <FB> the field builder type.
  */
@@ -65,6 +65,12 @@ public class Logger<FB extends Field.Builder> {
 
   public Logger<FB> withFields(Field.BuilderFunction<FB> f) {
     return new Logger<>(core().withFields(f, fieldBuilder), fieldBuilder);
+  }
+
+  public <CFB extends Field.Builder> Logger<FB> withFields(
+      Field.BuilderFunction<CFB> ctxBuilderF, CFB ctxBuilder) {
+    final CoreLogger coreLogger = core().withFields(ctxBuilderF, ctxBuilder);
+    return new Logger<>(coreLogger, fieldBuilder);
   }
 
   public boolean isTraceEnabled() {

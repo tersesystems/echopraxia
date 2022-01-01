@@ -10,9 +10,8 @@ import java.util.function.Consumer;
 /**
  * The ScriptCondition class.
  *
- * This is a condition backed by a tweakflow script manager, which
- * keeps track of the script through a ScriptHandle and recompiles
- * the script if it's invalid.
+ * <p>This is a condition backed by a tweakflow script manager, which keeps track of the script
+ * through a ScriptHandle and recompiles the script if it's invalid.
  */
 public class ScriptCondition implements Condition {
 
@@ -68,13 +67,13 @@ public class ScriptCondition implements Condition {
     return create(defaultValue, handle);
   }
 
-    /**
-     * Creates a new condition using a default value and a handle.
-     *
-     * @param defaultValue the default value on exception or error.
-     * @param handle the script handle, created externally.
-     * @return the script condition
-     */
+  /**
+   * Creates a new condition using a default value and a handle.
+   *
+   * @param defaultValue the default value on exception or error.
+   * @param handle the script handle, created externally.
+   * @return the script condition
+   */
   public static Condition create(boolean defaultValue, ScriptHandle handle) {
     ScriptManager scriptManager = new ScriptManager(handle);
     return new ScriptCondition(scriptManager, defaultValue);

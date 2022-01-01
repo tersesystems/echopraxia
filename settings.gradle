@@ -6,5 +6,5 @@ include('example')
 // Add extra behaviors as modules
 include('scripting')
 // include('fluent')
-// include('semantic')
+include('semantic')
 // include('flow')
