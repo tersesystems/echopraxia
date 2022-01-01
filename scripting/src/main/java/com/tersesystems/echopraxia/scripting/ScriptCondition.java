@@ -50,7 +50,7 @@ public class ScriptCondition implements Condition {
           }
 
           @Override
-          public String script() throws IOException {
+          public String script() {
             return script;
           }
 

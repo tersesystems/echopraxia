@@ -9,8 +9,10 @@ public interface ScriptHandle {
   /** @return true if the script is invalid and should be re-evaluated, false otherwise. */
   boolean isInvalid();
 
-  /** @return the code of the script. */
-  String script() throws IOException;
+  /**
+   * @return the code of the script.
+  */
+  String script();
 
   /**
    * The path to use when debugging / evaulating the script.
