@@ -5,9 +5,11 @@ import com.tersesystems.echopraxia.Field;
 import java.util.function.Function;
 
 /**
- * SemanticLogger interface.
+ * SemanticLogger interface built around a datatype.
  *
  * <p>You will want to create this using a `SemanticLoggerFactory.getLogger` method.
+ *
+ * <p>This interface is less flexible than using a field builder, but is far simpler to use.
  *
  * @param <DataType> the data type to use as an argument.
  */

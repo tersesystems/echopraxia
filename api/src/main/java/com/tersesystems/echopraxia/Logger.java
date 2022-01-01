@@ -67,6 +67,12 @@ public class Logger<FB extends Field.Builder> {
     return new Logger<>(core().withFields(f, fieldBuilder), fieldBuilder);
   }
 
+  public <CFB extends Field.Builder> Logger<FB> withFields(
+      Field.BuilderFunction<CFB> ctxBuilderF, CFB ctxBuilder) {
+    final CoreLogger coreLogger = core().withFields(ctxBuilderF, ctxBuilder);
+    return new Logger<>(coreLogger, fieldBuilder);
+  }
+
   public boolean isTraceEnabled() {
     return core().isEnabled(TRACE);
   }

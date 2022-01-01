@@ -98,6 +98,9 @@ public class SemanticLoggerFactory {
     return getLogger(clazz, dataTypeClass, messageFunction, f, Logger.defaultFieldBuilder());
   }
 
+  // The implementation uses a field builder type, but we can cheat and hide this by only
+  // exposing the interface, on the basis that people will generally put up with so many
+  // magic generic angle bracket type things.
   static class Impl<DataType, FB extends Field.Builder> implements SemanticLogger<DataType> {
 
     private final CoreLogger core;
