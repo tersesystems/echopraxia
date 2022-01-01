@@ -1,10 +1,36 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.*;
+
 import java.util.function.Function;
 
+/**
+ * The semantic logger factory.  This is used to render complex objects specifically on their type.
+ *
+ * For example, you may want to render dates using a semantic logger:
+ *
+ * {@code SemanticLogger<Date> logger = SemanticLoggerFactory.getLogger( getClass(),
+ * java.util.Date.class, date -> "date = {}", date -> b -> b.onlyString("date",
+ * date.toInstant().toString()));}
+ *
+ * You would then be able to log dates and <b>only</b> dates as follows:
+ *
+ * {@code logger.info(new Date()); }
+ */
 public class SemanticLoggerFactory {
 
+    /**
+     * Creates a semantic logger using a logger class and explicit field builder.
+     *
+     * @param clazz the logger class.
+     * @param dataTypeClass the class of the data type.
+     * @param messageFunction the function to render a message template.
+     * @param f the datatype to builder function.
+     * @param builder the field builder to use in the builder function.
+     * @param <DataType> the type of data to render as an argument.
+     * @param <FB> the field builder type.
+     * @return an implementation of semantic logger.
+     */
   public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
       Class<?> clazz,
       Class<DataType> dataTypeClass,
@@ -15,6 +41,18 @@ public class SemanticLoggerFactory {
     return new Impl<>(coreLogger, builder, messageFunction, f);
   }
 
+    /**
+     * Creates a semantic logger using a logger name  and explicit field builder.
+     *
+     * @param name the logger name.
+     * @param dataTypeClass the class of the data type.
+     * @param messageFunction the function to render a message template.
+     * @param f the datatype to builder function.
+     * @param builder the field builder to use in the builder function.
+     * @param <DataType> the type of data to render as an argument.
+     * @param <FB> the field builder type.
+     * @return an implementation of semantic logger.
+     */
   public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
@@ -25,6 +63,16 @@ public class SemanticLoggerFactory {
     return new Impl<>(coreLogger, builder, messageFunction, f);
   }
 
+    /**
+     * Creates a semantic logger using a logger name  and a default field builder.
+     *
+     * @param name the logger name.
+     * @param dataTypeClass the class of the data type.
+     * @param messageFunction the function to render a message template.
+     * @param f the datatype to builder function.
+     * @param <DataType> the type of data to render as an argument.
+     * @return an implementation of semantic logger.
+     */
   public static <DataType> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
@@ -33,6 +81,16 @@ public class SemanticLoggerFactory {
     return getLogger(name, dataTypeClass, messageFunction, f, Logger.defaultFieldBuilder());
   }
 
+    /**
+     * Creates a semantic logger using a logger class and a default field builder.
+     *
+     * @param clazz the logger class.
+     * @param dataTypeClass the class of the data type.
+     * @param messageFunction the function to render a message template.
+     * @param f the datatype to builder function.
+     * @param <DataType> the type of data to render as an argument.
+     * @return an implementation of semantic logger.
+     */
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<?> clazz,
       Class<DataType> dataTypeClass,
@@ -65,6 +123,11 @@ public class SemanticLoggerFactory {
     }
 
     @Override
+    public boolean isErrorEnabled(Condition c) {
+      return core.isEnabled(Level.ERROR, c);
+    }
+
+    @Override
     public void error(DataType data) {
       if (core.isEnabled(Level.ERROR)) {
         core.log(Level.ERROR, convertMessage(data), f.apply(data), builder);
@@ -72,8 +135,20 @@ public class SemanticLoggerFactory {
     }
 
     @Override
+    public void error(Condition c, DataType data) {
+      if (core.isEnabled(Level.ERROR, c)) {
+        core.log(Level.ERROR, convertMessage(data), f.apply(data), builder);
+      }
+    }
+
+    @Override
     public boolean isWarnEnabled() {
       return core.isEnabled(Level.WARN);
+    }
+
+    @Override
+    public boolean isWarnEnabled(Condition c) {
+      return core.isEnabled(Level.WARN, c);
     }
 
     private String convertMessage(DataType data) {
@@ -88,8 +163,20 @@ public class SemanticLoggerFactory {
     }
 
     @Override
+    public void warn(Condition c, DataType data) {
+      if (core.isEnabled(Level.WARN, c)) {
+        core.log(Level.WARN, convertMessage(data), f.apply(data), builder);
+      }
+    }
+
+    @Override
     public boolean isInfoEnabled() {
       return core.isEnabled(Level.INFO);
+    }
+
+    @Override
+    public boolean isInfoEnabled(Condition c) {
+      return core.isEnabled(Level.INFO, c);
     }
 
     @Override
@@ -100,8 +187,20 @@ public class SemanticLoggerFactory {
     }
 
     @Override
+    public void info(Condition c, DataType data) {
+      if (core.isEnabled(Level.INFO, c)) {
+        core.log(Level.INFO, convertMessage(data), f.apply(data), builder);
+      }
+    }
+
+    @Override
     public boolean isDebugEnabled() {
       return core.isEnabled(Level.DEBUG);
+    }
+
+    @Override
+    public boolean isDebugEnabled(Condition c) {
+      return core.isEnabled(Level.DEBUG, c);
     }
 
     @Override
@@ -112,13 +211,32 @@ public class SemanticLoggerFactory {
     }
 
     @Override
+    public void debug(Condition c, DataType data) {
+      if (core.isEnabled(Level.DEBUG, c)) {
+        core.log(Level.DEBUG, convertMessage(data), f.apply(data), builder);
+      }
+    }
+
+    @Override
     public boolean isTraceEnabled() {
       return core.isEnabled(Level.TRACE);
     }
 
     @Override
+    public boolean isTraceEnabled(Condition c) {
+      return core.isEnabled(Level.TRACE, c);
+    }
+
+    @Override
     public void trace(DataType data) {
       if (core.isEnabled(Level.TRACE)) {
+        core.log(Level.TRACE, convertMessage(data), f.apply(data), builder);
+      }
+    }
+
+    @Override
+    public void trace(Condition c, DataType data) {
+      if (core.isEnabled(Level.TRACE, c)) {
         core.log(Level.TRACE, convertMessage(data), f.apply(data), builder);
       }
     }

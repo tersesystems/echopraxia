@@ -29,7 +29,7 @@ public class LoggerFactory {
   /**
    * Creates a logger using the given class name.
    *
-   * @param clazz the class to use
+   * @param clazz the logger class to use
    * @return the logger.
    */
   public static Logger<Field.Builder> getLogger(Class<?> clazz) {
@@ -39,7 +39,7 @@ public class LoggerFactory {
   /**
    * Creates a logger using the given name.
    *
-   * @param name the name to use
+   * @param name the logger name to use
    * @return the logger.
    */
   public static Logger<Field.Builder> getLogger(String name) {

@@ -1,41 +1,58 @@
 package com.tersesystems.echopraxia.semantic;
 
-import com.tersesystems.echopraxia.Condition;
-import java.util.Date;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.Arrays;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 public class SemanticLoggerTest {
 
+  static class Person {
+    final String name;
+    final int age;
+
+    public Person(String name, int age) {
+      this.name = name;
+      this.age = age;
+    }
+  }
+
   @Test
   public void testLogger() {
-
-    SemanticLogger<Date> dateLogger =
+    SemanticLogger<Person> logger =
         SemanticLoggerFactory.getLogger(
             getClass(),
-            java.util.Date.class,
-            date -> "date = {}",
-            date -> b -> b.onlyString("date", date.toInstant().toString()));
+            Person.class,
+            person -> "person.name = {}, person.age = {}",
+            p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)));
 
-    dateLogger.info(new Date());
-    if (dateLogger.isDebugEnabled()) {
-      dateLogger.debug(new Date());
-    }
+    Person eloise = new Person("Eloise", 1);
+    logger.info(eloise);
 
-    Condition c =
-        (level, context) ->
-            context.getFields().stream()
-                .anyMatch(
-                    f ->
-                        f.name().equals("something_iffy")
-                            ? (Boolean) f.value().raw()
-                            : Boolean.valueOf(false));
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getFormattedMessage()).isEqualTo("person.name = Eloise, person.age = 1");
+  }
 
-    SemanticLogger<Date> iffyLogger = dateLogger.withCondition(c);
+  @BeforeEach
+  public void beforeEach() {
+    getListAppender().list.clear();
+  }
 
-    boolean iffy = true;
-    iffyLogger
-        .withMessage(date -> "the date is {} and something is iffy")
-        .withFields(b -> b.onlyBool("something_iffy", iffy))
-        .warn(new Date()); // should print out with new message
+  LoggerContext loggerContext() {
+    return (LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
+  }
+
+  ListAppender<ILoggingEvent> getListAppender() {
+    return (ListAppender<ILoggingEvent>)
+        loggerContext().getLogger(ROOT_LOGGER_NAME).getAppender("LIST");
   }
 }

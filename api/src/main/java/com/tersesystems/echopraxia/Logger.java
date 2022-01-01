@@ -5,7 +5,7 @@ import static com.tersesystems.echopraxia.Level.*;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * An echopraxia logger.
+ * An echopraxia logger built around a field builder.
  *
  * @param <FB> the field builder type.
  */
