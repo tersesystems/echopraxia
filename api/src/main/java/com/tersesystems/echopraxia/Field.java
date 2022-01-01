@@ -142,15 +142,37 @@ public interface Field {
       return singletonList(array(name, values));
     }
 
+    /**
+     * Creates a singleton list of an array field out of a name and a list of values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, List<Value<?>> values) {
+      return singletonList(array(name, values));
+    }
+
     // object
     /**
      * Creates a field object out of a name and field values.
      *
      * @param name the name of the field.
      * @param values the values.
-     * @return a list containing a single field.
+     * @return a single field.
      */
     default Field object(String name, Field... values) {
+      return new DefaultField(name, Value.object(values));
+    }
+
+    /**
+     * Creates a field object out of a name and field values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a field.
+     */
+    default Field object(String name, List<Field> values) {
       return new DefaultField(name, Value.object(values));
     }
 
@@ -162,6 +184,17 @@ public interface Field {
      * @return a list containing a single field.
      */
     default List<Field> onlyObject(String name, Field... values) {
+      return singletonList(object(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an object out of a name and a list of values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyObject(String name, List<Field> values) {
       return singletonList(object(name, values));
     }
 
@@ -236,6 +269,8 @@ public interface Field {
       private final String name;
       private final Value<?> value;
 
+      private static final Formatter formatter = new Formatter() {};
+
       public DefaultField(String name, Value<?> value) {
         this.name = name;
         this.value = value;
@@ -249,6 +284,10 @@ public interface Field {
       @Override
       public Value<?> value() {
         return value;
+      }
+
+      public String toString() {
+        return formatter.fieldToString(this);
       }
     }
   }
@@ -271,6 +310,8 @@ public interface Field {
    * @param <V> the raw type of the underling value.
    */
   abstract class Value<V> {
+    private static final Formatter formatter = new Formatter() {};
+
     protected Value() {}
 
     /**
@@ -279,6 +320,12 @@ public interface Field {
      * @return the underlying raw value.
      */
     public abstract V raw();
+
+    public abstract ValueType type();
+
+    public String toString() {
+      return formatter.valueToString(this);
+    }
 
     /**
      * Wraps a string with a Value.
@@ -381,6 +428,16 @@ public interface Field {
       return Arrays.stream(array).map(f).collect(Collectors.toList());
     }
 
+    public enum ValueType {
+      ARRAY,
+      OBJECT,
+      STRING,
+      NUMBER,
+      BOOLEAN,
+      EXCEPTION,
+      NULL
+    }
+
     public static final class BooleanValue extends Value<Boolean> {
       private final Boolean bool;
 
@@ -391,6 +448,11 @@ public interface Field {
       @Override
       public Boolean raw() {
         return this.bool;
+      }
+
+      @Override
+      public ValueType type() {
+        return ValueType.BOOLEAN;
       }
     }
 
@@ -405,6 +467,11 @@ public interface Field {
       public Number raw() {
         return number;
       }
+
+      @Override
+      public ValueType type() {
+        return ValueType.NUMBER;
+      }
     }
 
     public static final class StringValue extends Value<String> {
@@ -417,6 +484,11 @@ public interface Field {
       @Override
       public String raw() {
         return s;
+      }
+
+      @Override
+      public ValueType type() {
+        return ValueType.STRING;
       }
     }
 
@@ -431,6 +503,11 @@ public interface Field {
       public List<Field.Value<?>> raw() {
         return raw;
       }
+
+      @Override
+      public ValueType type() {
+        return ValueType.ARRAY;
+      }
     }
 
     public static final class ObjectValue extends Value<List<Field>> {
@@ -438,6 +515,11 @@ public interface Field {
 
       private ObjectValue(List<Field> raw) {
         this.raw = raw;
+      }
+
+      @Override
+      public ValueType type() {
+        return ValueType.OBJECT;
       }
 
       @Override
@@ -455,6 +537,11 @@ public interface Field {
         return null;
       }
 
+      @Override
+      public ValueType type() {
+        return ValueType.NULL;
+      }
+
       public static NullValue instance = new NullValue();
     }
 
@@ -466,9 +553,26 @@ public interface Field {
       }
 
       @Override
+      public ValueType type() {
+        return ValueType.EXCEPTION;
+      }
+
+      @Override
       public Throwable raw() {
         return raw;
       }
+    }
+  }
+
+  // Internal formatter... at some point might be worth exposing this through SPI.
+  interface Formatter {
+    default String fieldToString(Field field) {
+      String name = field.name();
+      return name + "=" + field.value();
+    }
+
+    default <V> String valueToString(Value<V> v) {
+      return v.raw() == null ? "null" : v.raw().toString();
     }
   }
 }
