@@ -6,9 +6,9 @@ Echopraxia is a sequel to the Scala logging API [Blindsight](https://github.com/
 
 Echopraxia is based around three main concepts:
 
-* Structured Arguments (attached to a logging statement)
-* Contextual Logging (attached to a logger)
-* Conditions (attached to loggers, statement, and enabled checks)
+* Structured Logging (API based around structured fields and values)
+* Contextual Logging (API based around building state in loggers)
+* Conditions (API based around context-aware functions and dynamic scripting)
 
 Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
 
@@ -227,7 +227,7 @@ Condition condition = ScriptCondition.create(false, path, Throwable::printStackT
 Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
 ```
 
-Where `condition.tf` contains the following:
+Where `condition.tf` contains a tweakflow script, e.g.
 
 ```tweakflow
 import * as std from "std";
