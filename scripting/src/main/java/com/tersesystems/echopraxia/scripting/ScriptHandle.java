@@ -27,6 +27,10 @@ public interface ScriptHandle {
     return "evaluate";
   }
 
-  /** If evaluating or parsing the script throws an exception, this method is called. */
+  /**
+   * If evaluating or parsing the script throws an exception, this method is called.
+   *
+   * @param e throwable caused by failure in script
+   */
   void report(Throwable e);
 }

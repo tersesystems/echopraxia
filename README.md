@@ -10,6 +10,8 @@ Echopraxia is based around three main concepts:
 * Contextual Logging (API based around building state in loggers)
 * Conditions (API based around context-aware functions and dynamic scripting)
 
+For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
+
 Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
 
 Please see the [blog posts](https://tersesystems.com/category/logging/) for more background.
@@ -243,7 +245,7 @@ library echopraxia {
 
 Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
 
-One important thing to note is that creating a script tied to a file will ensure that if the file is touched, the script manager will invalidate the script and re-evaluate it.  This does mean that the condition will check last modified fs metadata on every evaluation, which *should be fine* for most filesystems, but I have not attempted to scale this feature and I vaguely remember something odd happening on Windows NTFS LastModifiedDate.  YMMV.
+One important thing to note is that creating a script tied to a file will ensure that if the file is touched, the script manager will invalidate the script and recompile it.  This does mean that the condition will check last modified fs metadata on every evaluation, which *should be fine* for most filesystems, but I have not attempted to scale this feature and I vaguely remember something odd happening on Windows NTFS LastModifiedDate.  YMMV.
 
 ## String Based Scripts
 
