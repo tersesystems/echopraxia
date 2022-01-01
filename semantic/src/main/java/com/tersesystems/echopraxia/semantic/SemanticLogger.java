@@ -2,13 +2,12 @@ package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
-
 import java.util.function.Function;
 
 /**
  * SemanticLogger interface.
  *
- * You will want to create this using a `SemanticLoggerFactory.getLogger` method.
+ * <p>You will want to create this using a `SemanticLoggerFactory.getLogger` method.
  *
  * @param <DataType> the data type to use as an argument.
  */

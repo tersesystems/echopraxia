@@ -1,36 +1,35 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.*;
-
 import java.util.function.Function;
 
 /**
- * The semantic logger factory.  This is used to render complex objects specifically on their type.
+ * The semantic logger factory. This is used to render complex objects specifically on their type.
  *
- * For example, you may want to render dates using a semantic logger:
+ * <p>For example, you may want to render dates using a semantic logger:
  *
- * {@code SemanticLogger<Date> logger = SemanticLoggerFactory.getLogger( getClass(),
+ * <p>{@code SemanticLogger<Date> logger = SemanticLoggerFactory.getLogger( getClass(),
  * java.util.Date.class, date -> "date = {}", date -> b -> b.onlyString("date",
  * date.toInstant().toString()));}
  *
- * You would then be able to log dates and <b>only</b> dates as follows:
+ * <p>You would then be able to log dates and <b>only</b> dates as follows:
  *
- * {@code logger.info(new Date()); }
+ * <p>{@code logger.info(new Date()); }
  */
 public class SemanticLoggerFactory {
 
-    /**
-     * Creates a semantic logger using a logger class and explicit field builder.
-     *
-     * @param clazz the logger class.
-     * @param dataTypeClass the class of the data type.
-     * @param messageFunction the function to render a message template.
-     * @param f the datatype to builder function.
-     * @param builder the field builder to use in the builder function.
-     * @param <DataType> the type of data to render as an argument.
-     * @param <FB> the field builder type.
-     * @return an implementation of semantic logger.
-     */
+  /**
+   * Creates a semantic logger using a logger class and explicit field builder.
+   *
+   * @param clazz the logger class.
+   * @param dataTypeClass the class of the data type.
+   * @param messageFunction the function to render a message template.
+   * @param f the datatype to builder function.
+   * @param builder the field builder to use in the builder function.
+   * @param <DataType> the type of data to render as an argument.
+   * @param <FB> the field builder type.
+   * @return an implementation of semantic logger.
+   */
   public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
       Class<?> clazz,
       Class<DataType> dataTypeClass,
@@ -41,18 +40,18 @@ public class SemanticLoggerFactory {
     return new Impl<>(coreLogger, builder, messageFunction, f);
   }
 
-    /**
-     * Creates a semantic logger using a logger name  and explicit field builder.
-     *
-     * @param name the logger name.
-     * @param dataTypeClass the class of the data type.
-     * @param messageFunction the function to render a message template.
-     * @param f the datatype to builder function.
-     * @param builder the field builder to use in the builder function.
-     * @param <DataType> the type of data to render as an argument.
-     * @param <FB> the field builder type.
-     * @return an implementation of semantic logger.
-     */
+  /**
+   * Creates a semantic logger using a logger name and explicit field builder.
+   *
+   * @param name the logger name.
+   * @param dataTypeClass the class of the data type.
+   * @param messageFunction the function to render a message template.
+   * @param f the datatype to builder function.
+   * @param builder the field builder to use in the builder function.
+   * @param <DataType> the type of data to render as an argument.
+   * @param <FB> the field builder type.
+   * @return an implementation of semantic logger.
+   */
   public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
@@ -63,16 +62,16 @@ public class SemanticLoggerFactory {
     return new Impl<>(coreLogger, builder, messageFunction, f);
   }
 
-    /**
-     * Creates a semantic logger using a logger name  and a default field builder.
-     *
-     * @param name the logger name.
-     * @param dataTypeClass the class of the data type.
-     * @param messageFunction the function to render a message template.
-     * @param f the datatype to builder function.
-     * @param <DataType> the type of data to render as an argument.
-     * @return an implementation of semantic logger.
-     */
+  /**
+   * Creates a semantic logger using a logger name and a default field builder.
+   *
+   * @param name the logger name.
+   * @param dataTypeClass the class of the data type.
+   * @param messageFunction the function to render a message template.
+   * @param f the datatype to builder function.
+   * @param <DataType> the type of data to render as an argument.
+   * @return an implementation of semantic logger.
+   */
   public static <DataType> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
@@ -81,16 +80,16 @@ public class SemanticLoggerFactory {
     return getLogger(name, dataTypeClass, messageFunction, f, Logger.defaultFieldBuilder());
   }
 
-    /**
-     * Creates a semantic logger using a logger class and a default field builder.
-     *
-     * @param clazz the logger class.
-     * @param dataTypeClass the class of the data type.
-     * @param messageFunction the function to render a message template.
-     * @param f the datatype to builder function.
-     * @param <DataType> the type of data to render as an argument.
-     * @return an implementation of semantic logger.
-     */
+  /**
+   * Creates a semantic logger using a logger class and a default field builder.
+   *
+   * @param clazz the logger class.
+   * @param dataTypeClass the class of the data type.
+   * @param messageFunction the function to render a message template.
+   * @param f the datatype to builder function.
+   * @param <DataType> the type of data to render as an argument.
+   * @return an implementation of semantic logger.
+   */
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<?> clazz,
       Class<DataType> dataTypeClass,
