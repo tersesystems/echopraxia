@@ -296,8 +296,8 @@ SemanticLogger<Person> logger =
         person -> "person.name = {}, person.age = {}",
         p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)));
 
-Person eloise = new Person("Eloise", 1);
-logger.info(eloise);
+Person person = new Person("Eloise", 1);
+logger.info(person);
 ```
 
 ### Conditions
