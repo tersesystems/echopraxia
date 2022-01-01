@@ -10,6 +10,7 @@ Echopraxia is based around several main concepts that build and leverage on each
 * Contextual Logging (API based around building state in loggers)
 * Conditions (API based around context-aware functions and dynamic scripting)
 * Semantic Logging (API based around typed arguments)
+* Fluent Logging (API based around log entry builder)
 
 For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
@@ -350,6 +351,48 @@ Gradle:
 ```
 implementation "com.tersesystems.echopraxia:semantic:0.0.3" 
 ```
+
+## Fluent Logging
+
+Fluent logging is done using a `FluentLoggerFactory`.  
+
+It is useful in situations where arguments may need to be built up over time.
+
+```java
+import com.tersesystems.echopraxia.fluent.*;
+
+FluentLogger<?> logger = FluentLoggerFactory.getLogger(getClass());
+
+Person person = new Person("Eloise", 1);
+
+logger
+    .atInfo()
+    .message("name = {}, age = {}")
+    .argument(b -> b.string("name", person.name))
+    .argument(b -> b.number("age", person.age))
+    .log();
+```
+
+### Installation
+
+Semantic Loggers have a dependency on the `api` module, but do not have any implementation dependencies.
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>fluent</artifactId>
+  <version>0.0.3</version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:fluent:0.0.3" 
+```
+
 
 ## SLF4J API
 
