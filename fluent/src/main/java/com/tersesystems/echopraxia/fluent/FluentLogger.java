@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.fluent;
 
+import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.CoreLogger;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
@@ -16,6 +17,16 @@ public class FluentLogger<FB extends Field.Builder> {
   public FluentLogger(CoreLogger core, FB builder) {
     this.core = core;
     this.builder = builder;
+  }
+
+  public FluentLogger<FB> withCondition(Condition c) {
+    CoreLogger coreLogger = core.withCondition(c);
+    return new FluentLogger<>(coreLogger, builder);
+  }
+
+  public FluentLogger<FB> withFields(Field.BuilderFunction<FB> f) {
+    CoreLogger coreLogger = core.withFields(f, builder);
+    return new FluentLogger<>(coreLogger, builder);
   }
 
   public EntryBuilder atError() {
@@ -45,10 +56,16 @@ public class FluentLogger<FB extends Field.Builder> {
   public class EntryBuilder {
     private final Level level;
     private String message;
+    private Condition condition = Condition.always();
     private final List<Function<FB, Field>> argumentFnList = new ArrayList<>();
 
     EntryBuilder(Level level) {
       this.level = level;
+    }
+
+    public EntryBuilder condition(Condition condition) {
+      this.condition = this.condition.and(condition);
+      return this;
     }
 
     public EntryBuilder message(String message) {
@@ -68,6 +85,7 @@ public class FluentLogger<FB extends Field.Builder> {
     public void log() {
       core.log(
           level,
+          condition,
           message,
           b -> argumentFnList.stream().map(f -> f.apply(b)).collect(Collectors.toList()),
           builder);
