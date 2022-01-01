@@ -32,7 +32,7 @@ public class FluentLoggerTest {
 
     logger
         .atInfo()
-        .message("name {} age {}")
+        .message("name = {}, age = {}")
         .argument(b -> b.string("name", person.name))
         .argument(b -> b.number("age", person.age))
         .log();
