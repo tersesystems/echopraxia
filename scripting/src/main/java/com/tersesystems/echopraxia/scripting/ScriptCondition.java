@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.scripting;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.LoggingContext;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.function.Consumer;
@@ -28,14 +27,14 @@ public class ScriptCondition implements Condition {
     return new ScriptCondition(scriptManager, defaultValue);
   }
 
-    /**
-     * Creates a condition from a passed in Tweakflow script.
-     *
-     * @param defaultValue the value to return if there's an exception in the flow.
-     * @param script the script
-     * @param reporter the reporter of any exceptions in the condition
-     * @return the condition backed by script.
-     */
+  /**
+   * Creates a condition from a passed in Tweakflow script.
+   *
+   * @param defaultValue the value to return if there's an exception in the flow.
+   * @param script the script
+   * @param reporter the reporter of any exceptions in the condition
+   * @return the condition backed by script.
+   */
   public static Condition create(
       boolean defaultValue, String script, Consumer<Throwable> reporter) {
     ScriptHandle handle =
@@ -50,12 +49,12 @@ public class ScriptCondition implements Condition {
             return script;
           }
 
-            @Override
-            public String path() {
-                return "<memory>";
-            }
+          @Override
+          public String path() {
+            return "<memory>";
+          }
 
-            @Override
+          @Override
           public void report(Throwable e) {
             reporter.accept(e);
           }

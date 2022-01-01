@@ -1,4 +1,11 @@
+# https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow
 # https://twineworks.github.io/tweakflow/reference.html
+# https://twineworks.github.io/tweakflow/modules/std.html#std
+
+import * as std from "std";
+
+# local alias for imported library
+alias std.strings as str;
 
 library echopraxia {
 
@@ -7,5 +14,6 @@ library echopraxia {
   #
   doc 'Evaluates if person age is less than 13'
   function evaluate: (string level, dict fields) ->
-     (fields[:person][:age] <= "13");
+    str.lower_case(fields[:person][:name]) == "will";
+    
 }

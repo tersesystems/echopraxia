@@ -1,5 +1,9 @@
 package com.tersesystems.echopraxia.scripting;
 
+import static java.util.Collections.singletonList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -7,15 +11,11 @@ import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
-import org.junit.jupiter.api.Test;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-
-import static java.util.Collections.singletonList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ScriptConditionTest {
 
@@ -57,7 +57,7 @@ public class ScriptConditionTest {
     logger
         .withFields(
             fb -> {
-              Field name = fb.string("name", "will");
+              Field name = fb.string("name", "Will");
               Field age = fb.number("age", 13);
               Field toys = fb.array("toys", Field.Value.string("binkie"));
               Field person = fb.object("person", name, age, toys);
@@ -69,6 +69,11 @@ public class ScriptConditionTest {
     List<ILoggingEvent> list = listAppender.list;
     ILoggingEvent event = list.get(0);
     assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @BeforeEach
+  public void beforeEach() {
+    getListAppender().list.clear();
   }
 
   LoggerContext loggerContext() {

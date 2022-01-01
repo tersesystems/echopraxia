@@ -13,13 +13,12 @@ import java.util.stream.Collectors;
 /**
  * A script handle that uses a direct path and verifies it by checking the last modified time.
  *
- * Note that this does mean that there's a filesystem access on every script evaluation, but
+ * <p>Note that this does mean that there's a filesystem access on every script evaluation, but
  * since it's just checking the file metadata to ask if it's changed, my belief is that most
- * filesystems can return this information pretty fast.  (Don't blame me if this tanks your
+ * filesystems can return this information pretty fast. (Don't blame me if this tanks your
  * application.)
  *
- * Errors are sent to the reporter.
- *
+ * <p>Errors are sent to the reporter.
  */
 public class FileScriptHandle implements ScriptHandle {
 
@@ -27,14 +26,13 @@ public class FileScriptHandle implements ScriptHandle {
   private final Consumer<Throwable> reporter;
   private final AtomicReference<FileTime> lastModified;
 
-  public FileScriptHandle(
-      Path path, Consumer<Throwable> reporter) {
+  public FileScriptHandle(Path path, Consumer<Throwable> reporter) {
     this.path = path;
     this.reporter = reporter;
     try {
-        lastModified = new AtomicReference<>(Files.getLastModifiedTime(path.toAbsolutePath()));
+      lastModified = new AtomicReference<>(Files.getLastModifiedTime(path.toAbsolutePath()));
     } catch (IOException e) {
-        throw new ScriptException(e);
+      throw new ScriptException(e);
     }
   }
 
@@ -60,12 +58,12 @@ public class FileScriptHandle implements ScriptHandle {
     return readString(path);
   }
 
-    @Override
-    public String path() {
-        return path.toString();
-    }
+  @Override
+  public String path() {
+    return path.toString();
+  }
 
-    protected String readString(Path path) throws IOException {
+  protected String readString(Path path) throws IOException {
     try (BufferedReader reader = Files.newBufferedReader(path)) {
       return reader.lines().collect(Collectors.joining("\n"));
     }

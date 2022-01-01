@@ -12,16 +12,16 @@ public interface ScriptHandle {
   /** @return the code of the script. */
   String script() throws IOException;
 
-    String path();
+  String path();
 
-    default String libraryName() {
-        return "echopraxia";
-    }
+  default String libraryName() {
+    return "echopraxia";
+  }
 
-    default String functionName() {
-        return "evaluate";
-    }
+  default String functionName() {
+    return "evaluate";
+  }
 
-    /** If evaluating or parsing the script throws an exception, this method is called. */
+  /** If evaluating or parsing the script throws an exception, this method is called. */
   void report(Throwable e);
 }

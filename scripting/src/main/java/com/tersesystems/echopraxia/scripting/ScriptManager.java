@@ -9,7 +9,6 @@ import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.values.Value;
 import com.twineworks.tweakflow.lang.values.Values;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +18,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * ScriptManager class.
  *
- * This does the work of evaluating a Tweakflow script from a ScriptHandle.
+ * <p>This does the work of evaluating a Tweakflow script from a ScriptHandle.
  */
 public class ScriptManager {
 
