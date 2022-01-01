@@ -24,14 +24,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:logstash:0.0.1" 
+implementation "com.tersesystems.echopraxia:logstash:0.0.2" 
 ```
 
 ## Basic Usage
@@ -186,6 +186,92 @@ Conditions can also be used in blocks for expensive objects.
 if (logger.isInfoEnabled(condition)) {
   // only true if condition and is info  
 }
+```
+
+## Dynamic Conditions with Scripts
+
+One of the limitations of logging is that it's not that easy to change logging levels in an application at run-time.  In modern applications, you typically have complex inputs and may want to enable logging for some very specific inputs without turning on your logging globally.
+
+Script Conditions lets you tie your conditions to scripts that you can change and re-evaluate at runtime.
+
+The security concerns surrounding Groovy or Javascript make them unsuitable in a logging environment.  Fortunately, Echopraxia provides a [Tweakflow](https://twineworks.github.io/tweakflow) script integration that lets you evaluate logging statements **safely**.
+
+Because Scripting has a dependency on Tweakflow, it is broken out into a distinct library that you must add to your build.
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>scripting</artifactId>
+  <version>0.0.2</version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:scripting:0.0.2" 
+```
+
+### File Based Scripts
+
+Creating a script condition is done with `ScriptCondition.create`:
+
+```java
+import com.tersesystems.echopraxia.scripting.*;
+
+Path path = Paths.get("src/test/tweakflow/condition.tf");
+Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
+
+Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+```
+
+Where `condition.tf` contains the following:
+
+```tweakflow
+import * as std from "std";
+alias std.strings as str;
+
+library echopraxia {
+  # level: the logging level
+  # fields: the dictionary of fields
+  function evaluate: (string level, dict fields) ->
+    str.lower_case(fields[:person][:name]) == "will";   
+}
+```
+
+Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
+
+One important thing to note is that creating a script tied to a file will ensure that if the file is touched, the script manager will invalidate the script and re-evaluate it.  This does mean that the condition will check last modified fs metadata on every evaluation, which *should be fine* for most filesystems, but I have not attempted to scale this feature and I vaguely remember something odd happening on Windows NTFS LastModifiedDate.  YMMV.
+
+## String Based Scripts
+
+You also have the option of passing in a string directly, which will never touch last modified date:
+
+```java
+Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
+```
+
+### Custom Source Scripts
+
+You also have the option of creating your own `ScriptHandle` which can be backed by whatever you like, for example you can call out to Consul or a feature flag system for script work:
+
+```groovy
+ScriptHandle handle = new ScriptHandle() {
+  @Override
+  public boolean isInvalid() {
+    return callConsulToCheckWeHaveNewest();
+  }
+
+  @Override
+  public String script() throws IOException {
+    return callConsulForScript();
+  }
+    
+  // ...report / path etc 
+};
+ScriptCondition.create(false, handle);
 ```
 
 ## SLF4J API

@@ -12,6 +12,11 @@ public interface ScriptHandle {
   /** @return the code of the script. */
   String script() throws IOException;
 
+  /**
+   * The path to use when debugging / evaulating the script.
+   *
+   * @return the path
+   */
   String path();
 
   default String libraryName() {

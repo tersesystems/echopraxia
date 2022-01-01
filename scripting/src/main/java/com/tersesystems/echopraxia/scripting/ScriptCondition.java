@@ -23,8 +23,7 @@ public class ScriptCondition implements Condition {
    */
   public static Condition create(boolean defaultValue, Path path, Consumer<Throwable> reporter) {
     ScriptHandle handle = new FileScriptHandle(path, reporter);
-    ScriptManager scriptManager = new ScriptManager(handle);
-    return new ScriptCondition(scriptManager, defaultValue);
+    return create(defaultValue, handle);
   }
 
   /**
@@ -59,6 +58,10 @@ public class ScriptCondition implements Condition {
             reporter.accept(e);
           }
         };
+    return create(defaultValue, handle);
+  }
+
+  public static Condition create(boolean defaultValue, ScriptHandle handle) {
     ScriptManager scriptManager = new ScriptManager(handle);
     return new ScriptCondition(scriptManager, defaultValue);
   }

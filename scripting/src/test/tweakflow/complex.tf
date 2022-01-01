@@ -12,7 +12,6 @@ library echopraxia {
   # level: the logging level
   # fields: the dictionary of fields
   #
-  doc 'Evaluates if person age is less than 13'
   function evaluate: (string level, dict fields) ->
     str.lower_case(fields[:person][:name]) == "will";
     
