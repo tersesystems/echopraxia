@@ -393,7 +393,6 @@ Gradle:
 implementation "com.tersesystems.echopraxia:fluent:0.0.3" 
 ```
 
-
 ## SLF4J API
 
 The SLF4J API are not enabled as part of context.  If you want to use markers specifically, you will need to cast and create loggers by hand, rather than going through `LoggerFactory`.

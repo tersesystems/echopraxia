@@ -1,9 +1,7 @@
 package com.tersesystems.echopraxia.fluent;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.CoreLogger;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -32,6 +30,23 @@ public class FluentLogger<FB extends Field.Builder> {
   public FluentLogger<FB> withFields(Field.BuilderFunction<FB> f) {
     CoreLogger coreLogger = core.withFields(f, builder);
     return new FluentLogger<>(coreLogger, builder);
+  }
+
+  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(T newBuilder) {
+    return new FluentLogger<>(core, newBuilder);
+  }
+
+  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(Class<T> newBuilderClass) {
+    try {
+      final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();
+      return new FluentLogger<>(core, newInstance);
+    } catch (NoSuchMethodException
+        | SecurityException
+        | InstantiationException
+        | IllegalAccessException
+        | InvocationTargetException e) {
+      throw new IllegalStateException(e);
+    }
   }
 
   public EntryBuilder atError() {
