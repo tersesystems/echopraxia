@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerProvider;
+import com.tersesystems.echopraxia.core.CoreLogger;
+import com.tersesystems.echopraxia.core.CoreLoggerProvider;
 import org.slf4j.ILoggerFactory;
 
 /**
@@ -10,15 +9,15 @@ import org.slf4j.ILoggerFactory;
  *
  * <p>This is the main SPI hook into the ServiceLoader.
  */
-public class LogstashLoggerProvider implements LoggerProvider {
+public class LogstashLoggerProvider implements CoreLoggerProvider {
 
-  public Logger<Field.Builder> getLogger(Class<?> clazz) {
+  public CoreLogger getLogger(Class<?> clazz) {
     return getLogger(clazz.getName());
   }
 
-  public Logger<Field.Builder> getLogger(String name) {
+  public CoreLogger getLogger(String name) {
     ILoggerFactory factory = org.slf4j.LoggerFactory.getILoggerFactory();
     org.slf4j.Logger logger = factory.getLogger(name);
-    return new Logger<>(new LogstashCoreLogger(logger), Logger.defaultFieldBuilder());
+    return new LogstashCoreLogger(logger);
   }
 }

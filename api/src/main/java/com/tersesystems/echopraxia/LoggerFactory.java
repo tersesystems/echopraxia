@@ -1,30 +1,15 @@
 package com.tersesystems.echopraxia;
 
-import java.util.Iterator;
-import java.util.ServiceConfigurationError;
-import java.util.ServiceLoader;
+import com.tersesystems.echopraxia.core.Caller;
+import com.tersesystems.echopraxia.core.CoreLogger;
+import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 
 /**
- * The LoggerFactory class returns a logger, using a LoggerProvider returned from service loader.
+ * The LoggerFactory class.
  *
  * <p>{@code Logger logger = LoggerFactory.getLogger(getClass()); }
  */
 public class LoggerFactory {
-
-  private static class LazyHolder {
-    private static LoggerProvider init() {
-      ServiceLoader<LoggerProvider> loader = ServiceLoader.load(LoggerProvider.class);
-      Iterator<LoggerProvider> iterator = loader.iterator();
-      if (iterator.hasNext()) {
-        return iterator.next();
-      } else {
-        String msg = "No LoggerProvider implementation found in classpath!";
-        throw new ServiceConfigurationError(msg);
-      }
-    }
-
-    static final LoggerProvider INSTANCE = init();
-  }
 
   /**
    * Creates a logger using the given class name.
@@ -33,7 +18,21 @@ public class LoggerFactory {
    * @return the logger.
    */
   public static Logger<Field.Builder> getLogger(Class<?> clazz) {
-    return LazyHolder.INSTANCE.getLogger(clazz);
+    final CoreLogger core = CoreLoggerFactory.getLogger(clazz);
+    return getLogger(core, Field.Builder.instance());
+  }
+
+  /**
+   * Creates a logger using the given class name and explicit field builder.
+   *
+   * @param clazz the logger class to use
+   * @param builder the field builder.
+   * @return the logger.
+   * @param <FB> the type of field builder.
+   */
+  public static <FB extends Field.Builder> Logger<FB> getLogger(Class<?> clazz, FB builder) {
+    CoreLogger coreLogger = LoggerFactory.getLogger(clazz).core();
+    return getLogger(coreLogger, builder);
   }
 
   /**
@@ -43,7 +42,21 @@ public class LoggerFactory {
    * @return the logger.
    */
   public static Logger<Field.Builder> getLogger(String name) {
-    return LazyHolder.INSTANCE.getLogger(name);
+    final CoreLogger core = CoreLoggerFactory.getLogger(name);
+    return getLogger(core, Field.Builder.instance());
+  }
+
+  /**
+   * Creates a logger using the given name and an explicit field builder.
+   *
+   * @param name the logger name to use
+   * @param builder the field builder.
+   * @param <FB> the type of field builder.
+   * @return the logger.
+   */
+  public static <FB extends Field.Builder> Logger<FB> getLogger(String name, FB builder) {
+    CoreLogger coreLogger = LoggerFactory.getLogger(name).core();
+    return getLogger(coreLogger, builder);
   }
 
   /**
@@ -52,30 +65,31 @@ public class LoggerFactory {
    * @return the logger.
    */
   public static Logger<Field.Builder> getLogger() {
-    return LazyHolder.INSTANCE.getLogger(Caller.resolveClassName());
+    CoreLogger core = CoreLoggerFactory.getLogger(Caller.resolveClassName());
+    return getLogger(core, Field.Builder.instance());
   }
 
-  public static class Caller {
+  /**
+   * Creates a logger using the caller's class name and an explicit field builder.
+   *
+   * @param fieldBuilder the field builder.
+   * @return the logger.
+   * @param <FB> the type of field builder.
+   */
+  public static <FB extends Field.Builder> Logger<FB> getLogger(FB fieldBuilder) {
+    CoreLogger core = CoreLoggerFactory.getLogger(Caller.resolveClassName());
+    return getLogger(core, fieldBuilder);
+  }
 
-    public static String resolveClassName() {
-      // If we're on JDK 9, we can use
-      // StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-      // Class<?> callerClass = walker.getCallerClass();
-      // However, this works fine: https://stackoverflow.com/a/11306854
-      StackTraceElement[] stElements = Thread.currentThread().getStackTrace();
-      String callerClassName = null;
-      for (int i = 1; i < stElements.length; i++) {
-        StackTraceElement ste = stElements[i];
-        if (!ste.getClassName().equals(Caller.class.getName())
-            && ste.getClassName().indexOf("java.lang.Thread") != 0) {
-          if (callerClassName == null) {
-            callerClassName = ste.getClassName();
-          } else if (!callerClassName.equals(ste.getClassName())) {
-            return ste.getClassName();
-          }
-        }
-      }
-      return null;
-    }
+  /**
+   * Creates a logger from a core logger and a field builder.
+   *
+   * @param core logger
+   * @param fieldBuilder the field builder.
+   * @return the logger.
+   * @param <FB> the type of field builder.
+   */
+  public static <FB extends Field.Builder> Logger<FB> getLogger(CoreLogger core, FB fieldBuilder) {
+    return new Logger<>(core, fieldBuilder);
   }
 }

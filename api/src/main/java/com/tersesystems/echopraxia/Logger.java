@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia;
 
 import static com.tersesystems.echopraxia.Level.*;
 
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -11,29 +12,14 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class Logger<FB extends Field.Builder> {
 
-  protected static final Field.Builder instance = new Default();
-
-  static class Default implements Field.Builder {}
-
-  // XXX field builder should be an SPI instance
-  public static Field.Builder defaultFieldBuilder() {
-    return instance;
-  }
-
   protected final CoreLogger core;
   protected final FB fieldBuilder;
 
-  public Logger(CoreLogger core, FB fieldBuilder) {
+  protected Logger(CoreLogger core, FB fieldBuilder) {
     this.core = core;
     this.fieldBuilder = fieldBuilder;
   }
 
-  // This is useful as an escape hatch so we can cast and call directly, and do
-  // SLF4J specific things...
-  //
-  // LogstashCoreLogger core = (LogstashCoreLogger) logger.core();
-  // var newCore = core.withMarkers(org.slf4j.MarkerFactory.getMarker("SECURITY"))
-  // var newLogger = new Logger(newCore, logger.fieldBuilder());
   public CoreLogger core() {
     return core;
   }

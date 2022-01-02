@@ -8,6 +8,7 @@ import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
@@ -39,10 +40,10 @@ class LoggerTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("hello will, you are 13, citizen status true");
   }
 
-  private Logger<Field.Builder> getLogger() {
-    return new Logger<>(
-        new LogstashCoreLogger(factory.getLogger(getClass().getName())),
-        Logger.defaultFieldBuilder());
+  private Logger<?> getLogger() {
+    LogstashCoreLogger logstashCoreLogger =
+        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 
   @Test

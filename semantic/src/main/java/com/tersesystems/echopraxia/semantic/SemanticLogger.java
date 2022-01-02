@@ -2,6 +2,8 @@ package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.core.CoreLogger;
+
 import java.util.function.Function;
 
 /**
@@ -14,6 +16,8 @@ import java.util.function.Function;
  * @param <DataType> the data type to use as an argument.
  */
 public interface SemanticLogger<DataType> {
+
+  CoreLogger core();
 
   boolean isErrorEnabled();
 

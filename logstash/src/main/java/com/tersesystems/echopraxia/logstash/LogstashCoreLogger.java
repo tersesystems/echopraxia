@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.CoreLogger;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.logstash.logback.argument.StructuredArguments;
@@ -23,7 +23,7 @@ public class LogstashCoreLogger implements CoreLogger {
     this.condition = Condition.always();
   }
 
-  protected LogstashCoreLogger(
+  public LogstashCoreLogger(
       org.slf4j.Logger logger, LogstashLoggingContext context, Condition condition) {
     this.logger = logger;
     this.context = context;
@@ -251,22 +251,30 @@ public class LogstashCoreLogger implements CoreLogger {
     for (Field a : args) {
       final String name = a.name();
       final Field.Value<?> value = a.value();
-      if (value instanceof Field.Value.ArrayValue) {
-        final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
-        Object[] elements = convertValues(values).toArray();
-        arguments.add(StructuredArguments.array(name, elements));
-      } else if (value instanceof Field.Value.ObjectValue) {
-        List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
-        final Object[] fields = convertArguments(fieldArgs, true);
-        arguments.add(StructuredArguments.kv(name, StructuredArguments.fields(fields)));
-      } else if (value instanceof Field.Value.ExceptionValue) {
-        throwable = (Field.Value.ExceptionValue) value;
-      } else {
-        if (verbose) {
-          arguments.add(StructuredArguments.keyValue(name, value.raw()));
-        } else {
-          arguments.add(StructuredArguments.value(name, value.raw()));
-        }
+      switch (value.type()) {
+        case ARRAY:
+          final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
+          Object[] elements = convertValues(values).toArray();
+          arguments.add(StructuredArguments.array(name, elements));
+          break;
+        case OBJECT:
+          List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
+          final Object[] fields = convertArguments(fieldArgs, true);
+          arguments.add(StructuredArguments.kv(name, StructuredArguments.fields(fields)));
+          break;
+        case EXCEPTION:
+          throwable = (Field.Value.ExceptionValue) value;
+          break;
+        case NULL:
+        case BOOLEAN:
+        case NUMBER:
+        case STRING:
+          if (verbose) {
+            arguments.add(StructuredArguments.keyValue(name, value.raw()));
+          } else {
+            arguments.add(StructuredArguments.value(name, value.raw()));
+          }
+          break;
       }
     }
     if (throwable != null) {
@@ -295,14 +303,19 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   protected Object getRawValue(Field.Value<?> value) {
-    if (value instanceof Field.Value.ArrayValue) {
-      final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
-      return convertValues(values);
-    } else if (value instanceof Field.Value.ObjectValue) {
-      List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
-      return convertMarkerFields(fieldArgs);
-    } else {
-      return value.raw();
+    switch (value.type()) {
+      case ARRAY:
+        final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
+        return convertValues(values);
+      case OBJECT:
+        List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
+        return convertMarkerFields(fieldArgs);
+      case STRING:
+      case NUMBER:
+      case BOOLEAN:
+      case EXCEPTION:
+      case NULL:
     }
+    return value.raw();
   }
 }

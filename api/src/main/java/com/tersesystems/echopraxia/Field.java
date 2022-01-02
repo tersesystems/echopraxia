@@ -35,6 +35,10 @@ public interface Field {
   interface Builder {
     String EXCEPTION = "exception";
 
+    static Builder instance() {
+      return new Field.Builder() {};
+    }
+
     // string
 
     /**
