@@ -5,9 +5,7 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 
-/**
- * The factory for FluentLogger.
- */
+/** The factory for FluentLogger. */
 public class FluentLoggerFactory {
 
   public static FluentLogger<Field.Builder> getLogger(Class<?> clazz) {
@@ -26,5 +24,13 @@ public class FluentLoggerFactory {
   public static <FB extends Field.Builder> FluentLogger<FB> getLogger(String name, FB builder) {
     CoreLogger coreLogger = LoggerFactory.getLogger(name).core();
     return new FluentLogger<>(coreLogger, builder);
+  }
+
+  public static FluentLogger<Field.Builder> getLogger() {
+    return getLogger(LoggerFactory.Caller.resolveClassName());
+  }
+
+  public static <FB extends Field.Builder> FluentLogger<Field.Builder> getLogger(FB builder) {
+    return getLogger(LoggerFactory.Caller.resolveClassName(), builder);
   }
 }
