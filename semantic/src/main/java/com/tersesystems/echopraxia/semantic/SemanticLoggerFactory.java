@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.*;
+
 import java.util.function.Function;
 
 /**
@@ -96,6 +97,47 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
     return getLogger(clazz, dataTypeClass, messageFunction, f, Logger.defaultFieldBuilder());
+  }
+
+  /**
+   * Creates a semantic logger using the caller's class name and a default field builder.
+   *
+   * @param dataTypeClass the class of the data type.
+   * @param messageFunction the function to render a message template.
+   * @param f the datatype to builder function.
+   * @param <DataType> the type of data to render as an argument.
+   * @return an implementation of semantic logger.
+   */
+  public static <DataType> SemanticLogger<DataType> getLogger(
+      Class<DataType> dataTypeClass,
+      Function<DataType, String> messageFunction,
+      Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
+    return getLogger(
+        LoggerFactory.Caller.resolveClassName(),
+        dataTypeClass,
+        messageFunction,
+        f,
+        Logger.defaultFieldBuilder());
+  }
+
+  /**
+   * Creates a semantic logger using the caller's class name and an explicit field builder.
+   *
+   * @param dataTypeClass the class of the data type.
+   * @param messageFunction the function to render a message template.
+   * @param f the datatype to builder function.
+   * @param builder the field builder to use in the builder function.
+   * @param <DataType> the type of data to render as an argument.
+   * @return an implementation of semantic logger.
+   * @param <FB> the field builder type.
+   */
+  public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
+      Class<DataType> dataTypeClass,
+      Function<DataType, String> messageFunction,
+      Function<DataType, Field.BuilderFunction<Field.Builder>> f,
+      FB builder) {
+    return getLogger(
+        LoggerFactory.Caller.resolveClassName(), dataTypeClass, messageFunction, f, builder);
   }
 
   // The implementation uses a field builder type, but we can cheat and hide this by only
