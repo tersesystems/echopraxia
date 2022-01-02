@@ -12,7 +12,7 @@ public class Main {
 
   // For basic logging, you can alway use the `Logger<?>` syntax
   // which gives you a basic field builder.
-  Logger<?> basicLogger = LoggerFactory.getLogger(getClass());
+  Logger<?> basicLogger = LoggerFactory.getLogger();
 
   // More often you'll want to create a logger with your own domain objects and render those.
   // So we start with the basic logger...
