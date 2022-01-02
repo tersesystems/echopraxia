@@ -375,7 +375,7 @@ logger
 
 ### Installation
 
-Semantic Loggers have a dependency on the `api` module, but do not have any implementation dependencies.
+Fluent Loggers have a dependency on the `api` module, but do not have any implementation dependencies.
 
 Maven:
 
@@ -395,7 +395,7 @@ implementation "com.tersesystems.echopraxia:fluent:1.0.0"
 
 ## Core Logger and SLF4J API
 
-The SLF4J API are not enabled as part of context.  If you want to use markers specifically, you will need to use a core logger.
+The SLF4J API are not exposed normally.  If you want to use SLF4J features like markers specifically, you will need to use a core logger.
 
 First, import the `logstash` package and the `core` package:
 
