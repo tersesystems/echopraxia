@@ -28,14 +28,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
-  <version>0.0.3</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:logstash:0.0.3" 
+implementation "com.tersesystems.echopraxia:logstash:1.0.0" 
 ```
 
 ## Basic Usage
@@ -208,14 +208,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>scripting</artifactId>
-  <version>0.0.2</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:scripting:0.0.2" 
+implementation "com.tersesystems.echopraxia:scripting:1.0.0" 
 ```
 
 ### File Based Scripts
@@ -342,14 +342,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>semantic</artifactId>
-  <version>0.0.3</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:semantic:0.0.3" 
+implementation "com.tersesystems.echopraxia:semantic:1.0.0" 
 ```
 
 ## Fluent Logging
@@ -383,14 +383,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>fluent</artifactId>
-  <version>0.0.3</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:fluent:0.0.3" 
+implementation "com.tersesystems.echopraxia:fluent:1.0.0" 
 ```
 
 ## Core Logger and SLF4J API
