@@ -46,11 +46,11 @@ public class LoggerFactory {
     return LazyHolder.INSTANCE.getLogger(name);
   }
 
-    /**
-     * Creates a logger using the caller's class name.
-     *
-     * @return the logger.
-     */
+  /**
+   * Creates a logger using the caller's class name.
+   *
+   * @return the logger.
+   */
   public static Logger<Field.Builder> getLogger() {
     return LazyHolder.INSTANCE.getLogger(Caller.resolveClassName());
   }

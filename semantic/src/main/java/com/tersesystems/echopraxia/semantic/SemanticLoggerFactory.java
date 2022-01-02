@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.*;
-
 import java.util.function.Function;
 
 /**

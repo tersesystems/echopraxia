@@ -1,10 +1,11 @@
 rootProject.name = 'echopraxia'
+
 include('api')
 include('logstash')
 include('example')
 
 // Add extra behaviors as modules
 include('scripting')
-// include('fluent')
+include('fluent')
 include('semantic')
 // include('flow')
