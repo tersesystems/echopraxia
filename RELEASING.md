@@ -80,3 +80,9 @@ gpg: signing failed: Cannot allocate memory
 [Gradle is not smart enough to disable this](https://github.com/gradle/gradle/issues/12167).
 
 Do not use `-Porg.gradle.parallel=false` and don't use `--parallel` when publishing.
+
+## Snapshots
+
+If you deploy snapshots to sonatype, you don't get the jar files.  
+
+No idea why this happens, but for now only use staging without the -SNAPSHOT prefix.
