@@ -20,12 +20,6 @@ public class Logger<FB extends Field.Builder> {
     this.fieldBuilder = fieldBuilder;
   }
 
-  // This is useful as an escape hatch so we can cast and call directly, and do
-  // SLF4J specific things...
-  //
-  // LogstashCoreLogger core = (LogstashCoreLogger) logger.core();
-  // var newCore = core.withMarkers(org.slf4j.MarkerFactory.getMarker("SECURITY"))
-  // var newLogger = new Logger(newCore, logger.fieldBuilder());
   public CoreLogger core() {
     return core;
   }

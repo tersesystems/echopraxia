@@ -163,22 +163,39 @@ public class SemanticLoggerFactory {
   // The implementation uses a field builder type, but we can cheat and hide this by only
   // exposing the interface, on the basis that people will generally put up with so many
   // magic generic angle bracket type things.
-  static class Impl<DataType, FB extends Field.Builder> implements SemanticLogger<DataType> {
+  public static class Impl<DataType, FB extends Field.Builder> implements SemanticLogger<DataType> {
 
     private final CoreLogger core;
-    private final Function<DataType, Field.BuilderFunction<FB>> f;
+    private final Function<DataType, Field.BuilderFunction<FB>> builderFunction;
     private final FB builder;
     private final Function<DataType, String> messageFunction;
 
-    Impl(
+    protected Impl(
         CoreLogger core,
         FB builder,
         Function<DataType, String> messageFunction,
-        Function<DataType, Field.BuilderFunction<FB>> f) {
+        Function<DataType, Field.BuilderFunction<FB>> builderFunction) {
       this.core = core;
-      this.f = f;
+      this.builderFunction = builderFunction;
       this.messageFunction = messageFunction;
       this.builder = builder;
+    }
+
+    @Override
+    public CoreLogger core() {
+      return core;
+    }
+
+    public FB fieldBuilder() {
+      return builder;
+    }
+
+    public Function<DataType, String> messageFunction() {
+      return messageFunction;
+    }
+
+    public Function<DataType, Field.BuilderFunction<FB>> builderFunction() {
+      return builderFunction;
     }
 
     @Override
@@ -194,14 +211,14 @@ public class SemanticLoggerFactory {
     @Override
     public void error(DataType data) {
       if (core.isEnabled(Level.ERROR)) {
-        core.log(Level.ERROR, convertMessage(data), f.apply(data), builder);
+        core.log(Level.ERROR, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
     public void error(Condition c, DataType data) {
       if (core.isEnabled(Level.ERROR, c)) {
-        core.log(Level.ERROR, convertMessage(data), f.apply(data), builder);
+        core.log(Level.ERROR, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
@@ -222,14 +239,14 @@ public class SemanticLoggerFactory {
     @Override
     public void warn(DataType data) {
       if (core.isEnabled(Level.WARN)) {
-        core.log(Level.WARN, convertMessage(data), f.apply(data), builder);
+        core.log(Level.WARN, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
     public void warn(Condition c, DataType data) {
       if (core.isEnabled(Level.WARN, c)) {
-        core.log(Level.WARN, convertMessage(data), f.apply(data), builder);
+        core.log(Level.WARN, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
@@ -246,14 +263,14 @@ public class SemanticLoggerFactory {
     @Override
     public void info(DataType data) {
       if (core.isEnabled(Level.INFO)) {
-        core.log(Level.INFO, convertMessage(data), f.apply(data), builder);
+        core.log(Level.INFO, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
     public void info(Condition c, DataType data) {
       if (core.isEnabled(Level.INFO, c)) {
-        core.log(Level.INFO, convertMessage(data), f.apply(data), builder);
+        core.log(Level.INFO, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
@@ -270,14 +287,14 @@ public class SemanticLoggerFactory {
     @Override
     public void debug(DataType data) {
       if (core.isEnabled(Level.DEBUG)) {
-        core.log(Level.DEBUG, convertMessage(data), f.apply(data), builder);
+        core.log(Level.DEBUG, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
     public void debug(Condition c, DataType data) {
       if (core.isEnabled(Level.DEBUG, c)) {
-        core.log(Level.DEBUG, convertMessage(data), f.apply(data), builder);
+        core.log(Level.DEBUG, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
@@ -294,21 +311,21 @@ public class SemanticLoggerFactory {
     @Override
     public void trace(DataType data) {
       if (core.isEnabled(Level.TRACE)) {
-        core.log(Level.TRACE, convertMessage(data), f.apply(data), builder);
+        core.log(Level.TRACE, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
     public void trace(Condition c, DataType data) {
       if (core.isEnabled(Level.TRACE, c)) {
-        core.log(Level.TRACE, convertMessage(data), f.apply(data), builder);
+        core.log(Level.TRACE, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
     public SemanticLogger<DataType> withCondition(Condition c) {
       final CoreLogger coreLogger = core.withCondition(c);
-      return new SemanticLoggerFactory.Impl<>(coreLogger, builder, messageFunction, f);
+      return new SemanticLoggerFactory.Impl<>(coreLogger, builder, messageFunction, builderFunction);
     }
 
     @Override
@@ -320,12 +337,12 @@ public class SemanticLoggerFactory {
     public <CFB extends Field.Builder> SemanticLogger<DataType> withFields(
         Field.BuilderFunction<CFB> ctxBuilderF, CFB ctxBuilder) {
       final CoreLogger coreLogger = core.withFields(ctxBuilderF, ctxBuilder);
-      return new SemanticLoggerFactory.Impl<>(coreLogger, builder, messageFunction, f);
+      return new SemanticLoggerFactory.Impl<>(coreLogger, builder, messageFunction, builderFunction);
     }
 
     @Override
     public SemanticLogger<DataType> withMessage(Function<DataType, String> messageFunction) {
-      return new SemanticLoggerFactory.Impl<>(core, builder, messageFunction, f);
+      return new SemanticLoggerFactory.Impl<>(core, builder, messageFunction, builderFunction);
     }
   }
 }
