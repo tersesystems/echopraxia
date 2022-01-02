@@ -12,15 +12,6 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class Logger<FB extends Field.Builder> {
 
-  protected static final Field.Builder instance = new Default();
-
-  static class Default implements Field.Builder {}
-
-  // XXX field builder should be an SPI instance
-  public static Field.Builder defaultFieldBuilder() {
-    return instance;
-  }
-
   protected final CoreLogger core;
   protected final FB fieldBuilder;
 

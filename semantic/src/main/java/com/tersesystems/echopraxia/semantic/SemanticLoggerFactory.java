@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.util.function.Function;
@@ -79,7 +80,7 @@ public class SemanticLoggerFactory {
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
-    return getLogger(name, dataTypeClass, messageFunction, f, Logger.defaultFieldBuilder());
+    return getLogger(name, dataTypeClass, messageFunction, f, Field.Builder.instance());
   }
 
   /**
@@ -97,7 +98,7 @@ public class SemanticLoggerFactory {
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
-    return getLogger(clazz, dataTypeClass, messageFunction, f, Logger.defaultFieldBuilder());
+    return getLogger(clazz, dataTypeClass, messageFunction, f, Field.Builder.instance());
   }
 
   /**
@@ -114,11 +115,7 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
     return getLogger(
-        CoreLoggerFactory.Caller.resolveClassName(),
-        dataTypeClass,
-        messageFunction,
-        f,
-        Logger.defaultFieldBuilder());
+        Caller.resolveClassName(), dataTypeClass, messageFunction, f, Field.Builder.instance());
   }
 
   /**
@@ -137,8 +134,7 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<Field.Builder>> f,
       FB builder) {
-    return getLogger(
-        CoreLoggerFactory.Caller.resolveClassName(), dataTypeClass, messageFunction, f, builder);
+    return getLogger(Caller.resolveClassName(), dataTypeClass, messageFunction, f, builder);
   }
 
   /**

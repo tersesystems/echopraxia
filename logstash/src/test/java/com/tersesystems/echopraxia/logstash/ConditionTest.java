@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Level;
-import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.*;
 import org.junit.jupiter.api.Test;
 
 public class ConditionTest extends TestBase {
@@ -24,9 +22,9 @@ public class ConditionTest extends TestBase {
   }
 
   private Logger<?> getLogger() {
-    return new Logger<>(
-        new LogstashCoreLogger(factory.getLogger(getClass().getName())),
-        Logger.defaultFieldBuilder());
+    final LogstashCoreLogger logstashCoreLogger =
+        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 
   @Test

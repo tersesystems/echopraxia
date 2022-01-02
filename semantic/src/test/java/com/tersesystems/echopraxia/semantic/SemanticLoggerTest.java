@@ -6,7 +6,7 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.logstash.LogstashCoreLogger;
 import java.util.Arrays;
 import java.util.List;
@@ -54,7 +54,7 @@ public class SemanticLoggerTest {
             Person.class,
             person -> "person.name = {}, person.age = {}",
             p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)),
-            Logger.defaultFieldBuilder());
+            Field.Builder.instance());
 
     Person eloise = new Person("Eloise", 1);
     logger.info(eloise);

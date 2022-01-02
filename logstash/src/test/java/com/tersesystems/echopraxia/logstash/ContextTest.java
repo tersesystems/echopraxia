@@ -8,6 +8,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.HashMap;
 import java.util.Map;
 import net.logstash.logback.marker.LogstashMarker;
@@ -20,12 +21,11 @@ public class ContextTest extends TestBase {
 
   @Test
   void testMarkers() {
-    Logger<?> baseLogger = getLogger();
     //
-    LogstashCoreLogger core = (LogstashCoreLogger) baseLogger.core();
+    final LogstashCoreLogger core = new LogstashCoreLogger(factory.getLogger(getClass().getName()));
     Logger<?> logger =
-        new Logger<>(
-            core.withMarkers(MarkerFactory.getMarker("SECURITY")), baseLogger.fieldBuilder());
+        LoggerFactory.getLogger(
+            core.withMarkers(MarkerFactory.getMarker("SECURITY")), Field.Builder.instance());
     logger.withFields(f -> f.onlyString("key", "value")).error("This has a marker");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -40,9 +40,9 @@ public class ContextTest extends TestBase {
   }
 
   private Logger<?> getLogger() {
-    return new Logger<>(
-        new LogstashCoreLogger(factory.getLogger(getClass().getName())),
-        Logger.defaultFieldBuilder());
+    final LogstashCoreLogger logstashCoreLogger =
+        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 
   @Test

@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia;
 
+import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 
@@ -18,7 +19,7 @@ public class LoggerFactory {
    */
   public static Logger<Field.Builder> getLogger(Class<?> clazz) {
     final CoreLogger core = CoreLoggerFactory.getLogger(clazz);
-    return getLogger(core, Logger.defaultFieldBuilder());
+    return getLogger(core, Field.Builder.instance());
   }
 
   /**
@@ -29,7 +30,7 @@ public class LoggerFactory {
    */
   public static Logger<Field.Builder> getLogger(String name) {
     final CoreLogger core = CoreLoggerFactory.getLogger(name);
-    return getLogger(core, Logger.defaultFieldBuilder());
+    return getLogger(core, Field.Builder.instance());
   }
 
   /**
@@ -38,8 +39,8 @@ public class LoggerFactory {
    * @return the logger.
    */
   public static Logger<Field.Builder> getLogger() {
-    CoreLogger core = CoreLoggerFactory.getLogger(CoreLoggerFactory.Caller.resolveClassName());
-    return getLogger(core, Logger.defaultFieldBuilder());
+    CoreLogger core = CoreLoggerFactory.getLogger(Caller.resolveClassName());
+    return getLogger(core, Field.Builder.instance());
   }
 
   /**
