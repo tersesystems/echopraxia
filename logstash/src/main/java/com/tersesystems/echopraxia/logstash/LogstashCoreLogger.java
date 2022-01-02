@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.CoreLogger;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
 import java.util.stream.Collectors;
 import net.logstash.logback.argument.StructuredArguments;
@@ -17,13 +17,13 @@ public class LogstashCoreLogger implements CoreLogger {
   private final LogstashLoggingContext context;
   private final Condition condition;
 
-  protected LogstashCoreLogger(org.slf4j.Logger logger) {
+  public LogstashCoreLogger(org.slf4j.Logger logger) {
     this.logger = logger;
     this.context = new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
     this.condition = Condition.always();
   }
 
-  protected LogstashCoreLogger(
+  public LogstashCoreLogger(
       org.slf4j.Logger logger, LogstashLoggingContext context, Condition condition) {
     this.logger = logger;
     this.context = context;

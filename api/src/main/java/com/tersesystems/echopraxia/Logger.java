@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia;
 
 import static com.tersesystems.echopraxia.Level.*;
 
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 
 /**
@@ -23,7 +24,7 @@ public class Logger<FB extends Field.Builder> {
   protected final CoreLogger core;
   protected final FB fieldBuilder;
 
-  public Logger(CoreLogger core, FB fieldBuilder) {
+  protected Logger(CoreLogger core, FB fieldBuilder) {
     this.core = core;
     this.fieldBuilder = fieldBuilder;
   }

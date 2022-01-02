@@ -1,4 +1,8 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.core;
+
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Level;
 
 /**
  * The core logger API.

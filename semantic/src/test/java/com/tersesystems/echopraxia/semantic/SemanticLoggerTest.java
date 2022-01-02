@@ -6,10 +6,13 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.logstash.LogstashCoreLogger;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MarkerFactory;
 
 public class SemanticLoggerTest {
 
@@ -31,6 +34,27 @@ public class SemanticLoggerTest {
             Person.class,
             person -> "person.name = {}, person.age = {}",
             p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)));
+
+    Person eloise = new Person("Eloise", 1);
+    logger.info(eloise);
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getFormattedMessage()).isEqualTo("person.name = Eloise, person.age = 1");
+  }
+
+  @Test
+  public void testLoggerWithLogstashEscape() {
+    LogstashCoreLogger coreLogger =
+        new LogstashCoreLogger(org.slf4j.LoggerFactory.getLogger(getClass()));
+    SemanticLogger<Person> logger =
+        SemanticLoggerFactory.getLogger(
+            coreLogger.withMarkers(MarkerFactory.getMarker("SECURITY")),
+            Person.class,
+            person -> "person.name = {}, person.age = {}",
+            p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)),
+            Logger.defaultFieldBuilder());
 
     Person eloise = new Person("Eloise", 1);
     logger.info(eloise);

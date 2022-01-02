@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.core.CoreLogger;
+import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.util.function.Function;
 
 /**
@@ -36,8 +38,8 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<FB>> f,
       FB builder) {
-    CoreLogger coreLogger = LoggerFactory.getLogger(clazz).core();
-    return new Impl<>(coreLogger, builder, messageFunction, f);
+    CoreLogger coreLogger = CoreLoggerFactory.getLogger(clazz);
+    return getLogger(coreLogger, dataTypeClass, messageFunction, f, builder);
   }
 
   /**
@@ -58,8 +60,8 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<FB>> f,
       FB builder) {
-    CoreLogger coreLogger = LoggerFactory.getLogger(name).core();
-    return new Impl<>(coreLogger, builder, messageFunction, f);
+    CoreLogger coreLogger = CoreLoggerFactory.getLogger(name);
+    return getLogger(coreLogger, dataTypeClass, messageFunction, f, builder);
   }
 
   /**
@@ -112,7 +114,7 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
     return getLogger(
-        LoggerFactory.Caller.resolveClassName(),
+        CoreLoggerFactory.Caller.resolveClassName(),
         dataTypeClass,
         messageFunction,
         f,
@@ -136,7 +138,29 @@ public class SemanticLoggerFactory {
       Function<DataType, Field.BuilderFunction<Field.Builder>> f,
       FB builder) {
     return getLogger(
-        LoggerFactory.Caller.resolveClassName(), dataTypeClass, messageFunction, f, builder);
+        CoreLoggerFactory.Caller.resolveClassName(), dataTypeClass, messageFunction, f, builder);
+  }
+
+  /**
+   * Creates a semantic logger using a core logger.
+   *
+   * <p>Useful when you need an escape hatch for an implementation.
+   *
+   * @param coreLogger a core logger.
+   * @param messageFunction the function to render a message template.
+   * @param f the datatype to builder function.
+   * @param builder the field builder to use in the builder function.
+   * @param <DataType> the type of data to render as an argument.
+   * @return an implementation of semantic logger.
+   * @param <FB> the field builder type.
+   */
+  public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
+      CoreLogger coreLogger,
+      Class<DataType> dataTypeClass,
+      Function<DataType, String> messageFunction,
+      Function<DataType, Field.BuilderFunction<FB>> f,
+      FB builder) {
+    return new Impl<>(coreLogger, builder, messageFunction, f);
   }
 
   // The implementation uses a field builder type, but we can cheat and hide this by only

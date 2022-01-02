@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,9 +18,17 @@ public class FluentLogger<FB extends Field.Builder> {
   private final CoreLogger core;
   private final FB builder;
 
-  public FluentLogger(CoreLogger core, FB builder) {
+  protected FluentLogger(CoreLogger core, FB builder) {
     this.core = core;
     this.builder = builder;
+  }
+
+  public CoreLogger core() {
+    return core;
+  }
+
+  public FB fieldBuilder() {
+    return builder;
   }
 
   public FluentLogger<FB> withCondition(Condition c) {
