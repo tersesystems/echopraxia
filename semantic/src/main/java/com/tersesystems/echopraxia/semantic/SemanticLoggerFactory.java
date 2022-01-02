@@ -143,6 +143,7 @@ public class SemanticLoggerFactory {
    * <p>Useful when you need an escape hatch for an implementation.
    *
    * @param coreLogger a core logger.
+   * @param dataTypeClass the class of the data type.
    * @param messageFunction the function to render a message template.
    * @param f the datatype to builder function.
    * @param builder the field builder to use in the builder function.

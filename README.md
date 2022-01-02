@@ -393,28 +393,30 @@ Gradle:
 implementation "com.tersesystems.echopraxia:fluent:0.0.3" 
 ```
 
-## SLF4J API
+## Core Logger and SLF4J API
 
-The SLF4J API are not enabled as part of context.  If you want to use markers specifically, you will need to cast and create loggers by hand, rather than going through `LoggerFactory`.
+The SLF4J API are not enabled as part of context.  If you want to use markers specifically, you will need to use a core logger.
 
-First, import the `logstash` package:
+First, import the `logstash` package and the `core` package:
 
 ```java
 import com.tersesystems.echopraxia.logstash.*;
+import com.tersesystems.echopraxia.core.*;
 ```
 
-The `LogstashCoreLogger` has a `withMarkers` method that can be used, and can be passed through:
+This gets you access to the `CoreLogger` and `CoreLoggerFactory`, which is used as a backing logger.
+
+The `LogstashCoreLogger` has a `withMarkers` method that takes an SLF4J marker:
 
 ```java
-Logger<?> baseLogger = getLogger();
-LogstashCoreLogger core = (LogstashCoreLogger) baseLogger.core();
-Logger<?> logger = new Logger<>(core.withMarkers(MarkerFactory.getMarker("SECURITY")), baseLogger.fieldBuilder());
+LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
+Logger<?> logger = LoggerFactory.getLogger(core.withMarkers(MarkerFactory.getMarker("SECURITY")), Field.Builder.instance);
 ```
 
-Likewise, you need to get at the SLF4J API, you can cast and call `core.logger()`:
+Likewise, you need to get at the SLF4J logger from a core logger, you can cast and call `core.logger()`:
 
 ```java
-Logger<?> baseLogger = getLogger();
+Logger<?> baseLogger = LoggerFactory.getLogger();
 LogstashCoreLogger core = (LogstashCoreLogger) baseLogger.core();
 org.slf4j.Logger slf4jLogger = core.logger();
 ```

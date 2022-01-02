@@ -17,7 +17,7 @@ public class LogstashCoreLogger implements CoreLogger {
   private final LogstashLoggingContext context;
   private final Condition condition;
 
-  public LogstashCoreLogger(org.slf4j.Logger logger) {
+  protected LogstashCoreLogger(org.slf4j.Logger logger) {
     this.logger = logger;
     this.context = new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
     this.condition = Condition.always();
@@ -251,22 +251,30 @@ public class LogstashCoreLogger implements CoreLogger {
     for (Field a : args) {
       final String name = a.name();
       final Field.Value<?> value = a.value();
-      if (value instanceof Field.Value.ArrayValue) {
-        final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
-        Object[] elements = convertValues(values).toArray();
-        arguments.add(StructuredArguments.array(name, elements));
-      } else if (value instanceof Field.Value.ObjectValue) {
-        List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
-        final Object[] fields = convertArguments(fieldArgs, true);
-        arguments.add(StructuredArguments.kv(name, StructuredArguments.fields(fields)));
-      } else if (value instanceof Field.Value.ExceptionValue) {
-        throwable = (Field.Value.ExceptionValue) value;
-      } else {
-        if (verbose) {
-          arguments.add(StructuredArguments.keyValue(name, value.raw()));
-        } else {
-          arguments.add(StructuredArguments.value(name, value.raw()));
-        }
+      switch (value.type()) {
+        case ARRAY:
+          final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
+          Object[] elements = convertValues(values).toArray();
+          arguments.add(StructuredArguments.array(name, elements));
+          break;
+        case OBJECT:
+          List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
+          final Object[] fields = convertArguments(fieldArgs, true);
+          arguments.add(StructuredArguments.kv(name, StructuredArguments.fields(fields)));
+          break;
+        case EXCEPTION:
+          throwable = (Field.Value.ExceptionValue) value;
+          break;
+        case NULL:
+        case BOOLEAN:
+        case NUMBER:
+        case STRING:
+          if (verbose) {
+            arguments.add(StructuredArguments.keyValue(name, value.raw()));
+          } else {
+            arguments.add(StructuredArguments.value(name, value.raw()));
+          }
+          break;
       }
     }
     if (throwable != null) {
@@ -295,14 +303,19 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   protected Object getRawValue(Field.Value<?> value) {
-    if (value instanceof Field.Value.ArrayValue) {
-      final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
-      return convertValues(values);
-    } else if (value instanceof Field.Value.ObjectValue) {
-      List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
-      return convertMarkerFields(fieldArgs);
-    } else {
-      return value.raw();
+    switch (value.type()) {
+      case ARRAY:
+        final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
+        return convertValues(values);
+      case OBJECT:
+        List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
+        return convertMarkerFields(fieldArgs);
+      case STRING:
+      case NUMBER:
+      case BOOLEAN:
+      case EXCEPTION:
+      case NULL:
     }
+    return value.raw();
   }
 }

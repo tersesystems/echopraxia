@@ -21,9 +21,9 @@ public class Main {
   //
   // Here, `creation_date` will be rendered with every log entry, but will
   // not show in the log message.
-  private final Logger<BuilderWithDate> logger =
+  private final Logger<MyFieldBuilder> logger =
       basicLogger
-          .withFieldBuilder(BuilderWithDate.class)
+          .withFieldBuilder(MyFieldBuilder.class)
           .withFields(fb -> fb.onlyDate("creation_date", new Date()));
 
   public static void main(String[] args) {
@@ -83,9 +83,9 @@ public class Main {
    * <p>{@code <pre> Logger<FooBuilder> logger =
    * LoggerFactory.getLogger(getClass()).withFieldBuilder(FooBuilder.class) </pre>}
    */
-  public static class BuilderWithDate implements Field.Builder {
+  public static class MyFieldBuilder implements Field.Builder {
 
-    public BuilderWithDate() {}
+    public MyFieldBuilder() {}
 
     // Renders a date using the `only` idiom returning a list of `Field`.
     // This is a useful shortcut when you only have one field you want to add.

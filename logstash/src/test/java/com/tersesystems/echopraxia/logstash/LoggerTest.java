@@ -41,7 +41,7 @@ class LoggerTest extends TestBase {
   }
 
   private Logger<?> getLogger() {
-    final LogstashCoreLogger logstashCoreLogger =
+    LogstashCoreLogger logstashCoreLogger =
         new LogstashCoreLogger(factory.getLogger(getClass().getName()));
     return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
