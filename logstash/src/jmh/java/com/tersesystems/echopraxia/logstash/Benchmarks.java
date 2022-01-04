@@ -10,10 +10,11 @@ import org.openjdk.jmh.annotations.OutputTimeUnit;
 
 import java.util.concurrent.TimeUnit;
 
-@BenchmarkMode(Mode.Throughput)
-@OutputTimeUnit(TimeUnit.MILLISECONDS)
+@BenchmarkMode(Mode.AverageTime)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 public class Benchmarks {
-    private final Logger<?> logger = LoggerFactory.getLogger();
+
+    private static final Logger<?> logger = LoggerFactory.getLogger();
 
     @Benchmark
     public void info() {

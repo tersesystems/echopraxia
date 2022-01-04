@@ -288,10 +288,16 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   protected org.slf4j.Marker convertMarkers(List<Field> fields, List<Marker> markers) {
+    if (fields.isEmpty() && markers.isEmpty()) {
+      return null;
+    }
     return Markers.appendEntries(convertMarkerFields(fields)).and(Markers.aggregate(markers));
   }
 
   protected Map<?, ?> convertMarkerFields(List<Field> fields) {
+    if (fields.isEmpty()) {
+      return Collections.emptyMap();
+    }
     Map<String, Object> result = new HashMap<>(fields.size());
     for (Field f : fields) {
       final String name = f.name();
