@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.semantic;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.core.CoreLogger;
-
 import java.util.function.Function;
 
 /**

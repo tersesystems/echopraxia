@@ -325,7 +325,8 @@ public class SemanticLoggerFactory {
     @Override
     public SemanticLogger<DataType> withCondition(Condition c) {
       final CoreLogger coreLogger = core.withCondition(c);
-      return new SemanticLoggerFactory.Impl<>(coreLogger, builder, messageFunction, builderFunction);
+      return new SemanticLoggerFactory.Impl<>(
+          coreLogger, builder, messageFunction, builderFunction);
     }
 
     @Override
@@ -337,7 +338,8 @@ public class SemanticLoggerFactory {
     public <CFB extends Field.Builder> SemanticLogger<DataType> withFields(
         Field.BuilderFunction<CFB> ctxBuilderF, CFB ctxBuilder) {
       final CoreLogger coreLogger = core.withFields(ctxBuilderF, ctxBuilder);
-      return new SemanticLoggerFactory.Impl<>(coreLogger, builder, messageFunction, builderFunction);
+      return new SemanticLoggerFactory.Impl<>(
+          coreLogger, builder, messageFunction, builderFunction);
     }
 
     @Override

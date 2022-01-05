@@ -41,18 +41,31 @@ public class LogstashLoggingContext implements LoggingContext {
    */
   public LogstashLoggingContext and(LogstashLoggingContext context) {
     if (context != null) {
-      Supplier<List<Field>> joinedFields =
-          () -> {
-            final List<Field> listOne = LogstashLoggingContext.this.getFields();
-            final List<Field> listTwo = context.getFields();
-            return Stream.concat(listOne.stream(), listTwo.stream()).collect(Collectors.toList());
-          };
-      Supplier<List<Marker>> joinedMarkers =
-          () -> {
-            final List<Marker> listOne = LogstashLoggingContext.this.getMarkers();
-            final List<Marker> listTwo = context.getMarkers();
-            return Stream.concat(listOne.stream(), listTwo.stream()).collect(Collectors.toList());
-          };
+      Supplier<List<Field>> joinedFields;
+      final List<Field> thisFields = LogstashLoggingContext.this.getFields();
+      final List<Field> ctxFields = context.getFields();
+      if (thisFields.isEmpty()) {
+        joinedFields = () -> ctxFields;
+      } else if (ctxFields.isEmpty()) {
+        joinedFields = () -> thisFields;
+      } else {
+        joinedFields =
+            () ->
+                Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
+      }
+
+      final List<Marker> markers = context.getMarkers();
+      final List<Marker> thisMarkers = LogstashLoggingContext.this.getMarkers();
+      Supplier<List<Marker>> joinedMarkers;
+      if (markers.isEmpty()) {
+        joinedMarkers = () -> thisMarkers;
+      } else if (thisMarkers.isEmpty()) {
+        joinedMarkers = () -> markers;
+      } else {
+        joinedMarkers =
+            () ->
+                Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
+      }
       return new LogstashLoggingContext(joinedFields, joinedMarkers);
     } else {
       return this;
