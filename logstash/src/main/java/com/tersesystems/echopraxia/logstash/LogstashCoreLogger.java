@@ -19,7 +19,7 @@ public class LogstashCoreLogger implements CoreLogger {
 
   protected LogstashCoreLogger(org.slf4j.Logger logger) {
     this.logger = logger;
-    this.context = new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
+    this.context = LogstashLoggingContext.empty();
     this.condition = Condition.always();
   }
 
