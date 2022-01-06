@@ -14,9 +14,7 @@ import org.openjdk.jmh.annotations.*;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class LoggerBenchmarks {
-
   private static final Logger<?> logger = LoggerFactory.getLogger();
-
   private static final Exception exception = new RuntimeException();
 
   @Benchmark

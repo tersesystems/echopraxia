@@ -16,7 +16,9 @@ For a worked example, see this [Spring Boot Project](https://github.com/tersesys
 
 Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
 
-Please see the [blog posts](https://tersesystems.com/category/logging/) for more background.
+Benchmarks show [performance inline with straight SLF4J calls](BENCHMARKS.md).  Please be aware that how "fast" you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender and your available I/O, and if you are doing significant logging you should be taking a hard look at your incurred operational costs i.e. storage, indexing, centralized logging infrastructure.
+
+Please see the [blog posts](https://tersesystems.com/category/logging/) for more background on logging stuff.
 
 ## Logstash
 

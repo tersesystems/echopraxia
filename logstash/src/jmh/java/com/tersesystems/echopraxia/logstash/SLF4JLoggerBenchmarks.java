@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class SLF4JLoggerBenchmarks {
-
   private static final Logger logger =
       org.slf4j.LoggerFactory.getLogger(SLF4JLoggerBenchmarks.class);
 
