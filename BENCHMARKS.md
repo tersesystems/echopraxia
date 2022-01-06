@@ -24,6 +24,12 @@ public class SLF4JLoggerBenchmarks {
     // SLF4JLoggerBenchmarks.info                    avgt    5   49.033 ± 3.101  ns/op
     logger.info("message");
   }
+  
+  @Benchmark
+  public void isInfoEnabled() {
+    // SLF4JLoggerBenchmarks.isInfoEnabled  avgt    5  0.949 ± 0.011  ns/op
+   logger.isInfoEnabled();
+  }
 
   @Benchmark
   public void infoWithArgument() {
@@ -79,6 +85,12 @@ public class CoreLoggerBenchmarks {
   }
 
   @Benchmark
+  public void isEnabled() {
+    // CoreLoggerBenchmarks.isEnabled       avgt    5  1.945 ± 0.049  ns/op
+    logger.isEnabled(Level.INFO);
+  }
+
+  @Benchmark
   public void infoWithParameterizedString() {
     // CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5   76.189 ± 2.388  ns/op
     logger.log(Level.INFO, "Message {}", fb -> fb.onlyString("foo", "bar"), builder);
@@ -105,6 +117,12 @@ public class LoggerBenchmarks {
   public void info() {
     // LoggerBenchmarks.info                         avgt    5   47.464 ± 0.414  ns/op
     logger.info("Message");
+  }
+
+  @Benchmark
+  public void isInfoEnabled() {
+    // LoggerBenchmarks.isInfoEnabled       avgt    5  2.821 ± 0.063  ns/op
+    logger.isInfoEnabled();
   }
 
   @Benchmark

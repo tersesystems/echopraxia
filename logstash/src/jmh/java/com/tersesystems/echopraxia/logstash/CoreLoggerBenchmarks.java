@@ -5,7 +5,6 @@ import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.util.concurrent.TimeUnit;
-
 import org.openjdk.jmh.annotations.*;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -22,6 +21,12 @@ public class CoreLoggerBenchmarks {
   public void info() {
     // CoreLoggerBenchmarks.info                     avgt    5   45.618 ± 0.965  ns/op
     logger.log(Level.INFO, "Message");
+  }
+
+  @Benchmark
+  public void isEnabled() {
+    // CoreLoggerBenchmarks.isEnabled       avgt    5  1.945 ± 0.049  ns/op
+    logger.isEnabled(Level.INFO);
   }
 
   @Benchmark

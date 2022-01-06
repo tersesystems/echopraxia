@@ -5,7 +5,6 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.concurrent.TimeUnit;
-
 import org.openjdk.jmh.annotations.*;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -21,6 +20,12 @@ public class LoggerBenchmarks {
   public void info() {
     // LoggerBenchmarks.info                         avgt    5   47.464 ± 0.414  ns/op
     logger.info("Message");
+  }
+
+  @Benchmark
+  public void isInfoEnabled() {
+    // LoggerBenchmarks.isInfoEnabled       avgt    5  2.821 ± 0.063  ns/op
+    logger.isInfoEnabled();
   }
 
   @Benchmark

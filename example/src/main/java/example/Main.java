@@ -10,21 +10,26 @@ import java.util.List;
 
 public class Main {
 
-  // For basic logging, you can alway use the `Logger<?>` syntax
+  // For basic logging, you can always use the `Logger<?>` syntax
   // which gives you a basic field builder.
-  Logger<?> basicLogger = LoggerFactory.getLogger();
+  private static final Logger<?> basicLogger = LoggerFactory.getLogger();
+
+  private Date lastAccessedDate = new Date();
 
   // More often you'll want to create a logger with your own domain objects and render those.
   // So we start with the basic logger...
   //   ...and add a custom `BuilderWithDate` as the field builder...
   //   ...then add a date to the logger's context.
   //
-  // Here, `creation_date` will be rendered with every log entry, but will
+  // Here, `last_accessed_date` will be rendered with every log entry, but will
   // not show in the log message.
+  //
+  // Note that here we have a final logger because we have to access a field that
+  // belongs to an object instance.
   private final Logger<MyFieldBuilder> logger =
       basicLogger
           .withFieldBuilder(MyFieldBuilder.class)
-          .withFields(fb -> fb.onlyDate("creation_date", new Date()));
+          .withFields(fb -> fb.onlyDate("last_accessed_date", lastAccessedDate));
 
   public static void main(String[] args) {
     Main m = new Main();
@@ -33,7 +38,16 @@ public class Main {
 
   // Example method that will do logging.
   private void doStuff() {
+    // Show the "before" date
+    logger.info("This renders with the last access date");
 
+    // touch the last accessed date to show context fields
+    lastAccessedDate = new Date();
+
+    // Show the "after" date
+    logger.info("This renders the updated date");
+
+    // Disable statements through condition
     logger.error(Condition.never(), "This will never render");
 
     // Create a complex business object

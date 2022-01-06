@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.LoggingContext;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -18,7 +17,8 @@ import org.slf4j.Marker;
  */
 public class LogstashLoggingContext implements LoggingContext {
 
-  private static final LogstashLoggingContext EMPTY = new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
+  private static final LogstashLoggingContext EMPTY =
+      new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
 
   protected final Supplier<List<Field>> fieldsSupplier;
   protected final Supplier<List<Marker>> markersSupplier;
@@ -61,8 +61,7 @@ public class LogstashLoggingContext implements LoggingContext {
       joinedFields = () -> thisFields;
     } else {
       joinedFields =
-          () ->
-              Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
+          () -> Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
     }
 
     final List<Marker> markers = context.getMarkers();
@@ -74,10 +73,8 @@ public class LogstashLoggingContext implements LoggingContext {
       joinedMarkers = () -> markers;
     } else {
       joinedMarkers =
-          () ->
-              Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
+          () -> Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
     }
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
-
   }
 }

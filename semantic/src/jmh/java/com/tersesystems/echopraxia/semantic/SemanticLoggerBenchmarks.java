@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.semantic;
 
 import java.util.concurrent.TimeUnit;
-
 import org.openjdk.jmh.annotations.*;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -15,9 +14,14 @@ public class SemanticLoggerBenchmarks {
       SemanticLoggerFactory.getLogger(
           String.class, s -> "Message {}", s -> b -> b.onlyString("name", s));
 
+  //  @Benchmark
+  //  public void info() {
+  //    // SemanticLoggerBenchmarks.info  avgt   25  97.199 ± 3.323  ns/op
+  //    logger.info("string");
+  //  }
+
   @Benchmark
-  public void info() {
-    // SemanticLoggerBenchmarks.info  avgt   25  97.199 ± 3.323  ns/op
-    logger.info("string");
+  public void isInfoEnabled() {
+    logger.isInfoEnabled();
   }
 }

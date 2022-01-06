@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
 import java.util.concurrent.TimeUnit;
-
 import org.openjdk.jmh.annotations.*;
 import org.slf4j.Logger;
 
@@ -20,6 +19,12 @@ public class SLF4JLoggerBenchmarks {
   public void info() {
     // SLF4JLoggerBenchmarks.info                    avgt    5   49.033 ± 3.101  ns/op
     logger.info("message");
+  }
+
+  @Benchmark
+  public void isInfoEnabled() {
+    // SLF4JLoggerBenchmarks.isInfoEnabled  avgt    5  0.949 ± 0.011  ns/op
+    logger.isInfoEnabled();
   }
 
   @Benchmark
