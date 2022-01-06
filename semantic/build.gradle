@@ -5,6 +5,8 @@ plugins {
 dependencies {
     api project(":api")
 
+    jmhImplementation project(":logstash")
+
     testImplementation project(":logstash")
     testImplementation 'ch.qos.logback:logback-classic:1.2.10'
     testImplementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
