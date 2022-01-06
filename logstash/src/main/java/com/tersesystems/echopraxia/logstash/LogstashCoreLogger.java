@@ -58,6 +58,8 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public CoreLogger withCondition(Condition condition) {
+    // If this is Condition.never we could optimize this by returning a No-op logger
+    // likewise a Condition.always means nothing (it's an AND true)
     return new LogstashCoreLogger(logger, context, this.condition.and(condition));
   }
 
@@ -288,10 +290,16 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   protected org.slf4j.Marker convertMarkers(List<Field> fields, List<Marker> markers) {
+    if (fields.isEmpty() && markers.isEmpty()) {
+      return null;
+    }
     return Markers.appendEntries(convertMarkerFields(fields)).and(Markers.aggregate(markers));
   }
 
   protected Map<?, ?> convertMarkerFields(List<Field> fields) {
+    if (fields.isEmpty()) {
+      return Collections.emptyMap();
+    }
     Map<String, Object> result = new HashMap<>(fields.size());
     for (Field f : fields) {
       final String name = f.name();
