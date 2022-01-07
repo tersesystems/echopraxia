@@ -28,6 +28,12 @@ SLF4J is an appropriate solution **when you do not control the logging output**,
 
 Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
 
+## Benchmarks
+
+Benchmarks show [performance inline with straight SLF4J calls](BENCHMARKS.md).  
+
+Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR):  if you are doing significant diagnostic logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and if you are doing significant operational logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.
+
 ## Logstash
 
 There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) implementation of [event specific custom fields](https://github.com/logfellow/logstash-logback-encoder#event-specific-custom-fields).
@@ -468,9 +474,3 @@ Condition hasAnyMarkers = (level, context) -> {
    return markers.size() > 0;
 };
 ```
-
-## Benchmarks
-
-Benchmarks show [performance inline with straight SLF4J calls](BENCHMARKS.md).  
-
-Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR):  if you are doing significant diagnostic logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and if you are doing significant operational logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.
