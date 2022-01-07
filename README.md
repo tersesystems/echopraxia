@@ -22,7 +22,7 @@ Please see the [blog posts](https://tersesystems.com/category/logging/) for more
 
 **Echopraxia is not a replacement for SLF4J**.  It is not an attempt to compete with Log4J2 API, JUL, commons-logging for the title of "one true logging API" and restart the [logging mess](https://varraa.wordpress.com/2011/09/18/the-logging-mess/).  SLF4J won that fight a long time ago.
 
-Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application where you're using [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) already.  
+Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application where you've decided to use [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) already.  
 
 SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations by anybody.  
 
