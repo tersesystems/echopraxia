@@ -32,7 +32,13 @@ Echopraxia is best described as a specialization or augmentation for application
 
 Benchmarks show [performance inline with straight SLF4J calls](BENCHMARKS.md).  
 
-Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR):  if you are doing significant diagnostic logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and if you are doing significant operational logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.
+Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  
+
+Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR).
+
+If you are doing significant diagnostic logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and consider writing to `tmpfs`.
+
+If you are doing significant operational logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.  It is very likely that you will run up against budget constraints long before you ever need to optimize your logging for greater throughput.
 
 ## Logstash
 
