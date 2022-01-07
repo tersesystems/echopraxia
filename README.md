@@ -20,7 +20,7 @@ Please see the [blog posts](https://tersesystems.com/category/logging/) for more
 
 ## Statement of Intent
 
-Echopraxia is **not a replacement for SLF4J**.  
+**Echopraxia is not a replacement for SLF4J**.  
 
 Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application.  
 
