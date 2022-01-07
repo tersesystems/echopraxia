@@ -93,9 +93,6 @@ public class Main {
   /**
    * A custom field builder. This is useful for structured logging because typically you want to
    * serialize custom objects to JSON in one place.
-   *
-   * <p>{@code <pre> Logger<FooBuilder> logger =
-   * LoggerFactory.getLogger(getClass()).withFieldBuilder(FooBuilder.class) </pre>}
    */
   public static class MyFieldBuilder implements Field.Builder {
 

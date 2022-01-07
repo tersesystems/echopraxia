@@ -58,6 +58,54 @@ public class FluentLogger<FB extends Field.Builder> {
     }
   }
 
+  public boolean isErrorEnabled() {
+    return core.isEnabled(Level.ERROR);
+  }
+
+  public boolean isErrorEnabled(Condition condition) {
+    return core.isEnabled(Level.ERROR, condition);
+  }
+
+  public boolean isWarnEnabled() {
+    return core.isEnabled(Level.WARN);
+  }
+
+  public boolean isWarnEnabled(Condition condition) {
+    return core.isEnabled(Level.WARN, condition);
+  }
+
+  public boolean isInfoEnabled() {
+    return core.isEnabled(Level.INFO);
+  }
+
+  public boolean isInfoEnabled(Condition condition) {
+    return core.isEnabled(Level.INFO, condition);
+  }
+
+  public boolean isDebugEnabled() {
+    return core.isEnabled(Level.DEBUG);
+  }
+
+  public boolean isDebugEnabled(Condition condition) {
+    return core.isEnabled(Level.DEBUG, condition);
+  }
+
+  public boolean isTraceEnabled() {
+    return core.isEnabled(Level.TRACE);
+  }
+
+  public boolean isTraceEnabled(Condition condition) {
+    return core.isEnabled(Level.TRACE, condition);
+  }
+
+  public boolean isEnabled(Level level) {
+    return core.isEnabled(level);
+  }
+
+  public boolean isEnabled(Level level, Condition condition) {
+    return core.isEnabled(level, condition);
+  }
+
   public EntryBuilder atError() {
     return atLevel(Level.ERROR);
   }
