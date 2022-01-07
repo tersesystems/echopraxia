@@ -12,6 +12,8 @@ Echopraxia is based around several main concepts that build and leverage on each
 * Semantic Logging (API based around typed arguments)
 * Fluent Logging (API based around log entry builder)
 
+Echopraxia is **not intended a replacement for SLF4J**.  As it is a structured logging API, it is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application.  SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations.  Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
+
 For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
 Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
@@ -50,7 +52,7 @@ For almost all use cases, you will be working with the API which is a single imp
 import com.tersesystems.echopraxia.*;
 ```
 
-First you define a logger (usually in a controller or a singleton):
+First you define a logger (usually in a controller or singleton -- `getClass()` is particularly useful for abstract controllers):
 
 ```java
 final Logger<?> basicLogger = LoggerFactory.getLogger(getClass());
@@ -149,7 +151,35 @@ loggerWithFoo.info("JSON field will log automatically") // will log "foo": "bar"
 
 This works very well for HTTP session and request data such as correlation ids.
 
-Note that in contrast to MDC, logging using context fields will work seamlessly across multiple threads.
+One thing to be aware of that the popular idiom of using `public static final Logger<?> logger` can be limiting in cases where you want to include context data.  For example, if you have a number of objects with their own internal state, it may be more appropriate to create a logger field on the object.
+
+```java
+public class PlayerData {
+
+  // the date is scoped to an instance of this actor
+  private Date lastAccessedDate = new Date();
+
+  // logger is not static because lastAccessedDate is an instance variable
+  private final Logger<BuilderWithDate> logger =
+      LoggerFactory.getLogger()
+          .withFieldBuilder(BuilderWithDate.class)
+          .withFields(fb -> fb.onlyDate("last_accessed_date", lastAccessedDate));
+
+}
+```
+
+In addition, thread safety is something to be aware of when using context fields.  While fields are thread-safe and using a context is far more convenient than using MDC, you do still have to be aware when you are accessing non-thread safe state.
+
+For example, `SimpleDateFormat` is infamously not thread-safe, and so the following code is not safe to use in a multi-threaded context:
+
+```java
+private final static DateFormat df = new SimpleDateFormat("yyyyMMdd");
+
+// UNSAFE EXAMPLE
+private static final Logger<?> logger =
+        LoggerFactory.getLogger()
+        .withFields(fb -> fb.onlyString("unsafe_date", df.format(new Date())));
+```
 
 ## Conditions
 
