@@ -227,3 +227,36 @@ public class SemanticLoggerBenchmarks {
   }
 }
 ```
+
+## Scripting
+
+Scripting is in microseconds, not nanoseconds.  One microsecond is 1000 nanoseconds.
+
+```groovy
+public class ScriptingBenchmarks {
+  private static final Path path = Paths.get("src/jmh/tweakflow/condition.tf");
+  private static final Condition condition =
+      ScriptCondition.create(false, path, Throwable::printStackTrace);
+
+  @Benchmark
+  public void testConditionMatch(Blackhole blackhole) {
+    // ScriptingBenchmarks.testConditionMatch  avgt    5  2.313 ± 0.222  us/op
+    blackhole.consume(condition.test(Level.INFO, LogstashLoggingContext.empty()));
+  }
+
+  @Benchmark
+  public void testConditionFail(Blackhole blackhole) {
+    // ScriptingBenchmarks.testConditionFail   avgt    5  2.166 ± 0.039  us/op
+    blackhole.consume(condition.test(Level.DEBUG, LogstashLoggingContext.empty()));
+  }
+}
+```
+
+where the script is 
+
+```
+library echopraxia {
+  function evaluate: (string level, dict fields) ->
+     level == "INFO";
+}
+```

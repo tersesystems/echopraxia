@@ -56,7 +56,8 @@ public class Main {
     // Show off a condition that only returns true if the date field is present in logger
     Condition dateCondition =
         (level, context) ->
-            context.getFields().stream().anyMatch(field -> field.name().equals("last_accessed_date"));
+            context.getFields().stream()
+                .anyMatch(field -> field.name().equals("last_accessed_date"));
 
     // Render the person using the custom field builder as a StructuredArgument.
     if (logger.isInfoEnabled(dateCondition)) {
