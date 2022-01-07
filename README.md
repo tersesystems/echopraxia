@@ -12,17 +12,22 @@ Echopraxia is based around several main concepts that build and leverage on each
 * Semantic Logging (API based around typed arguments)
 * Fluent Logging (API based around log entry builder)
 
-Echopraxia is **not intended a replacement for SLF4J**.  As it is a structured logging API, it is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application.  SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations.  Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
-
 For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
 Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
 
-Benchmarks show [performance inline with straight SLF4J calls](BENCHMARKS.md).  
-
-Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR):  if you are doing significant diagnostic logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and if you are doing significant operational logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.
-
 Please see the [blog posts](https://tersesystems.com/category/logging/) for more background on logging stuff.
+
+## Statement of Intent
+
+Echopraxia is **not a replacement for SLF4J**.  
+
+Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application.  
+
+SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations.  
+
+Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
+
 
 ## Logstash
 
@@ -464,3 +469,9 @@ Condition hasAnyMarkers = (level, context) -> {
    return markers.size() > 0;
 };
 ```
+
+## Benchmarks
+
+Benchmarks show [performance inline with straight SLF4J calls](BENCHMARKS.md).  
+
+Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR):  if you are doing significant diagnostic logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and if you are doing significant operational logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.
