@@ -53,13 +53,13 @@ public class Main {
     // Create a complex business object
     Person eloise = new Person("Eloise", 1, "binkie");
 
-    // Show off a condition that only returns true if the creation date field is present in logger
-    Condition creationDateCondition =
+    // Show off a condition that only returns true if the date field is present in logger
+    Condition dateCondition =
         (level, context) ->
-            context.getFields().stream().anyMatch(field -> field.name().equals("creation_date"));
+            context.getFields().stream().anyMatch(field -> field.name().equals("last_accessed_date"));
 
     // Render the person using the custom field builder as a StructuredArgument.
-    if (logger.isInfoEnabled(creationDateCondition)) {
+    if (logger.isInfoEnabled(dateCondition)) {
       logger.info("hi there {}", fb -> singletonList(fb.person("small_mammal", eloise)));
     }
   }

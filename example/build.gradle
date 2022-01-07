@@ -6,6 +6,9 @@ repositories {
     mavenCentral()
 }
 
+// "gradle :example:run" to run this
+mainClassName  = "example.Main"
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
