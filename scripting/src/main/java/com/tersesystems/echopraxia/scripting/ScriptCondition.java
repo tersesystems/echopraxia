@@ -3,14 +3,15 @@ package com.tersesystems.echopraxia.scripting;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.LoggingContext;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
 /**
  * The ScriptCondition class.
  *
- * <p>This is a condition backed by a tweakflow script manager, which keeps track of the script
- * through a ScriptHandle and recompiles the script if it's invalid.
+ * <p>This is a condition backed by a tweakflow script manager.
  */
 public class ScriptCondition implements Condition {
 
@@ -18,8 +19,7 @@ public class ScriptCondition implements Condition {
   private final boolean defaultValue;
 
   /**
-   * Creates a condition from a script on the filesystem, checking the last modified date to reload
-   * the script automatically if need be.
+   * Creates a condition from a script on the filesystem.
    *
    * @param defaultValue the value to return if there's an exception in the flow.
    * @param path the script path
@@ -27,6 +27,9 @@ public class ScriptCondition implements Condition {
    * @return the condition backed by script.
    */
   public static Condition create(boolean defaultValue, Path path, Consumer<Throwable> reporter) {
+    if (Files.isDirectory(path)) {
+      throw new IllegalArgumentException("Path is a directory: " + path);
+    }
     ScriptHandle handle = new FileScriptHandle(path, reporter);
     return create(defaultValue, handle);
   }
@@ -43,6 +46,11 @@ public class ScriptCondition implements Condition {
       boolean defaultValue, String script, Consumer<Throwable> reporter) {
     ScriptHandle handle =
         new ScriptHandle() {
+          @Override
+          public void close() throws IOException {
+            // do nothing
+          }
+
           @Override
           public boolean isInvalid() {
             return false;

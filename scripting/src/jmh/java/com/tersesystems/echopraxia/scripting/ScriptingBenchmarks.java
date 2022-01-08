@@ -10,7 +10,7 @@ import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
 @BenchmarkMode(Mode.AverageTime)
-@OutputTimeUnit(TimeUnit.MICROSECONDS)
+@OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
@@ -33,25 +33,25 @@ public class ScriptingBenchmarks {
 
   @Benchmark
   public void testFileConditionMatch(Blackhole blackhole) {
-    //ScriptingBenchmarks.testFileConditionMatch    avgt    5  2.032 ± 0.062  us/op
+    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
     blackhole.consume(fileCondition.test(Level.INFO, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testStringConditionMatch(Blackhole blackhole) {
-    // ScriptingBenchmarks.testStringConditionMatch  avgt    5  0.200 ± 0.003  us/op
+    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
     blackhole.consume(stringCondition.test(Level.INFO, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testFileConditionFail(Blackhole blackhole) {
-    //ScriptingBenchmarks.testFileConditionFail     avgt    5  2.006 ± 0.033  us/op
+    // ScriptingBenchmarks.testFileConditionFail     avgt    5  188.610 ±  0.351  ns/op
     blackhole.consume(fileCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testStringConditionFail(Blackhole blackhole) {
-    // ScriptingBenchmarks.testStringConditionFail   avgt    5  0.202 ± 0.004  us/op
+    // ScriptingBenchmarks.testStringConditionFail   avgt    5  209.430 ± 11.467  ns/op
     blackhole.consume(stringCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
   }
 }

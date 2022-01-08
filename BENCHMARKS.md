@@ -230,11 +230,9 @@ public class SemanticLoggerBenchmarks {
 
 ## Scripting
 
-Scripting is in microseconds, not nanoseconds.  One microsecond is 1000 nanoseconds.
+Scripts can be read from file system or directly from memory.
 
-The performance of file based scripts is much slower because it checks for last modified date on every evaluation.  This can be made much faster by moving file watching to a different thread.
-
-```groovy
+```java
 public class ScriptingBenchmarks {
     private static final Path path = Paths.get("src/jmh/tweakflow/condition.tf");
 
@@ -254,25 +252,25 @@ public class ScriptingBenchmarks {
 
     @Benchmark
     public void testFileConditionMatch(Blackhole blackhole) {
-        //ScriptingBenchmarks.testFileConditionMatch    avgt    5  2.032 ± 0.062  us/op
+        // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
         blackhole.consume(fileCondition.test(Level.INFO, LogstashLoggingContext.empty()));
     }
 
     @Benchmark
     public void testStringConditionMatch(Blackhole blackhole) {
-        // ScriptingBenchmarks.testStringConditionMatch  avgt    5  0.200 ± 0.003  us/op
+        // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
         blackhole.consume(stringCondition.test(Level.INFO, LogstashLoggingContext.empty()));
     }
 
     @Benchmark
     public void testFileConditionFail(Blackhole blackhole) {
-        //ScriptingBenchmarks.testFileConditionFail     avgt    5  2.006 ± 0.033  us/op
+        // ScriptingBenchmarks.testFileConditionFail     avgt    5  188.610 ±  0.351  ns/op
         blackhole.consume(fileCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
     }
 
     @Benchmark
     public void testStringConditionFail(Blackhole blackhole) {
-        // ScriptingBenchmarks.testStringConditionFail   avgt    5  0.202 ± 0.004  us/op
+        // ScriptingBenchmarks.testStringConditionFail   avgt    5  209.430 ± 11.467  ns/op
         blackhole.consume(stringCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
     }
 }

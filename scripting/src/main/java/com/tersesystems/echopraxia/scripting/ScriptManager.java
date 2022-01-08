@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ScriptManager {
 
   private final ScriptHandle handle;
-  protected AtomicReference<Runtime.Module> mref = new AtomicReference<>();
+  private final AtomicReference<Runtime.Module> mref = new AtomicReference<>();
 
   public ScriptManager(ScriptHandle handle) {
     this.handle = handle;
@@ -59,6 +59,7 @@ public class ScriptManager {
   private Value convertValue(Field.Value<?> value) {
     switch (value.type()) {
       case ARRAY:
+        //noinspection unchecked
         List<Field.Value<?>> values = (List<Field.Value<?>>) value.raw();
         List<Value> rawList = new ArrayList<>();
         for (Field.Value<?> v : values) {
@@ -88,7 +89,7 @@ public class ScriptManager {
     }
   }
 
-  public Runtime.Module compileModule(String script) {
+  Runtime.Module compileModule(String script) {
     String path = handle.path();
     MemoryLocation memLocation = new MemoryLocation.Builder().add(path, script).build();
     LoadPath loadPath = new LoadPath.Builder().addStdLocation().add(memLocation).build();
@@ -104,7 +105,7 @@ public class ScriptManager {
     return call.bool();
   }
 
-  public void eval(String script) {
+  void eval(String script) {
     Runtime.Module module = compileModule(script);
     module.evaluate();
     mref.set(module);

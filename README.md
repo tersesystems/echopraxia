@@ -297,7 +297,7 @@ library echopraxia {
 
 Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
 
-One important thing to note is that creating a script tied to a file will ensure that if the file is touched, the script manager will invalidate the script and recompile it.  This does mean that the condition will check last modified fs metadata on every evaluation, which *should be fine* for most filesystems, but I have not attempted to scale this feature and I vaguely remember something odd happening on Windows NTFS LastModifiedDate.  YMMV.
+One important thing to note is that creating a script tied to a file will add a file watch service, which will check to see if the file has been notified. If it has, then the script will be recompiled.
 
 ## String Based Scripts
 
