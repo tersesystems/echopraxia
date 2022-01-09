@@ -2,8 +2,6 @@ package com.tersesystems.echopraxia.scripting;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Level;
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
 import java.nio.file.Path;
 import java.nio.file.Paths;

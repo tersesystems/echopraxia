@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.CoreLogger;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Collections;
