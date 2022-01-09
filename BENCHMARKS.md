@@ -232,23 +232,49 @@ public class SemanticLoggerBenchmarks {
 
 Scripting is in microseconds, not nanoseconds.  One microsecond is 1000 nanoseconds.
 
+The performance of file based scripts is much slower because it checks for last modified date on every evaluation.  This can be made much faster by moving file watching to a different thread.
+
 ```groovy
 public class ScriptingBenchmarks {
-  private static final Path path = Paths.get("src/jmh/tweakflow/condition.tf");
-  private static final Condition condition =
-      ScriptCondition.create(false, path, Throwable::printStackTrace);
+    private static final Path path = Paths.get("src/jmh/tweakflow/condition.tf");
 
-  @Benchmark
-  public void testConditionMatch(Blackhole blackhole) {
-    // ScriptingBenchmarks.testConditionMatch  avgt    5  2.313 ± 0.222  us/op
-    blackhole.consume(condition.test(Level.INFO, LogstashLoggingContext.empty()));
-  }
+    public static String buildScript() {
+        StringBuilder b = new StringBuilder("library echopraxia {");
+        b.append("  function evaluate: (string level, dict fields) ->");
+        b.append("    fields[:correlation_id] == \"match\";");
+        b.append("}");
+        return b.toString();
+    }
 
-  @Benchmark
-  public void testConditionFail(Blackhole blackhole) {
-    // ScriptingBenchmarks.testConditionFail   avgt    5  2.166 ± 0.039  us/op
-    blackhole.consume(condition.test(Level.DEBUG, LogstashLoggingContext.empty()));
-  }
+    private static final Condition fileCondition =
+            ScriptCondition.create(false, path, Throwable::printStackTrace);
+
+    private static final Condition stringCondition =
+            ScriptCondition.create(false, buildScript(), Throwable::printStackTrace);
+
+    @Benchmark
+    public void testFileConditionMatch(Blackhole blackhole) {
+        //ScriptingBenchmarks.testFileConditionMatch    avgt    5  2.032 ± 0.062  us/op
+        blackhole.consume(fileCondition.test(Level.INFO, LogstashLoggingContext.empty()));
+    }
+
+    @Benchmark
+    public void testStringConditionMatch(Blackhole blackhole) {
+        // ScriptingBenchmarks.testStringConditionMatch  avgt    5  0.200 ± 0.003  us/op
+        blackhole.consume(stringCondition.test(Level.INFO, LogstashLoggingContext.empty()));
+    }
+
+    @Benchmark
+    public void testFileConditionFail(Blackhole blackhole) {
+        //ScriptingBenchmarks.testFileConditionFail     avgt    5  2.006 ± 0.033  us/op
+        blackhole.consume(fileCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
+    }
+
+    @Benchmark
+    public void testStringConditionFail(Blackhole blackhole) {
+        // ScriptingBenchmarks.testStringConditionFail   avgt    5  0.202 ± 0.004  us/op
+        blackhole.consume(stringCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
+    }
 }
 ```
 

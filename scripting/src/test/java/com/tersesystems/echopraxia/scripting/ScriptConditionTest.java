@@ -19,6 +19,28 @@ import org.junit.jupiter.api.Test;
 
 public class ScriptConditionTest {
 
+  public String buildScript() {
+    StringBuilder b = new StringBuilder("library echopraxia {");
+    b.append("  function evaluate: (string level, dict fields) ->");
+    b.append("    fields[:correlation_id] == \"match\";");
+    b.append("}");
+    return b.toString();
+  }
+
+  @Test
+  public void testStringCondition() {
+    Condition condition = ScriptCondition.create(false, buildScript(), Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger
+        .withFields(bf -> bf.onlyString("correlation_id", "match"))
+        .info("data of interest found");
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
   @Test
   public void testCondition() {
     Path path = Paths.get("src/test/tweakflow/condition.tf");
