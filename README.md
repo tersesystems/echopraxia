@@ -60,6 +60,26 @@ Gradle:
 implementation "com.tersesystems.echopraxia:logstash:1.0.0" 
 ```
 
+## Log4J
+
+There is a Log4J implementation, which does not rely on a given JSON layout (XXX detail why nothing works with custom fields)
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>log4j</artifactId>
+  <version>0.0.2</version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:log4j:0.0.2" 
+```
+
 ## Basic Usage
 
 For almost all use cases, you will be working with the API which is a single import:
