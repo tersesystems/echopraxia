@@ -1,9 +1,7 @@
 package com.tersesystems.echopraxia.scripting;
 
-import java.nio.file.*;
-
 /** A script handle returns the script source, and can say if the script is invalid. */
-public interface ScriptHandle {
+public interface ScriptHandle extends AutoCloseable {
 
   /** @return true if the script is invalid and should be re-evaluated, false otherwise. */
   boolean isInvalid();

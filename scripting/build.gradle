@@ -5,7 +5,10 @@ plugins {
 dependencies {
     api project(":api")
 
-    implementation "com.twineworks:tweakflow:1.4.0"
+    implementation project(":filewatch")
+    implementation "com.twineworks:tweakflow:1.4.1"
+
+    // https://github.com/playframework/play-file-watch
 
     jmhImplementation project(":logstash")
 

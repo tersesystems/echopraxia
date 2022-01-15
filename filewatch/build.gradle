@@ -1,0 +1,10 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    // intentionally no dependency on project(":api")
+
+    implementation "io.methvin:directory-watcher:0.15.0"
+    testImplementation project(":logstash")
+}
