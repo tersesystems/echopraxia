@@ -7,12 +7,12 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.filewatch.FileWatchEvent;
 import com.tersesystems.echopraxia.filewatch.FileWatchService;
 import com.tersesystems.echopraxia.filewatch.FileWatchServiceFactory;
-import java.io.Closeable;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
@@ -21,31 +21,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
- * A service that watches a directory of scripts, and invalidates a script handle if the file has
- * been touched.
+ * A service that watches a directory containing scripts, and
+ * invalidates a script handle if the file has been touched.
  */
-public class ScriptWatchService implements Closeable {
+public class ScriptWatchService implements AutoCloseable {
   private static final Logger<?> logger = LoggerFactory.getLogger();
 
   private static final FileWatchService watchService = FileWatchServiceFactory.fileWatchService();
-
-  static class ScriptThreadFactory implements ThreadFactory {
-    private final AtomicInteger threadNumber = new AtomicInteger(1);
-
-    @Override
-    public Thread newThread(Runnable r) {
-      Thread t = new Thread(r);
-      t.setDaemon(true);
-      t.setName("scriptwatchservice-thread-" + threadNumber.getAndIncrement());
-      return t;
-    }
-  }
 
   private static final ScriptThreadFactory threadFactory = new ScriptThreadFactory();
 
   private final FileWatchService.FileWatcher watcher;
 
-  private final Map<Path, AtomicBoolean> touchedMap = new ConcurrentHashMap<>();
+  private final Map<Path, AtomicBoolean> touchedMap;
 
   private final Path watchedDirectory;
 
@@ -70,6 +58,7 @@ public class ScriptWatchService implements Closeable {
       throw new ScriptException(msg);
     }
 
+    this.touchedMap = new ConcurrentHashMap<>();
     this.watchedDirectory = watchedDirectory;
     final Consumer<FileWatchEvent> fileWatchEventConsumer =
         event -> {
@@ -107,19 +96,31 @@ public class ScriptWatchService implements Closeable {
               break;
           }
         };
-    watcher =
-        watchService.watch(threadFactory, singletonList(watchedDirectory), fileWatchEventConsumer);
+
+    try {
+      List<Path> watchList = singletonList(watchedDirectory);
+      watcher = watchService.watch(threadFactory, watchList, fileWatchEventConsumer);
+    } catch (IOException e) {
+      throw new ScriptException("Error setting up watch service for " + watchedDirectory, e);
+    }
   }
 
-  // scriptPath should be relative to the script watch service
-  public ScriptHandle watchScript(Path scriptPath, Consumer<Throwable> throwableConsumer) {
+  /**
+   * Watches a script, returning a handle that will be "invalid" if the watched directory sees that
+   * the file has been touched recently.
+   *
+   * @param scriptPath the path to the script, must be within the script directory.
+   * @param reporter the reporter for an exception.
+   * @return the handle to the script.
+   */
+  public ScriptHandle watchScript(Path scriptPath, Consumer<Throwable> reporter) {
     if (scriptPath == null) {
       String msg = "Null scriptPath";
       throw new ScriptException(msg);
     }
 
-    if (throwableConsumer == null) {
-      String msg = "Null throwableConsumer";
+    if (reporter == null) {
+      String msg = "Null reporter";
       throw new ScriptException(msg);
     }
 
@@ -135,13 +136,12 @@ public class ScriptWatchService implements Closeable {
 
     if (!scriptPath.startsWith(watchedDirectory)) {
       String msg =
-          String.format(
-              "Script path %s is not a sub directory of %s", scriptPath, watchedDirectory);
+          String.format("Path %s is not in watched directory %s", scriptPath, watchedDirectory);
       throw new ScriptException(msg);
     }
 
     if (!Files.exists(scriptPath)) {
-      String msg = String.format("Script path %s does not exist!", scriptPath);
+      String msg = String.format("Path %s does not exist!", scriptPath);
       throw new ScriptException(msg);
     }
 
@@ -166,7 +166,7 @@ public class ScriptWatchService implements Closeable {
           final byte[] bytes = Files.readAllBytes(scriptPath);
           return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException e) {
-          throw new ScriptException(e);
+          throw new ScriptException("Cannot read from " + scriptPath, e);
         }
       }
 
@@ -177,7 +177,7 @@ public class ScriptWatchService implements Closeable {
 
       @Override
       public void report(Throwable e) {
-        throwableConsumer.accept(e);
+        reporter.accept(e);
       }
     };
   }
@@ -193,5 +193,17 @@ public class ScriptWatchService implements Closeable {
 
   private void registerPath(Path scriptPath, AtomicBoolean touched) {
     touchedMap.put(scriptPath, touched);
+  }
+
+  private static class ScriptThreadFactory implements ThreadFactory {
+    private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+    @Override
+    public Thread newThread(Runnable r) {
+      Thread t = new Thread(r);
+      t.setDaemon(true);
+      t.setName("scriptwatchservice-thread-" + threadNumber.getAndIncrement());
+      return t;
+    }
   }
 }

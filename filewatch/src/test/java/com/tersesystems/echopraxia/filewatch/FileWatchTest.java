@@ -21,9 +21,6 @@ public class FileWatchTest {
 
   FileWatchService watchService = FileWatchServiceFactory.fileWatchService();
 
-  // XXX polling still doesn't work
-  // FileWatchService watchService = FileWatchService.polling(300);
-
   // https://junit.org/junit5/docs/current/user-guide/#writing-tests-built-in-extensions-TempDirectory
   @Test
   public void testDetectNewFiles(@TempDir Path tempDir) throws IOException {
@@ -72,7 +69,8 @@ public class FileWatchTest {
         });
   }
 
-  private void watchFiles(FileWatchService watchService, List<Path> files, Runnable runnable) {
+  private void watchFiles(FileWatchService watchService, List<Path> files, Runnable runnable)
+      throws IOException {
     FileWatchService.FileWatcher watcher =
         watchService.watch(
             new ThreadFactory() {
