@@ -75,6 +75,16 @@ public class ScriptCondition implements Condition {
   }
 
   /**
+   * Creates a new condition using a handle and a default value of false.
+   *
+   * @param handle the script handle, created externally.
+   * @return the script condition
+   */
+  public static Condition create(ScriptHandle handle) {
+    return create(false, handle);
+  }
+
+  /**
    * Creates a new condition using a default value and a handle.
    *
    * @param defaultValue the default value on exception or error.

@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.filewatch.FileWatchEvent;
 import com.tersesystems.echopraxia.filewatch.FileWatchService;
 import com.tersesystems.echopraxia.filewatch.FileWatchServiceFactory;
 import java.io.Closeable;
@@ -16,6 +17,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
@@ -23,58 +25,126 @@ import java.util.function.Consumer;
  * been touched.
  */
 public class ScriptWatchService implements Closeable {
-  private final Logger<?> logger = LoggerFactory.getLogger();
+  private static final Logger<?> logger = LoggerFactory.getLogger();
 
   private static final FileWatchService watchService = FileWatchServiceFactory.fileWatchService();
+
+  static class ScriptThreadFactory implements ThreadFactory {
+    private final AtomicInteger threadNumber = new AtomicInteger(1);
+
+    @Override
+    public Thread newThread(Runnable r) {
+      Thread t = new Thread(r);
+      t.setDaemon(true);
+      t.setName("scriptwatchservice-thread-" + threadNumber.getAndIncrement());
+      return t;
+    }
+  }
+
+  private static final ScriptThreadFactory threadFactory = new ScriptThreadFactory();
 
   private final FileWatchService.FileWatcher watcher;
 
   private final Map<Path, AtomicBoolean> touchedMap = new ConcurrentHashMap<>();
 
-  ScriptWatchService(Path watchedDirectory) {
-    ThreadFactory threadFactory =
-        r -> {
-          Thread t = new Thread(r);
-          t.setDaemon(true);
-          t.setName("filewatcher-" + System.currentTimeMillis());
-          return t;
-        };
+  private final Path watchedDirectory;
 
-    watcher =
-        watchService.watch(
-            threadFactory,
-            singletonList(watchedDirectory),
-            event -> {
-              switch (event.eventType()) {
-                case CREATE:
-                  logger.debug("CREATE: {}", fb -> fb.onlyString("path", event.path().toString()));
-                  // XXX is there a script handle with this path?  There shouldn't be, but
-                  // could it be deleted and then created again?
-                  break;
-                case MODIFY:
-                  logger.debug("MODIFY: {}", fb -> fb.onlyString("path", event.path().toString()));
-                  final AtomicBoolean touched = touchedMap.get(event.path());
-                  if (touched != null) {
-                    touched.set(true);
-                  }
+  public ScriptWatchService(Path watchedDirectory) {
+    if (watchedDirectory == null) {
+      String msg = "Null watchedDirectory!";
+      throw new ScriptException(msg);
+    }
 
-                  break;
-                case DELETE:
-                  logger.debug("DELETE: {}", fb -> fb.onlyString("path", event.path().toString()));
+    if (!Files.exists(watchedDirectory)) {
+      String msg = String.format("Path %s does not exist!", watchedDirectory);
+      throw new ScriptException(msg);
+    }
 
-                  // XXX if there's a file script handle with this path, disable it
-                  // and complain.
-                  break;
-                case OVERFLOW:
-                  logger.debug(
-                      "OVERFLOW: {}", fb -> fb.onlyString("path", event.path().toString()));
-                  // XXX complain.
-                  break;
+    if (!Files.isDirectory(watchedDirectory)) {
+      String msg = String.format("Path %s is not a directory!", watchedDirectory);
+      throw new ScriptException(msg);
+    }
+
+    if (!Files.isReadable(watchedDirectory)) {
+      String msg = String.format("Path %s is not readable!", watchedDirectory);
+      throw new ScriptException(msg);
+    }
+
+    this.watchedDirectory = watchedDirectory;
+    final Consumer<FileWatchEvent> fileWatchEventConsumer =
+        event -> {
+          switch (event.eventType()) {
+            case CREATE:
+              // Creation is an automatic touch, and a full eval is needed after a file is deleted.
+              logger.debug("CREATE: {}", fb -> fb.onlyString("path", event.path().toString()));
+              final AtomicBoolean t = touchedMap.get(event.path());
+              if (t != null) {
+                t.set(true);
               }
-            });
+              break;
+            case MODIFY:
+              // This is the normal use case.
+              logger.debug("MODIFY: {}", fb -> fb.onlyString("path", event.path().toString()));
+              final AtomicBoolean touched = touchedMap.get(event.path());
+              if (touched != null) {
+                touched.set(true);
+              }
+
+              break;
+            case DELETE:
+              logger.debug("DELETE: {}", fb -> fb.onlyString("path", event.path().toString()));
+              final AtomicBoolean t3 = touchedMap.get(event.path());
+              if (t3 != null) {
+                logger.warn(
+                    "Watched script {} was deleted!  Disabling touched flag until found again.",
+                    fb -> fb.onlyString("path", event.path().toString()));
+                t3.set(false);
+              }
+              break;
+            case OVERFLOW:
+              // Honestly not much we can do about this?
+              logger.debug("OVERFLOW: {}", fb -> fb.onlyString("path", event.path().toString()));
+              break;
+          }
+        };
+    watcher =
+        watchService.watch(threadFactory, singletonList(watchedDirectory), fileWatchEventConsumer);
   }
 
-  public ScriptHandle create(Path scriptPath, Consumer<Throwable> throwableConsumer) {
+  // scriptPath should be relative to the script watch service
+  public ScriptHandle watchScript(Path scriptPath, Consumer<Throwable> throwableConsumer) {
+    if (scriptPath == null) {
+      String msg = "Null scriptPath";
+      throw new ScriptException(msg);
+    }
+
+    if (throwableConsumer == null) {
+      String msg = "Null throwableConsumer";
+      throw new ScriptException(msg);
+    }
+
+    if (!Files.isRegularFile(scriptPath)) {
+      String msg = String.format("Path %s is not a file!", scriptPath);
+      throw new ScriptException(msg);
+    }
+
+    if (!Files.isReadable(scriptPath)) {
+      String msg = String.format("Path %s is not readable!", scriptPath);
+      throw new ScriptException(msg);
+    }
+
+    if (!scriptPath.startsWith(watchedDirectory)) {
+      String msg =
+          String.format(
+              "Script path %s is not a sub directory of %s", scriptPath, watchedDirectory);
+      throw new ScriptException(msg);
+    }
+
+    if (!Files.exists(scriptPath)) {
+      String msg = String.format("Script path %s does not exist!", scriptPath);
+      throw new ScriptException(msg);
+    }
+
     AtomicBoolean touched = new AtomicBoolean(false);
     registerPath(scriptPath, touched);
 

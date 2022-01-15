@@ -52,9 +52,29 @@ public class LogstashLoggingContext implements LoggingContext {
       return this;
     }
 
-    Supplier<List<Field>> joinedFields;
     final List<Field> thisFields = LogstashLoggingContext.this.getFields();
     final List<Field> ctxFields = context.getFields();
+    Supplier<List<Field>> joinedFields = joinFields(thisFields, ctxFields);
+
+    final List<Marker> markers = context.getMarkers();
+    final List<Marker> thisMarkers = LogstashLoggingContext.this.getMarkers();
+    Supplier<List<Marker>> joinedMarkers = joinMarkers(markers, thisMarkers);
+    return new LogstashLoggingContext(joinedFields, joinedMarkers);
+  }
+
+  private Supplier<List<Marker>> joinMarkers(List<Marker> markers, List<Marker> thisMarkers) {
+    if (markers.isEmpty()) {
+      return () -> thisMarkers;
+    } else if (thisMarkers.isEmpty()) {
+      return () -> markers;
+    } else {
+      return () ->
+          Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
+    }
+  }
+
+  private Supplier<List<Field>> joinFields(List<Field> thisFields, List<Field> ctxFields) {
+    Supplier<List<Field>> joinedFields;
     if (thisFields.isEmpty()) {
       joinedFields = () -> ctxFields;
     } else if (ctxFields.isEmpty()) {
@@ -63,18 +83,6 @@ public class LogstashLoggingContext implements LoggingContext {
       joinedFields =
           () -> Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
     }
-
-    final List<Marker> markers = context.getMarkers();
-    final List<Marker> thisMarkers = LogstashLoggingContext.this.getMarkers();
-    Supplier<List<Marker>> joinedMarkers;
-    if (markers.isEmpty()) {
-      joinedMarkers = () -> thisMarkers;
-    } else if (thisMarkers.isEmpty()) {
-      joinedMarkers = () -> markers;
-    } else {
-      joinedMarkers =
-          () -> Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
-    }
-    return new LogstashLoggingContext(joinedFields, joinedMarkers);
+    return joinedFields;
   }
 }

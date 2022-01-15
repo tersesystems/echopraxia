@@ -1,8 +1,10 @@
 package com.tersesystems.echopraxia.scripting;
 
+import static com.tersesystems.echopraxia.Level.INFO;
+
 import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.LoggingContext;
+import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -11,45 +13,53 @@ import java.util.List;
 
 public class Main {
 
-  private static final Logger<?> logger =
-      LoggerFactory.getLogger().withFields(fb -> fb.onlyString("name", "Will"));
-
   public static void main(String[] args) throws IOException, InterruptedException {
     final Path dir = Files.createTempDirectory("echopraxia");
     try (ScriptWatchService watchService = new ScriptWatchService(dir)) {
       Path filePath = dir.resolve("testfile");
-      Files.write(filePath, lines("will"));
+      Files.write(filePath, lines("INFO"));
 
-      final ScriptHandle handle =
-          watchService.create(filePath, e -> logger.error(e.getMessage(), e));
-      final Condition condition = ScriptCondition.create(false, handle);
-      logger.info(condition, "logging first message ");
+      final ScriptHandle handle = watchService.watchScript(filePath, Throwable::printStackTrace);
+      final Condition condition = ScriptCondition.create(handle);
+      LoggingContext context = LogstashLoggingContext.empty();
+      if (condition.test(INFO, context)) {
+        System.out.println("First test should eval but take a while...");
+      }
 
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 100; i++) {
         // Write a change and then sleep
-        Files.write(filePath, lines("steve"));
+        Files.write(filePath, lines("DEBUG"));
         Thread.sleep(300);
 
         // and then we should be able to see the changed condition evaluate.
-        logger.info(condition, "this should never log because the condition doesn't pass!");
+        if (condition.test(INFO, LogstashLoggingContext.empty())) {
+          System.out.println(
+              "this doesn't log, because even though we pass in INFO the script changed to DEBUG");
+        }
 
         // Write the condition again and give some time for the watcher
-        Files.write(filePath, lines("will"));
+        Files.write(filePath, lines("INFO"));
         Thread.sleep(300);
 
         // Now the first time it sees, it'll re-evaluate and process again!
-        logger.info(condition, "this logs because we changed the script back.");
+        if (condition.test(INFO, LogstashLoggingContext.empty())) {
+          System.out.println("this logs because we have changed the script back to INFO.");
+        }
+
+        Files.deleteIfExists(filePath);
+        Thread.sleep(300);
+        if (condition.test(INFO, LogstashLoggingContext.empty())) {
+          System.out.println("see what happens when script is deleted");
+        }
       }
     }
   }
 
   private static List<String> lines(String name) {
     return Arrays.asList(
-        "import * as std from \"std\";",
-        "alias std.strings as str;",
         "library echopraxia {",
         "  function evaluate: (string level, dict fields) ->",
-        String.format("    str.lower_case(fields[:name]) == \"%s\";", name),
+        "    level == \"" + name + "\";",
         "}");
   }
 }

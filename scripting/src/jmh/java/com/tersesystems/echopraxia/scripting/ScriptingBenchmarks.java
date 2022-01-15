@@ -17,10 +17,13 @@ import org.openjdk.jmh.infra.Blackhole;
 public class ScriptingBenchmarks {
   private static final Path path = Paths.get("src/jmh/tweakflow/condition.tf");
 
+  private static final Path watchedDir = Paths.get("src/jmh/tweakflow");
+
   public static String buildScript() {
-    StringBuilder b = new StringBuilder("library echopraxia {");
+    StringBuilder b = new StringBuilder("");
+    b.append("library echopraxia {");
     b.append("  function evaluate: (string level, dict fields) ->");
-    b.append("    fields[:correlation_id] == \"match\";");
+    b.append("    level == \"INFO\";");
     b.append("}");
     return b.toString();
   }
@@ -31,27 +34,47 @@ public class ScriptingBenchmarks {
   private static final Condition stringCondition =
       ScriptCondition.create(false, buildScript(), Throwable::printStackTrace);
 
+  private static final ScriptWatchService scriptWatchService = new ScriptWatchService(watchedDir);
+
+  private static final ScriptHandle watchedScript =
+      scriptWatchService.watchScript(
+          watchedDir.resolve("condition.tf"), Throwable::printStackTrace);
+
+  private static final Condition watchedCondition = ScriptCondition.create(false, watchedScript);
+
   @Benchmark
   public void testFileConditionMatch(Blackhole blackhole) {
-    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
+    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  208.966 ± 15.136  ns/op
     blackhole.consume(fileCondition.test(Level.INFO, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testStringConditionMatch(Blackhole blackhole) {
-    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
+    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  208.966 ± 15.136  ns/op
     blackhole.consume(stringCondition.test(Level.INFO, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testFileConditionFail(Blackhole blackhole) {
-    // ScriptingBenchmarks.testFileConditionFail     avgt    5  188.610 ±  0.351  ns/op
+    // ScriptingBenchmarks.testFileConditionFail     avgt    5  203.641 ±  0.959  ns/op
     blackhole.consume(fileCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testStringConditionFail(Blackhole blackhole) {
-    // ScriptingBenchmarks.testStringConditionFail   avgt    5  209.430 ± 11.467  ns/op
+    // ScriptingBenchmarks.testStringConditionFail   avgt    5  198.490 ±  1.657  ns/op
     blackhole.consume(stringCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
+  }
+
+  @Benchmark
+  public void testWatchedConditionMatch(Blackhole blackhole) {
+    // ScriptingBenchmarks.testWatchedConditionFail   avgt    5  236.907 ±  9.992  ns/op
+    blackhole.consume(watchedCondition.test(Level.INFO, LogstashLoggingContext.empty()));
+  }
+
+  @Benchmark
+  public void testWatchedConditionFail(Blackhole blackhole) {
+    // ScriptingBenchmarks.testWatchedConditionMatch  avgt    5  256.803 ± 25.520  ns/op
+    blackhole.consume(watchedCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
   }
 }

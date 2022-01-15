@@ -237,7 +237,8 @@ public class ScriptingBenchmarks {
     private static final Path path = Paths.get("src/jmh/tweakflow/condition.tf");
 
     public static String buildScript() {
-        StringBuilder b = new StringBuilder("library echopraxia {");
+        StringBuilder b = new StringBuilder();
+        b.append("library echopraxia {");
         b.append("  function evaluate: (string level, dict fields) ->");
         b.append("    fields[:correlation_id] == \"match\";");
         b.append("}");
@@ -252,31 +253,31 @@ public class ScriptingBenchmarks {
 
     @Benchmark
     public void testFileConditionMatch(Blackhole blackhole) {
-        // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
+        // ScriptingBenchmarks.testFileConditionMatch    avgt    5  208.966 ± 15.136  ns/op
         blackhole.consume(fileCondition.test(Level.INFO, LogstashLoggingContext.empty()));
     }
 
     @Benchmark
     public void testStringConditionMatch(Blackhole blackhole) {
-        // ScriptingBenchmarks.testFileConditionMatch    avgt    5  197.870 ±  1.252  ns/op
+        // ScriptingBenchmarks.testFileConditionMatch    avgt    5  208.966 ± 15.136  ns/op
         blackhole.consume(stringCondition.test(Level.INFO, LogstashLoggingContext.empty()));
     }
 
     @Benchmark
     public void testFileConditionFail(Blackhole blackhole) {
-        // ScriptingBenchmarks.testFileConditionFail     avgt    5  188.610 ±  0.351  ns/op
+        // ScriptingBenchmarks.testFileConditionFail     avgt    5  203.641 ±  0.959  ns/op
         blackhole.consume(fileCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
     }
 
     @Benchmark
     public void testStringConditionFail(Blackhole blackhole) {
-        // ScriptingBenchmarks.testStringConditionFail   avgt    5  209.430 ± 11.467  ns/op
+        // ScriptingBenchmarks.testStringConditionFail   avgt    5  198.490 ±  1.657  ns/op
         blackhole.consume(stringCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
     }
 }
 ```
 
-where the script is 
+where the `condition.tf` script is 
 
 ```
 library echopraxia {

@@ -8,9 +8,9 @@
         </encoder>
     </appender>
 
-    <!--    <logger name="com.tersesystems.echopraxia.scripting" level="DEBUG" additivity="false">-->
-    <!--        <appender-ref ref="CONSOLE"/>-->
-    <!--    </logger>-->
+<!--        <logger name="com.tersesystems.echopraxia.scripting" level="DEBUG" additivity="false">-->
+<!--            <appender-ref ref="CONSOLE"/>-->
+<!--        </logger>-->
 
     <root level="TRACE">
         <appender-ref ref="LIST"/>

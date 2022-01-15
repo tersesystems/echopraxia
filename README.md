@@ -248,7 +248,7 @@ One of the limitations of logging is that it's not that easy to change logging l
 
 Script Conditions lets you tie your conditions to scripts that you can change and re-evaluate at runtime.
 
-The security concerns surrounding Groovy or Javascript make them unsuitable in a logging environment.  Fortunately, Echopraxia provides a [Tweakflow](https://twineworks.github.io/tweakflow) script integration that lets you evaluate logging statements **safely**.
+The security concerns surrounding Groovy or Javascript make them unsuitable in a logging environment.  Fortunately, Echopraxia provides a [Tweakflow](https://twineworks.github.io/tweakflow) script integration that lets you evaluate logging statements **safely**.  Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
 
 Because Scripting has a dependency on Tweakflow, it is broken out into a distinct library that you must add to your build.
 
@@ -266,6 +266,14 @@ Gradle:
 
 ```
 implementation "com.tersesystems.echopraxia:scripting:1.0.0" 
+```
+
+## String Based Scripts
+
+You also have the option of passing in a string directly:
+
+```java
+Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
 ```
 
 ### File Based Scripts
@@ -295,16 +303,35 @@ library echopraxia {
 }
 ```
 
-Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
+## Watched Scripts
 
-One important thing to note is that creating a script tied to a file will add a file watch service, which will check to see if the file has been notified. If it has, then the script will be recompiled.
+You can also change scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
 
-## String Based Scripts
-
-You also have the option of passing in a string directly, which will never touch last modified date:
+To configure `ScriptWatchService`, pass it the directory that contains your script files:
 
 ```java
-Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
+final Path watchedDir = Paths.get("/your/script/directory");
+ScriptWatchService watchService = new ScriptWatchService(watchedDir);
+
+Path filePath = watchedDir.resolve("myscript.tf");
+
+Logger logger = LoggerFactory.getLogger();
+
+final ScriptHandle watchedHandle = watchService.watchScript(filePath, 
+        e -> logger.error("Script compilation error", e));
+final Condition condition = ScriptCondition.create(watchedHandle);
+
+logger.info(condition, "Statement only logs if condition is met!")
+        
+// After that, you can edit myscript.tf and the condition will 
+// re-evaluate the script as needed automatically!
+        
+// You can delete the file, but doing so will log a warning from `ScriptWatchService`
+// Recreating a deleted file will trigger an evaluation, same as modification.
+
+// Note that the watch service creates a daemon thread to watch the directory.
+// To free up the thread and stop watching, you should call close() as appropriate:
+watchService.close();
 ```
 
 ### Custom Source Scripts
