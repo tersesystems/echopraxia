@@ -7,6 +7,7 @@ import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
+import com.twineworks.tweakflow.lang.values.Arity2CallSite;
 import com.twineworks.tweakflow.lang.values.Value;
 import com.twineworks.tweakflow.lang.values.Values;
 import java.util.ArrayList;
@@ -25,6 +26,9 @@ public class ScriptManager {
   private final ScriptHandle handle;
   private final AtomicReference<Runtime.Module> mref = new AtomicReference<>();
 
+  // Callsite is faster but not thread-safe, so use a thread-local
+  private final ThreadLocal<Arity2CallSite> callSiteThreadLocal = new ThreadLocal<>();
+
   public ScriptManager(ScriptHandle handle) {
     this.handle = handle;
   }
@@ -34,6 +38,9 @@ public class ScriptManager {
       if (mref.get() == null || handle.isInvalid()) {
         String script = handle.script();
         eval(script);
+      }
+      if (callSiteThreadLocal.get() == null) {
+        refreshCallSite();
       }
       Value levelV = Values.make(level.name());
       Value fieldsV = convertFields(context.getFields());
@@ -45,8 +52,6 @@ public class ScriptManager {
   }
 
   private Value convertFields(List<Field> fields) {
-    // Tweakwork only understands simple values, so only things that
-    // are not array or object
     Map<String, Value> objectMap = new HashMap<>();
     for (Field field : fields) {
       Value fieldValue = convertValue(field.value());
@@ -68,6 +73,7 @@ public class ScriptManager {
         }
         return Values.make(rawList);
       case OBJECT:
+        //noinspection unchecked
         List<Field> fields = (List<Field>) value.raw();
         return convertFields(fields);
       case STRING:
@@ -83,7 +89,7 @@ public class ScriptManager {
         Throwable t = (Throwable) value.raw();
         return Values.make(t);
       case NULL:
-        return Values.make((Object) null);
+        return Values.NIL;
       default:
         throw new IllegalStateException("Unknown state " + value.type());
     }
@@ -98,10 +104,7 @@ public class ScriptManager {
   }
 
   protected boolean call(Value level, Value fields) {
-    Runtime.Module module = mref.get();
-    Runtime.Var callSite = module.getLibrary(handle.libraryName()).getVar(handle.functionName());
-
-    Value call = callSite.call(level, fields);
+    Value call = callSiteThreadLocal.get().call(level, fields);
     return call.bool();
   }
 
@@ -109,5 +112,11 @@ public class ScriptManager {
     Runtime.Module module = compileModule(script);
     module.evaluate();
     mref.set(module);
+    callSiteThreadLocal.set(null);
+  }
+
+  void refreshCallSite() {
+    Runtime.Var var = mref.get().getLibrary(handle.libraryName()).getVar(handle.functionName());
+    callSiteThreadLocal.set(var.arity2CallSite());
   }
 }
