@@ -10,6 +10,11 @@ import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.values.Arity2CallSite;
 import com.twineworks.tweakflow.lang.values.Value;
 import com.twineworks.tweakflow.lang.values.Values;
+
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -80,21 +85,46 @@ public class ScriptManager {
         String s = (String) value.raw();
         return Values.make(s);
       case NUMBER:
-        Number n = (Number) value.raw();
-        return Values.make(n);
+        // Speed up conversion by using overloaded value directly
+        Number o = (Number) value.raw();
+        if (o instanceof Byte) return Values.make(o.longValue());
+        if (o instanceof Short) return Values.make(o.longValue());
+        if (o instanceof Long) return Values.make(o.longValue());
+        if (o instanceof Integer) return Values.make(o.longValue());
+        if (o instanceof Float) return Values.make((Float) o);
+        if (o instanceof Double) return Values.make((Double) o);
+        if (o instanceof BigDecimal) return Values.make((BigDecimal) o);
+        // Tweakflow doesn't have a BigInteger representation, we must hack it for now
+        // this is fixed in https://github.com/twineworks/tweakflow/commit/cd0d2412d9826028ccd9ce412a35e2d17086e985
+        if (o instanceof BigInteger) return Values.make(new BigDecimal((BigInteger) o));
+        throw new IllegalStateException("Unknown number type " + o.getClass().getName());
       case BOOLEAN:
         Boolean b = (Boolean) value.raw();
         return Values.make(b);
       case EXCEPTION:
-        // Tweakflow does not have a value representation for Throwables. They’ll get converted using toString which may or may not be what you intended.
-        // Creating a standardised string or an object might be useful here.
-        Throwable t = (Throwable) value.raw();
-        return Values.make(t);
+        return createThrowable((Throwable) value.raw());
       case NULL:
         return Values.NIL;
       default:
         throw new IllegalStateException("Unknown state " + value.type());
     }
+  }
+
+  private Value createThrowable(Throwable t) {
+    final String message = t.getMessage();
+    StringWriter stringWriter = new StringWriter();
+    t.printStackTrace(new PrintWriter(stringWriter));
+    String stackTrace = stringWriter.toString();
+
+    Map<String, Value> throwMap = new HashMap<>();
+    throwMap.put("message", Values.make(message));
+    throwMap.put("stackTrace", Values.make(stackTrace));
+
+    if (t.getCause() != null) {
+      Value cause = createThrowable(t.getCause());
+      throwMap.put("cause", cause);
+    }
+    return Values.makeDict(throwMap);
   }
 
   Runtime.Module compileModule(String script) {
