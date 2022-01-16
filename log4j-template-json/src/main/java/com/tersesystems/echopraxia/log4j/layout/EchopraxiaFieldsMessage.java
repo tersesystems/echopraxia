@@ -1,31 +1,33 @@
 package com.tersesystems.echopraxia.log4j.layout;
 ;
 import com.tersesystems.echopraxia.Field;
+import java.util.List;
 import java.util.function.BiFunction;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.message.Message;
 
 /** Create the simplest possible message for Log4J. */
 public class EchopraxiaFieldsMessage implements Message {
 
-  private final BiFunction<String, Object[], String> formatter;
+  private final BiFunction<String, List<Field>, String> formatter;
   private final String message;
-  private final Object[] parameters;
-  private final Field[] fields;
+  private final List<Field> argumentFields;
+  private final List<Field> contextFields;
 
   public EchopraxiaFieldsMessage(
-      BiFunction<String, Object[], String> formatter,
+      BiFunction<String, List<Field>, String> formatter,
       String message,
-      Object[] parameters,
-      Field[] fields) {
+      List<Field> argumentFields,
+      List<Field> contextFields) {
     this.formatter = formatter;
     this.message = message;
-    this.parameters = parameters;
-    this.fields = fields;
+    this.argumentFields = argumentFields;
+    this.contextFields = contextFields;
   }
 
   @Override
   public String getFormattedMessage() {
-    return formatter.apply(message, parameters);
+    return formatter.apply(message, argumentFields);
   }
 
   @Override
@@ -35,11 +37,11 @@ public class EchopraxiaFieldsMessage implements Message {
 
   @Override
   public Object[] getParameters() {
-    return parameters;
+    return argumentFields.toArray();
   }
 
   public Field[] getFields() {
-    return fields;
+    return Stream.concat(argumentFields.stream(), contextFields.stream()).toArray(Field[]::new);
   }
 
   // It looks like nothing actually uses message.getThrowable() internally

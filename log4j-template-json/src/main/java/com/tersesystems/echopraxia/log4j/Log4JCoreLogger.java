@@ -17,11 +17,12 @@ import org.apache.logging.log4j.message.Message;
 public class Log4JCoreLogger implements CoreLogger {
 
   // A function that fills in message.getFormattedMessage() appropriately.
-  private static final BiFunction<String, Object[], String> identity =
+  private static final BiFunction<String, List<Field>, String> identity =
       (msg, args) -> {
         // XXX TODO make this work reliably in logfmt
         // https://github.com/logfellow/logstash-logback-encoder/issues/397
         // https://github.com/logfellow/logstash-logback-encoder/issues/632
+        // https://github.com/logfellow/logstash-logback-encoder/blob/main/src/main/java/net/logstash/logback/argument/StructuredArguments.java#L270
         return msg;
       };
 
@@ -116,11 +117,10 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   private <B extends Field.Builder> Message createMessage(String template, List<Field> arguments) {
-    // XXX should we filter out exception from the fields?
+    // XXX should we filter out exception from the fields?  Should be filtered out by the
+    // serializer...
     List<Field> contextFields = context.getFields();
-    Field[] joinedFields = joinLists(arguments, contextFields);
-
-    return new EchopraxiaFieldsMessage(identity, template, arguments.toArray(), joinedFields);
+    return new EchopraxiaFieldsMessage(identity, template, arguments, contextFields);
   }
 
   private Marker createMarker() {
