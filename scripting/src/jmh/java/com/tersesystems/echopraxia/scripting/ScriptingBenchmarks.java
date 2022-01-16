@@ -44,37 +44,37 @@ public class ScriptingBenchmarks {
 
   @Benchmark
   public void testFileConditionMatch(Blackhole blackhole) {
-    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  208.966 ± 15.136  ns/op
+    // ScriptingBenchmarks.testFileConditionMatch     avgt    5  127.251 ± 0.816  ns/op
     blackhole.consume(fileCondition.test(Level.INFO, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testStringConditionMatch(Blackhole blackhole) {
-    // ScriptingBenchmarks.testFileConditionMatch    avgt    5  208.966 ± 15.136  ns/op
+    // ScriptingBenchmarks.testStringConditionMatch   avgt    5  122.905 ± 3.440  ns/op
     blackhole.consume(stringCondition.test(Level.INFO, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testFileConditionFail(Blackhole blackhole) {
-    // ScriptingBenchmarks.testFileConditionFail     avgt    5  203.641 ±  0.959  ns/op
+    // ScriptingBenchmarks.testFileConditionFail      avgt    5  112.629 ± 2.951  ns/op
     blackhole.consume(fileCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testStringConditionFail(Blackhole blackhole) {
-    // ScriptingBenchmarks.testStringConditionFail   avgt    5  198.490 ±  1.657  ns/op
+    // ScriptingBenchmarks.testStringConditionFail    avgt    5  118.323 ± 4.296  ns/op
     blackhole.consume(stringCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testWatchedConditionMatch(Blackhole blackhole) {
-    // ScriptingBenchmarks.testWatchedConditionFail   avgt    5  236.907 ±  9.992  ns/op
+    // ScriptingBenchmarks.testWatchedConditionMatch  avgt    5  134.601 ± 2.325  ns/op
     blackhole.consume(watchedCondition.test(Level.INFO, LogstashLoggingContext.empty()));
   }
 
   @Benchmark
   public void testWatchedConditionFail(Blackhole blackhole) {
-    // ScriptingBenchmarks.testWatchedConditionMatch  avgt    5  256.803 ± 25.520  ns/op
+    // ScriptingBenchmarks.testWatchedConditionFail   avgt    5  125.652 ± 5.286  ns/op
     blackhole.consume(watchedCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
   }
 }
