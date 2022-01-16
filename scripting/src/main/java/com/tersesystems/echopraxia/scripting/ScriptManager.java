@@ -86,6 +86,8 @@ public class ScriptManager {
         Boolean b = (Boolean) value.raw();
         return Values.make(b);
       case EXCEPTION:
+        // Tweakflow does not have a value representation for Throwables. They’ll get converted using toString which may or may not be what you intended.
+        // Creating a standardised string or an object might be useful here.
         Throwable t = (Throwable) value.raw();
         return Values.make(t);
       case NULL:
