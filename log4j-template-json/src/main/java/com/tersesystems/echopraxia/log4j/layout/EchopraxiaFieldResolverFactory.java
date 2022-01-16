@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.log4j;
+package com.tersesystems.echopraxia.log4j.layout;
 
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;

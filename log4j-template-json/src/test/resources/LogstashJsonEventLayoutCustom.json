@@ -1,7 +1,6 @@
 {
   "fields": {
-    "$resolver": "echopraxiaFields",
-    "flatten": true
+    "$resolver": "echopraxiaFields"
   },
   "mdc": {
     "$resolver": "mdc"

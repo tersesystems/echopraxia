@@ -4,22 +4,22 @@ import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.message.Message;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.stream.Stream;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
 
   // A function that fills in message.getFormattedMessage() appropriately.
   private static final BiFunction<String, Object[], String> identity = (msg, args) -> {
+    // XXX TODO make this work reliably in logfmt
     return msg;
   };
 
@@ -48,8 +48,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public void log(Level level, String message) {
-    Marker m = convertContext(context);
-    logger.log(convertLevel(level), m, message);
+    logger.log(convertLevel(level), createMarker(), message);
   }
 
   @Override
@@ -58,8 +57,9 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return;
     }
-    Marker m = convertContext(context);
-    logger.log(convertLevel(level), m, createMessage(message, f, builder));
+    List<Field> argumentFields = f.apply(builder);
+    Throwable e = findThrowable(argumentFields);
+    logger.log(convertLevel(level), createMarker(), createMessage(message, argumentFields), e);
   }
 
   @Override
@@ -67,8 +67,7 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return;
     }
-    Marker m = convertContext(context);
-    logger.log(convertLevel(level), m, createMessage(message, e));
+    logger.log(convertLevel(level), createMarker(), createMessage(message, Collections.emptyList()), e);
   }
 
   @Override
@@ -113,32 +112,15 @@ public class Log4JCoreLogger implements CoreLogger {
     return new Log4JCoreLogger(logger, context, this.condition.and(condition));
   }
 
-  private <B extends Field.Builder> Message createMessage(
-      String template, Field.BuilderFunction<B> f, B builder) {
-    // We pull in the fields for arguments
-    List<Field> argumentFields = f.apply(builder);
-
-    // we don't look in context fields for an exception, because
-    // exception fields shouldn't ever be added into a context.
-    // XXX do we make that explicit?  I feel like that's kind of obvious.
-    Throwable t = findThrowable(argumentFields);
-
-    // We also need to pull in the context fields as well since
-    // Log4J doesn't have a Markers facility like logstash-logback-encoder
-    // so we can't send it through a marker
+  private <B extends Field.Builder> Message createMessage(String template, List<Field> arguments) {
+    // XXX should we filter out exception from the fields?
     List<Field> contextFields = context.getFields();
+    Field[] joinedFields = joinLists(arguments, contextFields);
 
-    Field[] joinedFields = joinLists(argumentFields, contextFields);
-
-    return new EchopraxiaFieldsMessage(identity, template, argumentFields.toArray(), joinedFields, t);
+    return new EchopraxiaFieldsMessage(identity, template, arguments.toArray(), joinedFields);
   }
 
-  private Message createMessage(String template, Throwable e) {
-    Field[] contextFields = context.getFields().toArray(new Field[0]);
-    return new EchopraxiaFieldsMessage(identity, template, null, contextFields, e);
-  }
-
-  private Marker convertContext(Log4JLoggingContext context) {
+  private Marker createMarker() {
     // https://logging.apache.org/log4j/2.x/manual/markers.html
     //
     // Log4J markers are static, kept in a single map and so there's no such
@@ -152,7 +134,7 @@ public class Log4JCoreLogger implements CoreLogger {
     //
     // From what I can tell here, you'll only ever work with one Log4J marker and
     // will have to manage the parent / child relationships outside of Echopraxia.
-    // So we just return the first one and hope that works.
+    // So we just return th of them and hope it works.
     return context.getMarkers().stream().findFirst().orElseGet(() -> null);
   }
 
@@ -172,10 +154,6 @@ public class Log4JCoreLogger implements CoreLogger {
 
   private Field[] joinLists(List<Field> fields, List<Field> contextFields) {
     return Stream.concat(fields.stream(), contextFields.stream()).toArray(Field[]::new);
-  }
-
-  protected Object[] convertArguments(List<Field> fields) {
-    return fields.toArray();
   }
 
 }
