@@ -1,18 +1,15 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
 import com.tersesystems.echopraxia.Field;
+import java.io.StringWriter;
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.layout.template.json.resolver.EventResolver;
 import org.apache.logging.log4j.layout.template.json.util.JsonWriter;
 
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonObjectBuilder;
-import java.io.StringWriter;
-
-/**
- * Creates a resolver (but it only goes under the `fields` and flatten doesn't work)
- */
+/** Creates a resolver (but it only goes under the `fields` and flatten doesn't work) */
 final class EchopraxiaFieldsResolver implements EventResolver {
 
   private static final EchopraxiaFieldsResolver INSTANCE = new EchopraxiaFieldsResolver();
@@ -47,5 +44,4 @@ final class EchopraxiaFieldsResolver implements EventResolver {
     javaxJsonWriter.write(jsonObject);
     jsonWriter.writeRawString(stringWriter.toString());
   }
-
 }

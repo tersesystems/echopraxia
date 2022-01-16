@@ -1,13 +1,10 @@
 package com.tersesystems.echopraxia.log4j.layout;
 ;
 import com.tersesystems.echopraxia.Field;
+import java.util.function.BiFunction;
 import org.apache.logging.log4j.message.Message;
 
-import java.util.function.BiFunction;
-
-/**
- * Create the simplest possible message for Log4J.
- */
+/** Create the simplest possible message for Log4J. */
 public class EchopraxiaFieldsMessage implements Message {
 
   private final BiFunction<String, Object[], String> formatter;
@@ -15,7 +12,11 @@ public class EchopraxiaFieldsMessage implements Message {
   private final Object[] parameters;
   private final Field[] fields;
 
-  public EchopraxiaFieldsMessage(BiFunction<String, Object[], String> formatter, String message, Object[] parameters, Field[] fields) {
+  public EchopraxiaFieldsMessage(
+      BiFunction<String, Object[], String> formatter,
+      String message,
+      Object[] parameters,
+      Field[] fields) {
     this.formatter = formatter;
     this.message = message;
     this.parameters = parameters;
@@ -46,6 +47,4 @@ public class EchopraxiaFieldsMessage implements Message {
   public Throwable getThrowable() {
     return null;
   }
-
-
 }

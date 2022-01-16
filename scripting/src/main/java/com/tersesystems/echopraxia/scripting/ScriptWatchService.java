@@ -21,8 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
- * A service that watches a directory containing scripts, and
- * invalidates a script handle if the file has been touched.
+ * A service that watches a directory containing scripts, and invalidates a script handle if the
+ * file has been touched.
  */
 public class ScriptWatchService implements AutoCloseable {
   private static final Logger<?> logger = LoggerFactory.getLogger();

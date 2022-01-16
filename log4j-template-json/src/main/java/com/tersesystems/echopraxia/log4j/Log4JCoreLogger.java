@@ -5,23 +5,25 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.message.Message;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.message.Message;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
 
   // A function that fills in message.getFormattedMessage() appropriately.
-  private static final BiFunction<String, Object[], String> identity = (msg, args) -> {
-    // XXX TODO make this work reliably in logfmt
-    return msg;
-  };
+  private static final BiFunction<String, Object[], String> identity =
+      (msg, args) -> {
+        // XXX TODO make this work reliably in logfmt
+        // https://github.com/logfellow/logstash-logback-encoder/issues/397
+        // https://github.com/logfellow/logstash-logback-encoder/issues/632
+        return msg;
+      };
 
   private final Logger logger;
   private final Log4JLoggingContext context;
@@ -67,7 +69,8 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return;
     }
-    logger.log(convertLevel(level), createMarker(), createMessage(message, Collections.emptyList()), e);
+    logger.log(
+        convertLevel(level), createMarker(), createMessage(message, Collections.emptyList()), e);
   }
 
   @Override
@@ -155,5 +158,4 @@ public class Log4JCoreLogger implements CoreLogger {
   private Field[] joinLists(List<Field> fields, List<Field> contextFields) {
     return Stream.concat(fields.stream(), contextFields.stream()).toArray(Field[]::new);
   }
-
 }

@@ -8,7 +8,7 @@ import org.apache.logging.log4j.layout.template.json.resolver.*;
 public class EchopraxiaFieldResolverFactory implements EventResolverFactory {
 
   private static final EchopraxiaFieldResolverFactory INSTANCE =
-          new EchopraxiaFieldResolverFactory();
+      new EchopraxiaFieldResolverFactory();
 
   private EchopraxiaFieldResolverFactory() {}
 
@@ -24,9 +24,7 @@ public class EchopraxiaFieldResolverFactory implements EventResolverFactory {
 
   @Override
   public EchopraxiaFieldsResolver create(
-          final EventResolverContext context,
-          final TemplateResolverConfig config) {
+      final EventResolverContext context, final TemplateResolverConfig config) {
     return EchopraxiaFieldsResolver.getInstance();
   }
-
 }

@@ -1,15 +1,13 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
 import com.tersesystems.echopraxia.Field;
-
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.List;
 import javax.json.Json;
 import javax.json.JsonArrayBuilder;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonValue;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.List;
-import java.util.stream.Collectors;
 
 class EchopraxiaFieldSerializer {
 
