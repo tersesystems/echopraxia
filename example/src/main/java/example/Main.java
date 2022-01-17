@@ -63,7 +63,7 @@ public class Main {
 
     // Render the person using the custom field builder as a StructuredArgument.
     if (logger.isInfoEnabled(dateCondition)) {
-      logger.info("hi there {}", fb -> singletonList(fb.person("small_mammal", eloise)));
+      logger.info("hi there {}", fb -> fb.only(fb.person("small_mammal", eloise)));
     }
   }
 

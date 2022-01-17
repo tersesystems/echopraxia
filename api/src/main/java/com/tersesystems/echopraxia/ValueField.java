@@ -1,16 +1,16 @@
 package com.tersesystems.echopraxia;
 
 /**
- * The KeyValueField class.
+ * The ValueField class.
  *
- * <p>This is a field that prints out key=value to a message template if possible.
+ * <p>This is a field that prints out `value` to a message template if possible.
  */
-public final class KeyValueField implements Field {
+public final class ValueField implements Field {
 
   private final String name;
   private final Value<?> value;
 
-  public KeyValueField(String name, Value<?> value) {
+  public ValueField(String name, Value<?> value) {
     this.name = name;
     this.value = value;
   }
@@ -26,6 +26,6 @@ public final class KeyValueField implements Field {
   }
 
   public String toString() {
-    return name + "=" + value;
+    return value.toString();
   }
 }
