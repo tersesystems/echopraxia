@@ -7,24 +7,12 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.message.Message;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
-
-  // A function that fills in message.getFormattedMessage() appropriately.
-  private static final BiFunction<String, List<Field>, String> identity =
-      (msg, args) -> {
-        // XXX TODO make this work reliably in logfmt
-        // https://github.com/logfellow/logstash-logback-encoder/issues/397
-        // https://github.com/logfellow/logstash-logback-encoder/issues/632
-        // https://github.com/logfellow/logstash-logback-encoder/blob/main/src/main/java/net/logstash/logback/argument/StructuredArguments.java#L270
-        return msg;
-      };
 
   private final Logger logger;
   private final Log4JLoggingContext context;
@@ -120,7 +108,7 @@ public class Log4JCoreLogger implements CoreLogger {
     // XXX should we filter out exception from the fields?  Should be filtered out by the
     // serializer...
     List<Field> contextFields = context.getFields();
-    return new EchopraxiaFieldsMessage(identity, template, arguments, contextFields);
+    return new EchopraxiaFieldsMessage(template, arguments, contextFields);
   }
 
   private Marker createMarker() {
@@ -153,9 +141,5 @@ public class Log4JCoreLogger implements CoreLogger {
       }
     }
     return null;
-  }
-
-  private Field[] joinLists(List<Field> fields, List<Field> contextFields) {
-    return Stream.concat(fields.stream(), contextFields.stream()).toArray(Field[]::new);
   }
 }

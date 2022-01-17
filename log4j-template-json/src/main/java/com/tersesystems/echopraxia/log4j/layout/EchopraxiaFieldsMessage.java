@@ -1,25 +1,23 @@
 package com.tersesystems.echopraxia.log4j.layout;
-;
+
 import com.tersesystems.echopraxia.Field;
-import java.util.List;
-import java.util.function.BiFunction;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.message.ParameterizedMessage;
+
+import java.util.List;
+import java.util.stream.Stream;
 
 /** Create the simplest possible message for Log4J. */
 public class EchopraxiaFieldsMessage implements Message {
 
-  private final BiFunction<String, List<Field>, String> formatter;
   private final String message;
   private final List<Field> argumentFields;
   private final List<Field> contextFields;
 
   public EchopraxiaFieldsMessage(
-      BiFunction<String, List<Field>, String> formatter,
       String message,
       List<Field> argumentFields,
       List<Field> contextFields) {
-    this.formatter = formatter;
     this.message = message;
     this.argumentFields = argumentFields;
     this.contextFields = contextFields;
@@ -27,7 +25,13 @@ public class EchopraxiaFieldsMessage implements Message {
 
   @Override
   public String getFormattedMessage() {
-    return formatter.apply(message, argumentFields);
+    // If I'm reading this right, there's no way to format a message through
+    // log4j without creating a ParameterizedMessage and then calling
+    // getFormattedMessage() on it, because ParameterFormatter is a package
+    // private class, and ReusableParameterizedMessage.set methods are also
+    // package private.
+    final ParameterizedMessage pm = new ParameterizedMessage(getFormat(), getParameters());
+    return pm.getFormattedMessage();
   }
 
   @Override

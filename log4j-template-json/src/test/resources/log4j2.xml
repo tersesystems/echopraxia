@@ -3,7 +3,7 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT" follow="true">
-           <JsonTemplateLayout eventTemplateUri="classpath:mylayout.json"/>
+           <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutCustom.json"/>
         </Console>
     </Appenders>
     <Loggers>
