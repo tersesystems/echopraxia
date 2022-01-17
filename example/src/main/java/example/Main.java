@@ -16,9 +16,11 @@ public class Main {
 
   private Date lastAccessedDate = new Date();
 
+  private static final MyFieldBuilder myFieldBuilder = new MyFieldBuilder();
+
   // More often you'll want to create a logger with your own domain objects and render those.
   // So we start with the basic logger...
-  //   ...and add a custom `BuilderWithDate` as the field builder...
+  //   ...and add a custom field builder...
   //   ...then add a date to the logger's context.
   //
   // Here, `last_accessed_date` will be rendered with every log entry, but will
@@ -28,7 +30,7 @@ public class Main {
   // belongs to an object instance.
   private final Logger<MyFieldBuilder> logger =
       basicLogger
-          .withFieldBuilder(MyFieldBuilder.class)
+          .withFieldBuilder(myFieldBuilder)
           .withFields(fb -> fb.onlyDate("last_accessed_date", lastAccessedDate));
 
   public static void main(String[] args) {

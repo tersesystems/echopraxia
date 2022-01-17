@@ -32,18 +32,52 @@ public interface Field {
   Value<?> value();
 
   /**
-   *  The field builder interface.
+   * The field builder interface.
    *
-   *  <p>This is provided in a function for creating fields in context and arguments.
-   *  You are encourage to extend this interface to create your own custom field builders
-   *  to create your own domain specific logic for creating fields.
-   *  </p>
+   * <p>This is provided in a function for creating fields in context and arguments. You are
+   * encourage to extend this interface to create your own custom field builders to create your own
+   * domain specific logic for creating fields.
    */
   interface Builder {
     String EXCEPTION = "exception";
 
     static Builder instance() {
-      return new Field.Builder() {};
+      return KeyValueField.keyValueFieldBuilder;
+    }
+
+    /**
+     * Wraps a single field in a singleton list.
+     *
+     * <p>{@code fb.only(fb.string("correlation_id", "match"))}
+     *
+     * @param field the given field
+     * @return a list containing a single field element.
+     */
+    default List<Field> only(Field field) {
+      return singletonList(field);
+    }
+
+    /**
+     * Wraps fields in a list. More convenient than {@code Arrays.asList}.
+     *
+     * <p>{@code fb.list( fb.string("correlation_id", "match"), fb.number("some_number", 12345) )}
+     *
+     * @param fields the given fields
+     * @return a list containing the fields.
+     */
+    default List<Field> list(Field... fields) {
+      return Arrays.asList(fields);
+    }
+
+    /**
+     * Creates a field.
+     *
+     * @param name the field name
+     * @param value the field value
+     * @return the field.
+     */
+    default Field field(String name, Field.Value<?> value) {
+      return new KeyValueField(name, value);
     }
 
     // string
@@ -56,18 +90,7 @@ public interface Field {
      * @return the field.
      */
     default Field string(String name, String value) {
-      return new DefaultField(name, Value.string(value));
-    }
-
-    /**
-     * Creates a list of fields out of a name and a raw string value.
-     *
-     * @param name the name of the field.
-     * @param value the value of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyString(String name, String value) {
-      return singletonList(string(name, value));
+      return field(name, Value.string(value));
     }
 
     // number
@@ -80,18 +103,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field number(String name, Number value) {
-      return new DefaultField(name, Value.number(value));
-    }
-
-    /**
-     * Creates a singleton list of fields out of a name and a raw number value.
-     *
-     * @param name the name of the field.
-     * @param value the value of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyNumber(String name, Number value) {
-      return singletonList(number(name, value));
+      return field(name, Value.number(value));
     }
 
     // boolean
@@ -104,18 +116,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field bool(String name, Boolean value) {
-      return new DefaultField(name, Value.bool(value));
-    }
-
-    /**
-     * Creates a singleton list of fields out of a name and a raw boolean value.
-     *
-     * @param name the name of the field.
-     * @param value the value of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyBool(String name, Boolean value) {
-      return singletonList(bool(name, value));
+      return field(name, Value.bool(value));
     }
 
     // array
@@ -128,7 +129,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, Value<?>... values) {
-      return new DefaultField(name, Value.array(values));
+      return field(name, Value.array(values));
     }
 
     /**
@@ -139,29 +140,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, List<Value<?>> values) {
-      return new DefaultField(name, Value.array(values));
-    }
-
-    /**
-     * Creates a singleton list of an array field out of a name and array values.
-     *
-     * @param name the name of the field.
-     * @param values the values.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyArray(String name, Value<?>... values) {
-      return singletonList(array(name, values));
-    }
-
-    /**
-     * Creates a singleton list of an array field out of a name and a list of values.
-     *
-     * @param name the name of the field.
-     * @param values the values.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyArray(String name, List<Value<?>> values) {
-      return singletonList(array(name, values));
+      return field(name, Value.array(values));
     }
 
     // object
@@ -173,7 +152,7 @@ public interface Field {
      * @return a single field.
      */
     default Field object(String name, Field... values) {
-      return new DefaultField(name, Value.object(values));
+      return field(name, Value.object(values));
     }
 
     /**
@@ -184,29 +163,7 @@ public interface Field {
      * @return a field.
      */
     default Field object(String name, List<Field> values) {
-      return new DefaultField(name, Value.object(values));
-    }
-
-    /**
-     * Creates a singleton list of an object out of a name and array values.
-     *
-     * @param name the name of the field.
-     * @param values the values.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyObject(String name, Field... values) {
-      return singletonList(object(name, values));
-    }
-
-    /**
-     * Creates a singleton list of an object out of a name and a list of values.
-     *
-     * @param name the name of the field.
-     * @param values the values.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyObject(String name, List<Field> values) {
-      return singletonList(object(name, values));
+      return field(name, Value.object(values));
     }
 
     // null
@@ -218,17 +175,7 @@ public interface Field {
      * @return a field.
      */
     default Field nullValue(String name) {
-      return new DefaultField(name, Value.nullValue());
-    }
-
-    /**
-     * Creates a singleton list of a null.
-     *
-     * @param name the name of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyNullValue(String name) {
-      return singletonList(nullValue(name));
+      return field(name, Value.nullValue());
     }
 
     // exception
@@ -240,7 +187,7 @@ public interface Field {
      * @return a field.
      */
     default Field exception(Throwable t) {
-      return new DefaultField(EXCEPTION, Value.exception(t));
+      return field(EXCEPTION, Value.exception(t));
     }
 
     /**
@@ -251,7 +198,84 @@ public interface Field {
      * @return a field.
      */
     default Field exception(String name, Throwable t) {
-      return new DefaultField(name, Value.exception(t));
+      return field(name, Value.exception(t));
+    }
+
+    /**
+     * Creates a list of fields out of a name and a raw string value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyString(String name, String value) {
+      return only(string(name, value));
+    }
+
+    /**
+     * Creates a singleton list of fields out of a name and a raw number value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyNumber(String name, Number value) {
+      return only(number(name, value));
+    }
+
+    /**
+     * Creates a singleton list of fields out of a name and a raw boolean value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyBool(String name, Boolean value) {
+      return only(bool(name, value));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and array values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, Value<?>... values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and a list of values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, List<Value<?>> values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an object out of a name and array values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyObject(String name, Field... values) {
+      return only(object(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an object out of a name and a list of values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyObject(String name, List<Field> values) {
+      return only(object(name, values));
     }
 
     /**
@@ -261,7 +285,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default List<Field> onlyException(Throwable t) {
-      return singletonList(exception(t));
+      return only(exception(t));
     }
 
     /**
@@ -272,34 +296,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default List<Field> onlyException(String name, Throwable t) {
-      return singletonList(exception(name, t));
-    }
-
-    /** The DefaultField class. This is an implementation detail of Field. */
-    final class DefaultField implements Field {
-      private final String name;
-      private final Value<?> value;
-
-      private static final Formatter formatter = new Formatter() {};
-
-      public DefaultField(String name, Value<?> value) {
-        this.name = name;
-        this.value = value;
-      }
-
-      @Override
-      public String name() {
-        return name;
-      }
-
-      @Override
-      public Value<?> value() {
-        return value;
-      }
-
-      public String toString() {
-        return formatter.fieldToString(this);
-      }
+      return only(exception(name, t));
     }
   }
 
@@ -321,7 +318,6 @@ public interface Field {
    * @param <V> the raw type of the underling value.
    */
   abstract class Value<V> {
-    private static final Formatter formatter = new Formatter() {};
 
     protected Value() {}
 
@@ -335,7 +331,11 @@ public interface Field {
     public abstract ValueType type();
 
     public String toString() {
-      return formatter.valueToString(this);
+      return valueToString(this);
+    }
+
+    private String valueToString(Value<?> v) {
+      return v.raw() == null ? "null" : v.raw().toString();
     }
 
     /**
@@ -572,19 +572,6 @@ public interface Field {
       public Throwable raw() {
         return raw;
       }
-    }
-  }
-
-  // Internal formatter... at some point might be worth exposing this through SPI.
-  // This may be important for key=value vs just plain value and logfmt line oriented data.
-  interface Formatter {
-    default String fieldToString(Field field) {
-      String name = field.name();
-      return name + "=" + field.value();
-    }
-
-    default <V> String valueToString(Value<V> v) {
-      return v.raw() == null ? "null" : v.raw().toString();
     }
   }
 }

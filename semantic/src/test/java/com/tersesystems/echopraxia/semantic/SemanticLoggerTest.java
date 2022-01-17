@@ -9,7 +9,6 @@ import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import com.tersesystems.echopraxia.logstash.LogstashCoreLogger;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ public class SemanticLoggerTest {
             getClass(),
             Person.class,
             person -> "person.name = {}, person.age = {}",
-            p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)));
+            p -> b -> b.list(b.string("name", p.name), b.number("age", p.age)));
 
     Person eloise = new Person("Eloise", 1);
     logger.info(eloise);
@@ -53,7 +52,7 @@ public class SemanticLoggerTest {
             coreLogger.withMarkers(MarkerFactory.getMarker("SECURITY")),
             Person.class,
             person -> "person.name = {}, person.age = {}",
-            p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)),
+            p -> b -> b.list(b.string("name", p.name), b.number("age", p.age)),
             Field.Builder.instance());
 
     Person eloise = new Person("Eloise", 1);

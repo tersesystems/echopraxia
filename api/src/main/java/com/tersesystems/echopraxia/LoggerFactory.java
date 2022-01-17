@@ -5,7 +5,7 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 
 /**
- * The LoggerFactory class.  This is used to create the appropriate `Logger`.
+ * The LoggerFactory class. This is used to create the appropriate `Logger`.
  *
  * <p>{@code private static final Logger logger = LoggerFactory.getLogger(); }
  */

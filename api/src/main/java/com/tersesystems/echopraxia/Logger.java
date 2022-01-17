@@ -20,16 +20,12 @@ public class Logger<FB extends Field.Builder> {
     this.fieldBuilder = fieldBuilder;
   }
 
-  /**
-   * @return the internal core logger.
-   */
+  /** @return the internal core logger. */
   public CoreLogger core() {
     return core;
   }
 
-  /**
-   * @return the field builder.
-   */
+  /** @return the field builder. */
   public FB fieldBuilder() {
     return fieldBuilder;
   }
@@ -86,9 +82,8 @@ public class Logger<FB extends Field.Builder> {
   }
 
   /**
-   * Creates a new logger with fields using a one-off
-   * field builder for the function that is <b>not</b> passed through to the new
-   * logger.
+   * Creates a new logger with fields using a one-off field builder for the function that is
+   * <b>not</b> passed through to the new logger.
    *
    * @param ctxBuilderF the given function producing fields from a field builder.
    * @param ctxBuilder the field builder to use for the function.
@@ -101,12 +96,10 @@ public class Logger<FB extends Field.Builder> {
     return new Logger<>(coreLogger, fieldBuilder);
   }
 
-  //------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   // TRACE
 
-  /**
-   * @return true if the logger level is TRACE or higher.
-   */
+  /** @return true if the logger level is TRACE or higher. */
   public boolean isTraceEnabled() {
     return core().isEnabled(TRACE);
   }
@@ -142,7 +135,7 @@ public class Logger<FB extends Field.Builder> {
    * Logs statement at TRACE level with exception.
    *
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void trace(String message, Throwable e) {
     core().log(TRACE, message, e);
@@ -174,18 +167,16 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param condition the given condition.
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void trace(Condition condition, String message, Throwable e) {
     core().log(TRACE, condition, message, e);
   }
 
-  //------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   // DEBUG
 
-  /**
-   * @return true if the logger level is DEBUG or higher.
-   */
+  /** @return true if the logger level is DEBUG or higher. */
   public boolean isDebugEnabled() {
     return core().isEnabled(DEBUG);
   }
@@ -221,7 +212,7 @@ public class Logger<FB extends Field.Builder> {
    * Logs statement at DEBUG level with exception.
    *
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void debug(String message, Throwable e) {
     core().log(DEBUG, message, e);
@@ -253,18 +244,16 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param condition the given condition.
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void debug(Condition condition, String message, Throwable e) {
     core().log(DEBUG, condition, message, e);
   }
 
-  //------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   // INFO
 
-  /**
-   * @return true if the logger level is INFO or higher.
-   */
+  /** @return true if the logger level is INFO or higher. */
   public boolean isInfoEnabled() {
     return core().isEnabled(INFO);
   }
@@ -300,7 +289,7 @@ public class Logger<FB extends Field.Builder> {
    * Logs statement at INFO level with exception.
    *
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void info(String message, Throwable e) {
     core().log(INFO, message, e);
@@ -332,18 +321,16 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param condition the given condition.
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void info(Condition condition, String message, Throwable e) {
     core().log(INFO, condition, message, e);
   }
 
-  //------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   // WARN
 
-  /**
-   * @return true if the logger level is WARN or higher.
-   */
+  /** @return true if the logger level is WARN or higher. */
   public boolean isWarnEnabled() {
     return core().isEnabled(WARN);
   }
@@ -379,7 +366,7 @@ public class Logger<FB extends Field.Builder> {
    * Logs statement at WARN level with exception.
    *
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void warn(String message, Throwable e) {
     core().log(WARN, message, e);
@@ -411,18 +398,16 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param condition the given condition.
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void warn(Condition condition, String message, Throwable e) {
     core().log(WARN, condition, message, e);
   }
 
-  //------------------------------------------------------------------------
+  // ------------------------------------------------------------------------
   // ERROR
 
-  /**
-   * @return true if the logger level is ERROR or higher.
-   */
+  /** @return true if the logger level is ERROR or higher. */
   public boolean isErrorEnabled() {
     return core().isEnabled(ERROR);
   }
@@ -458,7 +443,7 @@ public class Logger<FB extends Field.Builder> {
    * Logs statement at INFO level with exception.
    *
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void error(String message, Throwable e) {
     core().log(ERROR, message, e);
@@ -490,10 +475,9 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param condition the given condition.
    * @param message the message.
-   * @param e       the given exception.
+   * @param e the given exception.
    */
   public void error(Condition condition, String message, Throwable e) {
     core().log(ERROR, condition, message, e);
   }
-
 }
