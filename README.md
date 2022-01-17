@@ -50,14 +50,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:logstash:1.0.0" 
+implementation "com.tersesystems.echopraxia:logstash:1.1.0" 
 ```
 
 ## Log4J
@@ -262,7 +262,7 @@ final Condition mustHaveFoo = (level, context) ->
 
 Conditions should be cheap to evaluate, and should be "safe" - i.e. they should not do things like network calls, database lookups, or rely on locks.
 
-Conditions can be used either on the logger, on the statement, or against the enabled check.
+Conditions can be used either on the logger, on the statement, or against the predicate check.
 
 ### Logger
 
@@ -286,9 +286,9 @@ You can use conditions in an individual statement:
 logger.info(mustHaveFoo, "Only log if foo is present");
 ```
 
-### Enabled
+### Predicates
 
-Conditions can also be used in blocks for expensive objects.
+Conditions can also be used in predicate blocks for expensive objects.
 
 ```java
 if (logger.isInfoEnabled(condition)) {
@@ -312,14 +312,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>scripting</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:scripting:1.0.0" 
+implementation "com.tersesystems.echopraxia:scripting:1.1.0" 
 ```
 
 ## String Based Scripts
@@ -327,6 +327,12 @@ implementation "com.tersesystems.echopraxia:scripting:1.0.0"
 You also have the option of passing in a string directly:
 
 ```java
+StringBuilder b = new StringBuilder("");
+b.append("library echopraxia {");
+b.append("  function evaluate: (string level, dict fields) ->");
+b.append("    level == \"INFO\";");
+b.append("}");
+String scriptString = b.toString();  
 Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
 ```
 
@@ -473,14 +479,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>semantic</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:semantic:1.0.0" 
+implementation "com.tersesystems.echopraxia:semantic:1.1.0" 
 ```
 
 ## Fluent Logging
@@ -514,14 +520,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>fluent</artifactId>
-  <version>1.0.0</version>
+  <version>1.1.0</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:fluent:1.0.0" 
+implementation "com.tersesystems.echopraxia:fluent:1.1.0" 
 ```
 
 ## Core Logger and SLF4J API

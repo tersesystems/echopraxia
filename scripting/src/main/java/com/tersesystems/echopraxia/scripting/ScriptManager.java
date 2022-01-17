@@ -10,7 +10,6 @@ import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.values.Arity2CallSite;
 import com.twineworks.tweakflow.lang.values.Value;
 import com.twineworks.tweakflow.lang.values.Values;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -95,7 +94,8 @@ public class ScriptManager {
         if (o instanceof Double) return Values.make((Double) o);
         if (o instanceof BigDecimal) return Values.make((BigDecimal) o);
         // Tweakflow doesn't have a BigInteger representation, we must hack it for now
-        // this is fixed in https://github.com/twineworks/tweakflow/commit/cd0d2412d9826028ccd9ce412a35e2d17086e985
+        // this is fixed in
+        // https://github.com/twineworks/tweakflow/commit/cd0d2412d9826028ccd9ce412a35e2d17086e985
         if (o instanceof BigInteger) return Values.make(new BigDecimal((BigInteger) o));
         throw new IllegalStateException("Unknown number type " + o.getClass().getName());
       case BOOLEAN:
