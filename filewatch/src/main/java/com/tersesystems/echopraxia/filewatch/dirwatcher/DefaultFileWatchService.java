@@ -39,7 +39,6 @@ public class DefaultFileWatchService implements FileWatchService {
     this.disableFileHashCheck = disableFileHashCheck;
   }
 
-  /** @inheritDoc */
   @Override
   public FileWatcher watch(
       ThreadFactory factory, List<Path> watchList, Consumer<FileWatchEvent> eventConsumer)

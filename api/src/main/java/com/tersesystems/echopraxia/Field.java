@@ -31,7 +31,14 @@ public interface Field {
    */
   Value<?> value();
 
-  /** The builder interface. */
+  /**
+   *  The field builder interface.
+   *
+   *  <p>This is provided in a function for creating fields in context and arguments.
+   *  You are encourage to extend this interface to create your own custom field builders
+   *  to create your own domain specific logic for creating fields.
+   *  </p>
+   */
   interface Builder {
     String EXCEPTION = "exception";
 
@@ -569,6 +576,7 @@ public interface Field {
   }
 
   // Internal formatter... at some point might be worth exposing this through SPI.
+  // This may be important for key=value vs just plain value and logfmt line oriented data.
   interface Formatter {
     default String fieldToString(Field field) {
       String name = field.name();

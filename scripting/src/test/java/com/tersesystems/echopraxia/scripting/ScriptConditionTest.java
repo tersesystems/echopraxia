@@ -47,15 +47,15 @@ public class ScriptConditionTest {
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger.withFields(bf -> bf.onlyException(new RuntimeException("testing")))
-            .info("data of interest found");
+    logger
+        .withFields(bf -> bf.onlyException(new RuntimeException("testing")))
+        .info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
     ILoggingEvent event = list.get(0);
     assertThat(event.getMessage()).isEqualTo("data of interest found");
   }
-
 
   @Test
   public void testCondition() {
