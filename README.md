@@ -142,13 +142,28 @@ try {
 However, when you log arguments, you pass a function which provides you with a field builder and returns a list of fields:
 
 ```java
+basicLogger.info("Message name {} age {}", fb -> fb.list(
+  fb.string("name", "value"),
+  fb.number("age", 13)
+));
+```
+
+You can specify a single field using `only`:
+
+```java
+basicLogger.info("Message name {}", fb -> fb.only(fb.string("name", "value")));
+```
+
+And there are some shortcut methods like `onlyString` that combine `only` and `string`:
+
+```java
 basicLogger.info("Message name {}", fb -> fb.onlyString("name", "value"));
 ```
 
 You can log multiple arguments and include the exception if you want the stack trace:
 
 ```java
-basicLogger.info("Message name {}", fb -> Arrays.asList(
+basicLogger.info("Message name {}", fb -> fb.list(
   fb.string("name", "value"),
   fb.exception(e)
 ));
@@ -167,7 +182,7 @@ Echopraxia lets you specify custom field builders whenever you want to log domai
     // Renders a date using the `only` idiom returning a list of `Field`.
     // This is a useful shortcut when you only have one field you want to add.
     public List<Field> onlyDate(String name, Date date) {
-      return singletonList(date(name, date));
+      return only(date(name, date));
     }
 
     // Renders a date as an ISO 8601 string.
@@ -207,7 +222,7 @@ This also applies to more complex objects:
 ```java
 Person user = ...
 Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.class);
-personLogger.info("Person {}", fb -> Arrays.asList(fb.person("user", user)));
+personLogger.info("Person {}", fb -> fb.only(fb.person("user", user)));
 ```
 
 ## Context

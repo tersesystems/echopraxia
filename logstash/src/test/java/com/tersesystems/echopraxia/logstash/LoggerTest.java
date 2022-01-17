@@ -30,9 +30,7 @@ class LoggerTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.debug(
         "hello {}, you are {}, citizen status {}",
-        fb ->
-            Arrays.asList(
-                fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
+        fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);

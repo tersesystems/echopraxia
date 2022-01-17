@@ -32,7 +32,7 @@ public class ScriptConditionTest {
     Condition condition = ScriptCondition.create(false, buildScript(), Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger
-        .withFields(bf -> bf.onlyString("correlation_id", "match"))
+        .withFields(fb -> fb.only(fb.string("correlation_id", "match")))
         .info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -48,7 +48,7 @@ public class ScriptConditionTest {
 
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger
-        .withFields(bf -> bf.onlyException(new RuntimeException("testing")))
+        .withFields(fb -> fb.only(fb.exception(new RuntimeException("testing"))))
         .info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -64,7 +64,7 @@ public class ScriptConditionTest {
 
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger
-        .withFields(bf -> bf.onlyString("correlation_id", "match"))
+        .withFields(bf -> bf.only(bf.string("correlation_id", "match")))
         .info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();

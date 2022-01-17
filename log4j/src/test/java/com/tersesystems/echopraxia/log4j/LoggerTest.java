@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.log4j;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
-import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +23,7 @@ public class LoggerTest {
         fb -> {
           final Field field1 = fb.string("key1", "value1");
           final Field field2 = fb.string("key2", "value2");
-          return fb.onlyObject("random_object", Arrays.asList(field1, field2));
+          return fb.onlyObject("random_object", field1, field2);
         });
   }
 
@@ -33,17 +32,16 @@ public class LoggerTest {
     Logger<?> logger = LoggerFactory.getLogger(getClass());
     logger.info(
         "my argument is {}",
-        fb -> {
-          return Arrays.asList( //
-              fb.object(
-                  "object1", //
-                  fb.string("key1", "value1"),
-                  fb.string("key2", "value2")), //
-              fb.object(
-                  "object2", //
-                  fb.string("key3", "value3"),
-                  fb.string("key4", "value4")));
-        });
+        fb ->
+            fb.list(
+                fb.object(
+                    "object1", //
+                    fb.string("key1", "value1"),
+                    fb.string("key2", "value2")),
+                fb.object(
+                    "object2", //
+                    fb.string("key3", "value3"),
+                    fb.string("key4", "value4"))));
   }
 
   @Test
