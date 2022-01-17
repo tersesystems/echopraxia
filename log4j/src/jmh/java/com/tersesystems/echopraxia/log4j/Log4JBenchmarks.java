@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
@@ -13,61 +13,62 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
-public class LoggerBenchmarks {
+public class Log4JBenchmarks {
   private static final Logger<?> logger = LoggerFactory.getLogger();
+
   private static final Exception exception = new RuntimeException();
 
   @Benchmark
   public void info() {
-    // LoggerBenchmarks.info                         avgt    5   47.464 ± 0.414  ns/op
+    // Log4JBenchmarks.info                         avgt    5  142.433 ± 27.654  ns/op
     logger.info("Message");
   }
 
   @Benchmark
   public void isInfoEnabled(Blackhole blackhole) {
-    // LoggerBenchmarks.isInfoEnabled       avgt    5  2.821 ± 0.063  ns/op
+    // Log4JBenchmarks.isInfoEnabled                avgt    5    5.556 ±  0.056  ns/op
     blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark
   public void infoWithStringArg() {
-    // LoggerBenchmarks.infoWithStringArg            avgt    5   75.672 ± 0.749  ns/op
+    // Log4JBenchmarks.infoWithStringArg            avgt    5  288.263 ±  0.753  ns/op
     logger.info("Message", fb -> fb.onlyString("foo", "bar"));
   }
 
   @Benchmark
   public void infoWithContextString() {
-    // LoggerBenchmarks.infoWithContextString        avgt    5  116.451 ± 6.000  ns/op
+    // Log4JBenchmarks.infoWithContextString        avgt    5  247.300 ±  2.810  ns/op
     logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
   }
 
   @Benchmark
   public void infoWithParameterizedString() {
-    // LoggerBenchmarks.infoWithParameterizedString  avgt    5   75.732 ± 0.421  ns/op
+    // Log4JBenchmarks.infoWithParameterizedString  avgt    5  412.990 ± 27.346  ns/op
     logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
   }
 
   @Benchmark
   public void infoWithException() {
-    // LoggerBenchmarks.infoWithException            avgt    5  175.756 ± 1.843  ns/op
+    // Log4JBenchmarks.infoWithException            avgt    5  238.892 ± 54.381  ns/op
     logger.info("Message", exception);
   }
 
   @Benchmark
   public void infoWithNever() {
-    // LoggerBenchmarks.infoWithNever                avgt    5   11.358 ± 0.165  ns/op
+    // Log4JBenchmarks.infoWithNever                avgt    5  176.454 ± 57.493  ns/op
     logger.withCondition(Condition.never()).info("Message");
   }
 
   @Benchmark
   public void infoWithAlways() {
-    // LoggerBenchmarks.infoWithAlways               avgt    5   57.670 ± 0.318  ns/op
+    // Log4JBenchmarks.infoWithAlways               avgt    5  152.703 ± 52.607  ns/op
     logger.withCondition(Condition.always()).info("Message");
   }
 
   @Benchmark
   public void infoWithFieldBuilder() {
-    // LoggerBenchmarks.infoWithFieldBuilder         avgt    5   51.013 ± 0.436  ns/op
+    // Log4JBenchmarks.infoWithFieldBuilder         avgt    5  156.345 ± 80.493  ns/op
     logger.withFieldBuilder(Field.Builder.instance()).info("Message");
   }
 }

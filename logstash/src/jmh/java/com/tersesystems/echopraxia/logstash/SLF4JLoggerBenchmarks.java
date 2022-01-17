@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.logstash;
 
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 import org.slf4j.Logger;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -22,9 +23,9 @@ public class SLF4JLoggerBenchmarks {
   }
 
   @Benchmark
-  public void isInfoEnabled() {
+  public void isInfoEnabled(Blackhole blackhole) {
     // SLF4JLoggerBenchmarks.isInfoEnabled  avgt    5  0.949 ± 0.011  ns/op
-    logger.isInfoEnabled();
+    blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark

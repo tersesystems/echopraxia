@@ -60,6 +60,60 @@ Gradle:
 implementation "com.tersesystems.echopraxia:logstash:1.0.0" 
 ```
 
+## Log4J
+
+There is a Log4J implementation that works with the [JSON Template Layout](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html).
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>log4j</artifactId>
+  <version>1.1.0</version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:log4j:1.1.0" 
+```
+
+You will need to integrate the `com.tersesystems.echopraxia.log4j.layout` package into your `log4j2.xml` file, e.g. by using the `packages` attribute:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" packages="com.tersesystems.echopraxia.log4j.layout">
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT" follow="true">
+           <JsonTemplateLayout eventTemplateUri="classpath:mylayout.json"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="info">
+            <AppenderRef ref="Console" />
+        </Root>
+    </Loggers>
+</Configuration>
+```
+
+And your layout should include an `echopraxiaFields` resolver, e.g. `mylayout.json` contains:
+
+```json
+{
+  "fields": {
+    "$resolver": "echopraxiaFields"
+  },
+  "@version": 1,
+  "source_host": "${hostName}",
+  "message": {
+    "$resolver": "message",
+    "stringified": true
+  }
+}
+```
+
 ## Basic Usage
 
 For almost all use cases, you will be working with the API which is a single import:
