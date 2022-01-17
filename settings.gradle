@@ -2,7 +2,7 @@ rootProject.name = 'echopraxia'
 
 include('api')
 include('logstash')
-include('log4j-template-json')
+include('log4j')
 include('example')
 
 // Add extra behaviors as modules

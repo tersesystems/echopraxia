@@ -77,7 +77,7 @@ Maven:
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:log4j:1.10" 
+implementation "com.tersesystems.echopraxia:log4j:1.1.0" 
 ```
 
 You will need to integrate the `com.tersesystems.echopraxia.log4j.layout` package into your `log4j2.xml` file, e.g. by using the `packages` attribute:

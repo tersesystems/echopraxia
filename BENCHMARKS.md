@@ -8,7 +8,7 @@ OpenJDK 64-Bit Server VM Corretto-11.0.9.11.1 (build 11.0.9+11-LTS, mixed mode)
 
 ## SLF4J Logger
 
-As a baseline, here are the benchmarks for a straight SLF4J logger.  
+As a baseline, here are the benchmarks for a straight SLF4J logger using Logback.
 
 The average time is in comments.  For example, the baseline CPU time for a `logger.info("message")` is around 49 nanoseconds per operation, plus or minus 3 nanoseconds.
 
@@ -104,9 +104,7 @@ public class CoreLoggerBenchmarks {
 }
 ```
 
-## Logger 
-
-This is the main public facing Logger API.  It uses a core logger internally, and has the same `logback.xml` configuration as the core logger.
+The `Logger` uses a core logger internally, and has the same `logback.xml` configuration as the core logger.
 
 ```java
 public class LoggerBenchmarks {
@@ -120,9 +118,9 @@ public class LoggerBenchmarks {
   }
 
   @Benchmark
-  public void isInfoEnabled() {
+  public void isInfoEnabled(Blackhole blackhole) {
     // LoggerBenchmarks.isInfoEnabled       avgt    5  2.821 ± 0.063  ns/op
-    logger.isInfoEnabled();
+    blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark
@@ -169,9 +167,77 @@ public class LoggerBenchmarks {
 }
 ```
 
+## Log4J Implementation
+
+The Log4J implementation using a `NullAppender`:
+
+```java
+public class Log4JBenchmarks {
+    private static final Logger<?> logger = LoggerFactory.getLogger();
+
+    private static final Exception exception = new RuntimeException();
+
+    @Benchmark
+    public void info() {
+        // Log4JBenchmarks.info                         avgt    5  142.433 ± 27.654  ns/op
+        logger.info("Message");
+    }
+
+    @Benchmark
+    public void isInfoEnabled(Blackhole blackhole) {
+        // Log4JBenchmarks.isInfoEnabled                avgt    5    5.556 ±  0.056  ns/op
+        blackhole.consume(logger.isInfoEnabled());
+    }
+
+    @Benchmark
+    public void infoWithStringArg() {
+        // Log4JBenchmarks.infoWithStringArg            avgt    5  288.263 ±  0.753  ns/op
+        logger.info("Message", fb -> fb.onlyString("foo", "bar"));
+    }
+
+    @Benchmark
+    public void infoWithContextString() {
+        // Log4JBenchmarks.infoWithContextString        avgt    5  247.300 ±  2.810  ns/op
+        logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
+    }
+
+    @Benchmark
+    public void infoWithParameterizedString() {
+        // Log4JBenchmarks.infoWithParameterizedString  avgt    5  412.990 ± 27.346  ns/op
+        logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
+    }
+
+    @Benchmark
+    public void infoWithException() {
+        // Log4JBenchmarks.infoWithException            avgt    5  238.892 ± 54.381  ns/op
+        logger.info("Message", exception);
+    }
+
+    @Benchmark
+    public void infoWithNever() {
+        // Log4JBenchmarks.infoWithNever                avgt    5  176.454 ± 57.493  ns/op
+        logger.withCondition(Condition.never()).info("Message");
+    }
+
+    @Benchmark
+    public void infoWithAlways() {
+        // Log4JBenchmarks.infoWithAlways               avgt    5  152.703 ± 52.607  ns/op
+        logger.withCondition(Condition.always()).info("Message");
+    }
+
+    @Benchmark
+    public void infoWithFieldBuilder() {
+        // Log4JBenchmarks.infoWithFieldBuilder         avgt    5  156.345 ± 80.493  ns/op
+        logger.withFieldBuilder(Field.Builder.instance()).info("Message");
+    }
+}
+```
+
 ## Fluent Logger
 
 The Fluent Logger uses the same configuration as above.  It is slower on average because object instantiation has some built-in costs, and takes 20 nanoseconds as a [baseline](https://shipilev.net/jvm/anatomy-quarks/6-new-object-stages/).
+
+Using Logback:
 
 ```java
 public class FluentBenchmarks {
@@ -212,6 +278,8 @@ public class FluentBenchmarks {
 ## Semantic Logger
 
 The semantic logger configuration is the same as above.  There is only one kind of call you can make.
+
+Using Logback:
 
 ```java
 public class SemanticLoggerBenchmarks {

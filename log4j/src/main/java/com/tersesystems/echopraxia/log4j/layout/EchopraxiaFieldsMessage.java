@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
 import com.tersesystems.echopraxia.Field;
-import org.apache.logging.log4j.message.Message;
-import org.apache.logging.log4j.message.ParameterizedMessage;
-
 import java.util.List;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.message.ParameterizedMessage;
 
 /** Create the simplest possible message for Log4J. */
 public class EchopraxiaFieldsMessage implements Message {
@@ -15,9 +14,7 @@ public class EchopraxiaFieldsMessage implements Message {
   private final List<Field> contextFields;
 
   public EchopraxiaFieldsMessage(
-      String message,
-      List<Field> argumentFields,
-      List<Field> contextFields) {
+      String message, List<Field> argumentFields, List<Field> contextFields) {
     this.message = message;
     this.argumentFields = argumentFields;
     this.contextFields = contextFields;
