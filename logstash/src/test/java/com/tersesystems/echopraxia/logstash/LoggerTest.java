@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -60,7 +59,7 @@ class LoggerTest extends TestBase {
   @Test
   void testNullArgument() {
     Logger<?> logger = getLogger();
-    logger.debug("hello {}", fb -> singletonList(fb.nullValue("nothing")));
+    logger.debug("hello {}", fb -> fb.list(fb.nullValue("nothing")));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -76,15 +75,15 @@ class LoggerTest extends TestBase {
         fb -> {
           Field name = fb.string("name", "will");
           Field age = fb.number("age", 13);
-          Field toys = fb.array("toys", Field.Value.string("binkie"));
+          Field toys = fb.array("toys", "binkie", "dotty");
           Field person = fb.object("person", name, age, toys);
-          return singletonList(person);
+          return fb.list(person);
         });
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello person=[name=will, age=13, toys=[binkie]]");
+    assertThat(formattedMessage).isEqualTo("hello person=[will, 13, toys=[binkie, dotty]]");
   }
 
   @Test

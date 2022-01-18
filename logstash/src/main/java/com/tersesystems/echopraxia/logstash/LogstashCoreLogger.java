@@ -3,9 +3,11 @@ package com.tersesystems.echopraxia.logstash;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.ValueField;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
 import java.util.stream.Collectors;
+import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.Markers;
 import org.slf4j.Marker;
@@ -151,35 +153,35 @@ public class LogstashCoreLogger implements CoreLogger {
       case ERROR:
         if (logger.isErrorEnabled(m)) {
           final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args, false);
+          final Object[] arguments = convertArguments(args);
           logger.error(m, message, arguments);
         }
         break;
       case WARN:
         if (logger.isWarnEnabled(m)) {
           final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args, false);
+          final Object[] arguments = convertArguments(args);
           logger.warn(m, message, arguments);
         }
         break;
       case INFO:
         if (logger.isWarnEnabled(m)) {
           final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args, false);
+          final Object[] arguments = convertArguments(args);
           logger.info(m, message, arguments);
         }
         break;
       case DEBUG:
         if (logger.isDebugEnabled(m)) {
           final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args, false);
+          final Object[] arguments = convertArguments(args);
           logger.debug(m, message, arguments);
         }
         break;
       case TRACE:
         if (logger.isTraceEnabled(m)) {
           final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args, false);
+          final Object[] arguments = convertArguments(args);
           logger.trace(m, message, arguments);
         }
         break;
@@ -247,12 +249,12 @@ public class LogstashCoreLogger implements CoreLogger {
     log(level, message, f, builder);
   }
 
-  protected Object[] convertArguments(List<Field> args, boolean verbose) {
+  protected Object[] convertArguments(List<Field> args) {
     Field.Value<Throwable> throwable = null;
     List<Object> arguments = new ArrayList<>(args.size() + 1);
-    for (Field a : args) {
-      final String name = a.name();
-      final Field.Value<?> value = a.value();
+    for (Field field : args) {
+      final String name = field.name();
+      final Field.Value<?> value = field.value();
       switch (value.type()) {
         case ARRAY:
           final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
@@ -261,8 +263,12 @@ public class LogstashCoreLogger implements CoreLogger {
           break;
         case OBJECT:
           List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
-          final Object[] fields = convertArguments(fieldArgs, true);
-          arguments.add(StructuredArguments.kv(name, StructuredArguments.fields(fields)));
+          final Object[] fields = convertArguments(fieldArgs);
+          StructuredArgument structuredArgument =
+              field instanceof ValueField
+                  ? StructuredArguments.value(name, StructuredArguments.fields(fields))
+                  : StructuredArguments.keyValue(name, StructuredArguments.fields(fields));
+          arguments.add(structuredArgument);
           break;
         case EXCEPTION:
           throwable = (Field.Value.ExceptionValue) value;
@@ -271,11 +277,11 @@ public class LogstashCoreLogger implements CoreLogger {
         case BOOLEAN:
         case NUMBER:
         case STRING:
-          if (verbose) {
-            arguments.add(StructuredArguments.keyValue(name, value.raw()));
-          } else {
-            arguments.add(StructuredArguments.value(name, value.raw()));
-          }
+          StructuredArgument simpleStructuredArgument =
+              field instanceof ValueField
+                  ? StructuredArguments.value(name, value.raw())
+                  : StructuredArguments.keyValue(name, value.raw());
+          arguments.add(simpleStructuredArgument);
           break;
       }
     }

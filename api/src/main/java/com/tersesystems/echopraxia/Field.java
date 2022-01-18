@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia;
 
 import static java.util.Collections.singletonList;
 
+import com.tersesystems.echopraxia.Constants.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -42,7 +43,7 @@ public interface Field {
     String EXCEPTION = "exception";
 
     static Builder instance() {
-      return KeyValueField.keyValueFieldBuilder;
+      return Constants.builder();
     }
 
     /**
@@ -76,8 +77,12 @@ public interface Field {
      * @param value the field value
      * @return the field.
      */
-    default Field field(String name, Field.Value<?> value) {
-      return new KeyValueField(name, value);
+    default Field value(String name, Field.Value<?> value) {
+      return new DefaultValueField(name, value);
+    }
+
+    default Field keyValue(String name, Field.Value<?> value) {
+      return new DefaultKeyValueField(name, value);
     }
 
     // string
@@ -90,7 +95,7 @@ public interface Field {
      * @return the field.
      */
     default Field string(String name, String value) {
-      return field(name, Value.string(value));
+      return value(name, Value.string(value));
     }
 
     // number
@@ -103,7 +108,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field number(String name, Number value) {
-      return field(name, Value.number(value));
+      return value(name, Value.number(value));
     }
 
     // boolean
@@ -116,7 +121,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field bool(String name, Boolean value) {
-      return field(name, Value.bool(value));
+      return value(name, Value.bool(value));
     }
 
     // array
@@ -129,7 +134,42 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, Value<?>... values) {
-      return field(name, Value.array(values));
+      // in logstash, StructuredArguments.array() ALWAYS returns key=value,
+      // so it may not be possible to override this.
+      return keyValue(name, Value.array(values));
+    }
+
+    /**
+     * Creates a field out of a name and string array values.
+     *
+     * @param name the name of the field.
+     * @param values the array of values.
+     * @return a list containing a single field.
+     */
+    default Field array(String name, String... values) {
+      return keyValue(name, Value.array(Value.asList(values, Value::string)));
+    }
+
+    /**
+     * Creates a field out of a name and number array values.
+     *
+     * @param name the name of the field.
+     * @param values the array of values.
+     * @return a list containing a single field.
+     */
+    default Field array(String name, Number... values) {
+      return keyValue(name, Value.array(Value.asList(values, Value::number)));
+    }
+
+    /**
+     * Creates a field out of a name and boolean array values.
+     *
+     * @param name the name of the field.
+     * @param values the array of values.
+     * @return a list containing a single field.
+     */
+    default Field array(String name, Boolean... values) {
+      return keyValue(name, Value.array(Value.asList(values, Value::bool)));
     }
 
     /**
@@ -140,7 +180,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, List<Value<?>> values) {
-      return field(name, Value.array(values));
+      return keyValue(name, Value.array(values));
     }
 
     // object
@@ -152,7 +192,7 @@ public interface Field {
      * @return a single field.
      */
     default Field object(String name, Field... values) {
-      return field(name, Value.object(values));
+      return keyValue(name, Value.object(values));
     }
 
     /**
@@ -163,7 +203,7 @@ public interface Field {
      * @return a field.
      */
     default Field object(String name, List<Field> values) {
-      return field(name, Value.object(values));
+      return keyValue(name, Value.object(values));
     }
 
     // null
@@ -175,7 +215,7 @@ public interface Field {
      * @return a field.
      */
     default Field nullValue(String name) {
-      return field(name, Value.nullValue());
+      return value(name, Value.nullValue());
     }
 
     // exception
@@ -187,7 +227,7 @@ public interface Field {
      * @return a field.
      */
     default Field exception(Throwable t) {
-      return field(EXCEPTION, Value.exception(t));
+      return keyValue(EXCEPTION, Value.exception(t));
     }
 
     /**
@@ -198,7 +238,7 @@ public interface Field {
      * @return a field.
      */
     default Field exception(String name, Throwable t) {
-      return field(name, Value.exception(t));
+      return keyValue(name, Value.exception(t));
     }
 
     /**
