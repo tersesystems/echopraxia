@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia;
 
 import static java.util.Collections.singletonList;
 
+import com.tersesystems.echopraxia.Constants.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
@@ -42,7 +43,7 @@ public interface Field {
     String EXCEPTION = "exception";
 
     static Builder instance() {
-      return DefaultFieldBuilder.singleton();
+      return Constants.builder();
     }
 
     /**
@@ -77,11 +78,11 @@ public interface Field {
      * @return the field.
      */
     default Field value(String name, Field.Value<?> value) {
-      return new ValueField(name, value);
+      return new DefaultValueField(name, value);
     }
 
     default Field keyValue(String name, Field.Value<?> value) {
-      return new KeyValueField(name, value);
+      return new DefaultKeyValueField(name, value);
     }
 
     // string
