@@ -52,37 +52,38 @@ public class LogstashLoggingContext implements LoggingContext {
       return this;
     }
 
-    final List<Field> thisFields = LogstashLoggingContext.this.getFields();
-    final List<Field> ctxFields = context.getFields();
-    Supplier<List<Field>> joinedFields = joinFields(thisFields, ctxFields);
-
-    final List<Marker> markers = context.getMarkers();
-    final List<Marker> thisMarkers = LogstashLoggingContext.this.getMarkers();
-    Supplier<List<Marker>> joinedMarkers = joinMarkers(markers, thisMarkers);
+    // This MUST be lazy, we can't get the fields until statement evaluation
+    Supplier<List<Field>> joinedFields = joinFields(LogstashLoggingContext.this::getFields, context::getFields);
+    Supplier<List<Marker>> joinedMarkers = joinMarkers(context::getMarkers, LogstashLoggingContext.this::getMarkers);
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
   }
 
-  private Supplier<List<Marker>> joinMarkers(List<Marker> markers, List<Marker> thisMarkers) {
-    if (markers.isEmpty()) {
-      return () -> thisMarkers;
-    } else if (thisMarkers.isEmpty()) {
-      return () -> markers;
-    } else {
-      return () ->
-          Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
-    }
+  private Supplier<List<Marker>> joinMarkers(Supplier<List<Marker>> markersSupplier, Supplier<List<Marker>> thisMarkersSupplier) {
+    return () -> {
+      final List<Marker> markers = markersSupplier.get();
+      final List<Marker> thisMarkers = thisMarkersSupplier.get();
+      if (markers.isEmpty()) {
+        return thisMarkers;
+      } else if (thisMarkers.isEmpty()) {
+        return markers;
+      } else {
+        return Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
+      }
+    };
   }
 
-  private Supplier<List<Field>> joinFields(List<Field> thisFields, List<Field> ctxFields) {
-    Supplier<List<Field>> joinedFields;
-    if (thisFields.isEmpty()) {
-      joinedFields = () -> ctxFields;
-    } else if (ctxFields.isEmpty()) {
-      joinedFields = () -> thisFields;
-    } else {
-      joinedFields =
-          () -> Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
-    }
-    return joinedFields;
+  private Supplier<List<Field>> joinFields(Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
+    return () -> {
+      List<Field> thisFields = thisFieldsSupplier.get();
+      List<Field> ctxFields = ctxFieldsSupplier.get();
+
+      if (thisFields.isEmpty()) {
+         return ctxFields;
+      } else if (ctxFields.isEmpty()) {
+        return thisFields;
+      } else {
+        return Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
+      }
+    };
   }
 }
