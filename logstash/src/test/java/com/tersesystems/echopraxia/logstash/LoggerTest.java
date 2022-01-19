@@ -9,6 +9,8 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.Arrays;
+import java.util.UUID;
+import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.junit.jupiter.api.Test;
 
 class LoggerTest extends TestBase {
@@ -117,19 +119,25 @@ class LoggerTest extends TestBase {
     assertThat(throwableProxy).isNotNull();
   }
 
-  //  @Test
-  //  void testValueMapping() {
-  //      Logger<?> logger = getLogger();
-  //    ValueMapper<UUID, String> uuidMapper = uuid -> Value.string(uuid.toString());
-  //    UUID uuid = UUID.randomUUID();
-  //    logger.error("user id {}", uuidMapper.field("user_id", uuid));
-  //
-  //    final ListAppender<ILoggingEvent> listAppender = getListAppender();
-  //    final ILoggingEvent event = listAppender.list.get(0);
-  //    final String message = event.getMessage();
-  //    assertThat(message).isEqualTo("user id {}");
-  //    final Object[] args = event.getArgumentArray();
-  //    assertThat(args[0]).isEqualTo(StructuredArguments.v("user_id", uuid));
-  //  }
+  interface UUIDFieldBuilder extends Field.Builder {
+    default Field uuid(String name, UUID uuid) {
+      return string(name, uuid.toString());
+    }
+  }
 
+  @Test
+  void testCustomMapping() {
+    Logger<UUIDFieldBuilder> logger = getLogger().withFieldBuilder(new UUIDFieldBuilder() {});
+
+    UUID uuid = UUID.randomUUID();
+    logger.error("user id {}", fb -> fb.only(fb.uuid("user_id", uuid)));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String message = event.getMessage();
+    assertThat(message).isEqualTo("user id {}");
+    final Object[] args = event.getArgumentArray();
+    final ObjectAppendingMarker actual = (ObjectAppendingMarker) args[0];
+    assertThat(actual.getFieldValue()).isEqualTo(uuid.toString());
+  }
 }

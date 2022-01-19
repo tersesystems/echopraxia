@@ -9,6 +9,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.HashMap;
 import java.util.Map;
 import net.logstash.logback.marker.LogstashMarker;
@@ -39,14 +40,30 @@ public class ContextTest extends TestBase {
     assertThat(m).isEqualTo(expected);
   }
 
-  private Logger<?> getLogger() {
-    final LogstashCoreLogger logstashCoreLogger =
-        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
-    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
+  @Test
+  void testMarkerPredicate() {
+    // Because MarkerFilter with ACCEPT exists,
+    // AND we have a SECURITY marker in context
+    // isTraceEnabled should return true even without an explicit marker.
+    final Marker securityMarker = MarkerFactory.getMarker("SECURITY");
+    final LogstashCoreLogger core = new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+    final CoreLogger security = core.withMarkers(securityMarker);
+    Logger<?> logger = LoggerFactory.getLogger(security, Field.Builder.instance());
+
+    final org.slf4j.Logger slf4jLogger = core.logger();
+
+    // Calling SLF4J directly should return true...
+    assertThat(slf4jLogger.isTraceEnabled(securityMarker)).isTrue();
+
+    // But otherwise TRACE is not enabled...
+    assertThat(slf4jLogger.isTraceEnabled()).isFalse();
+
+    // And as the marker is in context, it should be true as well.
+    assertThat(logger.isTraceEnabled()).isTrue();
   }
 
   @Test
-  void testComplexMarkers() {
+  void testComplexFields() {
     Logger<?> logger = getLogger();
     logger
         .withFields(
@@ -89,5 +106,11 @@ public class ContextTest extends TestBase {
     key.put("key2", "value2");
     Marker expected = (Markers.appendEntries(key));
     assertThat(m).isEqualTo(expected);
+  }
+
+  private Logger<?> getLogger() {
+    final LogstashCoreLogger logstashCoreLogger =
+        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 }
