@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.LoggingContext;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -12,6 +13,11 @@ public class Log4JLoggingContext implements LoggingContext {
 
   protected final Supplier<List<Field>> fieldsSupplier;
   protected final Supplier<List<Marker>> markersSupplier;
+
+  Log4JLoggingContext() {
+    this.fieldsSupplier = Collections::emptyList;
+    this.markersSupplier = Collections::emptyList;
+  }
 
   protected Log4JLoggingContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
     this.fieldsSupplier = f;

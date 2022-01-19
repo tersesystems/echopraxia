@@ -53,12 +53,15 @@ public class LogstashLoggingContext implements LoggingContext {
     }
 
     // This MUST be lazy, we can't get the fields until statement evaluation
-    Supplier<List<Field>> joinedFields = joinFields(LogstashLoggingContext.this::getFields, context::getFields);
-    Supplier<List<Marker>> joinedMarkers = joinMarkers(context::getMarkers, LogstashLoggingContext.this::getMarkers);
+    Supplier<List<Field>> joinedFields =
+        joinFields(LogstashLoggingContext.this::getFields, context::getFields);
+    Supplier<List<Marker>> joinedMarkers =
+        joinMarkers(context::getMarkers, LogstashLoggingContext.this::getMarkers);
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
   }
 
-  private Supplier<List<Marker>> joinMarkers(Supplier<List<Marker>> markersSupplier, Supplier<List<Marker>> thisMarkersSupplier) {
+  private Supplier<List<Marker>> joinMarkers(
+      Supplier<List<Marker>> markersSupplier, Supplier<List<Marker>> thisMarkersSupplier) {
     return () -> {
       final List<Marker> markers = markersSupplier.get();
       final List<Marker> thisMarkers = thisMarkersSupplier.get();
@@ -72,13 +75,14 @@ public class LogstashLoggingContext implements LoggingContext {
     };
   }
 
-  private Supplier<List<Field>> joinFields(Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
+  private Supplier<List<Field>> joinFields(
+      Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
     return () -> {
       List<Field> thisFields = thisFieldsSupplier.get();
       List<Field> ctxFields = ctxFieldsSupplier.get();
 
       if (thisFields.isEmpty()) {
-         return ctxFields;
+        return ctxFields;
       } else if (ctxFields.isEmpty()) {
         return thisFields;
       } else {
