@@ -73,34 +73,36 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(Level level) {
+    Marker marker = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
-        return logger.isErrorEnabled() && condition.test(level, context);
+        return logger.isErrorEnabled(marker) && condition.test(level, context);
       case WARN:
-        return logger.isWarnEnabled() && condition.test(level, context);
+        return logger.isWarnEnabled(marker) && condition.test(level, context);
       case INFO:
-        return logger.isInfoEnabled() && condition.test(level, context);
+        return logger.isInfoEnabled(marker) && condition.test(level, context);
       case DEBUG:
-        return logger.isDebugEnabled() && condition.test(level, context);
+        return logger.isDebugEnabled(marker) && condition.test(level, context);
       case TRACE:
-        return logger.isTraceEnabled() && condition.test(level, context);
+        return logger.isTraceEnabled(marker) && condition.test(level, context);
     }
     throw new IllegalStateException("No branch found for level " + level);
   }
 
   @Override
   public boolean isEnabled(Level level, Condition condition) {
+    Marker marker = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
-        return logger.isErrorEnabled() && this.condition.and(condition).test(level, context);
+        return logger.isErrorEnabled(marker) && this.condition.and(condition).test(level, context);
       case WARN:
-        return logger.isWarnEnabled() && this.condition.and(condition).test(level, context);
+        return logger.isWarnEnabled(marker) && this.condition.and(condition).test(level, context);
       case INFO:
-        return logger.isInfoEnabled() && this.condition.and(condition).test(level, context);
+        return logger.isInfoEnabled(marker) && this.condition.and(condition).test(level, context);
       case DEBUG:
-        return logger.isDebugEnabled() && this.condition.and(condition).test(level, context);
+        return logger.isDebugEnabled(marker) && this.condition.and(condition).test(level, context);
       case TRACE:
-        return logger.isTraceEnabled() && this.condition.and(condition).test(level, context);
+        return logger.isTraceEnabled(marker) && this.condition.and(condition).test(level, context);
     }
     throw new IllegalStateException("No branch found for level " + level);
   }
@@ -114,29 +116,19 @@ public class LogstashCoreLogger implements CoreLogger {
     Marker m = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
-        if (logger.isErrorEnabled(m)) {
-          logger.error(m, message);
-        }
+        logger.error(m, message);
         break;
       case WARN:
-        if (logger.isWarnEnabled(m)) {
-          logger.warn(m, message);
-        }
+        logger.warn(m, message);
         break;
       case INFO:
-        if (logger.isInfoEnabled(m)) {
-          logger.info(m, message);
-        }
+        logger.info(m, message);
         break;
       case DEBUG:
-        if (logger.isDebugEnabled(m)) {
-          logger.debug(m, message);
-        }
+        logger.debug(m, message);
         break;
       case TRACE:
-        if (logger.isTraceEnabled(m)) {
-          logger.trace(m, message);
-        }
+        logger.trace(m, message);
         break;
     }
   }
@@ -197,29 +189,19 @@ public class LogstashCoreLogger implements CoreLogger {
     Marker m = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
-        if (logger.isErrorEnabled(m)) {
-          logger.error(m, message, e);
-        }
+        logger.error(m, message, e);
         break;
       case WARN:
-        if (logger.isWarnEnabled(m)) {
-          logger.warn(m, message, e);
-        }
+        logger.warn(m, message, e);
         break;
       case INFO:
-        if (logger.isInfoEnabled(m)) {
-          logger.info(m, message, e);
-        }
+        logger.info(m, message, e);
         break;
       case DEBUG:
-        if (logger.isDebugEnabled(m)) {
-          logger.debug(m, message, e);
-        }
+        logger.debug(m, message, e);
         break;
       case TRACE:
-        if (logger.isTraceEnabled(m)) {
-          logger.trace(m, message, e);
-        }
+        logger.trace(m, message, e);
         break;
     }
   }
@@ -296,6 +278,8 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   protected org.slf4j.Marker convertMarkers(List<Field> fields, List<Marker> markers) {
+    // XXX there should be a way to cache this if we know it hasn't changed, since it
+    // could be calculated repeatedly.
     if (fields.isEmpty() && markers.isEmpty()) {
       return null;
     }
