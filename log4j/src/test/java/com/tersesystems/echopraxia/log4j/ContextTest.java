@@ -5,12 +5,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import javax.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.junit.jupiter.api.Test;
 
-public class ContextTest {
+public class ContextTest extends TestBase {
 
   @Test
   void testMarkers() {
@@ -18,10 +19,13 @@ public class ContextTest {
     final Log4JCoreLogger core = new Log4JCoreLogger(LogManager.getLogger());
     Logger<?> logger =
         LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
-    logger = logger.withFields(f -> f.onlyString("context_name", "context_value"));
-
-    // XXX Should render both context field and argument field.
     logger.error("Message {}", fb -> fb.onlyString("field_name", "field_value"));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("Message field_value");
+    final String actual = entry.getString("marker");
+    assertThat(actual).isEqualTo("SECURITY");
   }
 
   @Test

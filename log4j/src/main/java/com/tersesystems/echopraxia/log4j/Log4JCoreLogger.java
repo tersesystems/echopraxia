@@ -47,7 +47,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public void log(Level level, String message) {
-    logger.log(convertLevel(level), createMarker(), message);
+    logger.log(convertLevel(level), createMarker(), createMessage(message));
   }
 
   @Override
@@ -116,6 +116,10 @@ public class Log4JCoreLogger implements CoreLogger {
     Log4JLoggingContext newContext =
         new Log4JLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
     return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
+  }
+
+  private Message createMessage(String message) {
+    return createMessage(message, Collections.emptyList());
   }
 
   private <B extends Field.Builder> Message createMessage(String template, List<Field> arguments) {
