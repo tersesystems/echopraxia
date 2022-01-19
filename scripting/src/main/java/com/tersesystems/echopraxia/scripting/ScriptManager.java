@@ -137,7 +137,12 @@ public class ScriptManager {
 
   protected boolean call(Value level, Value fields) {
     Value call = callSiteThreadLocal.get().call(level, fields);
-    return call.bool();
+    if (call.isBoolean()) {
+      return call.bool();
+    } else {
+      throw new ScriptException(
+          "Your function needs to return a boolean value!  Invalid return type: " + call.type());
+    }
   }
 
   void eval(String script) {
