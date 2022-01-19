@@ -5,8 +5,11 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
+
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.message.Message;
@@ -18,6 +21,12 @@ public class Log4JCoreLogger implements CoreLogger {
   private final Log4JLoggingContext context;
   private final Condition condition;
 
+  Log4JCoreLogger(Logger log4jLogger) {
+    this.logger = log4jLogger;
+    this.context = new Log4JLoggingContext();
+    this.condition = Condition.always();
+  }
+
   protected Log4JCoreLogger(Logger log4jLogger, Log4JLoggingContext context, Condition condition) {
     this.logger = log4jLogger;
     this.context = context;
@@ -26,7 +35,8 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(Level level) {
-    return logger.isEnabled(convertLevel(level));
+    final Marker marker = createMarker();
+    return logger.isEnabled(convertLevel(level), marker);
   }
 
   @Override
@@ -34,7 +44,7 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return false;
     }
-    return logger.isEnabled(convertLevel(level));
+    return isEnabled(level);
   }
 
   @Override
@@ -104,6 +114,12 @@ public class Log4JCoreLogger implements CoreLogger {
     return new Log4JCoreLogger(logger, context, this.condition.and(condition));
   }
 
+  public CoreLogger withMarkers(Marker... markers) {
+    Log4JLoggingContext newContext =
+            new Log4JLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
+  }
+
   private <B extends Field.Builder> Message createMessage(String template, List<Field> arguments) {
     // XXX should we filter out exception from the fields?  Should be filtered out by the
     // serializer...
@@ -121,11 +137,15 @@ public class Log4JCoreLogger implements CoreLogger {
     //
     // You can't join two markers, and they're not SLF4J markers in any meaningful
     // sense.  There's Log4jMarker and that's IT, because JSON deserialization lists
-    // that in the MarkerMixin.
+    // that in the MarkerMixin.  And the source there says to consider it private.
     //
     // From what I can tell here, you'll only ever work with one Log4J marker and
     // will have to manage the parent / child relationships outside of Echopraxia.
-    // So we just return th of them and hope it works.
+    //
+    // Possibly we could just have the context return a single marker, but we
+    // might want to be able to prioritize which marker we pick.
+    //
+    // So for now we just return the first of them and hope it works.
     return context.getMarkers().stream().findFirst().orElseGet(() -> null);
   }
 
@@ -141,5 +161,9 @@ public class Log4JCoreLogger implements CoreLogger {
       }
     }
     return null;
+  }
+
+  public Logger logger() {
+    return this.logger;
   }
 }

@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN" packages="com.tersesystems.echopraxia.log4j.layout">
 
+    <!-- always log a statement with a security marker. -->
+    <MarkerFilter marker="SECURITY" onMatch="ACCEPT"/>
+
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT" follow="true">
-           <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutCustom.json"/>
+           <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
+               <EventTemplateAdditionalField
+                       key="marker"
+                       format="JSON"
+                       value='{"$resolver": "marker", "field": "name"}'/>
+               <EventTemplateAdditionalField
+                       key="fields"
+                       format="JSON"
+                       value='{"$resolver": "echopraxiaFields"}'/>
+           </JsonTemplateLayout>
         </Console>
     </Appenders>
     <Loggers>
