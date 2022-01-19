@@ -1,15 +1,14 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
-import com.tersesystems.echopraxia.core.CoreLogger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ContextTest {
 
@@ -32,7 +31,8 @@ public class ContextTest {
     // isTraceEnabled should return true even without an explicit marker.
     final Marker securityMarker = MarkerManager.getMarker("SECURITY");
     final Log4JCoreLogger core = new Log4JCoreLogger(LogManager.getLogger());
-    Logger<?> logger = LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
+    Logger<?> logger =
+        LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
 
     org.apache.logging.log4j.Logger log4jLogger = core.logger();
 

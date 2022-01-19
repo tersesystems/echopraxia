@@ -5,11 +5,9 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.message.Message;
@@ -116,7 +114,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   public CoreLogger withMarkers(Marker... markers) {
     Log4JLoggingContext newContext =
-            new Log4JLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
+        new Log4JLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
     return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
   }
 

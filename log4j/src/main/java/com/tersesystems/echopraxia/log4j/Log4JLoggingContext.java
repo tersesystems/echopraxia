@@ -2,13 +2,12 @@ package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.LoggingContext;
-import org.apache.logging.log4j.Marker;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.apache.logging.log4j.Marker;
 
 public class Log4JLoggingContext implements LoggingContext {
 
