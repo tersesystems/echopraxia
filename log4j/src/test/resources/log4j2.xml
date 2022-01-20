@@ -1,26 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" packages="com.tersesystems.echopraxia.log4j.layout">
+<Configuration status="WARN" packages="com.tersesystems.echopraxia.log4j.layout,com.tersesystems.echopraxia.log4j.appender">
 
     <!-- always log a statement with a security marker. -->
-    <MarkerFilter marker="SECURITY" onMatch="ACCEPT"/>
+    <MarkerFilter marker="SECURITY" onMatch="ACCEPT" onMismatch="NEUTRAL"/>
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT" follow="true">
-           <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
-               <EventTemplateAdditionalField
-                       key="marker"
-                       format="JSON"
-                       value='{"$resolver": "marker", "field": "name"}'/>
-               <EventTemplateAdditionalField
-                       key="fields"
-                       format="JSON"
-                       value='{"$resolver": "echopraxiaFields"}'/>
-           </JsonTemplateLayout>
+            <PatternLayout pattern="%-5p %d{dd-MMM-yyyy HH:mm:ss} %t %m%n"/>
         </Console>
+        <List name="ListAppender">
+            <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
+                <EventTemplateAdditionalField
+                        key="marker"
+                        format="JSON"
+                        value='{"$resolver": "marker", "field": "name"}'/>
+                <EventTemplateAdditionalField
+                        key="fields"
+                        format="JSON"
+                        value='{"$resolver": "echopraxiaFields"}'/>
+            </JsonTemplateLayout>
+        </List>
     </Appenders>
     <Loggers>
         <Root level="info">
-            <AppenderRef ref="Console" />
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="ListAppender"/>
         </Root>
     </Loggers>
 </Configuration>
