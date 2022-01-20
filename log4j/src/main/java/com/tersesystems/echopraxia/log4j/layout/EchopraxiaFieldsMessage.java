@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.log4j.layout;
 
 import com.tersesystems.echopraxia.Field;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.message.ParameterizedMessage;
@@ -41,8 +42,17 @@ public class EchopraxiaFieldsMessage implements Message {
     return argumentFields.toArray();
   }
 
-  public Field[] getFields() {
-    return Stream.concat(argumentFields.stream(), contextFields.stream()).toArray(Field[]::new);
+  public List<Field> getArgumentFields() {
+    return argumentFields;
+  }
+
+  public List<Field> getContextFields() {
+    return contextFields;
+  }
+
+  public List<Field> getFields() {
+    return Stream.concat(argumentFields.stream(), contextFields.stream())
+        .collect(Collectors.toList());
   }
 
   // It looks like nothing actually uses message.getThrowable() internally
