@@ -6,7 +6,24 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT" follow="true">
-            <PatternLayout pattern="%-5p %d{dd-MMM-yyyy HH:mm:ss} %t %m%n"/>
+            <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
+                <EventTemplateAdditionalField
+                        key="marker"
+                        format="JSON"
+                        value='{"$resolver": "marker", "field": "name"}'/>
+                <EventTemplateAdditionalField
+                        key="fields"
+                        format="JSON"
+                        value='{"$resolver": "echopraxiaFields"}'/>
+                <EventTemplateAdditionalField
+                        key="arguments"
+                        format="JSON"
+                        value='{"$resolver": "echopraxiaArgumentFields"}'/>
+                <EventTemplateAdditionalField
+                        key="context"
+                        format="JSON"
+                        value='{"$resolver": "echopraxiaContextFields"}'/>
+            </JsonTemplateLayout>
         </Console>
         <List name="ListAppender">
             <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
@@ -18,6 +35,14 @@
                         key="fields"
                         format="JSON"
                         value='{"$resolver": "echopraxiaFields"}'/>
+                <EventTemplateAdditionalField
+                        key="arguments"
+                        format="JSON"
+                        value='{"$resolver": "echopraxiaArgumentFields"}'/>
+                <EventTemplateAdditionalField
+                        key="context"
+                        format="JSON"
+                        value='{"$resolver": "echopraxiaContextFields"}'/>
             </JsonTemplateLayout>
         </List>
     </Appenders>

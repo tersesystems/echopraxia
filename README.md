@@ -103,6 +103,23 @@ You will need to integrate the `com.tersesystems.echopraxia.log4j.layout` packag
 </Configuration>
 ```
 
+If you want to seperate the context fields from the argument fields, you can define them seperately:
+
+```xml
+<JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
+    <EventTemplateAdditionalField
+            key="arguments"
+            format="JSON"
+            value='{"$resolver": "echopraxiaArgumentFields"}'/>
+    <EventTemplateAdditionalField
+            key="context"
+            format="JSON"
+            value='{"$resolver": "echopraxiaContextFields"}'/>
+</JsonTemplateLayout>
+```
+
+Unfortunately, I don't know of a way to "flatten" fields so that they show up on the root object instead of under an additional field.  If you know how to do this, let me know!
+
 ## Basic Usage
 
 For almost all use cases, you will be working with the API which is a single import:
