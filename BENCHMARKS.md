@@ -6,231 +6,69 @@ All benchmarks were run on a Dell XPS 15 running Linux, using Amazon Corretto 11
 OpenJDK 64-Bit Server VM Corretto-11.0.9.11.1 (build 11.0.9+11-LTS, mixed mode)
 ```
 
-## SLF4J Logger
+Implementations are set up with a null / no-op appender, so only the time going through the API and the implementation. 
 
-As a baseline, here are the benchmarks for a straight SLF4J logger using Logback.
+## Logstash Implementation
 
-The average time is in comments.  For example, the baseline CPU time for a `logger.info("message")` is around 49 nanoseconds per operation, plus or minus 3 nanoseconds.
+Uses logback 1.2.10 and logstash-logback-encoder 7.0.1.
 
-```java
-public class SLF4JLoggerBenchmarks {
-  private static final Logger logger =
-      org.slf4j.LoggerFactory.getLogger(SLF4JLoggerBenchmarks.class);
+`LoggerBenchmarks` shows the main `Logger` API.  
 
-  private static final Exception exception = new RuntimeException();
+`CoreLoggerBenchmarks` shows the CoreLogger SPI.  
 
-  @Benchmark
-  public void info() {
-    // SLF4JLoggerBenchmarks.info                    avgt    5   49.033 ± 3.101  ns/op
-    logger.info("message");
-  }
-  
-  @Benchmark
-  public void isInfoEnabled() {
-    // SLF4JLoggerBenchmarks.isInfoEnabled  avgt    5  0.949 ± 0.011  ns/op
-   logger.isInfoEnabled();
-  }
+`SLF4JLoggerBenchmarks` show the SLF4J API being called directly for comparison.
 
-  @Benchmark
-  public void infoWithArgument() {
-    // SLF4JLoggerBenchmarks.infoWithArgument        avgt    5   49.749 ± 2.394  ns/op
-    logger.info("message {}", "string");
-  }
-
-  @Benchmark
-  public void infoWithArrayArgs() {
-    // SLF4JLoggerBenchmarks.infoWithArrayArgs       avgt    5   51.215 ± 2.638  ns/op
-    logger.info("message {} {} {} {}", "one", "two", "three", "four");
-  }
-
-  @Benchmark
-  public void infoWithException() {
-    // SLF4JLoggerBenchmarks.infoWithException       avgt    5  175.896 ± 0.807  ns/op
-    logger.info("Message", exception);
-  }
-}
 ```
-
-## Logstash Core Logger
-
-The Logstash core logger wraps an SLF4J logger, backed by logback, and uses Logstash markers and structured arguments for fields.  This is not exposed directly, but is used internally.
-
-Here, the `logback.xml` uses a no-op appender as follows:
-
-```xml
-<configuration>
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
-
-    <appender name="NOP" class="ch.qos.logback.core.helpers.NOPAppender">
-    </appender>
-
-    <root level="DEBUG">
-        <appender-ref ref="NOP" />
-    </root>
-</configuration>
-```
-
-The benchmarks are as follows:
-
-```java
-public class CoreLoggerBenchmarks {
-  private static final CoreLogger logger = CoreLoggerFactory.getLogger();
-  private static final Exception exception = new RuntimeException();
-  private static final Field.Builder builder = Field.Builder.instance();
-
-  @Benchmark
-  public void info() {
-    // CoreLoggerBenchmarks.info                     avgt    5   45.618 ± 0.965  ns/op
-    logger.log(Level.INFO, "Message");
-  }
-
-  @Benchmark
-  public void isEnabled() {
-    // CoreLoggerBenchmarks.isEnabled       avgt    5  1.945 ± 0.049  ns/op
-    logger.isEnabled(Level.INFO);
-  }
-
-  @Benchmark
-  public void infoWithParameterizedString() {
-    // CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5   76.189 ± 2.388  ns/op
-    logger.log(Level.INFO, "Message {}", fb -> fb.onlyString("foo", "bar"), builder);
-  }
-
-  @Benchmark
-  public void infoWithException() {
-    // CoreLoggerBenchmarks.infoWithException            avgt    5  174.242 ± 7.510  ns/op
-    logger.log(Level.INFO, "Message", exception);
-  }
-}
-```
-
-The `Logger` uses a core logger internally, and has the same `logback.xml` configuration as the core logger.
-
-```java
-public class LoggerBenchmarks {
-  private static final Logger<?> logger = LoggerFactory.getLogger();
-  private static final Exception exception = new RuntimeException();
-
-  @Benchmark
-  public void info() {
-    // LoggerBenchmarks.info                         avgt    5   47.464 ± 0.414  ns/op
-    logger.info("Message");
-  }
-
-  @Benchmark
-  public void isInfoEnabled(Blackhole blackhole) {
-    // LoggerBenchmarks.isInfoEnabled       avgt    5  2.821 ± 0.063  ns/op
-    blackhole.consume(logger.isInfoEnabled());
-  }
-
-  @Benchmark
-  public void infoWithStringArg() {
-    // LoggerBenchmarks.infoWithStringArg            avgt    5   75.672 ± 0.749  ns/op
-    logger.info("Message", fb -> fb.onlyString("foo", "bar"));
-  }
-
-  @Benchmark
-  public void infoWithContextString() {
-    // LoggerBenchmarks.infoWithContextString        avgt    5  116.451 ± 6.000  ns/op
-    logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
-  }
-
-  @Benchmark
-  public void infoWithParameterizedString() {
-    // LoggerBenchmarks.infoWithParameterizedString  avgt    5   75.732 ± 0.421  ns/op
-    logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
-  }
-
-  @Benchmark
-  public void infoWithException() {
-    // LoggerBenchmarks.infoWithException            avgt    5  175.756 ± 1.843  ns/op
-    logger.info("Message", exception);
-  }
-
-  @Benchmark
-  public void infoWithNever() {
-    // LoggerBenchmarks.infoWithNever                avgt    5   11.358 ± 0.165  ns/op
-    logger.withCondition(Condition.never()).info("Message");
-  }
-
-  @Benchmark
-  public void infoWithAlways() {
-    // LoggerBenchmarks.infoWithAlways               avgt    5   57.670 ± 0.318  ns/op
-    logger.withCondition(Condition.always()).info("Message");
-  }
-
-  @Benchmark
-  public void infoWithFieldBuilder() {
-    // LoggerBenchmarks.infoWithFieldBuilder         avgt    5   51.013 ± 0.436  ns/op
-    logger.withFieldBuilder(Field.Builder.instance()).info("Message");
-  }
-}
+Benchmark                                         Mode  Cnt    Score    Error  Units
+CoreLoggerBenchmarks.info                         avgt    5   46.720 ±  0.738  ns/op
+CoreLoggerBenchmarks.infoWithException            avgt    5  157.549 ±  0.671  ns/op
+CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5   68.739 ±  0.832  ns/op
+CoreLoggerBenchmarks.isEnabled                    avgt    5    3.190 ±  0.044  ns/op
+LoggerBenchmarks.info                             avgt    5   51.689 ±  0.464  ns/op
+LoggerBenchmarks.infoWithAlways                   avgt    5   54.344 ±  1.687  ns/op
+LoggerBenchmarks.infoWithContextString            avgt    5  129.888 ± 11.851  ns/op
+LoggerBenchmarks.infoWithException                avgt    5  165.892 ±  2.760  ns/op
+LoggerBenchmarks.infoWithFieldBuilder             avgt    5   47.062 ±  0.237  ns/op
+LoggerBenchmarks.infoWithNever                    avgt    5   10.088 ±  0.522  ns/op
+LoggerBenchmarks.infoWithParameterizedString      avgt    5   70.574 ±  0.538  ns/op
+LoggerBenchmarks.infoWithStringArg                avgt    5   72.281 ±  0.456  ns/op
+LoggerBenchmarks.isInfoEnabled                    avgt    5    4.920 ±  0.041  ns/op
+SLF4JLoggerBenchmarks.info                        avgt    5   46.025 ±  0.549  ns/op
+SLF4JLoggerBenchmarks.infoWithArgument            avgt    5   49.617 ±  0.844  ns/op
+SLF4JLoggerBenchmarks.infoWithArrayArgs           avgt    5   47.900 ±  0.361  ns/op
+SLF4JLoggerBenchmarks.infoWithException           avgt    5  158.507 ±  6.367  ns/op
+SLF4JLoggerBenchmarks.isInfoEnabled               avgt    5    2.799 ±  0.107  ns/op
 ```
 
 ## Log4J Implementation
 
-The Log4J implementation using a `NullAppender`:
+Uses Log4J 2.17.1 with layout-template-json.
 
-```java
-public class Log4JBenchmarks {
-    private static final Logger<?> logger = LoggerFactory.getLogger();
+`LoggerBenchmarks` shows the main `Logger` API.
 
-    private static final Exception exception = new RuntimeException();
+`CoreLoggerBenchmarks` shows the CoreLogger SPI.
 
-    @Benchmark
-    public void info() {
-        // Log4JBenchmarks.info                         avgt    5  142.433 ± 27.654  ns/op
-        logger.info("Message");
-    }
+`SLF4JLoggerBenchmarks` show the Log4J API being called directly for comparison.
 
-    @Benchmark
-    public void isInfoEnabled(Blackhole blackhole) {
-        // Log4JBenchmarks.isInfoEnabled                avgt    5    5.556 ±  0.056  ns/op
-        blackhole.consume(logger.isInfoEnabled());
-    }
-
-    @Benchmark
-    public void infoWithStringArg() {
-        // Log4JBenchmarks.infoWithStringArg            avgt    5  288.263 ±  0.753  ns/op
-        logger.info("Message", fb -> fb.onlyString("foo", "bar"));
-    }
-
-    @Benchmark
-    public void infoWithContextString() {
-        // Log4JBenchmarks.infoWithContextString        avgt    5  247.300 ±  2.810  ns/op
-        logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
-    }
-
-    @Benchmark
-    public void infoWithParameterizedString() {
-        // Log4JBenchmarks.infoWithParameterizedString  avgt    5  412.990 ± 27.346  ns/op
-        logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
-    }
-
-    @Benchmark
-    public void infoWithException() {
-        // Log4JBenchmarks.infoWithException            avgt    5  238.892 ± 54.381  ns/op
-        logger.info("Message", exception);
-    }
-
-    @Benchmark
-    public void infoWithNever() {
-        // Log4JBenchmarks.infoWithNever                avgt    5  176.454 ± 57.493  ns/op
-        logger.withCondition(Condition.never()).info("Message");
-    }
-
-    @Benchmark
-    public void infoWithAlways() {
-        // Log4JBenchmarks.infoWithAlways               avgt    5  152.703 ± 52.607  ns/op
-        logger.withCondition(Condition.always()).info("Message");
-    }
-
-    @Benchmark
-    public void infoWithFieldBuilder() {
-        // Log4JBenchmarks.infoWithFieldBuilder         avgt    5  156.345 ± 80.493  ns/op
-        logger.withFieldBuilder(Field.Builder.instance()).info("Message");
-    }
-}
+```
+CoreLoggerBenchmarks.info                         avgt    5  279.517 ± 43.641  ns/op
+CoreLoggerBenchmarks.infoWithException            avgt    5  275.560 ± 34.584  ns/op
+CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  397.302 ± 61.220  ns/op
+CoreLoggerBenchmarks.isEnabled                    avgt    5   16.601 ±  0.804  ns/op
+Log4JBenchmarks.info                              avgt    5  137.684 ±  0.939  ns/op
+Log4JBenchmarks.infoWithArgument                  avgt    5  195.993 ±  1.689  ns/op
+Log4JBenchmarks.infoWithArrayArgs                 avgt    5  259.549 ±  2.049  ns/op
+Log4JBenchmarks.infoWithException                 avgt    5  136.656 ± 10.485  ns/op
+Log4JBenchmarks.isInfoEnabled                     avgt    5    4.053 ±  3.329  ns/op
+LoggerBenchmarks.info                             avgt    5  283.472 ± 58.634  ns/op
+LoggerBenchmarks.infoWithAlways                   avgt    5  316.920 ± 53.611  ns/op
+LoggerBenchmarks.infoWithContextString            avgt    5  548.993 ±  9.219  ns/op
+LoggerBenchmarks.infoWithException                avgt    5  270.362 ± 69.730  ns/op
+LoggerBenchmarks.infoWithFieldBuilder             avgt    5  279.177 ± 41.426  ns/op
+LoggerBenchmarks.infoWithNever                    avgt    5   12.484 ±  0.555  ns/op
+LoggerBenchmarks.infoWithParameterizedString      avgt    5  406.018 ± 75.713  ns/op
+LoggerBenchmarks.infoWithStringArg                avgt    5  299.972 ± 61.293  ns/op
+LoggerBenchmarks.isInfoEnabled                    avgt    5   18.947 ±  0.091  ns/op
 ```
 
 ## Fluent Logger
