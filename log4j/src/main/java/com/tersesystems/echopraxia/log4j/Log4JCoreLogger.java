@@ -33,6 +33,9 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(Level level) {
+    if (!condition.test(level, context)) {
+      return false;
+    }
     final Marker marker = createMarker();
     return logger.isEnabled(convertLevel(level), marker);
   }
@@ -47,6 +50,9 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public void log(Level level, String message) {
+    if (!condition.test(level, context)) {
+      return;
+    }
     logger.log(convertLevel(level), createMarker(), createMessage(message));
   }
 
@@ -123,8 +129,6 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   private <B extends Field.Builder> Message createMessage(String template, List<Field> arguments) {
-    // XXX should we filter out exception from the fields?  Should be filtered out by the
-    // serializer...
     List<Field> contextFields = context.getFields();
     return new EchopraxiaFieldsMessage(template, arguments, contextFields);
   }
