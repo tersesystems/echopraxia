@@ -38,6 +38,10 @@ public class Logger<FB extends Field.Builder> {
    * @return a new logger using the given field builder.
    */
   public <T extends Field.Builder> Logger<T> withFieldBuilder(T newBuilder) {
+    if (this.fieldBuilder == newBuilder) {
+      //noinspection unchecked
+      return (Logger<T>) this;
+    }
     return new Logger<>(core(), newBuilder);
   }
 
@@ -71,7 +75,12 @@ public class Logger<FB extends Field.Builder> {
     if (condition == Condition.always()) {
       return this;
     }
-    return new Logger<>(core().withCondition(condition), fieldBuilder);
+    // Reduce allocation if we can help it
+    final CoreLogger coreLogger = core().withCondition(condition);
+    if (coreLogger == core()) {
+      return this;
+    }
+    return new Logger<>(coreLogger, fieldBuilder);
   }
 
   /**

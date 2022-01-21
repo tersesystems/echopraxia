@@ -32,18 +32,47 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(Level level) {
-    if (!condition.test(level, context)) {
+    if (this.condition == Condition.never()) {
       return false;
     }
-    return logger.isEnabled(convertLevel(level), context.getMarker());
+    Marker marker = context.getMarker();
+    switch (level) {
+      case ERROR:
+        return logger.isErrorEnabled(marker) && condition.test(level, context);
+      case WARN:
+        return logger.isWarnEnabled(marker) && condition.test(level, context);
+      case INFO:
+        return logger.isInfoEnabled(marker) && condition.test(level, context);
+      case DEBUG:
+        return logger.isDebugEnabled(marker) && condition.test(level, context);
+      case TRACE:
+        return logger.isTraceEnabled(marker) && condition.test(level, context);
+    }
+    throw new IllegalStateException("No branch found for level " + level);
   }
 
   @Override
   public boolean isEnabled(Level level, Condition condition) {
-    if (!condition.test(level, context)) {
+    if (condition == Condition.always()) {
+      return isEnabled(level);
+    }
+    if (condition == Condition.never()) {
       return false;
     }
-    return isEnabled(level);
+    Marker marker = context.getMarker();
+    switch (level) {
+      case ERROR:
+        return logger.isErrorEnabled(marker) && this.condition.and(condition).test(level, context);
+      case WARN:
+        return logger.isWarnEnabled(marker) && this.condition.and(condition).test(level, context);
+      case INFO:
+        return logger.isInfoEnabled(marker) && this.condition.and(condition).test(level, context);
+      case DEBUG:
+        return logger.isDebugEnabled(marker) && this.condition.and(condition).test(level, context);
+      case TRACE:
+        return logger.isTraceEnabled(marker) && this.condition.and(condition).test(level, context);
+    }
+    throw new IllegalStateException("No branch found for level " + level);
   }
 
   @Override

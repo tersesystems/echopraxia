@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.Level.INFO;
+
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
@@ -80,6 +82,9 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(Level level) {
+    if (condition == Condition.never()) {
+      return false;
+    }
     Marker marker = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
@@ -98,6 +103,12 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(Level level, Condition condition) {
+    if (condition == Condition.always()) {
+      return isEnabled(level);
+    }
+    if (condition == Condition.never()) {
+      return false;
+    }
     Marker marker = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
