@@ -30,7 +30,7 @@ public interface Condition {
    * @return a condition returning true.
    */
   static Condition always() {
-    return (level, context) -> true;
+    return Conditions.ALWAYS;
   }
 
   /**
@@ -39,6 +39,12 @@ public interface Condition {
    * @return a condition returning false.
    */
   static Condition never() {
-    return (level, context) -> false;
+    return Conditions.NEVER;
   }
+}
+
+class Conditions {
+  static final Condition NEVER = (level, context) -> false;
+
+  static final Condition ALWAYS = (level, context) -> true;
 }

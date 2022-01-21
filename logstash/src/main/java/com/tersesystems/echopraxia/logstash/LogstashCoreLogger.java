@@ -60,8 +60,15 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public CoreLogger withCondition(Condition condition) {
-    // If this is Condition.never we could optimize this by returning a No-op logger
-    // likewise a Condition.always means nothing (it's an AND true)
+    if (condition == Condition.always()) {
+      return this;
+    }
+    if (condition == Condition.never()) {
+      if (this.condition == Condition.never()) {
+        return this;
+      }
+      return new LogstashCoreLogger(logger, context, condition);
+    }
     return new LogstashCoreLogger(logger, context, this.condition.and(condition));
   }
 

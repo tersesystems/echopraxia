@@ -6,6 +6,7 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -19,25 +20,21 @@ public class CoreLoggerBenchmarks {
 
   @Benchmark
   public void info() {
-    // CoreLoggerBenchmarks.info                     avgt    5   45.618 ± 0.965  ns/op
     logger.log(Level.INFO, "Message");
   }
 
   @Benchmark
-  public void isEnabled() {
-    // CoreLoggerBenchmarks.isEnabled       avgt    5  1.945 ± 0.049  ns/op
-    logger.isEnabled(Level.INFO);
+  public void isEnabled(Blackhole blackhole) {
+    blackhole.consume(logger.isEnabled(Level.INFO));
   }
 
   @Benchmark
   public void infoWithParameterizedString() {
-    // CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5   76.189 ± 2.388  ns/op
     logger.log(Level.INFO, "Message {}", fb -> fb.onlyString("foo", "bar"), builder);
   }
 
   @Benchmark
   public void infoWithException() {
-    // CoreLoggerBenchmarks.infoWithException            avgt    5  174.242 ± 7.510  ns/op
     logger.log(Level.INFO, "Message", exception);
   }
 }

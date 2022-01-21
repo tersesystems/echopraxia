@@ -29,14 +29,18 @@ public class Log4JBenchmarks {
 
   private static final List<Field> fields = Arrays.asList(field, field, field, field);
 
-  private static final Message messageWithArgument = new EchopraxiaFieldsMessage("message {}", singletonList(field), emptyList());
+  private static final Message message =
+      new EchopraxiaFieldsMessage("message", emptyList(), emptyList());
+
+  private static final Message messageWithArgument =
+      new EchopraxiaFieldsMessage("message {}", singletonList(field), emptyList());
 
   private static final EchopraxiaFieldsMessage fieldsMessage =
-          new EchopraxiaFieldsMessage("message {} {} {} {}", fields, emptyList());
+      new EchopraxiaFieldsMessage("message {} {} {} {}", fields, emptyList());
 
   @Benchmark
   public void info() {
-    logger.info(new EchopraxiaFieldsMessage("message", emptyList(), emptyList()));
+    logger.info(message);
   }
 
   @Benchmark
@@ -56,7 +60,7 @@ public class Log4JBenchmarks {
 
   @Benchmark
   public void infoWithException() {
-    logger.info("Message", exception);
+    logger.info(message, exception);
   }
 
   static class MyKeyValueField implements KeyValueField {

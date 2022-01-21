@@ -68,6 +68,9 @@ public class Logger<FB extends Field.Builder> {
    * @return the new logger.
    */
   public Logger<FB> withCondition(Condition condition) {
+    if (condition == Condition.always()) {
+      return this;
+    }
     return new Logger<>(core().withCondition(condition), fieldBuilder);
   }
 

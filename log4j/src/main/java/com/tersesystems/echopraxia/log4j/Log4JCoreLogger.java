@@ -5,7 +5,6 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.apache.logging.log4j.Logger;
@@ -36,8 +35,7 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return false;
     }
-    final Marker marker = createMarker();
-    return logger.isEnabled(convertLevel(level), marker);
+    return logger.isEnabled(convertLevel(level), context.getMarker());
   }
 
   @Override
@@ -53,7 +51,7 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return;
     }
-    logger.log(convertLevel(level), createMarker(), createMessage(message));
+    logger.log(convertLevel(level), context.getMarker(), createMessage(message));
   }
 
   @Override
@@ -64,7 +62,7 @@ public class Log4JCoreLogger implements CoreLogger {
     }
     List<Field> argumentFields = f.apply(builder);
     Throwable e = findThrowable(argumentFields);
-    logger.log(convertLevel(level), createMarker(), createMessage(message, argumentFields), e);
+    logger.log(convertLevel(level), context.getMarker(), createMessage(message, argumentFields), e);
   }
 
   @Override
@@ -73,7 +71,10 @@ public class Log4JCoreLogger implements CoreLogger {
       return;
     }
     logger.log(
-        convertLevel(level), createMarker(), createMessage(message, Collections.emptyList()), e);
+        convertLevel(level),
+        context.getMarker(),
+        createMessage(message, Collections.emptyList()),
+        e);
   }
 
   @Override
@@ -108,19 +109,26 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder) {
-    Log4JLoggingContext newContext =
-        new Log4JLoggingContext(() -> f.apply(builder), Collections::emptyList);
+    Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
     return new Log4JCoreLogger(logger, context.and(newContext), condition);
   }
 
   @Override
   public CoreLogger withCondition(Condition condition) {
+    if (condition == Condition.never()) {
+      if (this.condition == Condition.never()) {
+        return this;
+      }
+      return new Log4JCoreLogger(logger, context, condition);
+    }
+    if (condition == Condition.always()) {
+      return this;
+    }
     return new Log4JCoreLogger(logger, context, this.condition.and(condition));
   }
 
-  public CoreLogger withMarkers(Marker... markers) {
-    Log4JLoggingContext newContext =
-        new Log4JLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
+  public CoreLogger withMarker(Marker marker) {
+    Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
     return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
   }
 
@@ -133,30 +141,20 @@ public class Log4JCoreLogger implements CoreLogger {
     return new EchopraxiaFieldsMessage(template, arguments, contextFields);
   }
 
-  private Marker createMarker() {
-    // https://logging.apache.org/log4j/2.x/manual/markers.html
-    //
-    // Log4J markers are static, kept in a single map and so there's no such
-    // thing as a "detached" marker -- if you add a parent, you're adding it
-    // for everyone.  SO... you can't have more than one marker passed in, and
-    // you also have a one-off aggregate parent marker.
-    //
-    // You can't join two markers, and they're not SLF4J markers in any meaningful
-    // sense.  There's Log4jMarker and that's IT, because JSON deserialization lists
-    // that in the MarkerMixin.  And the source there says to consider it private.
-    //
-    // From what I can tell here, you'll only ever work with one Log4J marker and
-    // will have to manage the parent / child relationships outside of Echopraxia.
-    //
-    // Possibly we could just have the context return a single marker, but we
-    // might want to be able to prioritize which marker we pick.
-    //
-    // So for now we just return the first of them and hope it works.
-    return context.getMarkers().stream().findFirst().orElseGet(() -> null);
-  }
-
   private org.apache.logging.log4j.Level convertLevel(Level level) {
-    return org.apache.logging.log4j.Level.getLevel(level.name());
+    switch (level) {
+      case ERROR:
+        return org.apache.logging.log4j.Level.ERROR;
+      case WARN:
+        return org.apache.logging.log4j.Level.WARN;
+      case INFO:
+        return org.apache.logging.log4j.Level.INFO;
+      case DEBUG:
+        return org.apache.logging.log4j.Level.DEBUG;
+      case TRACE:
+        return org.apache.logging.log4j.Level.TRACE;
+    }
+    throw new IllegalStateException("Unknown level " + level);
   }
 
   private Throwable findThrowable(List<Field> fields) {

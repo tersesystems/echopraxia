@@ -6,6 +6,7 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -23,8 +24,8 @@ public class CoreLoggerBenchmarks {
   }
 
   @Benchmark
-  public void isEnabled() {
-    logger.isEnabled(Level.INFO);
+  public void isEnabled(Blackhole blackhole) {
+    blackhole.consume(logger.isEnabled(Level.INFO));
   }
 
   @Benchmark
