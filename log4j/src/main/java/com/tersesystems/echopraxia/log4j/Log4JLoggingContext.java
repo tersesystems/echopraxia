@@ -12,16 +12,16 @@ import org.apache.logging.log4j.Marker;
 public class Log4JLoggingContext implements LoggingContext {
 
   protected final Supplier<List<Field>> fieldsSupplier;
-  protected final Supplier<List<Marker>> markersSupplier;
+  protected final Marker marker;
 
   Log4JLoggingContext() {
     this.fieldsSupplier = Collections::emptyList;
-    this.markersSupplier = Collections::emptyList;
+    this.marker = null;
   }
 
-  protected Log4JLoggingContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
+  protected Log4JLoggingContext(Supplier<List<Field>> f, Marker m) {
     this.fieldsSupplier = f;
-    this.markersSupplier = m;
+    this.marker = m;
   }
 
   @Override
@@ -29,8 +29,8 @@ public class Log4JLoggingContext implements LoggingContext {
     return fieldsSupplier.get();
   }
 
-  public List<Marker> getMarkers() {
-    return markersSupplier.get();
+  public Marker getMarker() {
+    return marker;
   }
 
   /**
@@ -47,13 +47,8 @@ public class Log4JLoggingContext implements LoggingContext {
             final List<Field> listTwo = context.getFields();
             return Stream.concat(listOne.stream(), listTwo.stream()).collect(Collectors.toList());
           };
-      Supplier<List<Marker>> joinedMarkers =
-          () -> {
-            final List<Marker> listOne = Log4JLoggingContext.this.getMarkers();
-            final List<Marker> listTwo = context.getMarkers();
-            return Stream.concat(listOne.stream(), listTwo.stream()).collect(Collectors.toList());
-          };
-      return new Log4JLoggingContext(joinedFields, joinedMarkers);
+      Marker m = context.getMarker() != null ? context.getMarker() : this.marker;
+      return new Log4JLoggingContext(joinedFields, m);
     } else {
       return this;
     }

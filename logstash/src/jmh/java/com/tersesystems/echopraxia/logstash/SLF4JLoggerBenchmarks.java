@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static net.logstash.logback.argument.StructuredArguments.kv;
+
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -18,31 +20,31 @@ public class SLF4JLoggerBenchmarks {
 
   @Benchmark
   public void info() {
-    // SLF4JLoggerBenchmarks.info                    avgt    5   49.033 ± 3.101  ns/op
     logger.info("message");
   }
 
   @Benchmark
   public void isInfoEnabled(Blackhole blackhole) {
-    // SLF4JLoggerBenchmarks.isInfoEnabled  avgt    5  0.949 ± 0.011  ns/op
     blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark
   public void infoWithArgument() {
-    // SLF4JLoggerBenchmarks.infoWithArgument        avgt    5   49.749 ± 2.394  ns/op
-    logger.info("message {}", "string");
+    logger.info("message {}", kv("key", "value"));
   }
 
   @Benchmark
   public void infoWithArrayArgs() {
-    // SLF4JLoggerBenchmarks.infoWithArrayArgs       avgt    5   51.215 ± 2.638  ns/op
-    logger.info("message {} {} {} {}", "one", "two", "three", "four");
+    logger.info(
+        "message {} {} {} {}",
+        kv("key1", "one"),
+        kv("key2", "two"),
+        kv("key3", "three"),
+        kv("key4", "four"));
   }
 
   @Benchmark
   public void infoWithException() {
-    // SLF4JLoggerBenchmarks.infoWithException       avgt    5  175.896 ± 0.807  ns/op
     logger.info("Message", exception);
   }
 }

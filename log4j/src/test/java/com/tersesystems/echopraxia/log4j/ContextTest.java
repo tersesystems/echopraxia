@@ -18,7 +18,7 @@ public class ContextTest extends TestBase {
     Marker securityMarker = MarkerManager.getMarker("SECURITY");
     final Log4JCoreLogger core = new Log4JCoreLogger(LogManager.getLogger());
     Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
+        LoggerFactory.getLogger(core.withMarker(securityMarker), Field.Builder.instance());
     logger.error("Message {}", fb -> fb.onlyString("field_name", "field_value"));
 
     JsonObject entry = getEntry();
@@ -36,7 +36,7 @@ public class ContextTest extends TestBase {
     final Marker securityMarker = MarkerManager.getMarker("SECURITY");
     final Log4JCoreLogger core = new Log4JCoreLogger(LogManager.getLogger());
     Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
+        LoggerFactory.getLogger(core.withMarker(securityMarker), Field.Builder.instance());
 
     org.apache.logging.log4j.Logger log4jLogger = core.logger();
 

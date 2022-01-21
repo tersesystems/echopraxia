@@ -16,8 +16,7 @@ public class Log4JCoreLoggerProvider implements CoreLoggerProvider {
   @Override
   public CoreLogger getLogger(String name) {
     org.apache.logging.log4j.Logger log4jLogger = LogManager.getLogger(name);
-    Log4JLoggingContext context =
-        new Log4JLoggingContext(Collections::emptyList, Collections::emptyList);
+    Log4JLoggingContext context = new Log4JLoggingContext(Collections::emptyList, null);
     Condition condition = Condition.always();
     return new Log4JCoreLogger(log4jLogger, context, condition);
   }

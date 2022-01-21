@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;

@@ -1,10 +1,17 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.Condition;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
+
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.KeyValueField;
+import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.message.Message;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -14,61 +21,65 @@ import org.openjdk.jmh.infra.Blackhole;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class Log4JBenchmarks {
-  private static final Logger<?> logger = LoggerFactory.getLogger();
+  private static final Logger logger = LogManager.getLogger(Log4JBenchmarks.class);
 
   private static final Exception exception = new RuntimeException();
 
+  private static final Field field = new MyKeyValueField("name", Field.Value.string("value"));
+
+  private static final List<Field> fields = Arrays.asList(field, field, field, field);
+
+  private static final Message message =
+      new EchopraxiaFieldsMessage("message", emptyList(), emptyList());
+
+  private static final Message messageWithArgument =
+      new EchopraxiaFieldsMessage("message {}", singletonList(field), emptyList());
+
+  private static final EchopraxiaFieldsMessage fieldsMessage =
+      new EchopraxiaFieldsMessage("message {} {} {} {}", fields, emptyList());
+
   @Benchmark
   public void info() {
-    // Log4JBenchmarks.info                         avgt    5  142.433 ± 27.654  ns/op
-    logger.info("Message");
+    logger.info(message);
   }
 
   @Benchmark
   public void isInfoEnabled(Blackhole blackhole) {
-    // Log4JBenchmarks.isInfoEnabled                avgt    5    5.556 ±  0.056  ns/op
     blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark
-  public void infoWithStringArg() {
-    // Log4JBenchmarks.infoWithStringArg            avgt    5  288.263 ±  0.753  ns/op
-    logger.info("Message", fb -> fb.onlyString("foo", "bar"));
+  public void infoWithArgument() {
+    logger.info(messageWithArgument);
   }
 
   @Benchmark
-  public void infoWithContextString() {
-    // Log4JBenchmarks.infoWithContextString        avgt    5  247.300 ±  2.810  ns/op
-    logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
-  }
-
-  @Benchmark
-  public void infoWithParameterizedString() {
-    // Log4JBenchmarks.infoWithParameterizedString  avgt    5  412.990 ± 27.346  ns/op
-    logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
+  public void infoWithArrayArgs() {
+    logger.info(fieldsMessage);
   }
 
   @Benchmark
   public void infoWithException() {
-    // Log4JBenchmarks.infoWithException            avgt    5  238.892 ± 54.381  ns/op
-    logger.info("Message", exception);
+    logger.info(message, exception);
   }
 
-  @Benchmark
-  public void infoWithNever() {
-    // Log4JBenchmarks.infoWithNever                avgt    5  176.454 ± 57.493  ns/op
-    logger.withCondition(Condition.never()).info("Message");
-  }
+  static class MyKeyValueField implements KeyValueField {
+    private final String name;
+    private final Value<?> value;
 
-  @Benchmark
-  public void infoWithAlways() {
-    // Log4JBenchmarks.infoWithAlways               avgt    5  152.703 ± 52.607  ns/op
-    logger.withCondition(Condition.always()).info("Message");
-  }
+    MyKeyValueField(String name, Value<?> value) {
+      this.name = name;
+      this.value = value;
+    }
 
-  @Benchmark
-  public void infoWithFieldBuilder() {
-    // Log4JBenchmarks.infoWithFieldBuilder         avgt    5  156.345 ± 80.493  ns/op
-    logger.withFieldBuilder(Field.Builder.instance()).info("Message");
+    @Override
+    public String name() {
+      return name;
+    }
+
+    @Override
+    public Value<?> value() {
+      return value;
+    }
   }
 }
