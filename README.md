@@ -285,6 +285,8 @@ Conditions should be cheap to evaluate, and should be "safe" - i.e. they should 
 
 Conditions can be used either on the logger, on the statement, or against the predicate check.
 
+> **NOTE**: conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.  Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using conditions to turn on and off debugging as needed.
+
 ### Logger
 
 You can use conditions in a logger, and statements will only log if the condition is met:
@@ -343,7 +345,7 @@ Gradle:
 implementation "com.tersesystems.echopraxia:scripting:1.1.1" 
 ```
 
-## String Based Scripts
+### String Based Scripts
 
 You also have the option of passing in a string directly:
 
@@ -384,9 +386,9 @@ library echopraxia {
 }
 ```
 
-## Watched Scripts
+### Watched Scripts
 
-You can also change scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
+You can also change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
 
 To configure `ScriptWatchService`, pass it the directory that contains your script files:
 
@@ -568,7 +570,8 @@ The `LogstashCoreLogger` has a `withMarkers` method that takes an SLF4J marker:
 
 ```java
 LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
-Logger<?> logger = LoggerFactory.getLogger(core.withMarkers(MarkerFactory.getMarker("SECURITY")), Field.Builder.instance);
+Logger<?> logger = LoggerFactory.getLogger(
+      core.withMarkers(MarkerFactory.getMarker("SECURITY")), Field.Builder.instance);
 ```
 
 Likewise, you need to get at the SLF4J logger from a core logger, you can cast and call `core.logger()`:
