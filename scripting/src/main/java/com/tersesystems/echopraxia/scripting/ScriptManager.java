@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ScriptManager {
 
   private final ScriptHandle handle;
-  private volatile Arity2CallSite callSite;
+  private Arity2CallSite callSite;
 
   private final Object lock = new Object();
 
@@ -38,13 +38,14 @@ public class ScriptManager {
 
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
-      if (callSite == null || handle.isInvalid()) {
-        String script = handle.script();
-        eval(script);
-      }
       Value levelV = Values.make(level.name());
       Value fieldsV = convertFields(context.getFields());
-      return call(levelV, fieldsV);
+      Value retValue = call(levelV, fieldsV);
+      if (! retValue.isBoolean()) {
+        throw new ScriptException(
+                "Your function needs to return a boolean value!  Invalid return type: " + retValue.type());
+      }
+      return retValue.bool();
     } catch (Exception e) {
       handle.report(e);
       return df; // pass the default through on exception.
@@ -123,33 +124,36 @@ public class ScriptManager {
     return Values.makeDict(throwMap);
   }
 
+  private Value call(Value level, Value fields) {
+    synchronized (lock) {
+      // if there's no callsite or the handle is bad, we need to eval the script
+      // probably safest to do this in a single thread in synchronized block?
+      //
+      // The handle will only be invalid for _one_ call, so if you get an exception,
+      // it won't try to recompile it again, and you'll get the previous successfully
+      // evaluated call-site next round.
+      //
+      // If the callsite is null and the script is bad, then this is the first time
+      // you've called the script and it WILL keep trying until it works.  It
+      // will throw an exception and return the default value so that conditional
+      // logging is not blocked in the meanwhile.
+      if (callSite == null || handle.isInvalid()) {
+        String script = handle.script();
+        Runtime.Module module = compileModule(script);
+        module.evaluate();
+        Runtime.Var var = module.getLibrary(handle.libraryName()).getVar(handle.functionName());
+        callSite = var.arity2CallSite();
+      }
+      // Callsite is not threadsafe, so only one thread can execute it at a time
+      return callSite.call(level, fields);
+    }
+  }
+
   private Runtime.Module compileModule(String script) {
     String path = handle.path();
     MemoryLocation memLocation = new MemoryLocation.Builder().add(path, script).build();
     LoadPath loadPath = new LoadPath.Builder().addStdLocation().add(memLocation).build();
     Runtime runtime = TweakFlow.compile(loadPath, path);
     return runtime.getModules().get(runtime.unitKey(path));
-  }
-
-  private boolean call(Value level, Value fields) {
-    synchronized (lock) {
-      Value call = callSite.call(level, fields);
-      if (! call.isBoolean()) {
-        throw new ScriptException(
-                  "Your function needs to return a boolean value!  Invalid return type: " + call.type());
-      }
-      return call.bool();
-    }
-  }
-
-  private void eval(String script) {
-    Runtime.Module module = compileModule(script);
-    module.evaluate();
-    refreshCallSite(module);
-  }
-
-  private void refreshCallSite(Runtime.Module module) {
-    Runtime.Var var = module.getLibrary(handle.libraryName()).getVar(handle.functionName());
-    callSite = var.arity2CallSite();
   }
 }
