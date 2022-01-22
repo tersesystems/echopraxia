@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * ScriptManager class.
@@ -29,8 +28,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ScriptManager {
 
   private final ScriptHandle handle;
-  private final AtomicReference<Runtime.Module> mref = new AtomicReference<>();
-  private final Map<Thread, Arity2CallSite> callSiteMap = new ConcurrentHashMap<>();
+
+  private final ReentrantLock lock = new ReentrantLock();
+  private volatile Arity2CallSite callSite;
 
   public ScriptManager(ScriptHandle handle) {
     this.handle = handle;
@@ -38,13 +38,9 @@ public class ScriptManager {
 
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
-      if (mref.get() == null || handle.isInvalid()) {
-        invalidateThreadMap();
+      if (callSite == null || handle.isInvalid()) {
         String script = handle.script();
         eval(script);
-      }
-      if (callSiteMap.get(Thread.currentThread()) == null) {
-        refreshCallSite();
       }
       Value levelV = Values.make(level.name());
       Value fieldsV = convertFields(context.getFields());
@@ -53,10 +49,6 @@ public class ScriptManager {
       handle.report(e);
       return df; // pass the default through on exception.
     }
-  }
-
-  private void invalidateThreadMap() {
-    callSiteMap.clear();
   }
 
   private Value convertFields(List<Field> fields) {
@@ -140,25 +132,27 @@ public class ScriptManager {
   }
 
   protected boolean call(Value level, Value fields) {
-    final Arity2CallSite callSite = callSiteMap.get(Thread.currentThread());
-
-    Value call = callSite.call(level, fields);
-    if (call.isBoolean()) {
+    lock.lock();
+    try {
+      Value call = callSite.call(level, fields);
+      if (! call.isBoolean()) {
+        throw new ScriptException(
+                  "Your function needs to return a boolean value!  Invalid return type: " + call.type());
+      }
       return call.bool();
-    } else {
-      throw new ScriptException(
-          "Your function needs to return a boolean value!  Invalid return type: " + call.type());
+    } finally{
+      lock.unlock();
     }
   }
 
   void eval(String script) {
     Runtime.Module module = compileModule(script);
     module.evaluate();
-    mref.set(module);
+    refreshCallSite(module);
   }
 
-  void refreshCallSite() {
-    Runtime.Var var = mref.get().getLibrary(handle.libraryName()).getVar(handle.functionName());
-    callSiteMap.put(Thread.currentThread(), var.arity2CallSite());
+  void refreshCallSite(Runtime.Module module) {
+    Runtime.Var var = module.getLibrary(handle.libraryName()).getVar(handle.functionName());
+    callSite = var.arity2CallSite();
   }
 }
