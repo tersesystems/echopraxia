@@ -28,9 +28,9 @@ import java.util.concurrent.locks.ReentrantLock;
 public class ScriptManager {
 
   private final ScriptHandle handle;
-
-  private final ReentrantLock lock = new ReentrantLock();
   private volatile Arity2CallSite callSite;
+
+  private final Object lock = new Object();
 
   public ScriptManager(ScriptHandle handle) {
     this.handle = handle;
@@ -123,7 +123,7 @@ public class ScriptManager {
     return Values.makeDict(throwMap);
   }
 
-  Runtime.Module compileModule(String script) {
+  private Runtime.Module compileModule(String script) {
     String path = handle.path();
     MemoryLocation memLocation = new MemoryLocation.Builder().add(path, script).build();
     LoadPath loadPath = new LoadPath.Builder().addStdLocation().add(memLocation).build();
@@ -131,27 +131,24 @@ public class ScriptManager {
     return runtime.getModules().get(runtime.unitKey(path));
   }
 
-  protected boolean call(Value level, Value fields) {
-    lock.lock();
-    try {
+  private boolean call(Value level, Value fields) {
+    synchronized (lock) {
       Value call = callSite.call(level, fields);
       if (! call.isBoolean()) {
         throw new ScriptException(
                   "Your function needs to return a boolean value!  Invalid return type: " + call.type());
       }
       return call.bool();
-    } finally{
-      lock.unlock();
     }
   }
 
-  void eval(String script) {
+  private void eval(String script) {
     Runtime.Module module = compileModule(script);
     module.evaluate();
     refreshCallSite(module);
   }
 
-  void refreshCallSite(Runtime.Module module) {
+  private void refreshCallSite(Runtime.Module module) {
     Runtime.Var var = module.getLibrary(handle.libraryName()).getVar(handle.functionName());
     callSite = var.arity2CallSite();
   }
