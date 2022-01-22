@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -29,9 +30,7 @@ public class ScriptManager {
 
   private final ScriptHandle handle;
   private final AtomicReference<Runtime.Module> mref = new AtomicReference<>();
-
-  // Callsite is faster but not thread-safe, so use a thread-local
-  private final ThreadLocal<Arity2CallSite> callSiteThreadLocal = new ThreadLocal<>();
+  private final Map<Thread, Arity2CallSite> callSiteMap = new ConcurrentHashMap<>();
 
   public ScriptManager(ScriptHandle handle) {
     this.handle = handle;
@@ -40,10 +39,11 @@ public class ScriptManager {
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
       if (mref.get() == null || handle.isInvalid()) {
+        invalidateThreadMap();
         String script = handle.script();
         eval(script);
       }
-      if (callSiteThreadLocal.get() == null) {
+      if (callSiteMap.get(Thread.currentThread()) == null) {
         refreshCallSite();
       }
       Value levelV = Values.make(level.name());
@@ -53,6 +53,10 @@ public class ScriptManager {
       handle.report(e);
       return df; // pass the default through on exception.
     }
+  }
+
+  private void invalidateThreadMap() {
+    callSiteMap.clear();
   }
 
   private Value convertFields(List<Field> fields) {
@@ -136,7 +140,9 @@ public class ScriptManager {
   }
 
   protected boolean call(Value level, Value fields) {
-    Value call = callSiteThreadLocal.get().call(level, fields);
+    final Arity2CallSite callSite = callSiteMap.get(Thread.currentThread());
+
+    Value call = callSite.call(level, fields);
     if (call.isBoolean()) {
       return call.bool();
     } else {
@@ -149,11 +155,10 @@ public class ScriptManager {
     Runtime.Module module = compileModule(script);
     module.evaluate();
     mref.set(module);
-    callSiteThreadLocal.set(null);
   }
 
   void refreshCallSite() {
     Runtime.Var var = mref.get().getLibrary(handle.libraryName()).getVar(handle.functionName());
-    callSiteThreadLocal.set(var.arity2CallSite());
+    callSiteMap.put(Thread.currentThread(), var.arity2CallSite());
   }
 }
