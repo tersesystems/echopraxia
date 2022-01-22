@@ -285,7 +285,7 @@ Conditions should be cheap to evaluate, and should be "safe" - i.e. they should 
 
 Conditions can be used either on the logger, on the statement, or against the predicate check.
 
-> **NOTE**: conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.  Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using conditions to turn on and off debugging as needed.
+> **NOTE**: Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.  Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).
 
 ### Logger
 
