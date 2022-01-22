@@ -18,8 +18,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * ScriptManager class.
@@ -29,8 +28,9 @@ import java.util.concurrent.atomic.AtomicReference;
 public class ScriptManager {
 
   private final ScriptHandle handle;
-  private final AtomicReference<Runtime.Module> mref = new AtomicReference<>();
-  private final Map<Thread, Arity2CallSite> callSiteMap = new ConcurrentHashMap<>();
+  private Arity2CallSite callSite;
+
+  private final Object lock = new Object();
 
   public ScriptManager(ScriptHandle handle) {
     this.handle = handle;
@@ -38,25 +38,18 @@ public class ScriptManager {
 
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
-      if (mref.get() == null || handle.isInvalid()) {
-        invalidateThreadMap();
-        String script = handle.script();
-        eval(script);
-      }
-      if (callSiteMap.get(Thread.currentThread()) == null) {
-        refreshCallSite();
-      }
       Value levelV = Values.make(level.name());
       Value fieldsV = convertFields(context.getFields());
-      return call(levelV, fieldsV);
+      Value retValue = call(levelV, fieldsV);
+      if (! retValue.isBoolean()) {
+        throw new ScriptException(
+                "Your function needs to return a boolean value!  Invalid return type: " + retValue.type());
+      }
+      return retValue.bool();
     } catch (Exception e) {
       handle.report(e);
       return df; // pass the default through on exception.
     }
-  }
-
-  private void invalidateThreadMap() {
-    callSiteMap.clear();
   }
 
   private Value convertFields(List<Field> fields) {
@@ -131,34 +124,36 @@ public class ScriptManager {
     return Values.makeDict(throwMap);
   }
 
-  Runtime.Module compileModule(String script) {
+  private Value call(Value level, Value fields) {
+    synchronized (lock) {
+      // if there's no callsite or the handle is bad, we need to eval the script
+      // probably safest to do this in a single thread in synchronized block?
+      //
+      // The handle will only be invalid for _one_ call, so if you get an exception,
+      // it won't try to recompile it again, and you'll get the previous successfully
+      // evaluated call-site next round.
+      //
+      // If the callsite is null and the script is bad, then this is the first time
+      // you've called the script and it WILL keep trying until it works.  It
+      // will throw an exception and return the default value so that conditional
+      // logging is not blocked in the meanwhile.
+      if (callSite == null || handle.isInvalid()) {
+        String script = handle.script();
+        Runtime.Module module = compileModule(script);
+        module.evaluate();
+        Runtime.Var var = module.getLibrary(handle.libraryName()).getVar(handle.functionName());
+        callSite = var.arity2CallSite();
+      }
+      // Callsite is not threadsafe, so only one thread can execute it at a time
+      return callSite.call(level, fields);
+    }
+  }
+
+  private Runtime.Module compileModule(String script) {
     String path = handle.path();
     MemoryLocation memLocation = new MemoryLocation.Builder().add(path, script).build();
     LoadPath loadPath = new LoadPath.Builder().addStdLocation().add(memLocation).build();
     Runtime runtime = TweakFlow.compile(loadPath, path);
     return runtime.getModules().get(runtime.unitKey(path));
-  }
-
-  protected boolean call(Value level, Value fields) {
-    final Arity2CallSite callSite = callSiteMap.get(Thread.currentThread());
-
-    Value call = callSite.call(level, fields);
-    if (call.isBoolean()) {
-      return call.bool();
-    } else {
-      throw new ScriptException(
-          "Your function needs to return a boolean value!  Invalid return type: " + call.type());
-    }
-  }
-
-  void eval(String script) {
-    Runtime.Module module = compileModule(script);
-    module.evaluate();
-    mref.set(module);
-  }
-
-  void refreshCallSite() {
-    Runtime.Var var = mref.get().getLibrary(handle.libraryName()).getVar(handle.functionName());
-    callSiteMap.put(Thread.currentThread(), var.arity2CallSite());
   }
 }
