@@ -8,10 +8,13 @@ import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.ValueField;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.Markers;
+import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 /** Logstash implementation of CoreLogger. */
@@ -57,6 +60,15 @@ public class LogstashCoreLogger implements CoreLogger {
   public <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
+    return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
+  }
+
+  @Override
+  public CoreLogger withThreadContext(
+      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
+    Supplier<List<Field>> fieldSupplier = mapTransform.apply(MDC::getCopyOfContextMap);
+    LogstashLoggingContext newContext =
+        new LogstashLoggingContext(fieldSupplier, Collections::emptyList);
     return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
   }
 

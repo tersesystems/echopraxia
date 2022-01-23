@@ -71,6 +71,14 @@ public class Main {
     // You can also use a custom logger
     MyLogger myLogger = MyLoggerFactory.getLogger();
     myLogger.debug("Using my logger {}", fb -> fb.onlyDate("my date", new Date()));
+
+    // Render some statements from context, always uses fb.string
+    org.slf4j.MDC.put("mdckey", "mdcvalue");
+    myLogger
+        .withThreadContext()
+        .withCondition(
+            (l, ctx) -> ctx.getFields().stream().anyMatch(field -> field.name().equals("mdckey")))
+        .info("This statement has MDC values in context");
   }
 
   // Example class with several fields on it.

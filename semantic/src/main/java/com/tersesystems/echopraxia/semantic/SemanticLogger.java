@@ -62,6 +62,8 @@ public interface SemanticLogger<DataType> {
 
   SemanticLogger<DataType> withFields(Field.BuilderFunction<Field.Builder> f);
 
+  SemanticLogger<DataType> withThreadContext();
+
   <FB extends Field.Builder> SemanticLogger<DataType> withFields(
       Field.BuilderFunction<FB> f, FB builder);
 

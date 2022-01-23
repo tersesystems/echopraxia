@@ -19,4 +19,7 @@ dependencies {
     implementation project(":logstash")
     implementation project(":scripting")
     implementation project(":semantic")
+
+    implementation 'ch.qos.logback:logback-classic:1.2.10'
+    implementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
 }

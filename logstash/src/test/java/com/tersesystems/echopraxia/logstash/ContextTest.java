@@ -15,6 +15,7 @@ import java.util.Map;
 import net.logstash.logback.marker.LogstashMarker;
 import net.logstash.logback.marker.Markers;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
@@ -104,6 +105,24 @@ public class ContextTest extends TestBase {
     Map<String, String> key = new HashMap<>();
     key.put("key", "value");
     key.put("key2", "value2");
+    Marker expected = (Markers.appendEntries(key));
+    assertThat(m).isEqualTo(expected);
+  }
+
+  @Test
+  void testThreadContext() {
+    MDC.put("mdckey", "mdcvalue");
+    Logger<?> logger = getLogger().withThreadContext();
+    logger.info("some message");
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("some message");
+    final LogstashMarker m = (LogstashMarker) event.getMarker();
+
+    Map<String, String> key = new HashMap<>();
+    key.put("mdckey", "mdcvalue");
     Marker expected = (Markers.appendEntries(key));
     assertThat(m).isEqualTo(expected);
   }
