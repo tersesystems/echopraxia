@@ -310,7 +310,7 @@ public interface Field {
     }
 
     /**
-     * Creates a singleton list of an array field out of a name and a varadic array of string.
+     * Creates a singleton list of an array field out of a name and a variadic array of string.
      *
      * @param name the name of the field.
      * @param values the values.
@@ -321,7 +321,7 @@ public interface Field {
     }
 
     /**
-     * Creates a singleton list of an array field out of a name and a varadic array of number.
+     * Creates a singleton list of an array field out of a name and a variadic array of number.
      *
      * @param name the name of the field.
      * @param values the values.
@@ -332,7 +332,7 @@ public interface Field {
     }
 
     /**
-     * Creates a singleton list of an array field out of a name and a varadic array of boolean.
+     * Creates a singleton list of an array field out of a name and a variadic array of boolean.
      *
      * @param name the name of the field.
      * @param values the values.
@@ -474,9 +474,14 @@ public interface Field {
      * @param t the value of the field.
      * @return a list containing a single field.
      */
+    // should probably deprecate this as  logger.error(msg, e) is the ideomatic form over fb ->
+    // fb.onlyException(e)
     default List<Field> onlyException(Throwable t) {
       return only(exception(t));
     }
+
+    // ---------------------------------------------------------
+    // Null
 
     /**
      * Creates a singleton list of an exception value using the default exception name.
@@ -490,13 +495,23 @@ public interface Field {
 
     /**
      * Creates a singleton list of an exception using an explicit name.
+     * Creates a field with a null as a value.
      *
      * @param name the name of the field.
-     * @param t the value of the field.
+     * @return a field.
+     */
+    default Field nullField(String name) {
+      return value(name, Value.nullValue());
+    }
+
+    /**
+     * Creates a singleton list with a null field.
+     *
+     * @param name the name of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyException(String name, Throwable t) {
-      return only(exception(name, t));
+    default List<Field> onlyNullField(String name) {
+      return only(nullField(name));
     }
 
     /**
@@ -636,7 +651,7 @@ public interface Field {
     /**
      * Wraps an array of values with a value.
      *
-     * @param values varadic elements of values.
+     * @param values variadic elements of values.
      * @return the Value.
      */
     public static Value<List<Value<?>>> array(Value<?>... values) {
@@ -710,7 +725,7 @@ public interface Field {
     /**
      * Wraps an array of fields with a Value as an object.
      *
-     * @param fields varadic elements of fields.
+     * @param fields variadic elements of fields.
      * @return the Value.
      */
     public static Value<List<Field>> object(Field... fields) {

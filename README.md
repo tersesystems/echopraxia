@@ -182,21 +182,24 @@ So far so good, but logging strings and numbers can get tedious.  Let's go into 
 Echopraxia lets you specify custom field builders whenever you want to log domain objects:
 
 ```java
-  public class BuilderWithDate implements Field.Builder {
-    public BuilderWithDate() {}
+public class BuilderWithDate implements Field.Builder {
+  public BuilderWithDate() {}
 
-    // Renders a date using the `only` idiom returning a list of `Field`.
-    // This is a useful shortcut when you only have one field you want to add.
-    public List<Field> onlyDate(String name, Date date) {
-      return only(date(name, date));
-    }
-
-    // Renders a date as an ISO 8601 string.
-    public Field date(String name, Date date) {
-      return string(
-              name, DateTimeFormatter.ISO_INSTANT.format(Instant.ofEpochMilli(date.getTime())));
-    }
+  // Renders a date as an ISO 8601 string.
+  public Field.Value<String> dateValue(Date date) {
+    return Field.Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
   }
+
+  public Field date(String name, Date date) {
+    return string(name, dateValue(date));
+  }
+
+  // Renders a date using the `only` idiom returning a list of `Field`.
+  // This is a useful shortcut when you only have one field you want to add.
+  public List<Field> onlyDate(String name, Date date) {
+    return only(date(name, date));
+  }
+}
 ```
 
 And now you can render a date automatically:
@@ -216,19 +219,18 @@ public class PersonBuilder implements Field.Builder {
     return keyValue(fieldName, personValue(p));
   }
 
-  public Value<?> personValue(Person p) {
+  public Field.Value<?> personValue(Person p) {
     if (p == null) {
       return Value.nullValue();
     }
     Field name = string("name", p.name());
     Field age = number("age", p.age());
     // optional returns either an object value or null value, keyValue is untyped
-    Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
-    Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
+    Field father = keyValue("father", Field.Value.optional(p.getFather().map(this::personValue)));
+    Field mother = keyValue("mother", Field.Value.optional(p.getMother().map(this::personValue)));
     Field interests = array("interests", p.interests());
     return Value.object(name, age, father, mother, interests);
   }
-}
 ```
 
 And then you can do the same by calling `fb.person`:
