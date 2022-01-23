@@ -1,18 +1,17 @@
 package com.tersesystems.echopraxia.scripting;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.*;
+
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.LoggingContext;
 import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
-import org.junit.jupiter.api.Test;
-
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.LongAdder;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.*;
+import org.junit.jupiter.api.Test;
 
 public class ScriptManagerTest {
 

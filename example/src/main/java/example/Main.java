@@ -3,6 +3,8 @@ package example;
 import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.core.CoreLogger;
+import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -65,6 +67,10 @@ public class Main {
     if (logger.isInfoEnabled(dateCondition)) {
       logger.info("hi there {}", fb -> fb.only(fb.person("small_mammal", eloise)));
     }
+
+    // You can also use a custom logger
+    MyLogger myLogger = MyLoggerFactory.getLogger();
+    myLogger.debug("Using my logger {}", fb -> fb.onlyDate("my date", new Date()));
   }
 
   // Example class with several fields on it.
@@ -122,6 +128,18 @@ public class Main {
           string("name", person.name()),
           number("age", person.age()),
           array("toys", Field.Value.asList(person.toys(), Field.Value::string)));
+    }
+  }
+
+  static class MyLogger extends Logger<MyFieldBuilder> {
+    protected MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) {
+      super(core, fieldBuilder);
+    }
+  }
+
+  static class MyLoggerFactory {
+    public static MyLogger getLogger() {
+      return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder);
     }
   }
 }

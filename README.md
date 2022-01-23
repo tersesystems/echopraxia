@@ -231,6 +231,26 @@ Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFie
 personLogger.info("Person {}", fb -> fb.only(fb.person("user", user)));
 ```
 
+If you are using a particular set of field builders for your domain and want them available by default, the `Logger` class is designed to be easy to subclass.
+
+```java
+public class MyLogger extends Logger<MyFieldBuilder> {
+  protected MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) {
+    super(core, fieldBuilder);
+  }
+}
+
+public class MyLoggerFactory {
+  public static MyLogger getLogger() {
+    return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder);
+  }
+}
+
+MyLogger myLogger = MyLoggerFactory.getLogger();
+```
+
+Subclassing the logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere.
+
 ## Context
 
 You can also add fields directly to the logger using `logger.withFields` for contextual logging:
