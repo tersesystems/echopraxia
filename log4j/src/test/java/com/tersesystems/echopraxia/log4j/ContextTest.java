@@ -1,15 +1,17 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import javax.json.JsonArray;
 import javax.json.JsonObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
+import org.apache.logging.log4j.ThreadContext;
 import org.junit.jupiter.api.Test;
 
 public class ContextTest extends TestBase {
@@ -52,7 +54,37 @@ public class ContextTest extends TestBase {
   }
 
   @Test
+  void testComplexFields() {
+    Logger<?> logger = getLogger();
+    logger
+        .withFields(
+            fb -> {
+              Field name = fb.string("name", "will");
+              Field age = fb.number("age", 13);
+              Field toys = fb.array("toys", Field.Value.string("binkie"));
+              Field person = fb.object("person", name, age, toys);
+              return singletonList(person);
+            })
+        .error("this is a message with complex fields");
+
+    JsonObject entry = getEntry();
+    JsonObject context = entry.getJsonObject("context");
+    final JsonObject person = context.getJsonObject("person");
+    assertThat(person.getString("name")).isEqualTo("will");
+    assertThat(person.getInt("age")).isEqualTo(13);
+    JsonArray toys = person.getJsonArray("toys");
+    assertThat(toys.getString(0)).isEqualTo("binkie");
+  }
+
+  @Test
   void testThreadContext() {
-    fail();
+    ThreadContext.put("mdckey", "mdcvalue");
+    Logger<?> logger = getLogger();
+    logger.withThreadContext().error("message with mdc context");
+
+    JsonObject entry = getEntry();
+    JsonObject context = entry.getJsonObject("context");
+    final String value = context.getString("mdckey");
+    assertThat(value).isEqualTo("mdcvalue");
   }
 }
