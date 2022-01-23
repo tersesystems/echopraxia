@@ -8,6 +8,13 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * An echopraxia logger built around a field builder.
  *
+ * This class is explicitly designed to be subclassed so that
+ * end users can customize it and avoid the parameterized type tax.
+ *
+ * {@code <pre>
+ * public class MyLogger extends Logger&lt;MyFieldBuilder&gt; { ... }
+ * MyLogger logger = MyLoggerFactory.getLogger(); // no Logger&lt;MyFieldBuilder&gt; required!
+ * </pre>}
  * @param <FB> the field builder type.
  */
 public class Logger<FB extends Field.Builder> {
