@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * ScriptManager class.
@@ -41,9 +40,10 @@ public class ScriptManager {
       Value levelV = Values.make(level.name());
       Value fieldsV = convertFields(context.getFields());
       Value retValue = call(levelV, fieldsV);
-      if (! retValue.isBoolean()) {
+      if (!retValue.isBoolean()) {
         throw new ScriptException(
-                "Your function needs to return a boolean value!  Invalid return type: " + retValue.type());
+            "Your function needs to return a boolean value!  Invalid return type: "
+                + retValue.type());
       }
       return retValue.bool();
     } catch (Exception e) {
