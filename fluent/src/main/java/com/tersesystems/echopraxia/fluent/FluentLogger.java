@@ -5,7 +5,9 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -56,6 +58,17 @@ public class FluentLogger<FB extends Field.Builder> {
         | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
+  }
+
+  public FluentLogger<FB> withThreadContext() {
+    Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
+        mapSupplier ->
+            () ->
+                mapSupplier.get().entrySet().stream()
+                    .map(e -> builder.string(e.getKey(), e.getValue()))
+                    .collect(Collectors.toList());
+    CoreLogger coreLogger = core.withThreadContext(mapTransform);
+    return new FluentLogger<>(coreLogger, builder);
   }
 
   public boolean isErrorEnabled() {

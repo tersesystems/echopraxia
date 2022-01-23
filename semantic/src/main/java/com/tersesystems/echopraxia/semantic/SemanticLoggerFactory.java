@@ -4,7 +4,11 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * The semantic logger factory. This is used to render complex objects specifically on their type.
@@ -332,6 +336,19 @@ public class SemanticLoggerFactory {
     @Override
     public SemanticLogger<DataType> withFields(Field.BuilderFunction<Field.Builder> f) {
       return withFields(f, builder);
+    }
+
+    @Override
+    public SemanticLogger<DataType> withThreadContext() {
+      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
+          mapSupplier ->
+              () ->
+                  mapSupplier.get().entrySet().stream()
+                      .map(e -> builder.string(e.getKey(), e.getValue()))
+                      .collect(Collectors.toList());
+      final CoreLogger coreLogger = core.withThreadContext(mapTransform);
+      return new SemanticLoggerFactory.Impl<>(
+          coreLogger, builder, messageFunction, builderFunction);
     }
 
     @Override
