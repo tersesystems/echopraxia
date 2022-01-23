@@ -475,7 +475,7 @@ SemanticLogger<Person> logger =
         getClass(),
         Person.class,
         person -> "person.name = {}, person.age = {}",
-        p -> b -> Arrays.asList(b.string("name", p.name), b.number("age", p.age)));
+        p -> fb -> fb.list(fb.string("name", p.name), fb.number("age", p.age)));
 
 Person person = new Person("Eloise", 1);
 logger.info(person);
@@ -548,8 +548,8 @@ Person person = new Person("Eloise", 1);
 logger
     .atInfo()
     .message("name = {}, age = {}")
-    .argument(b -> b.string("name", person.name))
-    .argument(b -> b.number("age", person.age))
+    .argument(sfb -> sfb.string("name", person.name)) // note only a single field
+    .argument(sfb -> sfb.number("age", person.age))
     .log();
 ```
 
