@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.log4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
@@ -48,5 +49,10 @@ public class ContextTest extends TestBase {
 
     // And as the marker is in context, it should be true as well.
     assertThat(logger.isTraceEnabled()).isTrue();
+  }
+
+  @Test
+  void testThreadContext() {
+    fail();
   }
 }

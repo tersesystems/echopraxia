@@ -267,7 +267,7 @@ One thing to be aware of that the popular idiom of using `public static final Lo
 ```java
 public class PlayerData {
 
-  // the date is scoped to an instance of this actor
+  // the date is scoped to an instance of this player
   private Date lastAccessedDate = new Date();
 
   // logger is not static because lastAccessedDate is an instance variable
@@ -279,7 +279,20 @@ public class PlayerData {
 }
 ```
 
-In addition, thread safety is something to be aware of when using context fields.  While fields are thread-safe and using a context is far more convenient than using MDC, you do still have to be aware when you are accessing non-thread safe state.
+### Thread Context
+
+You can also resolve any fields in Mapped Diagnostic Context (MDC) into fields, using `logger.withThreadContext()`.  This method provides a pre-built function that calls `fb.string` for each entry in the map.
+
+Because MDC is thread local, if you pass the logger between threads or use asynchronous processing i.e. `CompletionStage/CompletableFuture`, you may have inconsistent results.
+
+```java
+org.slf4j.MDC.put("mdckey", "mdcvalue");
+myLogger.withThreadContext().info("This statement has MDC values in context");
+```
+
+### Thread Safety
+
+Thread safety is something to be aware of when using context fields.  While fields are thread-safe and using a context is far more convenient than using MDC, you do still have to be aware when you are accessing non-thread safe state.
 
 For example, `SimpleDateFormat` is infamously not thread-safe, and so the following code is not safe to use in a multi-threaded context:
 
@@ -305,7 +318,9 @@ Conditions should be cheap to evaluate, and should be "safe" - i.e. they should 
 
 Conditions can be used either on the logger, on the statement, or against the predicate check.
 
-> **NOTE**: Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.  Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).
+> **NOTE**: Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.
+> 
+> Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).
 
 ### Logger
 

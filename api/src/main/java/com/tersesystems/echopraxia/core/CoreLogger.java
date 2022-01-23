@@ -3,6 +3,10 @@ package com.tersesystems.echopraxia.core;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * The core logger API.
@@ -117,6 +121,16 @@ public interface CoreLogger {
    * @return the core logger with given context fields applied.
    */
   <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder);
+
+  /**
+   * Pulls fields from thread context into logger context, if any exist and the implementation
+   * supports it. The implementation supplies the map, and the logger supplies the list of fields.
+   *
+   * @param mapTransform a function that takes a context map and returns a list of fields.
+   * @return the core logger with any thread context mapped into fields.
+   */
+  CoreLogger withThreadContext(
+      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform);
 
   /**
    * Adds the given condition to the logger.

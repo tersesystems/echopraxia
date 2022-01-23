@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.logstash;
 import static java.util.Collections.singletonList;
 import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -106,6 +107,11 @@ public class ContextTest extends TestBase {
     key.put("key2", "value2");
     Marker expected = (Markers.appendEntries(key));
     assertThat(m).isEqualTo(expected);
+  }
+
+  @Test
+  void testThreadContext() {
+    fail();
   }
 
   private Logger<?> getLogger() {

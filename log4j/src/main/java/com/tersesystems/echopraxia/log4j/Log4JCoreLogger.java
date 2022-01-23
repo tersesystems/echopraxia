@@ -7,8 +7,12 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.Message;
 
 /** A core logger using the Log4J API. */
@@ -140,6 +144,14 @@ public class Log4JCoreLogger implements CoreLogger {
   public <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder) {
     Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
     return new Log4JCoreLogger(logger, context.and(newContext), condition);
+  }
+
+  @Override
+  public CoreLogger withThreadContext(
+      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
+    Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
+    Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
   }
 
   @Override

@@ -24,7 +24,7 @@
                 <logLevel/>
                 <logLevelValue/><!-- numeric value is useful for filtering >= -->
                 <stackHash/>
-                <mdc/>
+                <!-- <mdc/> --> <!-- not showing mdc as we want to demo withContext() -->
                 <logstashMarkers/>
                 <arguments/>
                 <stackTrace/>

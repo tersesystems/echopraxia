@@ -1,9 +1,15 @@
 package com.tersesystems.echopraxia;
 
-import static com.tersesystems.echopraxia.Level.*;
-
 import com.tersesystems.echopraxia.core.CoreLogger;
+
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
+
+import static com.tersesystems.echopraxia.Level.*;
 
 /**
  * An echopraxia logger built around a field builder.
@@ -11,20 +17,14 @@ import java.lang.reflect.InvocationTargetException;
  * <p>This class is explicitly designed to be subclassed so that end users can customize it and
  * avoid the parameterized type tax.
  *
- * <p>{@code <pre>
- * public class MyLogger extends Logger&lt;MyFieldBuilder&gt; {
- *   protected MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) { super(core, fieldBuilder); }
- * }
+ * <p>{@code <pre> public class MyLogger extends Logger&lt;MyFieldBuilder&gt; { protected
+ * MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) { super(core, fieldBuilder); } }
  *
- * static class MyLoggerFactory {
- *   public static MyLogger getLogger() {
- *     return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder);
- *   }
- * }
+ * <p>static class MyLoggerFactory { public static MyLogger getLogger() { return new
+ * MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder); } }
  *
- * MyLogger logger = MyLoggerFactory.getLogger();
- * </pre>
- * }
+ * <p>MyLogger logger = MyLoggerFactory.getLogger(); </pre> }
+ *
  * @param <FB> the field builder type.
  */
 public class Logger<FB extends Field.Builder> {
@@ -85,6 +85,8 @@ public class Logger<FB extends Field.Builder> {
   /**
    * Creates a new logger with the given condition.
    *
+   * <p>Note that the condition is lazily evaluated on every logging statement.
+   *
    * @param condition the given condition.
    * @return the new logger.
    */
@@ -103,6 +105,8 @@ public class Logger<FB extends Field.Builder> {
   /**
    * Creates a new logger with the given context fields.
    *
+   * <p>Note that the field builder function is lazily evaluated on every logging statement.
+   *
    * @param f the given function producing fields from a field builder.
    * @return the new logger.
    */
@@ -111,18 +115,20 @@ public class Logger<FB extends Field.Builder> {
   }
 
   /**
-   * Creates a new logger with fields using a one-off field builder for the function that is
-   * <b>not</b> passed through to the new logger.
+   * Creates a new logger with context fields from thread context / MDC mapped as context fields.
    *
-   * @param ctxBuilderF the given function producing fields from a field builder.
-   * @param ctxBuilder the field builder to use for the function.
-   * @param <CFB> the context field builder type.
+   * Note that the context map is lazily evaluated on every logging statement.
+   *
    * @return the new logger.
    */
-  public <CFB extends Field.Builder> Logger<FB> withFields(
-      Field.BuilderFunction<CFB> ctxBuilderF, CFB ctxBuilder) {
-    final CoreLogger coreLogger = core().withFields(ctxBuilderF, ctxBuilder);
-    return new Logger<>(coreLogger, fieldBuilder);
+  public Logger<FB> withThreadContext() {
+    Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
+        mapSupplier ->
+            () ->
+                mapSupplier.get().entrySet().stream()
+                    .map(e -> fieldBuilder.string(e.getKey(), e.getValue()))
+                    .collect(Collectors.toList());
+    return new Logger<>(core().withThreadContext(mapTransform), fieldBuilder);
   }
 
   // ------------------------------------------------------------------------
