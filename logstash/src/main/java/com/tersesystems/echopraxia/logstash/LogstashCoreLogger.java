@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static com.tersesystems.echopraxia.Level.INFO;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Field.Value;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.ValueField;
 import com.tersesystems.echopraxia.core.CoreLogger;
@@ -19,6 +19,8 @@ import org.slf4j.Marker;
 
 /** Logstash implementation of CoreLogger. */
 public class LogstashCoreLogger implements CoreLogger {
+
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   private final org.slf4j.Logger logger;
   private final LogstashLoggingContext context;
@@ -261,89 +263,45 @@ public class LogstashCoreLogger implements CoreLogger {
     log(level, message, f, builder);
   }
 
+  // Top level conversion to Logback must be StructuredArgument, with an optional throwable
+  // at the end of the array.
   protected Object[] convertArguments(List<Field> args) {
-    Field.Value<Throwable> throwable = null;
+    // Top level arguments must be StructuredArguments, +1 for throwable
+    Value<Throwable> throwable = null;
     List<Object> arguments = new ArrayList<>(args.size() + 1);
     for (Field field : args) {
-      final String name = field.name();
-      final Field.Value<?> value = field.value();
-      switch (value.type()) {
-        case ARRAY:
-          final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
-          Object[] elements = convertValues(values).toArray();
-          arguments.add(StructuredArguments.array(name, elements));
-          break;
-        case OBJECT:
-          List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
-          final Object[] fields = convertArguments(fieldArgs);
-          StructuredArgument structuredArgument =
-              field instanceof ValueField
-                  ? StructuredArguments.value(name, StructuredArguments.fields(fields))
-                  : StructuredArguments.keyValue(name, StructuredArguments.fields(fields));
-          arguments.add(structuredArgument);
-          break;
-        case EXCEPTION:
-          throwable = (Field.Value.ExceptionValue) value;
-          break;
-        case NULL:
-        case BOOLEAN:
-        case NUMBER:
-        case STRING:
-          StructuredArgument simpleStructuredArgument =
-              field instanceof ValueField
-                  ? StructuredArguments.value(name, value.raw())
-                  : StructuredArguments.keyValue(name, value.raw());
-          arguments.add(simpleStructuredArgument);
-          break;
+      final Value<?> value = field.value();
+      if (value.type() == Value.ValueType.EXCEPTION) {
+        throwable = (Value.ExceptionValue) value;
+      } else {
+        final String name = field.name();
+        StructuredArgument array =
+            field instanceof ValueField
+                ? StructuredArguments.value(name, value)
+                : StructuredArguments.keyValue(name, value);
+        arguments.add(array);
       }
     }
+    // If the exception exists, it must be raw so the varadic case will pick it up.
     if (throwable != null) {
       arguments.add(throwable.raw());
     }
     return arguments.toArray();
   }
 
-  protected List<?> convertValues(List<Field.Value<?>> values) {
-    return values.stream().map(Field.Value::raw).collect(Collectors.toList());
-  }
-
+  // Convert markers explicitly.
   protected org.slf4j.Marker convertMarkers(List<Field> fields, List<Marker> markers) {
     // XXX there should be a way to cache this if we know it hasn't changed, since it
     // could be calculated repeatedly.
     if (fields.isEmpty() && markers.isEmpty()) {
       return null;
     }
-    return Markers.appendEntries(convertMarkerFields(fields)).and(Markers.aggregate(markers));
-  }
 
-  protected Map<?, ?> convertMarkerFields(List<Field> fields) {
-    if (fields.isEmpty()) {
-      return Collections.emptyMap();
-    }
-    Map<String, Object> result = new HashMap<>(fields.size());
-    for (Field f : fields) {
-      final String name = f.name();
-      final Field.Value<?> value = f.value();
-      Object rawValue = getRawValue(value);
-      result.put(name, rawValue);
-    }
-    return result;
-  }
-
-  protected Object getRawValue(Field.Value<?> value) {
-    switch (value.type()) {
-      case ARRAY:
-        final List<Field.Value<?>> values = ((Field.Value.ArrayValue) value).raw();
-        return convertValues(values);
-      case OBJECT:
-        List<Field> fieldArgs = ((Field.Value.ObjectValue) value).raw();
-        return convertMarkerFields(fieldArgs);
-      case STRING:
-      case NUMBER:
-      case BOOLEAN:
-      case EXCEPTION:
-      case NULL:
-    }
-    return value.raw();
+    final List<Marker> markerList =
+        fields.stream()
+            .map(field -> Markers.append(field.name(), field.value()))
+            .collect(Collectors.toList());
+    markerList.addAll(markers);
+    return Markers.aggregate(markerList);
   }
 }

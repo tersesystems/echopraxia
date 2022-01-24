@@ -1,19 +1,25 @@
 package com.tersesystems.echopraxia.logstash;
 
 import static java.util.Collections.singletonList;
-import static java.util.Collections.singletonMap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.CoreLogger;
-import java.util.HashMap;
-import java.util.Map;
-import net.logstash.logback.marker.LogstashMarker;
-import net.logstash.logback.marker.Markers;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
+import net.logstash.logback.marker.EmptyLogstashMarker;
+import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
@@ -21,24 +27,26 @@ import org.slf4j.MarkerFactory;
 
 public class ContextTest extends TestBase {
 
+  private static final ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
+
   @Test
   void testMarkers() {
-    //
+
+    final Marker securityMarker = MarkerFactory.getMarker("SECURITY");
     final LogstashCoreLogger core = new LogstashCoreLogger(factory.getLogger(getClass().getName()));
     Logger<?> logger =
-        LoggerFactory.getLogger(
-            core.withMarkers(MarkerFactory.getMarker("SECURITY")), Field.Builder.instance());
+        LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
     logger.withFields(f -> f.onlyString("key", "value")).error("This has a marker");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("This has a marker");
-    final LogstashMarker m = (LogstashMarker) event.getMarker();
-    Marker expected =
-        (Markers.appendEntries(singletonMap("key", "value")))
-            .and(MarkerFactory.getMarker("SECURITY"));
-    assertThat(m).isEqualTo(expected);
+    final List<Marker> markers = getMarkers(event);
+
+    testMarker(markers.get(0), "key", "value");
+    final Marker shouldBeSecurityMarker = markers.get(1);
+    assertThat(shouldBeSecurityMarker).isSameAs(securityMarker);
   }
 
   @Test
@@ -64,7 +72,7 @@ public class ContextTest extends TestBase {
   }
 
   @Test
-  void testComplexFields() {
+  void testComplexFields() throws IOException {
     Logger<?> logger = getLogger();
     logger
         .withFields(
@@ -79,13 +87,55 @@ public class ContextTest extends TestBase {
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
-    final LogstashMarker m = (LogstashMarker) event.getMarker();
+    final List<Marker> markers = getMarkers(event);
 
-    final Map<String, Object> props = new HashMap<>();
-    props.put("name", "will");
-    props.put("age", 13);
-    props.put("toys", singletonList("binkie"));
-    assertThat(m).isEqualTo(Markers.appendEntries(singletonMap("person", props)));
+    final ObjectAppendingMarker marker = (ObjectAppendingMarker) markers.get(0);
+
+    // getFieldValue calls the "logfmt" version that is fed into formatted message
+    final String actual = (String) marker.getFieldValue();
+    assertThat(actual).isEqualTo("[will, 13, toys=[binkie]]");
+
+    final StringWriter sw = new StringWriter();
+    final JsonGenerator generator = mapper.createGenerator(sw);
+    generator.writeStartObject();
+    marker.writeTo(generator);
+    generator.writeEndObject();
+    generator.close();
+    assertThat(sw.toString())
+        .isEqualTo("{\"person\":{\"name\":\"will\",\"age\":13,\"toys\":[\"binkie\"]}}");
+  }
+
+  @Test
+  void testArrays() throws IOException {
+    Logger<?> logger = getLogger();
+    logger
+        .withFields(
+            fb -> {
+              Field.Value a4 = Field.Value.array(true, false, true);
+              Field.Value a3 = Field.Value.array("1", "2", "3");
+              Field.Value a2 = Field.Value.array(1, 2, 3);
+              Field field = fb.array("a1", a2, a3, a4);
+              return singletonList(field);
+            })
+        .error("This has a marker");
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final List<Marker> markers = getMarkers(event);
+
+    final ObjectAppendingMarker marker = (ObjectAppendingMarker) markers.get(0);
+
+    // getFieldValue calls the "logfmt" version that is fed into formatted message
+    final String actual = (String) marker.getFieldValue();
+    assertThat(actual).isEqualTo("[[1, 2, 3], [1, 2, 3], [true, false, true]]");
+
+    final StringWriter sw = new StringWriter();
+    final JsonGenerator generator = mapper.createGenerator(sw);
+    generator.writeStartObject();
+    marker.writeTo(generator);
+    generator.writeEndObject();
+    generator.close();
+    assertThat(sw.toString()).isEqualTo("{\"a1\":[[1,2,3],[\"1\",\"2\",\"3\"],[true,false,true]]}");
   }
 
   @Test
@@ -100,13 +150,13 @@ public class ContextTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("This should have two contexts.");
-    final LogstashMarker m = (LogstashMarker) event.getMarker();
 
-    Map<String, String> key = new HashMap<>();
-    key.put("key", "value");
-    key.put("key2", "value2");
-    Marker expected = (Markers.appendEntries(key));
-    assertThat(m).isEqualTo(expected);
+    final List<Marker> markers = getMarkers(event);
+    final ObjectAppendingMarker m1 = (ObjectAppendingMarker) markers.get(0);
+    final ObjectAppendingMarker m2 = (ObjectAppendingMarker) markers.get(1);
+
+    testMarker(m1, "key", "value");
+    testMarker(m2, "key2", "value2");
   }
 
   @Test
@@ -119,12 +169,24 @@ public class ContextTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("some message");
-    final LogstashMarker m = (LogstashMarker) event.getMarker();
 
-    Map<String, String> key = new HashMap<>();
-    key.put("mdckey", "mdcvalue");
-    Marker expected = (Markers.appendEntries(key));
-    assertThat(m).isEqualTo(expected);
+    final List<Marker> markers = getMarkers(event);
+    testMarker(markers.get(0), "mdckey", "mdcvalue");
+  }
+
+  private void testMarker(Marker marker, String key, Object value) {
+    final ObjectAppendingMarker m = (ObjectAppendingMarker) marker;
+
+    // You can't use ObjectAppendingMarker.equals because it wants instance equality.
+    assertThat(m.getFieldName()).isEqualTo(key);
+    assertThat(m.getFieldValue()).isEqualTo(value);
+  }
+
+  // we can't use the result of Markers.aggregate, as an EmptyLogstashMarker ONLY CHECKS THE NAME.
+  private List<Marker> getMarkers(ILoggingEvent event) {
+    final EmptyLogstashMarker m = (EmptyLogstashMarker) event.getMarker();
+    Stream<Marker> stream = StreamSupport.stream(m.spliterator(), false);
+    return stream.collect(Collectors.toList());
   }
 
   private Logger<?> getLogger() {

@@ -5,15 +5,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.UUID;
+import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.junit.jupiter.api.Test;
 
 class LoggerTest extends TestBase {
+
+  private static final ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
 
   @Test
   void testDebug() {
@@ -55,8 +64,6 @@ class LoggerTest extends TestBase {
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("hello toys=[binkie]");
   }
-
-  // XXX test array of objects
 
   @Test
   void testNullArgument() {
@@ -139,5 +146,101 @@ class LoggerTest extends TestBase {
     final Object[] args = event.getArgumentArray();
     final ObjectAppendingMarker actual = (ObjectAppendingMarker) args[0];
     assertThat(actual.getFieldValue()).isEqualTo(uuid.toString());
+  }
+
+  @Test
+  public void testReallyComplexPerson() throws IOException {
+    Person abe = new Person("Abe", 1, "yodelling");
+    abe.setFather(new Person("Bert", 35, "keyboards"));
+    abe.setMother(new Person("Candace", 30, "iceskating"));
+
+    final Logger<MyFieldBuilder> logger = getLogger().withFieldBuilder(MyFieldBuilder.class);
+    logger.info("hi there {}", fb -> fb.only(fb.person("person", abe)));
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String message = event.getFormattedMessage();
+    assertThat(message)
+        .isEqualTo(
+            "hi there person=[Abe, 1,"
+                + " father=[Bert, 35, null, null, interests=[keyboards]],"
+                + " mother=[Candace, 30, null, null, interests=[iceskating]], interests=[yodelling]]");
+
+    final StringWriter sw = new StringWriter();
+    final Object[] argumentArray = event.getArgumentArray();
+    final StructuredArgument argument = (StructuredArgument) argumentArray[0];
+    try (JsonGenerator generator = mapper.createGenerator(sw)) {
+      generator.writeStartObject();
+      argument.writeTo(generator);
+      generator.writeEndObject();
+    }
+    assertThat(sw.toString())
+        .isEqualTo(
+            "{\"person\":{\"name\":\"Abe\",\"age\":1,"
+                + "\"father\":{\"name\":\"Bert\",\"age\":35,\"father\":null,\"mother\":null,\"interests\":[\"keyboards\"]},"
+                + "\"mother\":{\"name\":\"Candace\",\"age\":30,\"father\":null,\"mother\":null,\"interests\":[\"iceskating\"]},"
+                + "\"interests\":[\"yodelling\"]}}");
+  }
+
+  // Example class with several fields on it.
+  static class Person {
+
+    private final String name;
+    private final int age;
+    private final String[] interests;
+
+    private Person father;
+    private Person mother;
+
+    Person(String name, int age, String... interests) {
+      this.name = name;
+      this.age = age;
+      this.interests = interests;
+    }
+
+    public String name() {
+      return name;
+    }
+
+    public int age() {
+      return age;
+    }
+
+    public String[] interests() {
+      return interests;
+    }
+
+    public void setFather(Person father) {
+      this.father = father;
+    }
+
+    public Optional<Person> getFather() {
+      return Optional.ofNullable(father);
+    }
+
+    public void setMother(Person mother) {
+      this.mother = mother;
+    }
+
+    public Optional<Person> getMother() {
+      return Optional.ofNullable(mother);
+    }
+  }
+
+  public static class MyFieldBuilder implements Field.Builder {
+
+    public MyFieldBuilder() {}
+
+    // Renders a `Person` as an object field.
+    // Note that properties must be broken down to the basic JSON types,
+    // i.e. a primitive string/number/boolean/null or object/array.
+    public Field person(String fieldName, Person p) {
+      Field name = string("name", p.name());
+      Field age = number("age", p.age());
+      Field father = p.getFather().map(f -> person("father", f)).orElse(nullValue("father"));
+      Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullValue("mother"));
+      Field interests = array("interests", Field.Value.asList(p.interests(), Field.Value::string));
+      Field[] fields = {name, age, father, mother, interests};
+      return object(fieldName, fields);
+    }
   }
 }

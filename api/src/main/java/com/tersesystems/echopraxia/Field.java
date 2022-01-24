@@ -375,7 +375,14 @@ public interface Field {
     }
 
     private String valueToString(Value<?> v) {
-      return v.raw() == null ? "null" : v.raw().toString();
+      if (v.raw() == null) {
+        return "null";
+      } else {
+        // if (type() == ValueType.STRING) {
+        //  return "\"" + v.raw().toString() + "\"";
+        // }
+        return v.raw().toString();
+      }
     }
 
     /**
@@ -435,6 +442,18 @@ public interface Field {
      */
     public static Value<List<Value<?>>> array(Value<?>... values) {
       return new ArrayValue(Arrays.asList(values));
+    }
+
+    public static Value<List<Value<?>>> array(Boolean... values) {
+      return new ArrayValue(Value.asList(values, Value::bool));
+    }
+
+    public static Value<List<Value<?>>> array(String... values) {
+      return new ArrayValue(Value.asList(values, Value::string));
+    }
+
+    public static Value<List<Value<?>>> array(Number... values) {
+      return new ArrayValue(Value.asList(values, Value::number));
     }
 
     /**
