@@ -93,7 +93,7 @@ public class ContextTest extends TestBase {
 
     // getFieldValue calls the "logfmt" version that is fed into formatted message
     final String actual = (String) marker.getFieldValue();
-    assertThat(actual).isEqualTo("[will, 13, toys=[binkie]]");
+    assertThat(actual).isEqualTo("{will, 13, toys=[binkie]}");
 
     final StringWriter sw = new StringWriter();
     final JsonGenerator generator = mapper.createGenerator(sw);

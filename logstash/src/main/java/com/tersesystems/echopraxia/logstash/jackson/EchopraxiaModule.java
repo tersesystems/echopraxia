@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import com.tersesystems.echopraxia.Field;
 
-/**
- * A Jackson module that is loaded in automatically by logstash-logback-encoder.
- */
+/** A Jackson module that is loaded in automatically by logstash-logback-encoder. */
 public class EchopraxiaModule extends Module {
   //
   // https://github.com/FasterXML/jackson-docs/wiki/JacksonHowToCustomSerializers
