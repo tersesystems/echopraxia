@@ -509,7 +509,7 @@ public interface Field {
      * @return the Value.
      */
     public static Value<List<Value<?>>> array(Boolean... values) {
-      return new ArrayValue(Value.asList(values, Value::bool));
+      return new ArrayValue(asList(values, Value::bool));
     }
 
     /**
@@ -519,7 +519,7 @@ public interface Field {
      * @return the Value.
      */
     public static Value<List<Value<?>>> array(String... values) {
-      return new ArrayValue(Value.asList(values, Value::string));
+      return new ArrayValue(asList(values, Value::string));
     }
 
     /**
@@ -529,7 +529,7 @@ public interface Field {
      * @return the Value.
      */
     public static Value<List<Value<?>>> array(Number... values) {
-      return new ArrayValue(Value.asList(values, Value::number));
+      return new ArrayValue(asList(values, Value::number));
     }
 
     /**
@@ -551,7 +551,7 @@ public interface Field {
      * @param <T> the type of object.
      */
     public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, List<T> values) {
-      return new ArrayValue(values.stream().map(transform::apply).collect(Collectors.toList()));
+      return new ArrayValue(asList(values, transform));
     }
 
     /**
@@ -563,8 +563,7 @@ public interface Field {
      * @param <T> the type of object.
      */
     public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, T[] values) {
-      return new ArrayValue(
-          Arrays.stream(values).map(transform::apply).collect(Collectors.toList()));
+      return new ArrayValue(asList(values, transform));
     }
 
     /**
@@ -591,12 +590,24 @@ public interface Field {
      * Utility method to turn an array into a list of values with a transformer.
      *
      * @param array the raw array.
-     * @param f the function transforming a raw T to a value of T
+     * @param f the function transforming a raw T to a value
      * @return list of values.
      * @param <T> the raw type
      */
-    public static <T> List<Value<?>> asList(T[] array, Function<T, Value<T>> f) {
+    public static <T> List<Value<?>> asList(T[] array, Function<T, Value<?>> f) {
       return Arrays.stream(array).map(f).collect(Collectors.toList());
+    }
+
+    /**
+     * Utility method to turn a list into a list of values with a transformer.
+     *
+     * @param values the list of values
+     * @param f the function transforming a raw T to a value
+     * @return list of values.
+     * @param <T> the raw type
+     */
+    public static <T> List<Value<?>> asList(List<T> values, Function<T, Value<?>> f) {
+      return values.stream().map(f).collect(Collectors.toList());
     }
 
     public enum ValueType {
