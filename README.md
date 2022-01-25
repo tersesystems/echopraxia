@@ -209,40 +209,50 @@ dateLogger.info("Date {}", fb -> fb.onlyDate("creation_date", new Date()));
 This also applies to more complex objects:
 
 ```java
-  public class PersonFieldBuilder implements Field.Builder {
-    public PersonFieldBuilder() {}
-    // Renders a `Person` as an object field.
-    // Note that properties must be broken down to the basic JSON types,
-    // i.e. a primitive string/number/boolean/null or object/array.
-    public Field person(String name, Person person) {
-      return object(
-              name,
-              string("name", person.name()),
-              number("age", person.age()),
-              array("toys", person.toys()));
-    }
+public class PersonBuilder implements Field.Builder {
+
+  // Renders a `Person` as an object field.
+  public Field person(String fieldName, Person p) {
+    return keyValue(fieldName, personValue(p));
   }
+
+  public Value<?> personValue(Person p) {
+    if (p == null) {
+      return Value.nullValue();
+    }
+    Field name = string("name", p.name());
+    Field age = number("age", p.age());
+    // optional returns either an object value or null value, keyValue is untyped
+    Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
+    Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
+    Field interests = array("interests", p.interests());
+    return Value.object(name, age, father, mother, interests);
+  }
+}
 ```
 
+And then you can do the same by calling `fb.person`:
 
 ```java
 Person user = ...
-Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.class);
+Logger<PersonBuilder> personLogger = basicLogger.withFieldBuilder(PersonBuilder.class);
 personLogger.info("Person {}", fb -> fb.only(fb.person("user", user)));
 ```
 
 If you are using a particular set of field builders for your domain and want them available by default, the `Logger` class is designed to be easy to subclass.
 
 ```java
-public class MyLogger extends Logger<MyFieldBuilder> {
-  protected MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) {
+public class MyLogger extends Logger<PersonBuilder> {
+  protected MyLogger(CoreLogger core, PersonBuilder fieldBuilder) {
     super(core, fieldBuilder);
   }
 }
 
 public class MyLoggerFactory {
+  private static final PersonBuilder PERSON_BUILDER_SINGLETON = new PersonBuilder();
+  
   public static MyLogger getLogger() {
-    return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder);
+    return new MyLogger(CoreLoggerFactory.getLogger(), PERSON_BUILDER_SINGLETON);
   }
 }
 

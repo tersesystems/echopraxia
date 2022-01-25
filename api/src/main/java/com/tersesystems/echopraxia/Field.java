@@ -5,6 +5,7 @@ import static java.util.Collections.singletonList;
 import com.tersesystems.echopraxia.Constants.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -73,7 +74,8 @@ public interface Field {
     /**
      * Creates a field that renders in message template as value.
      *
-     * This method is intentionally value blind so any value, including null value, will work here.
+     * <p>This method is intentionally value blind so any value, including null value, will work
+     * here.
      *
      * @param name the field name
      * @param value the field value
@@ -86,7 +88,8 @@ public interface Field {
     /**
      * Creates a key value field that renders in message template as key=value.
      *
-     * This method is intentionally value blind so any value, including null value, will work here.
+     * <p>This method is intentionally value blind so any value, including null value, will work
+     * here.
      *
      * @param name the field name
      * @param value the field value
@@ -746,6 +749,20 @@ public interface Field {
     public static <T> Value<List<Field>> object(Function<T, Field> transform, List<T> values) {
       List<Field> fields = values.stream().map(transform).collect(Collectors.toList());
       return new ObjectValue(fields);
+    }
+
+    /**
+     * Wraps an optional value, returning nullValue() if the optional is empty.
+     *
+     * <p>Best used with {@code fb.value()} or {@code fb.keyValue()}.
+     *
+     * @return the value, or null value if the optional is empty.
+     */
+    public static Value<?> optional(Optional<? extends Value<?>> optionalValue) {
+      if (optionalValue.isPresent()) {
+        return optionalValue.get();
+      }
+      return nullValue();
     }
 
     /**

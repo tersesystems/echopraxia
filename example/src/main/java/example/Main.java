@@ -8,7 +8,6 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -164,10 +163,8 @@ public class Main {
       // i.e. a primitive string/number/boolean/null or object/array.
       Field name = string("name", p.name());
       Field age = number("age", p.age());
-      Field father =
-          keyValue("father", p.getFather().map(this::personValue).orElse(Value.nullValue()));
-      Field mother =
-          keyValue("mother", p.getMother().map(this::personValue).orElse(Value.nullValue()));
+      Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
+      Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
       Field interests = array("interests", p.interests());
       return Value.object(name, age, father, mother, interests);
     }
