@@ -187,7 +187,7 @@ public class LogstashCoreLogger implements CoreLogger {
         }
         break;
       case INFO:
-        if (logger.isWarnEnabled(m)) {
+        if (logger.isInfoEnabled(m)) {
           final List<Field> args = f.apply(builder);
           final Object[] arguments = convertArguments(args);
           logger.info(m, message, arguments);
