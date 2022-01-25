@@ -219,7 +219,7 @@ This also applies to more complex objects:
               name,
               string("name", person.name()),
               number("age", person.age()),
-              array("toys", Field.Value.asList(person.toys(), Field.Value::string)));
+              array("toys", person.toys()));
     }
   }
 ```

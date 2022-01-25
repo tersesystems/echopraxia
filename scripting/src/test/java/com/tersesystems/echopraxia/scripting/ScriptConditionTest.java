@@ -97,7 +97,7 @@ public class ScriptConditionTest {
             fb -> {
               Field name = fb.string("name", "Will");
               Field age = fb.number("age", 13);
-              Field toys = fb.array("toys", Field.Value.string("binkie"));
+              Field toys = fb.array("toys", "binkie");
               Field person = fb.object("person", name, age, toys);
               return singletonList(person);
             })

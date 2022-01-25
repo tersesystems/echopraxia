@@ -57,7 +57,7 @@ class LoggerTest extends TestBase {
   @Test
   void testArrayOfStringsArgument() {
     Logger<?> logger = getLogger();
-    logger.debug("hello {}", fb -> fb.onlyArray("toys", Field.Value.string("binkie")));
+    logger.debug("hello {}", fb -> fb.onlyArray("toys", "binkie"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -238,7 +238,7 @@ class LoggerTest extends TestBase {
       Field age = number("age", p.age());
       Field father = p.getFather().map(f -> person("father", f)).orElse(nullValue("father"));
       Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullValue("mother"));
-      Field interests = array("interests", Field.Value.asList(p.interests(), Field.Value::string));
+      Field interests = array("interests", p.interests());
       Field[] fields = {name, age, father, mother, interests};
       return object(fieldName, fields);
     }

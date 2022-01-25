@@ -157,7 +157,7 @@ public class Main {
       Field age = number("age", p.age());
       Field father = p.getFather().map(f -> person("father", f)).orElse(nullValue("father"));
       Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullValue("mother"));
-      Field interests = array("interests", Field.Value.asList(p.interests(), Field.Value::string));
+      Field interests = array("interests", p.interests());
       Field[] fields = {name, age, father, mother, interests};
       return object(fieldName, fields);
     }

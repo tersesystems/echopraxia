@@ -133,7 +133,7 @@ public interface Field {
      * @param values the array of values.
      * @return a list containing a single field.
      */
-    default Field array(String name, Value<?>... values) {
+    default Field array(String name, Value<List<Field>>... values) {
       // in logstash, StructuredArguments.array() ALWAYS returns key=value,
       // so it may not be possible to override this.
       return keyValue(name, Value.array(values));
@@ -174,6 +174,9 @@ public interface Field {
 
     /**
      * Creates a field out of a name and a list of array values.
+     *
+     * <p>This is technically not safe, because you can pass an array value in the list, which is
+     * undefined.
      *
      * @param name the name of the field.
      * @param values the list of values.
@@ -275,24 +278,60 @@ public interface Field {
     }
 
     /**
-     * Creates a singleton list of an array field out of a name and array values.
+     * Creates a singleton list of an array field out of a name and object values.
      *
      * @param name the name of the field.
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, Value<?>... values) {
+    default List<Field> onlyArray(String name, Value<List<Field>>... values) {
       return only(array(name, values));
     }
 
     /**
      * Creates a singleton list of an array field out of a name and a list of values.
      *
+     * <p>This is technically not safe, because you can pass an array value in the list, which is
+     * undefined.
+     *
      * @param name the name of the field.
      * @param values the values.
      * @return a list containing a single field.
      */
     default List<Field> onlyArray(String name, List<Value<?>> values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and a varadic array of string.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, String... values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and a varadic array of number.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, Number... values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and a varadic array of boolean.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, Boolean... values) {
       return only(array(name, values));
     }
 
@@ -469,6 +508,31 @@ public interface Field {
      */
     public static Value<List<Value<?>>> array(List<Value<?>> values) {
       return new ArrayValue(values);
+    }
+
+    /**
+     * Takes a list of objects and a transform function that maps from T to a value.
+     *
+     * @param values a list of values.
+     * @param transform the tranform function
+     * @return the Value.
+     * @param <T> the type of object.
+     */
+    public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, List<T> values) {
+      return new ArrayValue(values.stream().map(transform::apply).collect(Collectors.toList()));
+    }
+
+    /**
+     * Takes an array of objects and a transform function that maps from T to a value.
+     *
+     * @param values an array of values.
+     * @param transform the tranform function
+     * @return the Value.
+     * @param <T> the type of object.
+     */
+    public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, T[] values) {
+      return new ArrayValue(
+          Arrays.stream(values).map(transform::apply).collect(Collectors.toList()));
     }
 
     /**
