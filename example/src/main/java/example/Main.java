@@ -9,6 +9,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public class Main {
 
@@ -55,7 +56,9 @@ public class Main {
     logger.error(Condition.never(), "This will never render");
 
     // Create a complex business object
-    Person eloise = new Person("Eloise", 1, "binkie");
+    Person abe = new Person("Abe", 1, "yodelling");
+    abe.setFather(new Person("Bert", 35, "keyboards"));
+    abe.setMother(new Person("Candace", 30, "iceskating"));
 
     // Show off a condition that only returns true if the date field is present in logger
     Condition dateCondition =
@@ -65,7 +68,7 @@ public class Main {
 
     // Render the person using the custom field builder as a StructuredArgument.
     if (logger.isInfoEnabled(dateCondition)) {
-      logger.info("hi there {}", fb -> fb.only(fb.person("small_mammal", eloise)));
+      logger.info("hi there {}", fb -> fb.only(fb.person("person", abe)));
     }
 
     // You can also use a custom logger
@@ -86,12 +89,15 @@ public class Main {
 
     private final String name;
     private final int age;
-    private final String[] toys;
+    private final String[] interests;
 
-    Person(String name, int age, String... toys) {
+    private Person father;
+    private Person mother;
+
+    Person(String name, int age, String... interests) {
       this.name = name;
       this.age = age;
-      this.toys = toys;
+      this.interests = interests;
     }
 
     public String name() {
@@ -102,8 +108,24 @@ public class Main {
       return age;
     }
 
-    public String[] toys() {
-      return toys;
+    public String[] interests() {
+      return interests;
+    }
+
+    public void setFather(Person father) {
+      this.father = father;
+    }
+
+    public Optional<Person> getFather() {
+      return Optional.ofNullable(father);
+    }
+
+    public void setMother(Person mother) {
+      this.mother = mother;
+    }
+
+    public Optional<Person> getMother() {
+      return Optional.ofNullable(mother);
     }
   }
 
@@ -130,12 +152,14 @@ public class Main {
     // Renders a `Person` as an object field.
     // Note that properties must be broken down to the basic JSON types,
     // i.e. a primitive string/number/boolean/null or object/array.
-    public Field person(String name, Person person) {
-      return object(
-          name,
-          string("name", person.name()),
-          number("age", person.age()),
-          array("toys", Field.Value.asList(person.toys(), Field.Value::string)));
+    public Field person(String fieldName, Person p) {
+      Field name = string("name", p.name());
+      Field age = number("age", p.age());
+      Field father = p.getFather().map(f -> person("father", f)).orElse(nullValue("father"));
+      Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullValue("mother"));
+      Field interests = array("interests", Field.Value.asList(p.interests(), Field.Value::string));
+      Field[] fields = {name, age, father, mother, interests};
+      return object(fieldName, fields);
     }
   }
 
