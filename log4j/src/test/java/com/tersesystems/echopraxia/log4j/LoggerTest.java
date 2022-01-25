@@ -41,7 +41,7 @@ public class LoggerTest extends TestBase {
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
-    assertThat(message).isEqualTo("my argument is random_object=[value1, value2]");
+    assertThat(message).isEqualTo("my argument is random_object={value1, value2}");
 
     final JsonObject fields = entry.getJsonObject("fields");
     final JsonObject randomObject = fields.getJsonObject("random_object");
@@ -67,7 +67,7 @@ public class LoggerTest extends TestBase {
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
     assertThat(message)
-        .isEqualTo("my arguments are object1=[value1, value2] object2=[value3, value4]");
+        .isEqualTo("my arguments are object1={value1, value2} object2={value3, value4}");
 
     final JsonObject fields = entry.getJsonObject("fields");
 

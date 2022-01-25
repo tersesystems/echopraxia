@@ -92,7 +92,7 @@ class LoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello person=[will, 13, toys=[binkie, dotty]]");
+    assertThat(formattedMessage).isEqualTo("hello person={will, 13, toys=[binkie, dotty]}");
   }
 
   @Test
@@ -161,9 +161,9 @@ class LoggerTest extends TestBase {
     final String message = event.getFormattedMessage();
     assertThat(message)
         .isEqualTo(
-            "hi there person=[Abe, 1,"
-                + " father=[Bert, 35, null, null, interests=[keyboards]],"
-                + " mother=[Candace, 30, null, null, interests=[iceskating]], interests=[yodelling]]");
+            "hi there person={Abe, 1,"
+                + " father={Bert, 35, null, null, interests=[keyboards]},"
+                + " mother={Candace, 30, null, null, interests=[iceskating]}, interests=[yodelling]}");
 
     final StringWriter sw = new StringWriter();
     final Object[] argumentArray = event.getArgumentArray();

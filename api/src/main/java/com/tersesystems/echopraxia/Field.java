@@ -377,12 +377,17 @@ public interface Field {
     private String valueToString(Value<?> v) {
       if (v.raw() == null) {
         return "null";
-      } else {
-        // if (type() == ValueType.STRING) {
-        //  return "\"" + v.raw().toString() + "\"";
-        // }
-        return v.raw().toString();
       }
+      // render an object with curly braces to distinguish from array.
+      if (type() == ValueType.OBJECT) {
+        final List<Field> fieldList = ((ObjectValue) v).raw();
+        StringBuilder b = new StringBuilder("{");
+        final String s = fieldList.stream().map(Field::toString).collect(Collectors.joining(", "));
+        b.append(s);
+        b.append("}");
+        return b.toString();
+      }
+      return v.raw().toString();
     }
 
     /**
