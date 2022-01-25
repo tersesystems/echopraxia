@@ -8,6 +8,7 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -152,7 +153,7 @@ public class Main {
 
     // Renders a `Person` as an object field.
     public Field person(String fieldName, Person p) {
-      return object(fieldName, personValue(p));
+      return keyValue(fieldName, personValue(p));
     }
 
     public Value<?> personValue(Person p) {
