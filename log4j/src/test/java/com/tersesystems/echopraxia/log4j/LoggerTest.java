@@ -87,8 +87,7 @@ public class LoggerTest extends TestBase {
         "my argument is {}",
         fb -> {
           Number[] intArray = {1, 2, 3};
-          final List<Field.Value<?>> values = Field.Value.asList(intArray, Field.Value::number);
-          return fb.onlyArray("random_key", values);
+          return fb.onlyArray("random_key", intArray);
         });
 
     JsonObject entry = getEntry();

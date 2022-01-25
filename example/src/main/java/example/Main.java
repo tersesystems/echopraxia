@@ -3,6 +3,7 @@ package example;
 import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.Field.Value;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.time.Instant;
@@ -150,16 +151,22 @@ public class Main {
     }
 
     // Renders a `Person` as an object field.
-    // Note that properties must be broken down to the basic JSON types,
-    // i.e. a primitive string/number/boolean/null or object/array.
     public Field person(String fieldName, Person p) {
+      return keyValue(fieldName, personValue(p));
+    }
+
+    public Value<?> personValue(Person p) {
+      if (p == null) {
+        return Value.nullValue();
+      }
+      // Note that properties must be broken down to the basic JSON types,
+      // i.e. a primitive string/number/boolean/null or object/array.
       Field name = string("name", p.name());
       Field age = number("age", p.age());
-      Field father = p.getFather().map(f -> person("father", f)).orElse(nullValue("father"));
-      Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullValue("mother"));
-      Field interests = array("interests", Field.Value.asList(p.interests(), Field.Value::string));
-      Field[] fields = {name, age, father, mother, interests};
-      return object(fieldName, fields);
+      Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
+      Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
+      Field interests = array("interests", p.interests());
+      return Value.object(name, age, father, mother, interests);
     }
   }
 

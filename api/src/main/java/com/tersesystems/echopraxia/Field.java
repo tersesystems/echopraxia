@@ -5,6 +5,7 @@ import static java.util.Collections.singletonList;
 import com.tersesystems.echopraxia.Constants.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -71,21 +72,35 @@ public interface Field {
     }
 
     /**
-     * Creates a field.
+     * Creates a field that renders in message template as value.
+     *
+     * <p>This method is intentionally value blind so any value, including null value, will work
+     * here.
      *
      * @param name the field name
      * @param value the field value
      * @return the field.
      */
-    default Field value(String name, Field.Value<?> value) {
+    default Field value(String name, Value<?> value) {
       return new DefaultValueField(name, value);
     }
 
-    default Field keyValue(String name, Field.Value<?> value) {
+    /**
+     * Creates a key value field that renders in message template as key=value.
+     *
+     * <p>This method is intentionally value blind so any value, including null value, will work
+     * here.
+     *
+     * @param name the field name
+     * @param value the field value
+     * @return the field.
+     */
+    default Field keyValue(String name, Value<?> value) {
       return new DefaultKeyValueField(name, value);
     }
 
-    // string
+    // ---------------------------------------------------------
+    // String
 
     /**
      * Creates a field out of a name and a raw string value.
@@ -98,7 +113,41 @@ public interface Field {
       return value(name, Value.string(value));
     }
 
-    // number
+    /**
+     * Creates a field out of a name and a string value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return the field.
+     */
+    default Field string(String name, Value<String> value) {
+      return value(name, value);
+    }
+
+    /**
+     * Creates a list of fields out of a name and a raw string value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyString(String name, String value) {
+      return only(string(name, value));
+    }
+
+    /**
+     * Creates a list of fields out of a name and a string value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyString(String name, Value<String> value) {
+      return only(string(name, value));
+    }
+
+    // ---------------------------------------------------------
+    // Number
 
     /**
      * Creates a field out of a name and a raw number value.
@@ -111,7 +160,41 @@ public interface Field {
       return value(name, Value.number(value));
     }
 
-    // boolean
+    /**
+     * Creates a field out of a name and a number value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default Field number(String name, Value<Number> value) {
+      return value(name, value);
+    }
+
+    /**
+     * Creates a singleton list of fields out of a name and a raw number value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyNumber(String name, Number value) {
+      return only(number(name, value));
+    }
+
+    /**
+     * Creates a singleton list of fields out of a name and a number value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyNumber(String name, Value<Number> value) {
+      return only(number(name, value));
+    }
+
+    // ---------------------------------------------------------
+    // Boolean
 
     /**
      * Creates a field out of a name and a raw boolean value.
@@ -124,18 +207,50 @@ public interface Field {
       return value(name, Value.bool(value));
     }
 
-    // array
+    /**
+     * Creates a field out of a name and a boolean value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default Field bool(String name, Value<Boolean> value) {
+      return value(name, value);
+    }
 
     /**
-     * Creates a field out of a name and array values.
+     * Creates a singleton list of fields out of a name and a raw boolean value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyBool(String name, Boolean value) {
+      return only(bool(name, value));
+    }
+
+    /**
+     * Creates a singleton list of fields out of a name and a boolean value.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyBool(String name, Value<Boolean> value) {
+      return only(bool(name, value));
+    }
+
+    // ---------------------------------------------------------
+    // Array
+
+    /**
+     * Creates a field out of a name and a list of object values.
      *
      * @param name the name of the field.
      * @param values the array of values.
      * @return a list containing a single field.
      */
-    default Field array(String name, Value<?>... values) {
-      // in logstash, StructuredArguments.array() ALWAYS returns key=value,
-      // so it may not be possible to override this.
+    default Field array(String name, Value<List<Field>>... values) {
       return keyValue(name, Value.array(values));
     }
 
@@ -147,7 +262,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, String... values) {
-      return keyValue(name, Value.array(Value.asList(values, Value::string)));
+      return keyValue(name, Value.array(values));
     }
 
     /**
@@ -158,7 +273,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, Number... values) {
-      return keyValue(name, Value.array(Value.asList(values, Value::number)));
+      return keyValue(name, Value.array(values));
     }
 
     /**
@@ -169,21 +284,78 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, Boolean... values) {
-      return keyValue(name, Value.array(Value.asList(values, Value::bool)));
-    }
-
-    /**
-     * Creates a field out of a name and a list of array values.
-     *
-     * @param name the name of the field.
-     * @param values the list of values.
-     * @return a list containing a single field.
-     */
-    default Field array(String name, List<Value<?>> values) {
       return keyValue(name, Value.array(values));
     }
 
-    // object
+    /**
+     * Creates a field out of a name and an array value.
+     *
+     * @param name the name of the field.
+     * @param value the array value.
+     * @return a list containing a single field.
+     */
+    default Field array(String name, Value<List<Value<?>>> value) {
+      return keyValue(name, value);
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and object values.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, Value<List<Field>>... values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and a varadic array of string.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, String... values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and a varadic array of number.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, Number... values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and a varadic array of boolean.
+     *
+     * @param name the name of the field.
+     * @param values the values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, Boolean... values) {
+      return only(array(name, values));
+    }
+
+    /**
+     * Creates a singleton list of an array field out of a name and an array value.
+     *
+     * @param name the name of the field.
+     * @param value the array value.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyArray(String name, Value<List<Value<?>>> value) {
+      return only(array(name, value));
+    }
+
+    // ---------------------------------------------------------
+    // Object
+
     /**
      * Creates a field object out of a name and field values.
      *
@@ -206,94 +378,16 @@ public interface Field {
       return keyValue(name, Value.object(values));
     }
 
-    // null
-
     /**
-     * Creates a field with a null as a value.
+     * Creates a field object out of a name and a value.
      *
      * @param name the name of the field.
+     * @param value the value.
      * @return a field.
      */
-    default Field nullValue(String name) {
-      return value(name, Value.nullValue());
-    }
-
-    // exception
-
-    /**
-     * Creates a field from an exception, using the default exception name "exception".
-     *
-     * @param t the exception.
-     * @return a field.
-     */
-    default Field exception(Throwable t) {
-      return keyValue(EXCEPTION, Value.exception(t));
-    }
-
-    /**
-     * Creates a field from an exception, using an explicit name.
-     *
-     * @param name the field name
-     * @param t the exception.
-     * @return a field.
-     */
-    default Field exception(String name, Throwable t) {
-      return keyValue(name, Value.exception(t));
-    }
-
-    /**
-     * Creates a list of fields out of a name and a raw string value.
-     *
-     * @param name the name of the field.
-     * @param value the value of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyString(String name, String value) {
-      return only(string(name, value));
-    }
-
-    /**
-     * Creates a singleton list of fields out of a name and a raw number value.
-     *
-     * @param name the name of the field.
-     * @param value the value of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyNumber(String name, Number value) {
-      return only(number(name, value));
-    }
-
-    /**
-     * Creates a singleton list of fields out of a name and a raw boolean value.
-     *
-     * @param name the name of the field.
-     * @param value the value of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyBool(String name, Boolean value) {
-      return only(bool(name, value));
-    }
-
-    /**
-     * Creates a singleton list of an array field out of a name and array values.
-     *
-     * @param name the name of the field.
-     * @param values the values.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyArray(String name, Value<?>... values) {
-      return only(array(name, values));
-    }
-
-    /**
-     * Creates a singleton list of an array field out of a name and a list of values.
-     *
-     * @param name the name of the field.
-     * @param values the values.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyArray(String name, List<Value<?>> values) {
-      return only(array(name, values));
+    default Field object(String name, Value<List<Field>> value) {
+      // limited to object specifically -- if you want object or null, use value.
+      return keyValue(name, value);
     }
 
     /**
@@ -319,7 +413,63 @@ public interface Field {
     }
 
     /**
-     * Creates a singleton list of a exception using the default exception name.
+     * Creates a singleton list of an object out of a name and an object value.
+     *
+     * @param name the name of the field.
+     * @param value the object values.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyObject(String name, Value<List<Field>> value) {
+      return only(object(name, value));
+    }
+
+    // ---------------------------------------------------------
+    // Exception
+
+    /**
+     * Creates a field from an exception, using the default exception name "exception".
+     *
+     * @param t the exception.
+     * @return a field.
+     */
+    default Field exception(Throwable t) {
+      return keyValue(EXCEPTION, Value.exception(t));
+    }
+
+    /**
+     * Creates a field from an exception value, using the default exception name "exception".
+     *
+     * @param value the exception value.
+     * @return a field.
+     */
+    default Field exception(Value<Throwable> value) {
+      return keyValue(EXCEPTION, value);
+    }
+
+    /**
+     * Creates a field from an exception, using an explicit name.
+     *
+     * @param name the field name
+     * @param t the exception.
+     * @return a field.
+     */
+    default Field exception(String name, Throwable t) {
+      return keyValue(name, Value.exception(t));
+    }
+
+    /**
+     * Creates a field from an exception value, using an explicit name.
+     *
+     * @param name the field name
+     * @param value the exception value.
+     * @return a field.
+     */
+    default Field exception(String name, Value<Throwable> value) {
+      return keyValue(name, value);
+    }
+
+    /**
+     * Creates a singleton list of an exception using the default exception name.
      *
      * @param t the value of the field.
      * @return a list containing a single field.
@@ -329,7 +479,17 @@ public interface Field {
     }
 
     /**
-     * Creates a singleton list of a exception using an explicit name.
+     * Creates a singleton list of an exception value using the default exception name.
+     *
+     * @param t the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyException(Value<Throwable> t) {
+      return only(exception(t));
+    }
+
+    /**
+     * Creates a singleton list of an exception using an explicit name.
      *
      * @param name the name of the field.
      * @param t the value of the field.
@@ -337,6 +497,40 @@ public interface Field {
      */
     default List<Field> onlyException(String name, Throwable t) {
       return only(exception(name, t));
+    }
+
+    /**
+     * Creates a singleton list of an exception value using an explicit name.
+     *
+     * @param name the name of the field.
+     * @param value the value of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyException(String name, Value<Throwable> value) {
+      return only(exception(name, value));
+    }
+
+    // ---------------------------------------------------------
+    // Null
+
+    /**
+     * Creates a field with a null as a value.
+     *
+     * @param name the name of the field.
+     * @return a field.
+     */
+    default Field nullField(String name) {
+      return value(name, Value.nullValue());
+    }
+
+    /**
+     * Creates a singleton list with a null field.
+     *
+     * @param name the name of the field.
+     * @return a list containing a single field.
+     */
+    default List<Field> onlyNullField(String name) {
+      return only(nullField(name));
     }
   }
 
@@ -425,7 +619,7 @@ public interface Field {
      *
      * @return the Value.
      */
-    public static NullValue nullValue() {
+    public static Value<?> nullValue() {
       return NullValue.instance;
     }
 
@@ -440,7 +634,7 @@ public interface Field {
     }
 
     /**
-     * Wraps an array of values with a Value.
+     * Wraps an array of values with a value.
      *
      * @param values varadic elements of values.
      * @return the Value.
@@ -449,16 +643,34 @@ public interface Field {
       return new ArrayValue(Arrays.asList(values));
     }
 
+    /**
+     * Wraps an array of values with boolean values.
+     *
+     * @param values varadic elements of values.
+     * @return the Value.
+     */
     public static Value<List<Value<?>>> array(Boolean... values) {
-      return new ArrayValue(Value.asList(values, Value::bool));
+      return new ArrayValue(asList(values, Value::bool));
     }
 
+    /**
+     * Wraps an array of values with string values.
+     *
+     * @param values varadic elements of values.
+     * @return the Value.
+     */
     public static Value<List<Value<?>>> array(String... values) {
-      return new ArrayValue(Value.asList(values, Value::string));
+      return new ArrayValue(asList(values, Value::string));
     }
 
+    /**
+     * Wraps an array of values with number values.
+     *
+     * @param values varadic elements of values.
+     * @return the Value.
+     */
     public static Value<List<Value<?>>> array(Number... values) {
-      return new ArrayValue(Value.asList(values, Value::number));
+      return new ArrayValue(asList(values, Value::number));
     }
 
     /**
@@ -472,6 +684,30 @@ public interface Field {
     }
 
     /**
+     * Takes a list of objects and a transform function that maps from T to a value.
+     *
+     * @param values a list of values.
+     * @param transform the tranform function
+     * @return the Value.
+     * @param <T> the type of object.
+     */
+    public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, List<T> values) {
+      return new ArrayValue(asList(values, transform));
+    }
+
+    /**
+     * Takes an array of objects and a transform function that maps from T to a value.
+     *
+     * @param values an array of values.
+     * @param transform the transform function
+     * @return the Value.
+     * @param <T> the type of object.
+     */
+    public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, T[] values) {
+      return new ArrayValue(asList(values, transform));
+    }
+
+    /**
      * Wraps an array of fields with a Value as an object.
      *
      * @param fields varadic elements of fields.
@@ -482,7 +718,7 @@ public interface Field {
     }
 
     /**
-     * Wraps an list of fields with a Value as an object.
+     * Wraps a list of fields with a Value as an object.
      *
      * @param fields the list of fields.
      * @return the Value.
@@ -492,15 +728,65 @@ public interface Field {
     }
 
     /**
+     * Turns an array of T into a list of fields using the transform function.
+     *
+     * @param values the list of fields.
+     * @param transform the transform function
+     * @return the Value.
+     */
+    public static <T> Value<List<Field>> object(Function<T, Field> transform, T[] values) {
+      List<Field> fields = Arrays.stream(values).map(transform).collect(Collectors.toList());
+      return new ObjectValue(fields);
+    }
+
+    /**
+     * Turns a list of T into a list of fields using the transform function.
+     *
+     * @param values the list of fields.
+     * @param transform the transform function
+     * @return the Value.
+     */
+    public static <T> Value<List<Field>> object(Function<T, Field> transform, List<T> values) {
+      List<Field> fields = values.stream().map(transform).collect(Collectors.toList());
+      return new ObjectValue(fields);
+    }
+
+    /**
+     * Wraps an optional value, returning nullValue() if the optional is empty.
+     *
+     * <p>Best used with {@code fb.value()} or {@code fb.keyValue()}.
+     *
+     * @return the value, or null value if the optional is empty.
+     */
+    public static Value<?> optional(Optional<? extends Value<?>> optionalValue) {
+      if (optionalValue.isPresent()) {
+        return optionalValue.get();
+      }
+      return nullValue();
+    }
+
+    /**
      * Utility method to turn an array into a list of values with a transformer.
      *
      * @param array the raw array.
-     * @param f the function transforming a raw T to a value of T
+     * @param f the function transforming a raw T to a value
      * @return list of values.
      * @param <T> the raw type
      */
-    public static <T> List<Value<?>> asList(T[] array, Function<T, Value<T>> f) {
+    private static <T> List<Value<?>> asList(T[] array, Function<T, Value<?>> f) {
       return Arrays.stream(array).map(f).collect(Collectors.toList());
+    }
+
+    /**
+     * Utility method to turn a list into a list of values with a transformer.
+     *
+     * @param values the list of values
+     * @param f the function transforming a raw T to a value
+     * @return list of values.
+     * @param <T> the raw type
+     */
+    private static <T> List<Value<?>> asList(List<T> values, Function<T, Value<?>> f) {
+      return values.stream().map(f).collect(Collectors.toList());
     }
 
     public enum ValueType {

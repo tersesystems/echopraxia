@@ -57,7 +57,7 @@ class LoggerTest extends TestBase {
   @Test
   void testArrayOfStringsArgument() {
     Logger<?> logger = getLogger();
-    logger.debug("hello {}", fb -> fb.onlyArray("toys", Field.Value.string("binkie")));
+    logger.debug("hello {}", fb -> fb.onlyArray("toys", "binkie"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -68,7 +68,7 @@ class LoggerTest extends TestBase {
   @Test
   void testNullArgument() {
     Logger<?> logger = getLogger();
-    logger.debug("hello {}", fb -> fb.list(fb.nullValue("nothing")));
+    logger.debug("hello {}", fb -> fb.only(fb.nullField("nothing")));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -236,9 +236,9 @@ class LoggerTest extends TestBase {
     public Field person(String fieldName, Person p) {
       Field name = string("name", p.name());
       Field age = number("age", p.age());
-      Field father = p.getFather().map(f -> person("father", f)).orElse(nullValue("father"));
-      Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullValue("mother"));
-      Field interests = array("interests", Field.Value.asList(p.interests(), Field.Value::string));
+      Field father = p.getFather().map(f -> person("father", f)).orElse(nullField("father"));
+      Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullField("mother"));
+      Field interests = array("interests", p.interests());
       Field[] fields = {name, age, father, mother, interests};
       return object(fieldName, fields);
     }
