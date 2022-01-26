@@ -494,27 +494,6 @@ public interface Field {
     }
 
     /**
-     * Creates a singleton list of an exception using an explicit name.
-     * Creates a field with a null as a value.
-     *
-     * @param name the name of the field.
-     * @return a field.
-     */
-    default Field nullField(String name) {
-      return value(name, Value.nullValue());
-    }
-
-    /**
-     * Creates a singleton list with a null field.
-     *
-     * @param name the name of the field.
-     * @return a list containing a single field.
-     */
-    default List<Field> onlyNullField(String name) {
-      return only(nullField(name));
-    }
-
-    /**
      * Creates a singleton list of an exception value using an explicit name.
      *
      * @param name the name of the field.
