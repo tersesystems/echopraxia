@@ -724,9 +724,10 @@ public interface Field {
     /**
      * Turns an array of T into a list of fields using the transform function.
      *
-     * @param values the list of fields.
      * @param transform the transform function
+     * @param values the list of fields.
      * @return the Value.
+     * @param <T> THe type of the element
      */
     public static <T> Value<List<Field>> object(Function<T, Field> transform, T[] values) {
       List<Field> fields = Arrays.stream(values).map(transform).collect(Collectors.toList());
@@ -736,9 +737,10 @@ public interface Field {
     /**
      * Turns a list of T into a list of fields using the transform function.
      *
-     * @param values the list of fields.
      * @param transform the transform function
+     * @param values the list of fields.
      * @return the Value.
+     * @param <T> the type of the element
      */
     public static <T> Value<List<Field>> object(Function<T, Field> transform, List<T> values) {
       List<Field> fields = values.stream().map(transform).collect(Collectors.toList());
@@ -750,8 +752,10 @@ public interface Field {
      *
      * <p>Best used with {@code fb.value()} or {@code fb.keyValue()}.
      *
+     * @param optionalValue the optional value.
      * @return the value, or null value if the optional is empty.
      */
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     public static Value<?> optional(Optional<? extends Value<?>> optionalValue) {
       if (optionalValue.isPresent()) {
         return optionalValue.get();
