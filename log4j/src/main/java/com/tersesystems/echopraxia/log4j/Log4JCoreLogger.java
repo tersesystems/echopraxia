@@ -3,6 +3,8 @@ package com.tersesystems.echopraxia.log4j;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import static com.tersesystems.echopraxia.Field.*;
+
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Collections;
@@ -200,9 +202,9 @@ public class Log4JCoreLogger implements CoreLogger {
 
   private Throwable findThrowable(List<Field> fields) {
     for (Field field : fields) {
-      final Field.Value<?> value = field.value();
-      if (value instanceof Field.Value.ExceptionValue) {
-        return ((Field.Value.ExceptionValue) value).raw();
+      final Value<?> value = field.value();
+      if (value instanceof Value.ExceptionValue) {
+        return ((Value.ExceptionValue) value).raw();
       }
     }
     return null;

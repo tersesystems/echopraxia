@@ -5,6 +5,8 @@ import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Field;
+import static com.tersesystems.echopraxia.Field.*;
 
 /** A Jackson module that is loaded in automatically by logstash-logback-encoder. */
 public class EchopraxiaModule extends Module {
@@ -31,7 +33,7 @@ public class EchopraxiaModule extends Module {
   public void setupModule(final SetupContext context) {
     final SimpleSerializers serializers = new SimpleSerializers();
     serializers.addSerializer(Field.class, FieldSerializer.INSTANCE);
-    serializers.addSerializer(Field.Value.class, ValueSerializer.INSTANCE);
+    serializers.addSerializer(Value.class, ValueSerializer.INSTANCE);
     context.addSerializers(serializers);
   }
 }

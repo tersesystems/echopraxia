@@ -3,12 +3,13 @@ package com.tersesystems.echopraxia.scripting;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.LoggingContext;
+import static com.tersesystems.echopraxia.Field.*;
+
 import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.values.Arity2CallSite;
-import com.twineworks.tweakflow.lang.values.Value;
 import com.twineworks.tweakflow.lang.values.Values;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -37,9 +38,9 @@ public class ScriptManager {
 
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
-      Value levelV = Values.make(level.name());
-      Value fieldsV = convertFields(context.getFields());
-      Value retValue = call(levelV, fieldsV);
+      com.twineworks.tweakflow.lang.values.Value levelV = Values.make(level.name());
+      com.twineworks.tweakflow.lang.values.Value fieldsV = convertFields(context.getFields());
+      com.twineworks.tweakflow.lang.values.Value retValue = call(levelV, fieldsV);
       if (!retValue.isBoolean()) {
         throw new ScriptException(
             "Your function needs to return a boolean value!  Invalid return type: "
@@ -52,24 +53,24 @@ public class ScriptManager {
     }
   }
 
-  private Value convertFields(List<Field> fields) {
-    Map<String, Value> objectMap = new HashMap<>();
+  private com.twineworks.tweakflow.lang.values.Value convertFields(List<Field> fields) {
+    Map<String, com.twineworks.tweakflow.lang.values.Value> objectMap = new HashMap<>();
     for (Field field : fields) {
-      Value fieldValue = convertValue(field.value());
+      com.twineworks.tweakflow.lang.values.Value fieldValue = convertValue(field.value());
       objectMap.put(field.name(), fieldValue);
     }
 
     return Values.make(objectMap);
   }
 
-  private Value convertValue(Field.Value<?> value) {
+  private com.twineworks.tweakflow.lang.values.Value convertValue(Value<?> value) {
     switch (value.type()) {
       case ARRAY:
         //noinspection unchecked
-        List<Field.Value<?>> values = (List<Field.Value<?>>) value.raw();
-        List<Value> rawList = new ArrayList<>();
-        for (Field.Value<?> v : values) {
-          Value v2 = convertValue(v);
+        List<Value<?>> values = (List<Value<?>>) value.raw();
+        List<com.twineworks.tweakflow.lang.values.Value> rawList = new ArrayList<>();
+        for (Value<?> v : values) {
+          com.twineworks.tweakflow.lang.values.Value v2 = convertValue(v);
           rawList.add(v2);
         }
         return Values.make(rawList);
@@ -107,24 +108,26 @@ public class ScriptManager {
     }
   }
 
-  private Value createThrowable(Throwable t) {
+  private com.twineworks.tweakflow.lang.values.Value createThrowable(Throwable t) {
     final String message = t.getMessage();
     StringWriter stringWriter = new StringWriter();
     t.printStackTrace(new PrintWriter(stringWriter));
     String stackTrace = stringWriter.toString();
 
-    Map<String, Value> throwMap = new HashMap<>();
+    Map<String, com.twineworks.tweakflow.lang.values.Value> throwMap = new HashMap<>();
     throwMap.put("message", Values.make(message));
     throwMap.put("stackTrace", Values.make(stackTrace));
 
     if (t.getCause() != null) {
-      Value cause = createThrowable(t.getCause());
+      com.twineworks.tweakflow.lang.values.Value cause = createThrowable(t.getCause());
       throwMap.put("cause", cause);
     }
     return Values.makeDict(throwMap);
   }
 
-  private Value call(Value level, Value fields) {
+  private com.twineworks.tweakflow.lang.values.Value call(
+      com.twineworks.tweakflow.lang.values.Value level,
+      com.twineworks.tweakflow.lang.values.Value fields) {
     synchronized (lock) {
       // if there's no callsite or the handle is bad, we need to eval the script
       // probably safest to do this in a single thread in synchronized block?

@@ -2,6 +2,11 @@ package com.tersesystems.echopraxia;
 
 import static java.util.Collections.singletonList;
 
+import com.tersesystems.echopraxia.Constants.DefaultKeyValueField;
+import com.tersesystems.echopraxia.Constants.DefaultValueField;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
 import com.tersesystems.echopraxia.Constants.*;
 import java.util.Arrays;
 import java.util.List;
@@ -120,7 +125,7 @@ public interface Field {
      * @param value the value of the field.
      * @return the field.
      */
-    default Field string(String name, Value<String> value) {
+    default Field string(String name, Value.StringValue value) {
       return value(name, value);
     }
 
@@ -142,7 +147,7 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyString(String name, Value<String> value) {
+    default List<Field> onlyString(String name, Value.StringValue value) {
       return only(string(name, value));
     }
 
@@ -167,7 +172,7 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default Field number(String name, Value<Number> value) {
+    default Field number(String name, Value.NumberValue value) {
       return value(name, value);
     }
 
@@ -189,7 +194,7 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyNumber(String name, Value<Number> value) {
+    default List<Field> onlyNumber(String name, Value.NumberValue value) {
       return only(number(name, value));
     }
 
@@ -214,7 +219,7 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default Field bool(String name, Value<Boolean> value) {
+    default Field bool(String name, Value.BooleanValue value) {
       return value(name, value);
     }
 
@@ -236,7 +241,7 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyBool(String name, Value<Boolean> value) {
+    default List<Field> onlyBool(String name, Value.BooleanValue value) {
       return only(bool(name, value));
     }
 
@@ -250,7 +255,7 @@ public interface Field {
      * @param values the array of values.
      * @return a list containing a single field.
      */
-    default Field array(String name, Value<List<Field>>... values) {
+    default Field array(String name, Value.ObjectValue... values) {
       return keyValue(name, Value.array(values));
     }
 
@@ -288,13 +293,18 @@ public interface Field {
     }
 
     /**
-     * Creates a field out of a name and an array value.
+     * Only allow a single direct array value.
+     *
+     * This is because with hetrogenous elements, it's far too easy
+     * to double nest an array.  Do something like this:
+     *
+     * {@code array(name, Value.array(1, "a", true))}
      *
      * @param name the name of the field.
      * @param value the array value.
      * @return a list containing a single field.
      */
-    default Field array(String name, Value<List<Value<?>>> value) {
+    default Field array(String name, Value.ArrayValue value) {
       return keyValue(name, value);
     }
 
@@ -305,7 +315,7 @@ public interface Field {
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, Value<List<Field>>... values) {
+    default List<Field> onlyArray(String name, Value.ObjectValue... values) {
       return only(array(name, values));
     }
 
@@ -349,7 +359,7 @@ public interface Field {
      * @param value the array value.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, Value<List<Value<?>>> value) {
+    default List<Field> onlyArray(String name, Value.ArrayValue value) {
       return only(array(name, value));
     }
 
@@ -419,7 +429,7 @@ public interface Field {
      * @param value the object values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyObject(String name, Value<List<Field>> value) {
+    default List<Field> onlyObject(String name, Value.ObjectValue value) {
       return only(object(name, value));
     }
 
@@ -442,7 +452,7 @@ public interface Field {
      * @param value the exception value.
      * @return a field.
      */
-    default Field exception(Value<Throwable> value) {
+    default Field exception(Value.ExceptionValue value) {
       return keyValue(EXCEPTION, value);
     }
 
@@ -464,7 +474,7 @@ public interface Field {
      * @param value the exception value.
      * @return a field.
      */
-    default Field exception(String name, Value<Throwable> value) {
+    default Field exception(String name, Value.ExceptionValue value) {
       return keyValue(name, value);
     }
 
@@ -489,7 +499,7 @@ public interface Field {
      * @param t the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyException(Value<Throwable> t) {
+    default List<Field> onlyException(Value.ExceptionValue t) {
       return only(exception(t));
     }
 
@@ -500,7 +510,7 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyException(String name, Value<Throwable> value) {
+    default List<Field> onlyException(String name, Value.ExceptionValue value) {
       return only(exception(name, value));
     }
 
@@ -584,7 +594,7 @@ public interface Field {
      * @param raw the raw string value.
      * @return the Value
      */
-    public static Value<String> string(String raw) {
+    public static Value.StringValue string(String raw) {
       return new StringValue(raw);
     }
 
@@ -594,7 +604,7 @@ public interface Field {
      * @param n the raw number value.
      * @return the Value
      */
-    public static Value<Number> number(Number n) {
+    public static Value.NumberValue number(Number n) {
       return new NumberValue(n);
     }
 
@@ -604,7 +614,7 @@ public interface Field {
      * @param b the raw boolean value.
      * @return the Value.
      */
-    public static Value<Boolean> bool(Boolean b) {
+    public static Value.BooleanValue bool(Boolean b) {
       return new BooleanValue(b);
     }
 
@@ -623,7 +633,7 @@ public interface Field {
      * @param t the raw exception value.
      * @return the Value.
      */
-    public static Value<Throwable> exception(Throwable t) {
+    public static Value.ExceptionValue exception(Throwable t) {
       return new ExceptionValue(t);
     }
 
@@ -633,7 +643,7 @@ public interface Field {
      * @param values variadic elements of values.
      * @return the Value.
      */
-    public static Value<List<Value<?>>> array(Value<?>... values) {
+    public static Value.ArrayValue array(Value<?>... values) {
       return new ArrayValue(Arrays.asList(values));
     }
 
@@ -643,7 +653,7 @@ public interface Field {
      * @param values varadic elements of values.
      * @return the Value.
      */
-    public static Value<List<Value<?>>> array(Boolean... values) {
+    public static Value.ArrayValue array(Boolean... values) {
       return new ArrayValue(asList(values, Value::bool));
     }
 
@@ -653,7 +663,7 @@ public interface Field {
      * @param values varadic elements of values.
      * @return the Value.
      */
-    public static Value<List<Value<?>>> array(String... values) {
+    public static Value.ArrayValue array(String... values) {
       return new ArrayValue(asList(values, Value::string));
     }
 
@@ -663,7 +673,7 @@ public interface Field {
      * @param values varadic elements of values.
      * @return the Value.
      */
-    public static Value<List<Value<?>>> array(Number... values) {
+    public static Value.ArrayValue array(Number... values) {
       return new ArrayValue(asList(values, Value::number));
     }
 
@@ -673,7 +683,7 @@ public interface Field {
      * @param values a list of values.
      * @return the Value.
      */
-    public static Value<List<Value<?>>> array(List<Value<?>> values) {
+    public static Value.ArrayValue array(List<Value<?>> values) {
       return new ArrayValue(values);
     }
 
@@ -685,7 +695,7 @@ public interface Field {
      * @return the Value.
      * @param <T> the type of object.
      */
-    public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, List<T> values) {
+    public static <T> Value.ArrayValue array(Function<T, Value<?>> transform, List<T> values) {
       return new ArrayValue(asList(values, transform));
     }
 
@@ -697,7 +707,7 @@ public interface Field {
      * @return the Value.
      * @param <T> the type of object.
      */
-    public static <T> Value<List<Value<?>>> array(Function<T, Value<?>> transform, T[] values) {
+    public static <T> Value.ArrayValue array(Function<T, Value<?>> transform, T[] values) {
       return new ArrayValue(asList(values, transform));
     }
 
@@ -707,7 +717,7 @@ public interface Field {
      * @param fields variadic elements of fields.
      * @return the Value.
      */
-    public static Value<List<Field>> object(Field... fields) {
+    public static Value.ObjectValue object(Field... fields) {
       return new ObjectValue(Arrays.asList(fields));
     }
 
@@ -717,7 +727,7 @@ public interface Field {
      * @param fields the list of fields.
      * @return the Value.
      */
-    public static Value<List<Field>> object(List<Field> fields) {
+    public static Value.ObjectValue object(List<Field> fields) {
       return new ObjectValue(fields);
     }
 
@@ -729,7 +739,7 @@ public interface Field {
      * @return the Value.
      * @param <T> THe type of the element
      */
-    public static <T> Value<List<Field>> object(Function<T, Field> transform, T[] values) {
+    public static <T> Value.ObjectValue object(Function<T, Field> transform, T[] values) {
       List<Field> fields = Arrays.stream(values).map(transform).collect(Collectors.toList());
       return new ObjectValue(fields);
     }
@@ -742,7 +752,7 @@ public interface Field {
      * @return the Value.
      * @param <T> the type of the element
      */
-    public static <T> Value<List<Field>> object(Function<T, Field> transform, List<T> values) {
+    public static <T> Value.ObjectValue object(Function<T, Field> transform, List<T> values) {
       List<Field> fields = values.stream().map(transform).collect(Collectors.toList());
       return new ObjectValue(fields);
     }

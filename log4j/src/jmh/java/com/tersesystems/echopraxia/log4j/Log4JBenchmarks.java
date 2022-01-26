@@ -5,6 +5,8 @@ import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.KeyValueField;
+import com.tersesystems.echopraxia.Field;
+import static com.tersesystems.echopraxia.Field.*;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Arrays;
 import java.util.List;
@@ -25,7 +27,7 @@ public class Log4JBenchmarks {
 
   private static final Exception exception = new RuntimeException();
 
-  private static final Field field = new MyKeyValueField("name", Field.Value.string("value"));
+  private static final Field field = new MyKeyValueField("name", Value.string("value"));
 
   private static final List<Field> fields = Arrays.asList(field, field, field, field);
 

@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
 import com.tersesystems.echopraxia.Field;
+import static com.tersesystems.echopraxia.Field.*;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -16,8 +18,8 @@ class EchopraxiaFieldSerializer {
       case ARRAY:
         final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         //noinspection unchecked
-        final List<Field.Value<?>> arrayValues = (List<Field.Value<?>>) f.value().raw();
-        for (Field.Value<?> value : arrayValues) {
+        final List<Value<?>> arrayValues = (List<Value<?>>) f.value().raw();
+        for (Value<?> value : arrayValues) {
           addValue(value, arrayBuilder);
         }
         builder.add(f.name(), arrayBuilder);
@@ -58,7 +60,7 @@ class EchopraxiaFieldSerializer {
     }
   }
 
-  private void addValue(Field.Value<?> value, JsonArrayBuilder arrayBuilder) {
+  private void addValue(Value<?> value, JsonArrayBuilder arrayBuilder) {
     switch (value.type()) {
       case ARRAY:
         JsonArrayBuilder newArrayBuilder = Json.createArrayBuilder();
