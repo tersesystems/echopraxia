@@ -50,14 +50,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:logstash:1.1.2" 
+implementation "com.tersesystems.echopraxia:logstash:1.1.3" 
 ```
 
 ## Log4J
@@ -70,14 +70,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>log4j</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:log4j:1.1.2" 
+implementation "com.tersesystems.echopraxia:log4j:1.1.3" 
 ```
 
 You will need to integrate the `com.tersesystems.echopraxia.log4j.layout` package into your `log4j2.xml` file, e.g. by using the `packages` attribute, and add an `EventTemplateAdditionalField` element:
@@ -382,14 +382,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>scripting</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:scripting:1.1.2" 
+implementation "com.tersesystems.echopraxia:scripting:1.1.3" 
 ```
 
 ### String Based Scripts
@@ -549,14 +549,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>semantic</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:semantic:1.1.2" 
+implementation "com.tersesystems.echopraxia:semantic:1.1.3" 
 ```
 
 ## Fluent Logging
@@ -590,14 +590,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>fluent</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:fluent:1.1.2" 
+implementation "com.tersesystems.echopraxia:fluent:1.1.3" 
 ```
 
 ## Core Logger and SLF4J API
