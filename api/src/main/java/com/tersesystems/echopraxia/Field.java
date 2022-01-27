@@ -851,15 +851,15 @@ public interface Field {
       }
     }
 
-    public static final class ArrayValue extends Value<List<Field.Value<?>>> {
-      private final List<Field.Value<?>> raw;
+    public static final class ArrayValue extends Value<List<Value<?>>> {
+      private final List<Value<?>> raw;
 
-      private ArrayValue(List<Field.Value<?>> raw) {
+      private ArrayValue(List<Value<?>> raw) {
         this.raw = raw;
       }
 
       @Override
-      public List<Field.Value<?>> raw() {
+      public List<Value<?>> raw() {
         return raw;
       }
 
