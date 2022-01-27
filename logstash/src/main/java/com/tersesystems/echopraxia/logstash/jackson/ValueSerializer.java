@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.logstash.jackson;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
@@ -10,31 +12,30 @@ import java.math.BigInteger;
 import java.util.List;
 
 /**
- * The ValueSerializer class plugs into the Jackson serializer system to serialize Field.Value into
- * JSON.
+ * The ValueSerializer class plugs into the Jackson serializer system to serialize Value into JSON.
  */
-public class ValueSerializer extends StdSerializer<Field.Value> {
+public class ValueSerializer extends StdSerializer<Value> {
 
   public static final ValueSerializer INSTANCE = new ValueSerializer();
 
   public ValueSerializer() {
-    super(Field.Value.class);
+    super(Value.class);
   }
 
   @Override
-  public void serialize(Field.Value value, JsonGenerator gen, SerializerProvider provider)
+  public void serialize(Value value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
     switch (value.type()) {
       case ARRAY:
-        List<Field.Value<?>> arrayValues = ((Field.Value.ArrayValue) value).raw();
+        List<Value<?>> arrayValues = ((Value.ArrayValue) value).raw();
         gen.writeStartArray();
-        for (Field.Value<?> arrayValue : arrayValues) {
+        for (Value<?> arrayValue : arrayValues) {
           gen.writeObject(arrayValue);
         }
         gen.writeEndArray();
         break;
       case OBJECT:
-        List<Field> objFields = ((Field.Value.ObjectValue) value).raw();
+        List<Field> objFields = ((Value.ObjectValue) value).raw();
         gen.writeStartObject();
         for (Field objField : objFields) {
           gen.writeObject(objField);
@@ -45,7 +46,7 @@ public class ValueSerializer extends StdSerializer<Field.Value> {
         gen.writeString(value.raw().toString());
         break;
       case NUMBER:
-        Number n = ((Field.Value.NumberValue) value).raw();
+        Number n = ((Value.NumberValue) value).raw();
         if (n instanceof Byte) {
           gen.writeNumber(n.byteValue());
         } else if (n instanceof Short) {
@@ -63,7 +64,7 @@ public class ValueSerializer extends StdSerializer<Field.Value> {
         }
         break;
       case BOOLEAN:
-        boolean b = ((Field.Value.BooleanValue) value).raw();
+        boolean b = ((Value.BooleanValue) value).raw();
         gen.writeBoolean(b);
         break;
       case EXCEPTION:

@@ -1,9 +1,12 @@
 package example;
 
+import static com.tersesystems.echopraxia.Field.Value;
 import static java.util.Collections.singletonList;
 
-import com.tersesystems.echopraxia.*;
-import com.tersesystems.echopraxia.Field.Value;
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.time.Instant;
@@ -155,10 +158,7 @@ public class Main {
       return keyValue(fieldName, personValue(p));
     }
 
-    public Value<?> personValue(Person p) {
-      if (p == null) {
-        return Value.nullValue();
-      }
+    public Value.ObjectValue personValue(Person p) {
       // Note that properties must be broken down to the basic JSON types,
       // i.e. a primitive string/number/boolean/null or object/array.
       Field name = string("name", p.name());

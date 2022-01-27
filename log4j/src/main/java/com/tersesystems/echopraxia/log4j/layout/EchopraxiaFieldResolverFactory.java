@@ -4,7 +4,10 @@ import com.tersesystems.echopraxia.Field;
 import java.util.List;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;
-import org.apache.logging.log4j.layout.template.json.resolver.*;
+import org.apache.logging.log4j.layout.template.json.resolver.EventResolverContext;
+import org.apache.logging.log4j.layout.template.json.resolver.EventResolverFactory;
+import org.apache.logging.log4j.layout.template.json.resolver.TemplateResolverConfig;
+import org.apache.logging.log4j.layout.template.json.resolver.TemplateResolverFactory;
 
 @Plugin(name = "FieldResolverFactory", category = TemplateResolverFactory.CATEGORY)
 public class EchopraxiaFieldResolverFactory implements EventResolverFactory {

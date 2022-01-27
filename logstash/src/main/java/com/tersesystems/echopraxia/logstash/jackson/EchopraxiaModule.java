@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.logstash.jackson;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.Module;
@@ -31,7 +33,7 @@ public class EchopraxiaModule extends Module {
   public void setupModule(final SetupContext context) {
     final SimpleSerializers serializers = new SimpleSerializers();
     serializers.addSerializer(Field.class, FieldSerializer.INSTANCE);
-    serializers.addSerializer(Field.Value.class, ValueSerializer.INSTANCE);
+    serializers.addSerializer(Value.class, ValueSerializer.INSTANCE);
     context.addSerializers(serializers);
   }
 }

@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.Field.Value;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
@@ -25,7 +26,7 @@ public class Log4JBenchmarks {
 
   private static final Exception exception = new RuntimeException();
 
-  private static final Field field = new MyKeyValueField("name", Field.Value.string("value"));
+  private static final Field field = new MyKeyValueField("name", Value.string("value"));
 
   private static final List<Field> fields = Arrays.asList(field, field, field, field);
 

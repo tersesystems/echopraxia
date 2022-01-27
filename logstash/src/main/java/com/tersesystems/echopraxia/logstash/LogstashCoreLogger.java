@@ -1,9 +1,10 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Field.Value;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.ValueField;
 import com.tersesystems.echopraxia.core.CoreLogger;

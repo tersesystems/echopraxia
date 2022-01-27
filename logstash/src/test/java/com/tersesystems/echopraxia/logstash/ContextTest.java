@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.Field.Value;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -111,10 +112,10 @@ public class ContextTest extends TestBase {
     logger
         .withFields(
             fb -> {
-              Field.Value a4 = Field.Value.array(true, false, true);
-              Field.Value a3 = Field.Value.array("1", "2", "3");
-              Field.Value a2 = Field.Value.array(1, 2, 3);
-              Field field = fb.array("a1", a2, a3, a4);
+              Value.ArrayValue a4 = Value.array(true, false, true);
+              Value.ArrayValue a3 = Value.array("1", "2", "3");
+              Value.ArrayValue a2 = Value.array(1, 2, 3);
+              Field field = fb.array("a1", Value.array(a2, a3, a4));
               return singletonList(field);
             })
         .error("This has a marker");

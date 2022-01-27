@@ -1,7 +1,9 @@
 package com.tersesystems.echopraxia.logstash.jackson;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.tersesystems.echopraxia.Field;
 import java.io.IOException;
@@ -25,18 +27,18 @@ public class FieldSerializer extends StdSerializer<Field> {
   @Override
   public void serialize(Field field, JsonGenerator jgen, SerializerProvider provider)
       throws IOException {
-    Field.Value<?> value = field.value();
+    Value<?> value = field.value();
     switch (value.type()) {
       case ARRAY:
-        List<Field.Value<?>> arrayValues = ((Field.Value.ArrayValue) value).raw();
+        List<Value<?>> arrayValues = ((Value.ArrayValue) value).raw();
         jgen.writeArrayFieldStart(field.name());
-        for (Field.Value<?> av : arrayValues) {
+        for (Value<?> av : arrayValues) {
           jgen.writeObject(av);
         }
         jgen.writeEndArray();
         break;
       case OBJECT:
-        List<Field> objFields = ((Field.Value.ObjectValue) value).raw();
+        List<Field> objFields = ((Value.ObjectValue) value).raw();
         jgen.writeObjectFieldStart(field.name());
         for (Field objField : objFields) {
           jgen.writeObject(objField);
@@ -47,7 +49,7 @@ public class FieldSerializer extends StdSerializer<Field> {
         jgen.writeStringField(field.name(), value.raw().toString());
         break;
       case NUMBER:
-        Number n = ((Field.Value.NumberValue) value).raw();
+        Number n = ((Value.NumberValue) value).raw();
         if (n instanceof Byte) {
           jgen.writeNumberField(field.name(), n.byteValue());
         } else if (n instanceof Short) {
@@ -65,7 +67,7 @@ public class FieldSerializer extends StdSerializer<Field> {
         }
         break;
       case BOOLEAN:
-        boolean b = ((Field.Value.BooleanValue) value).raw();
+        boolean b = ((Value.BooleanValue) value).raw();
         jgen.writeBooleanField(field.name(), b);
         break;
       case EXCEPTION:
