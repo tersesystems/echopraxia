@@ -289,10 +289,7 @@ public interface Field {
     }
 
     /**
-     * Only allow a single direct array value.
-     *
-     * <p>This is because with hetrogenous elements, it's far too easy to double nest an array. Do
-     * something like this:
+     * Takes an array value as an array field. This is good for hetrogenous elements.
      *
      * <p>{@code array(name, Value.array(1, "a", true))}
      *
@@ -301,6 +298,7 @@ public interface Field {
      * @return a list containing a single field.
      */
     default Field array(String name, Value.ArrayValue value) {
+      // Don't allow Value.ArrayValue... it's far too easy to double nest an array.
       return keyValue(name, value);
     }
 
@@ -350,6 +348,8 @@ public interface Field {
 
     /**
      * Creates a singleton list of an array field out of a name and an array value.
+     *
+     * <p>{@code onlyArray(name, Value.array(1, "a", true))}
      *
      * @param name the name of the field.
      * @param value the array value.
