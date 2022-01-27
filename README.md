@@ -186,8 +186,8 @@ public class BuilderWithDate implements Field.Builder {
   public BuilderWithDate() {}
 
   // Renders a date as an ISO 8601 string.
-  public Field.Value<String> dateValue(Date date) {
-    return Field.Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
+  public Value<String> dateValue(Date date) {
+    return Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
   }
 
   public Field date(String name, Date date) {
@@ -219,18 +219,19 @@ public class PersonBuilder implements Field.Builder {
     return keyValue(fieldName, personValue(p));
   }
 
-  public Field.Value<?> personValue(Person p) {
+  public Value<?> personValue(Person p) {
     if (p == null) {
       return Value.nullValue();
     }
     Field name = string("name", p.name());
     Field age = number("age", p.age());
     // optional returns either an object value or null value, keyValue is untyped
-    Field father = keyValue("father", Field.Value.optional(p.getFather().map(this::personValue)));
-    Field mother = keyValue("mother", Field.Value.optional(p.getMother().map(this::personValue)));
+    Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
+    Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
     Field interests = array("interests", p.interests());
     return Value.object(name, age, father, mother, interests);
   }
+}
 ```
 
 And then you can do the same by calling `fb.person`:
