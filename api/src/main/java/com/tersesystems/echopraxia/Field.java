@@ -395,7 +395,7 @@ public interface Field {
      * @param value the value.
      * @return a field.
      */
-    default Field object(String name, Value<List<Field>> value) {
+    default Field object(String name, Value.ObjectValue value) {
       // limited to object specifically -- if you want object or null, use value.
       return keyValue(name, value);
     }

@@ -186,7 +186,7 @@ public class BuilderWithDate implements Field.Builder {
   public BuilderWithDate() {}
 
   // Renders a date as an ISO 8601 string.
-  public Value<String> dateValue(Date date) {
+  public StringValue dateValue(Date date) {
     return Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
   }
 
