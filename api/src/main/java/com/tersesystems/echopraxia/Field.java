@@ -553,6 +553,16 @@ public interface Field {
    */
   abstract class Value<V> {
 
+    public enum ValueType {
+      ARRAY,
+      OBJECT,
+      STRING,
+      NUMBER,
+      BOOLEAN,
+      EXCEPTION,
+      NULL
+    }
+
     protected Value() {}
 
     /**
@@ -562,18 +572,29 @@ public interface Field {
      */
     public abstract V raw();
 
+    /**
+     * The value type.
+     *
+     * @return the value type.
+     */
     public abstract ValueType type();
 
     public String toString() {
       return valueToString(this);
     }
 
-    private String valueToString(Value<?> v) {
-      if (v.raw() == null) {
+    /**
+     * Turns a given value into a string in a line oriented format.
+     *
+     * @param v the value
+     * @return the value as a string.
+     */
+    private static String valueToString(Value<?> v) {
+      if (v.type() == ValueType.NULL) {
         return "null";
       }
       // render an object with curly braces to distinguish from array.
-      if (type() == ValueType.OBJECT) {
+      if (v.type() == ValueType.OBJECT) {
         final List<Field> fieldList = ((ObjectValue) v).raw();
         StringBuilder b = new StringBuilder("{");
         final String s = fieldList.stream().map(Field::toString).collect(Collectors.joining(", "));
@@ -791,16 +812,6 @@ public interface Field {
      */
     private static <T> List<Value<?>> asList(List<T> values, Function<T, Value<?>> f) {
       return values.stream().map(f).collect(Collectors.toList());
-    }
-
-    public enum ValueType {
-      ARRAY,
-      OBJECT,
-      STRING,
-      NUMBER,
-      BOOLEAN,
-      EXCEPTION,
-      NULL
     }
 
     public static final class BooleanValue extends Value<Boolean> {
