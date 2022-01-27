@@ -392,7 +392,8 @@ public interface Field {
      * @return a field.
      */
     default Field object(String name, Value.ObjectValue value) {
-      // limited to object specifically -- if you want object or null, use value.
+      // limited to object specifically -- if you want object or null,
+      // use `value` or `keyValue`
       return keyValue(name, value);
     }
 

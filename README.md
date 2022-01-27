@@ -601,33 +601,26 @@ Gradle:
 implementation "com.tersesystems.echopraxia:fluent:1.1.3" 
 ```
 
-## Core Logger and SLF4J API
+## Core Logger 
 
-The SLF4J API are not exposed normally.  If you want to use SLF4J features like markers specifically, you will need to use a core logger.
+Because Echopraxia provides its own implementation independent API, some implementation features are not exposed normally.  If you want to use implementation specific features like markers, you will need to use a core logger.
 
-First, import the `logstash` package and the `core` package:
+### Logstash API
+
+First, import the `logstash` package and the `core` package.  This gets you access to the `CoreLoggerFactory` and  `CoreLogger`, which can be cast to `LogstashCoreLogger`:
 
 ```java
 import com.tersesystems.echopraxia.logstash.*;
 import com.tersesystems.echopraxia.core.*;
-```
 
-This gets you access to the `CoreLogger` and `CoreLoggerFactory`, which is used as a backing logger.
+LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
+```
 
 The `LogstashCoreLogger` has a `withMarkers` method that takes an SLF4J marker:
 
 ```java
-LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
 Logger<?> logger = LoggerFactory.getLogger(
       core.withMarkers(MarkerFactory.getMarker("SECURITY")), Field.Builder.instance);
-```
-
-Likewise, you need to get at the SLF4J logger from a core logger, you can cast and call `core.logger()`:
-
-```java
-Logger<?> baseLogger = LoggerFactory.getLogger();
-LogstashCoreLogger core = (LogstashCoreLogger) baseLogger.core();
-org.slf4j.Logger slf4jLogger = core.logger();
 ```
 
 If you have markers set as context, you can evaluate them in a condition through casting to `LogstashLoggingContext`:
@@ -638,4 +631,49 @@ Condition hasAnyMarkers = (level, context) -> {
    List<org.slf4j.Marker> markers = c.getMarkers();
    return markers.size() > 0;
 };
+```
+
+If you need to get at the SLF4J logger from a core logger, you can cast and call `core.logger()`:
+
+```java
+Logger<?> baseLogger = LoggerFactory.getLogger();
+LogstashCoreLogger core = (LogstashCoreLogger) baseLogger.core();
+org.slf4j.Logger slf4jLogger = core.logger();
+```
+
+### Log4J
+
+Similar to Logstash, you can get access to Log4J specific features by importing 
+
+```java
+import com.tersesystems.echopraxia.log4j.*;
+import com.tersesystems.echopraxia.core.*;
+
+Log4JCoreLogger core = (Log4JCoreLogger) CoreLoggerFactory.getLogger();
+```
+
+The `Log4JCoreLogger` has a `withMarker` method that takes a Log4J marker:
+
+```java
+final Marker securityMarker = MarkerManager.getMarker("SECURITY");
+Logger<?> logger = LoggerFactory.getLogger(
+      core.withMarker(securityMarker), Field.Builder.instance);
+```
+
+If you have a marker set as context, you can evaluate it in a condition through casting to `Log4JLoggingContext`:
+
+```java
+Condition hasAnyMarkers = (level, context) -> {
+   Log4JLoggingContext c = (Log4JLoggingContext) context;
+   Marker m = c.getMarker();
+   return securityMarker.equals(m);
+};
+```
+
+If you need to get the Log4j logger from a core logger, you can cast and call `core.logger()`:
+
+```java
+Logger<?> baseLogger = LoggerFactory.getLogger();
+Log4JCoreLogger core = (Log4JCoreLogger) baseLogger.core();
+org.apache.logging.log4j.Logger log4jLogger = core.logger();
 ```
