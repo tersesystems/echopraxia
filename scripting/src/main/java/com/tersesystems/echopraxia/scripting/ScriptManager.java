@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.scripting;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.LoggingContext;
-import static com.tersesystems.echopraxia.Field.*;
-
 import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;

@@ -6,10 +6,6 @@ import com.tersesystems.echopraxia.Constants.DefaultKeyValueField;
 import com.tersesystems.echopraxia.Constants.DefaultValueField;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import com.tersesystems.echopraxia.Constants.*;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -295,10 +291,10 @@ public interface Field {
     /**
      * Only allow a single direct array value.
      *
-     * This is because with hetrogenous elements, it's far too easy
-     * to double nest an array.  Do something like this:
+     * <p>This is because with hetrogenous elements, it's far too easy to double nest an array. Do
+     * something like this:
      *
-     * {@code array(name, Value.array(1, "a", true))}
+     * <p>{@code array(name, Value.array(1, "a", true))}
      *
      * @param name the name of the field.
      * @param value the array value.

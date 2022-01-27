@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.fluent;
 
-import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;

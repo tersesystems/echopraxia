@@ -1,7 +1,12 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.ValueField;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
 import java.util.function.Function;
@@ -12,8 +17,6 @@ import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.Markers;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
-import com.tersesystems.echopraxia.Field;
-import static com.tersesystems.echopraxia.Field.*;
 
 /** Logstash implementation of CoreLogger. */
 public class LogstashCoreLogger implements CoreLogger {

@@ -1,10 +1,11 @@
 package com.tersesystems.echopraxia.logstash.jackson;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.tersesystems.echopraxia.Field;
-import static com.tersesystems.echopraxia.Field.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;

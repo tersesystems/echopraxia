@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
-import static com.tersesystems.echopraxia.Field.*;
-
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Collections;

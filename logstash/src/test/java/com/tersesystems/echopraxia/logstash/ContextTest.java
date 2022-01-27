@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.Field.Value;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,8 +12,6 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
-import com.tersesystems.echopraxia.Field;
-import static com.tersesystems.echopraxia.Field.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.io.IOException;
 import java.io.StringWriter;
