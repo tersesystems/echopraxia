@@ -1,6 +1,6 @@
 # Echopraxia
 
-[Echopraxia](https://github.com/tersesystems/echopraxia) is a Java logging API that and is designed around structured logging, rich context, and conditional logging.  There is a Logback-based implementation, but Echopraxia's API is completely dependency-free, meaning it can be implemented with Log4J2, JUL, or directly.
+[Echopraxia](https://github.com/tersesystems/echopraxia) is a Java logging API that and is designed around structured logging, rich context, and conditional logging.  There are Logback and Log4J2 implementations, but Echopraxia's API is completely dependency-free, meaning it can be implemented with any logging API, i.e. jboss-logging, JUL, JEP 264, or even directly.
 
 Echopraxia is a sequel to the Scala logging API [Blindsight](https://github.com/tersesystems/blindsight), hence the name: "Echopraxia is the involuntary repetition or imitation of an observed action."
 
@@ -22,7 +22,7 @@ Please see the [blog posts](https://tersesystems.com/category/logging/) for more
 
 **Echopraxia is not a replacement for SLF4J**.  It is not an attempt to compete with Log4J2 API, JUL, commons-logging for the title of "one true logging API" and restart the [logging mess](https://techblog.bozho.net/the-logging-mess/).  SLF4J won that fight [a long time ago](https://www.semanticscholar.org/paper/Studying-the-Use-of-Java-Logging-Utilities-in-the-Chen-Jiang/be39720a72f04c92b9aece9548171d5fa3a627e6).
 
-Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application where you've decided to use [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) already.  
+Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application where you've decided to use [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) already. 
 
 SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations by anybody.  
 
@@ -30,7 +30,7 @@ Echopraxia is best described as a specialization or augmentation for application
 
 ## Benchmarks
 
-Benchmarks show [performance inline with straight SLF4J calls](BENCHMARKS.md).  
+Benchmarks show [performance inline with straight calls to the implementation](BENCHMARKS.md).  
 
 Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  
 
