@@ -2,12 +2,13 @@ package com.tersesystems.echopraxia.logstash;
 
 import static com.tersesystems.echopraxia.Field.Value;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Level;
-import com.tersesystems.echopraxia.ValueField;
+import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -24,18 +25,24 @@ public class LogstashCoreLogger implements CoreLogger {
   private final org.slf4j.Logger logger;
   private final LogstashLoggingContext context;
   private final Condition condition;
+  private final Executor executor;
 
   protected LogstashCoreLogger(org.slf4j.Logger logger) {
     this.logger = logger;
     this.context = LogstashLoggingContext.empty();
     this.condition = Condition.always();
+    this.executor = ForkJoinPool.commonPool();
   }
 
   public LogstashCoreLogger(
-      org.slf4j.Logger logger, LogstashLoggingContext context, Condition condition) {
+      org.slf4j.Logger logger,
+      LogstashLoggingContext context,
+      Condition condition,
+      Executor executor) {
     this.logger = logger;
     this.context = context;
     this.condition = condition;
+    this.executor = executor;
   }
 
   /**
@@ -62,7 +69,7 @@ public class LogstashCoreLogger implements CoreLogger {
       Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
-    return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
+    return new LogstashCoreLogger(logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
@@ -71,7 +78,7 @@ public class LogstashCoreLogger implements CoreLogger {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(MDC::getCopyOfContextMap);
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(fieldSupplier, Collections::emptyList);
-    return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
+    return new LogstashCoreLogger(logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
@@ -83,15 +90,80 @@ public class LogstashCoreLogger implements CoreLogger {
       if (this.condition == Condition.never()) {
         return this;
       }
-      return new LogstashCoreLogger(logger, context, condition);
+      return new LogstashCoreLogger(logger, context, condition, executor);
     }
-    return new LogstashCoreLogger(logger, context, this.condition.and(condition));
+    return new LogstashCoreLogger(logger, context, this.condition.and(condition), executor);
+  }
+
+  @Override
+  public CoreLogger withExecutor(Executor executor) {
+    return new LogstashCoreLogger(logger, context, condition, executor);
+  }
+
+  @Override
+  public <FB extends Field.Builder> void asyncLog(
+      Level level, Consumer<LoggerHandle<FB>> consumer, FB builder) {
+    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
+    CompletableFuture.runAsync(
+        () -> {
+          if (copyOfContextMap != null) {
+            MDC.setContextMap(copyOfContextMap);
+          }
+          consumer.accept(
+              new LoggerHandle<FB>() {
+                @Override
+                public void log(String message) {
+                  LogstashCoreLogger.this.log(level, message);
+                }
+
+                @Override
+                public void log(String message, Field.BuilderFunction<FB> f) {
+                  LogstashCoreLogger.this.log(level, message, f, builder);
+                }
+
+                @Override
+                public void log(String message, Exception e) {
+                  LogstashCoreLogger.this.log(level, message, e);
+                }
+              });
+        },
+        executor);
+  }
+
+  @Override
+  public <FB extends Field.Builder> void asyncLog(
+      Level level, Condition c, Consumer<LoggerHandle<FB>> consumer, FB builder) {
+    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
+    CompletableFuture.runAsync(
+        () -> {
+          if (copyOfContextMap != null) {
+            MDC.setContextMap(copyOfContextMap);
+          }
+          consumer.accept(
+              new LoggerHandle<FB>() {
+                @Override
+                public void log(String message) {
+                  LogstashCoreLogger.this.log(level, c, message);
+                }
+
+                @Override
+                public void log(String message, Field.BuilderFunction<FB> f) {
+                  LogstashCoreLogger.this.log(level, c, message, f, builder);
+                }
+
+                @Override
+                public void log(String message, Exception e) {
+                  LogstashCoreLogger.this.log(level, c, message, e);
+                }
+              });
+        },
+        executor);
   }
 
   public CoreLogger withMarkers(Marker... markers) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
-    return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
+    return new LogstashCoreLogger(logger, this.context.and(newContext), condition, executor);
   }
 
   @Override

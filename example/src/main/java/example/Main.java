@@ -14,6 +14,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Main {
 
@@ -74,6 +76,22 @@ public class Main {
     if (logger.isInfoEnabled(dateCondition)) {
       logger.info("hi there {}", fb -> fb.only(fb.person("person", abe)));
     }
+
+    // If you have conditions that are CPU expensive or may block on I/O network etc,
+    // then you can delegate logging to another thread (MDC / ThreadContext is copied).
+    final ExecutorService executor =
+        Executors.newSingleThreadExecutor(
+            r -> {
+              Thread t = new Thread(r);
+              t.setDaemon(true);
+              t.setName("condition-executor");
+              return t;
+            });
+
+    final Logger<MyFieldBuilder> asyncLogger = logger.withExecutor(executor);
+    asyncLogger.asyncError(
+        error ->
+            error.log("This is a test {}", fb -> fb.onlyNumber("nanotime", System.nanoTime())));
 
     // You can also use a custom logger
     MyLogger myLogger = MyLoggerFactory.getLogger();

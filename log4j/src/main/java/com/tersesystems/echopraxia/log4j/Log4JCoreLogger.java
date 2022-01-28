@@ -5,11 +5,16 @@ import static com.tersesystems.echopraxia.Field.Value;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.LoggerHandle;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.Logger;
@@ -25,17 +30,21 @@ public class Log4JCoreLogger implements CoreLogger {
   private final Logger logger;
   private final Log4JLoggingContext context;
   private final Condition condition;
+  private final Executor executor;
 
   Log4JCoreLogger(Logger log4jLogger) {
     this.logger = log4jLogger;
     this.context = new Log4JLoggingContext();
     this.condition = Condition.always();
+    this.executor = ForkJoinPool.commonPool();
   }
 
-  protected Log4JCoreLogger(Logger log4jLogger, Log4JLoggingContext context, Condition condition) {
+  protected Log4JCoreLogger(
+      Logger log4jLogger, Log4JLoggingContext context, Condition condition, Executor executor) {
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
+    this.executor = executor;
   }
 
   @Override
@@ -152,6 +161,71 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
+  public <FB extends Field.Builder> void asyncLog(
+      Level level, Consumer<LoggerHandle<FB>> consumer, FB builder) {
+    final Map<String, String> copyOfContextMap = ThreadContext.getImmutableContext();
+    final ThreadContext.ContextStack contextStack = ThreadContext.cloneStack();
+    CompletableFuture.runAsync(
+        () -> {
+          LoggerHandle<FB> handle =
+              new LoggerHandle<FB>() {
+                @Override
+                public void log(String message) {
+                  Log4JCoreLogger.this.log(level, message);
+                }
+
+                @Override
+                public void log(String message, Field.BuilderFunction<FB> f) {
+                  Log4JCoreLogger.this.log(level, message, f, builder);
+                }
+
+                @Override
+                public void log(String message, Exception e) {
+                  Log4JCoreLogger.this.log(level, message, e);
+                }
+              };
+
+          ThreadContext.clearMap();
+          ThreadContext.putAll(copyOfContextMap);
+          ThreadContext.setStack(contextStack);
+          consumer.accept(handle);
+        },
+        executor);
+  }
+
+  @Override
+  public <FB extends Field.Builder> void asyncLog(
+      Level level, Condition c, Consumer<LoggerHandle<FB>> consumer, FB builder) {
+    final Map<String, String> copyOfContextMap = ThreadContext.getImmutableContext();
+    final ThreadContext.ContextStack contextStack = ThreadContext.cloneStack();
+    CompletableFuture.runAsync(
+        () -> {
+          LoggerHandle<FB> handle =
+              new LoggerHandle<FB>() {
+                @Override
+                public void log(String message) {
+                  Log4JCoreLogger.this.log(level, c, message);
+                }
+
+                @Override
+                public void log(String message, Field.BuilderFunction<FB> f) {
+                  Log4JCoreLogger.this.log(level, c, message, f, builder);
+                }
+
+                @Override
+                public void log(String message, Exception e) {
+                  Log4JCoreLogger.this.log(level, c, message, e);
+                }
+              };
+          ThreadContext.clearMap();
+          ThreadContext.putAll(copyOfContextMap);
+          ThreadContext.setStack(contextStack);
+          consumer.accept(handle);
+        },
+        executor);
+  }
+
+  @Override
   public @NotNull Condition condition() {
     return this.condition;
   }
@@ -160,7 +234,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public <B extends Field.Builder> @NotNull CoreLogger withFields(
       Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
-    return new Log4JCoreLogger(logger, context.and(newContext), condition);
+    return new Log4JCoreLogger(logger, context.and(newContext), condition, executor);
   }
 
   @Override
@@ -168,7 +242,7 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
     Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
-    return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
@@ -177,17 +251,22 @@ public class Log4JCoreLogger implements CoreLogger {
       if (this.condition == Condition.never()) {
         return this;
       }
-      return new Log4JCoreLogger(logger, context, condition);
+      return new Log4JCoreLogger(logger, context, condition, executor);
     }
     if (condition == Condition.always()) {
       return this;
     }
-    return new Log4JCoreLogger(logger, context, this.condition.and(condition));
+    return new Log4JCoreLogger(logger, context, this.condition.and(condition), executor);
+  }
+
+  @Override
+  public CoreLogger withExecutor(Executor executor) {
+    return new Log4JCoreLogger(logger, context, this.condition, executor);
   }
 
   public CoreLogger withMarker(Marker marker) {
     Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
-    return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
   }
 
   private Message createMessage(String message) {

@@ -3,8 +3,11 @@ package com.tersesystems.echopraxia.core;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.LoggerHandle;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
@@ -157,4 +160,12 @@ public interface CoreLogger {
    */
   @NotNull
   CoreLogger withCondition(@NotNull Condition condition);
+
+  CoreLogger withExecutor(Executor executor);
+
+  <FB extends Field.Builder> void asyncLog(
+      Level level, Consumer<LoggerHandle<FB>> consumer, FB builder);
+
+  <FB extends Field.Builder> void asyncLog(
+      Level level, Condition c, Consumer<LoggerHandle<FB>> consumer, FB builder);
 }
