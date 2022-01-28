@@ -167,28 +167,41 @@ public class Log4JCoreLogger implements CoreLogger {
     final ThreadContext.ContextStack contextStack = ThreadContext.cloneStack();
     CompletableFuture.runAsync(
         () -> {
-          LoggerHandle<FB> handle =
-              new LoggerHandle<FB>() {
-                @Override
-                public void log(String message) {
-                  Log4JCoreLogger.this.log(level, message);
-                }
+          Thread current = Thread.currentThread();
+          final Thread.UncaughtExceptionHandler beforeHandler =
+              current.getUncaughtExceptionHandler();
+          try {
+            final LoggerHandle<FB> handle =
+                new LoggerHandle<FB>() {
+                  @Override
+                  public void log(String message) {
+                    Log4JCoreLogger.this.log(level, message);
+                  }
 
-                @Override
-                public void log(String message, Field.BuilderFunction<FB> f) {
-                  Log4JCoreLogger.this.log(level, message, f, builder);
-                }
+                  @Override
+                  public void log(String message, Field.BuilderFunction<FB> f) {
+                    Log4JCoreLogger.this.log(level, message, f, builder);
+                  }
 
-                @Override
-                public void log(String message, Exception e) {
-                  Log4JCoreLogger.this.log(level, message, e);
-                }
-              };
-
-          ThreadContext.clearMap();
-          ThreadContext.putAll(copyOfContextMap);
-          ThreadContext.setStack(contextStack);
-          consumer.accept(handle);
+                  @Override
+                  public void log(String message, Throwable e) {
+                    Log4JCoreLogger.this.log(level, message, e);
+                  }
+                };
+            Thread.UncaughtExceptionHandler handler =
+                (th, ex) -> handle.log("Uncaught exception", ex);
+            current.setUncaughtExceptionHandler(handler);
+            ThreadContext.clearAll();
+            if (copyOfContextMap != null) {
+              ThreadContext.putAll(copyOfContextMap);
+            }
+            if (contextStack != null) {
+              ThreadContext.setStack(contextStack);
+            }
+            consumer.accept(handle);
+          } finally {
+            current.setUncaughtExceptionHandler(beforeHandler);
+          }
         },
         executor);
   }
@@ -200,27 +213,41 @@ public class Log4JCoreLogger implements CoreLogger {
     final ThreadContext.ContextStack contextStack = ThreadContext.cloneStack();
     CompletableFuture.runAsync(
         () -> {
-          LoggerHandle<FB> handle =
-              new LoggerHandle<FB>() {
-                @Override
-                public void log(String message) {
-                  Log4JCoreLogger.this.log(level, c, message);
-                }
+          Thread current = Thread.currentThread();
+          final Thread.UncaughtExceptionHandler beforeHandler =
+              current.getUncaughtExceptionHandler();
+          try {
+            final LoggerHandle<FB> handle =
+                new LoggerHandle<FB>() {
+                  @Override
+                  public void log(String message) {
+                    Log4JCoreLogger.this.log(level, c, message);
+                  }
 
-                @Override
-                public void log(String message, Field.BuilderFunction<FB> f) {
-                  Log4JCoreLogger.this.log(level, c, message, f, builder);
-                }
+                  @Override
+                  public void log(String message, Field.BuilderFunction<FB> f) {
+                    Log4JCoreLogger.this.log(level, c, message, f, builder);
+                  }
 
-                @Override
-                public void log(String message, Exception e) {
-                  Log4JCoreLogger.this.log(level, c, message, e);
-                }
-              };
-          ThreadContext.clearMap();
-          ThreadContext.putAll(copyOfContextMap);
-          ThreadContext.setStack(contextStack);
-          consumer.accept(handle);
+                  @Override
+                  public void log(String message, Throwable e) {
+                    Log4JCoreLogger.this.log(level, c, message, e);
+                  }
+                };
+            Thread.UncaughtExceptionHandler handler =
+                (th, ex) -> handle.log("Uncaught exception", ex);
+            current.setUncaughtExceptionHandler(handler);
+            ThreadContext.clearAll();
+            if (copyOfContextMap != null) {
+              ThreadContext.putAll(copyOfContextMap);
+            }
+            if (contextStack != null) {
+              ThreadContext.setStack(contextStack);
+            }
+            consumer.accept(handle);
+          } finally {
+            current.setUncaughtExceptionHandler(beforeHandler);
+          }
         },
         executor);
   }

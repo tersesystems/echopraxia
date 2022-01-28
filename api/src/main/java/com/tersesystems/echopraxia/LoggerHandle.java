@@ -6,5 +6,5 @@ public interface LoggerHandle<FB extends Field.Builder> {
 
   void log(String message, Field.BuilderFunction<FB> f);
 
-  void log(String message, Exception e);
+  void log(String message, Throwable e);
 }

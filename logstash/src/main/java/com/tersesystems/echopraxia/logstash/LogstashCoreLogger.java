@@ -106,26 +106,37 @@ public class LogstashCoreLogger implements CoreLogger {
     final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
     CompletableFuture.runAsync(
         () -> {
-          if (copyOfContextMap != null) {
-            MDC.setContextMap(copyOfContextMap);
+          Thread current = Thread.currentThread();
+          final Thread.UncaughtExceptionHandler beforeHandler =
+              current.getUncaughtExceptionHandler();
+          try {
+            final LoggerHandle<FB> handle =
+                new LoggerHandle<FB>() {
+                  @Override
+                  public void log(String message) {
+                    LogstashCoreLogger.this.log(level, message);
+                  }
+
+                  @Override
+                  public void log(String message, Field.BuilderFunction<FB> f) {
+                    LogstashCoreLogger.this.log(level, message, f, builder);
+                  }
+
+                  @Override
+                  public void log(String message, Throwable e) {
+                    LogstashCoreLogger.this.log(level, message, e);
+                  }
+                };
+            Thread.UncaughtExceptionHandler handler =
+                (th, ex) -> handle.log("Uncaught exception", ex);
+            current.setUncaughtExceptionHandler(handler);
+            if (copyOfContextMap != null) {
+              MDC.setContextMap(copyOfContextMap);
+            }
+            consumer.accept(handle);
+          } finally {
+            current.setUncaughtExceptionHandler(beforeHandler);
           }
-          consumer.accept(
-              new LoggerHandle<FB>() {
-                @Override
-                public void log(String message) {
-                  LogstashCoreLogger.this.log(level, message);
-                }
-
-                @Override
-                public void log(String message, Field.BuilderFunction<FB> f) {
-                  LogstashCoreLogger.this.log(level, message, f, builder);
-                }
-
-                @Override
-                public void log(String message, Exception e) {
-                  LogstashCoreLogger.this.log(level, message, e);
-                }
-              });
         },
         executor);
   }
@@ -136,26 +147,37 @@ public class LogstashCoreLogger implements CoreLogger {
     final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
     CompletableFuture.runAsync(
         () -> {
-          if (copyOfContextMap != null) {
-            MDC.setContextMap(copyOfContextMap);
+          Thread current = Thread.currentThread();
+          final Thread.UncaughtExceptionHandler beforeHandler =
+              current.getUncaughtExceptionHandler();
+          try {
+            final LoggerHandle<FB> handle =
+                new LoggerHandle<FB>() {
+                  @Override
+                  public void log(String message) {
+                    LogstashCoreLogger.this.log(level, c, message);
+                  }
+
+                  @Override
+                  public void log(String message, Field.BuilderFunction<FB> f) {
+                    LogstashCoreLogger.this.log(level, c, message, f, builder);
+                  }
+
+                  @Override
+                  public void log(String message, Throwable e) {
+                    LogstashCoreLogger.this.log(level, c, message, e);
+                  }
+                };
+            Thread.UncaughtExceptionHandler handler =
+                (th, ex) -> handle.log("Uncaught exception", ex);
+            current.setUncaughtExceptionHandler(handler);
+            if (copyOfContextMap != null) {
+              MDC.setContextMap(copyOfContextMap);
+            }
+            consumer.accept(handle);
+          } finally {
+            current.setUncaughtExceptionHandler(beforeHandler);
           }
-          consumer.accept(
-              new LoggerHandle<FB>() {
-                @Override
-                public void log(String message) {
-                  LogstashCoreLogger.this.log(level, c, message);
-                }
-
-                @Override
-                public void log(String message, Field.BuilderFunction<FB> f) {
-                  LogstashCoreLogger.this.log(level, c, message, f, builder);
-                }
-
-                @Override
-                public void log(String message, Exception e) {
-                  LogstashCoreLogger.this.log(level, c, message, e);
-                }
-              });
         },
         executor);
   }
