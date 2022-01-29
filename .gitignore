@@ -6,6 +6,6 @@ build
 
 .idea/
 
-lib/bin/
+bin/
 
 
