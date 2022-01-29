@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.Markers;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
@@ -52,20 +53,21 @@ public class LogstashCoreLogger implements CoreLogger {
    * @return the condition.
    */
   @Override
-  public Condition condition() {
+  public @NotNull Condition condition() {
     return this.condition;
   }
 
   @Override
-  public <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder) {
+  public <B extends Field.Builder> @NotNull CoreLogger withFields(
+      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
     return new LogstashCoreLogger(logger, this.context.and(newContext), condition);
   }
 
   @Override
-  public CoreLogger withThreadContext(
-      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
+  public @NotNull CoreLogger withThreadContext(
+      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(MDC::getCopyOfContextMap);
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(fieldSupplier, Collections::emptyList);
@@ -73,7 +75,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public CoreLogger withCondition(Condition condition) {
+  public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
     if (condition == Condition.always()) {
       return this;
     }
@@ -93,7 +95,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public boolean isEnabled(Level level) {
+  public boolean isEnabled(@NotNull Level level) {
     if (condition == Condition.never()) {
       return false;
     }
@@ -114,7 +116,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public boolean isEnabled(Level level, Condition condition) {
+  public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
     if (condition == Condition.always()) {
       return isEnabled(level);
     }
@@ -138,7 +140,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(Level level, String message) {
+  public void log(@NotNull Level level, String message) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -165,7 +167,10 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public <FB extends Field.Builder> void log(
-      Level level, String message, Field.BuilderFunction<FB> f, FB builder) {
+      @NotNull Level level,
+      String message,
+      Field.@NotNull BuilderFunction<FB> f,
+      @NotNull FB builder) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -211,7 +216,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(Level level, String message, Throwable e) {
+  public void log(@NotNull Level level, String message, @NotNull Throwable e) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -237,7 +242,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(Level level, Condition condition, String message) {
+  public void log(@NotNull Level level, @NotNull Condition condition, String message) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -245,7 +250,11 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(Level level, Condition condition, String message, Throwable e) {
+  public void log(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull String message,
+      @NotNull Throwable e) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -254,7 +263,11 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public <B extends Field.Builder> void log(
-      Level level, Condition condition, String message, Field.BuilderFunction<B> f, B builder) {
+      @NotNull Level level,
+      @NotNull Condition condition,
+      String message,
+      Field.@NotNull BuilderFunction<B> f,
+      @NotNull B builder) {
     if (!condition.test(level, context)) {
       return;
     }

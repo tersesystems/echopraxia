@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia;
 
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.Constants.DefaultKeyValueField;
@@ -9,6 +10,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The Field interface. This is a core part of structured data, and consists of a name and a Value,
@@ -25,6 +28,7 @@ public interface Field {
    *
    * @return the field name.
    */
+  @NotNull
   String name();
 
   /**
@@ -32,6 +36,7 @@ public interface Field {
    *
    * @return the field value.
    */
+  @NotNull
   Value<?> value();
 
   /**
@@ -44,7 +49,7 @@ public interface Field {
   interface Builder {
     String EXCEPTION = "exception";
 
-    static Builder instance() {
+    static @NotNull Builder instance() {
       return Constants.builder();
     }
 
@@ -53,11 +58,12 @@ public interface Field {
      *
      * <p>{@code fb.only(fb.string("correlation_id", "match"))}
      *
-     * @param field the given field
+     * @param field the given field, can be null in which case an empty list is returned.
      * @return a list containing a single field element.
      */
-    default List<Field> only(Field field) {
-      return singletonList(field);
+    @NotNull
+    default List<Field> only(@Nullable Field field) {
+      return (field == null) ? emptyList() : singletonList(field);
     }
 
     /**
@@ -68,6 +74,7 @@ public interface Field {
      * @param fields the given fields
      * @return a list containing the fields.
      */
+    @NotNull
     default List<Field> list(Field... fields) {
       return Arrays.asList(fields);
     }
@@ -82,7 +89,8 @@ public interface Field {
      * @param value the field value
      * @return the field.
      */
-    default Field value(String name, Value<?> value) {
+    @NotNull
+    default Field value(@NotNull String name, @NotNull Value<?> value) {
       return new DefaultValueField(name, value);
     }
 
@@ -96,7 +104,8 @@ public interface Field {
      * @param value the field value
      * @return the field.
      */
-    default Field keyValue(String name, Value<?> value) {
+    @NotNull
+    default Field keyValue(@NotNull String name, @NotNull Value<?> value) {
       return new DefaultKeyValueField(name, value);
     }
 
@@ -110,7 +119,8 @@ public interface Field {
      * @param value the value of the field.
      * @return the field.
      */
-    default Field string(String name, String value) {
+    @NotNull
+    default Field string(@NotNull String name, @NotNull String value) {
       return value(name, Value.string(value));
     }
 
@@ -121,7 +131,8 @@ public interface Field {
      * @param value the value of the field.
      * @return the field.
      */
-    default Field string(String name, Value.StringValue value) {
+    @NotNull
+    default Field string(@NotNull String name, @NotNull Value.StringValue value) {
       return value(name, value);
     }
 
@@ -132,7 +143,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyString(String name, String value) {
+    @NotNull
+    default List<Field> onlyString(@NotNull String name, @NotNull String value) {
       return only(string(name, value));
     }
 
@@ -143,7 +155,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyString(String name, Value.StringValue value) {
+    @NotNull
+    default List<Field> onlyString(@NotNull String name, @NotNull Value.StringValue value) {
       return only(string(name, value));
     }
 
@@ -157,7 +170,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default Field number(String name, Number value) {
+    @NotNull
+    default Field number(@NotNull String name, @NotNull Number value) {
       return value(name, Value.number(value));
     }
 
@@ -168,7 +182,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default Field number(String name, Value.NumberValue value) {
+    @NotNull
+    default Field number(@NotNull String name, @NotNull Value.NumberValue value) {
       return value(name, value);
     }
 
@@ -179,7 +194,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyNumber(String name, Number value) {
+    @NotNull
+    default List<Field> onlyNumber(@NotNull String name, @NotNull Number value) {
       return only(number(name, value));
     }
 
@@ -190,7 +206,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyNumber(String name, Value.NumberValue value) {
+    @NotNull
+    default List<Field> onlyNumber(@NotNull String name, @NotNull Value.NumberValue value) {
       return only(number(name, value));
     }
 
@@ -204,7 +221,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default Field bool(String name, Boolean value) {
+    @NotNull
+    default Field bool(@NotNull String name, @NotNull Boolean value) {
       return value(name, Value.bool(value));
     }
 
@@ -215,7 +233,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default Field bool(String name, Value.BooleanValue value) {
+    @NotNull
+    default Field bool(@NotNull String name, @NotNull Value.BooleanValue value) {
       return value(name, value);
     }
 
@@ -226,7 +245,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyBool(String name, Boolean value) {
+    @NotNull
+    default List<Field> onlyBool(@NotNull String name, @NotNull Boolean value) {
       return only(bool(name, value));
     }
 
@@ -237,7 +257,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyBool(String name, Value.BooleanValue value) {
+    @NotNull
+    default List<Field> onlyBool(@NotNull String name, @NotNull Value.BooleanValue value) {
       return only(bool(name, value));
     }
 
@@ -251,7 +272,8 @@ public interface Field {
      * @param values the array of values.
      * @return a list containing a single field.
      */
-    default Field array(String name, Value.ObjectValue... values) {
+    @NotNull
+    default Field array(@NotNull String name, @NotNull Value.ObjectValue... values) {
       return keyValue(name, Value.array(values));
     }
 
@@ -262,7 +284,8 @@ public interface Field {
      * @param values the array of values.
      * @return a list containing a single field.
      */
-    default Field array(String name, String... values) {
+    @NotNull
+    default Field array(@NotNull String name, String... values) {
       return keyValue(name, Value.array(values));
     }
 
@@ -273,7 +296,8 @@ public interface Field {
      * @param values the array of values.
      * @return a list containing a single field.
      */
-    default Field array(String name, Number... values) {
+    @NotNull
+    default Field array(@NotNull String name, Number... values) {
       return keyValue(name, Value.array(values));
     }
 
@@ -284,7 +308,8 @@ public interface Field {
      * @param values the array of values.
      * @return a list containing a single field.
      */
-    default Field array(String name, Boolean... values) {
+    @NotNull
+    default Field array(@NotNull String name, Boolean... values) {
       return keyValue(name, Value.array(values));
     }
 
@@ -297,7 +322,8 @@ public interface Field {
      * @param value the array value.
      * @return a list containing a single field.
      */
-    default Field array(String name, Value.ArrayValue value) {
+    @NotNull
+    default Field array(@NotNull String name, @NotNull Value.ArrayValue value) {
       // Don't allow Value.ArrayValue... it's far too easy to double nest an array.
       return keyValue(name, value);
     }
@@ -309,7 +335,8 @@ public interface Field {
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, Value.ObjectValue... values) {
+    @NotNull
+    default List<Field> onlyArray(@NotNull String name, @NotNull Value.ObjectValue... values) {
       return only(array(name, values));
     }
 
@@ -320,7 +347,8 @@ public interface Field {
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, String... values) {
+    @NotNull
+    default List<Field> onlyArray(@NotNull String name, String... values) {
       return only(array(name, values));
     }
 
@@ -331,7 +359,8 @@ public interface Field {
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, Number... values) {
+    @NotNull
+    default List<Field> onlyArray(@NotNull String name, Number... values) {
       return only(array(name, values));
     }
 
@@ -342,7 +371,8 @@ public interface Field {
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, Boolean... values) {
+    @NotNull
+    default List<Field> onlyArray(@NotNull String name, Boolean... values) {
       return only(array(name, values));
     }
 
@@ -355,7 +385,8 @@ public interface Field {
      * @param value the array value.
      * @return a list containing a single field.
      */
-    default List<Field> onlyArray(String name, Value.ArrayValue value) {
+    @NotNull
+    default List<Field> onlyArray(@NotNull String name, @NotNull Value.ArrayValue value) {
       return only(array(name, value));
     }
 
@@ -369,7 +400,8 @@ public interface Field {
      * @param values the values.
      * @return a single field.
      */
-    default Field object(String name, Field... values) {
+    @NotNull
+    default Field object(@NotNull String name, Field... values) {
       return keyValue(name, Value.object(values));
     }
 
@@ -380,7 +412,8 @@ public interface Field {
      * @param values the values.
      * @return a field.
      */
-    default Field object(String name, List<Field> values) {
+    @NotNull
+    default Field object(@NotNull String name, @NotNull List<Field> values) {
       return keyValue(name, Value.object(values));
     }
 
@@ -391,7 +424,8 @@ public interface Field {
      * @param value the value.
      * @return a field.
      */
-    default Field object(String name, Value.ObjectValue value) {
+    @NotNull
+    default Field object(@NotNull String name, @NotNull Value.ObjectValue value) {
       // limited to object specifically -- if you want object or null,
       // use `value` or `keyValue`
       return keyValue(name, value);
@@ -404,7 +438,8 @@ public interface Field {
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyObject(String name, Field... values) {
+    @NotNull
+    default List<Field> onlyObject(@NotNull String name, @NotNull Field... values) {
       return only(object(name, values));
     }
 
@@ -415,7 +450,8 @@ public interface Field {
      * @param values the values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyObject(String name, List<Field> values) {
+    @NotNull
+    default List<Field> onlyObject(@NotNull String name, @NotNull List<Field> values) {
       return only(object(name, values));
     }
 
@@ -426,7 +462,8 @@ public interface Field {
      * @param value the object values.
      * @return a list containing a single field.
      */
-    default List<Field> onlyObject(String name, Value.ObjectValue value) {
+    @NotNull
+    default List<Field> onlyObject(@NotNull String name, @NotNull Value.ObjectValue value) {
       return only(object(name, value));
     }
 
@@ -439,7 +476,8 @@ public interface Field {
      * @param t the exception.
      * @return a field.
      */
-    default Field exception(Throwable t) {
+    @NotNull
+    default Field exception(@NotNull Throwable t) {
       return keyValue(EXCEPTION, Value.exception(t));
     }
 
@@ -449,7 +487,8 @@ public interface Field {
      * @param value the exception value.
      * @return a field.
      */
-    default Field exception(Value.ExceptionValue value) {
+    @NotNull
+    default Field exception(@NotNull Value.ExceptionValue value) {
       return keyValue(EXCEPTION, value);
     }
 
@@ -460,7 +499,8 @@ public interface Field {
      * @param t the exception.
      * @return a field.
      */
-    default Field exception(String name, Throwable t) {
+    @NotNull
+    default Field exception(@NotNull String name, @NotNull Throwable t) {
       return keyValue(name, Value.exception(t));
     }
 
@@ -471,7 +511,8 @@ public interface Field {
      * @param value the exception value.
      * @return a field.
      */
-    default Field exception(String name, Value.ExceptionValue value) {
+    @NotNull
+    default Field exception(@NotNull String name, @NotNull Value.ExceptionValue value) {
       return keyValue(name, value);
     }
 
@@ -483,7 +524,8 @@ public interface Field {
      */
     // should probably deprecate this as  logger.error(msg, e) is the ideomatic form over fb ->
     // fb.onlyException(e)
-    default List<Field> onlyException(Throwable t) {
+    @NotNull
+    default List<Field> onlyException(@NotNull Throwable t) {
       return only(exception(t));
     }
 
@@ -496,7 +538,8 @@ public interface Field {
      * @param t the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyException(Value.ExceptionValue t) {
+    @NotNull
+    default List<Field> onlyException(@NotNull Value.ExceptionValue t) {
       return only(exception(t));
     }
 
@@ -507,7 +550,8 @@ public interface Field {
      * @param value the value of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyException(String name, Value.ExceptionValue value) {
+    @NotNull
+    default List<Field> onlyException(@NotNull String name, @NotNull Value.ExceptionValue value) {
       return only(exception(name, value));
     }
 
@@ -520,7 +564,8 @@ public interface Field {
      * @param name the name of the field.
      * @return a field.
      */
-    default Field nullField(String name) {
+    @NotNull
+    default Field nullField(@NotNull String name) {
       return value(name, Value.nullValue());
     }
 
@@ -530,7 +575,8 @@ public interface Field {
      * @param name the name of the field.
      * @return a list containing a single field.
      */
-    default List<Field> onlyNullField(String name) {
+    @NotNull
+    default List<Field> onlyNullField(@NotNull String name) {
       return only(nullField(name));
     }
   }
@@ -567,7 +613,7 @@ public interface Field {
     protected Value() {}
 
     /**
-     * The underlying raw value.
+     * The underlying raw value, may be null in some cases.
      *
      * @return the underlying raw value.
      */
@@ -578,8 +624,10 @@ public interface Field {
      *
      * @return the value type.
      */
+    @NotNull
     public abstract ValueType type();
 
+    @NotNull
     public String toString() {
       return valueToString(this);
     }
@@ -590,10 +638,13 @@ public interface Field {
      * @param v the value
      * @return the value as a string.
      */
-    private static String valueToString(Value<?> v) {
-      if (v.type() == ValueType.NULL) {
+    @NotNull
+    private static String valueToString(@NotNull Value<?> v) {
+      final Object raw = v.raw();
+      if (raw == null) { // if null value or a raw value was set to null, keep going.
         return "null";
       }
+
       // render an object with curly braces to distinguish from array.
       if (v.type() == ValueType.OBJECT) {
         final List<Field> fieldList = ((ObjectValue) v).raw();
@@ -603,37 +654,41 @@ public interface Field {
         b.append("}");
         return b.toString();
       }
-      return v.raw().toString();
+
+      return raw.toString();
     }
 
     /**
      * Wraps a string with a Value.
      *
-     * @param raw the raw string value.
+     * @param value the raw string value.
      * @return the Value
      */
-    public static Value.StringValue string(String raw) {
-      return new StringValue(raw);
+    @NotNull
+    public static Value.StringValue string(@NotNull String value) {
+      return new StringValue(value);
     }
 
     /**
      * Wraps a number with a Value.
      *
-     * @param n the raw number value.
+     * @param value the raw number value.
      * @return the Value
      */
-    public static Value.NumberValue number(Number n) {
-      return new NumberValue(n);
+    @NotNull
+    public static Value.NumberValue number(@NotNull Number value) {
+      return new NumberValue(value);
     }
 
     /**
      * Wraps a boolean with a Value.
      *
-     * @param b the raw boolean value.
+     * @param value the raw boolean value.
      * @return the Value.
      */
-    public static Value.BooleanValue bool(Boolean b) {
-      return new BooleanValue(b);
+    @NotNull
+    public static Value.BooleanValue bool(@NotNull Boolean value) {
+      return new BooleanValue(value);
     }
 
     /**
@@ -641,6 +696,7 @@ public interface Field {
      *
      * @return the Value.
      */
+    @NotNull
     public static Value<?> nullValue() {
       return NullValue.instance;
     }
@@ -651,7 +707,8 @@ public interface Field {
      * @param t the raw exception value.
      * @return the Value.
      */
-    public static Value.ExceptionValue exception(Throwable t) {
+    @NotNull
+    public static Value.ExceptionValue exception(@NotNull Throwable t) {
       return new ExceptionValue(t);
     }
 
@@ -661,6 +718,7 @@ public interface Field {
      * @param values variadic elements of values.
      * @return the Value.
      */
+    @NotNull
     public static Value.ArrayValue array(Value<?>... values) {
       return new ArrayValue(Arrays.asList(values));
     }
@@ -671,7 +729,8 @@ public interface Field {
      * @param values varadic elements of values.
      * @return the Value.
      */
-    public static Value.ArrayValue array(Boolean... values) {
+    @NotNull
+    public static Value.ArrayValue array(Boolean @NotNull ... values) {
       return new ArrayValue(asList(values, Value::bool));
     }
 
@@ -681,7 +740,8 @@ public interface Field {
      * @param values varadic elements of values.
      * @return the Value.
      */
-    public static Value.ArrayValue array(String... values) {
+    @NotNull
+    public static Value.ArrayValue array(String @NotNull ... values) {
       return new ArrayValue(asList(values, Value::string));
     }
 
@@ -691,7 +751,8 @@ public interface Field {
      * @param values varadic elements of values.
      * @return the Value.
      */
-    public static Value.ArrayValue array(Number... values) {
+    @NotNull
+    public static Value.ArrayValue array(Number @NotNull ... values) {
       return new ArrayValue(asList(values, Value::number));
     }
 
@@ -701,7 +762,7 @@ public interface Field {
      * @param values a list of values.
      * @return the Value.
      */
-    public static Value.ArrayValue array(List<Value<?>> values) {
+    public static Value.ArrayValue array(@NotNull List<Value<?>> values) {
       return new ArrayValue(values);
     }
 
@@ -713,7 +774,9 @@ public interface Field {
      * @return the Value.
      * @param <T> the type of object.
      */
-    public static <T> Value.ArrayValue array(Function<T, Value<?>> transform, List<T> values) {
+    @NotNull
+    public static <T> Value.ArrayValue array(
+        @NotNull Function<T, Value<?>> transform, @NotNull List<T> values) {
       return new ArrayValue(asList(values, transform));
     }
 
@@ -725,7 +788,9 @@ public interface Field {
      * @return the Value.
      * @param <T> the type of object.
      */
-    public static <T> Value.ArrayValue array(Function<T, Value<?>> transform, T[] values) {
+    @NotNull
+    public static <T> Value.ArrayValue array(
+        @NotNull Function<T, Value<?>> transform, T @NotNull [] values) {
       return new ArrayValue(asList(values, transform));
     }
 
@@ -735,7 +800,8 @@ public interface Field {
      * @param fields variadic elements of fields.
      * @return the Value.
      */
-    public static Value.ObjectValue object(Field... fields) {
+    @NotNull
+    public static Value.ObjectValue object(Field @NotNull ... fields) {
       return new ObjectValue(Arrays.asList(fields));
     }
 
@@ -745,7 +811,8 @@ public interface Field {
      * @param fields the list of fields.
      * @return the Value.
      */
-    public static Value.ObjectValue object(List<Field> fields) {
+    @NotNull
+    public static Value.ObjectValue object(@NotNull List<Field> fields) {
       return new ObjectValue(fields);
     }
 
@@ -757,7 +824,9 @@ public interface Field {
      * @return the Value.
      * @param <T> THe type of the element
      */
-    public static <T> Value.ObjectValue object(Function<T, Field> transform, T[] values) {
+    @NotNull
+    public static <T> Value.ObjectValue object(
+        @NotNull Function<T, Field> transform, T @NotNull [] values) {
       List<Field> fields = Arrays.stream(values).map(transform).collect(Collectors.toList());
       return new ObjectValue(fields);
     }
@@ -770,7 +839,9 @@ public interface Field {
      * @return the Value.
      * @param <T> the type of the element
      */
-    public static <T> Value.ObjectValue object(Function<T, Field> transform, List<T> values) {
+    @NotNull
+    public static <T> Value.ObjectValue object(
+        @NotNull Function<T, Field> transform, @NotNull List<T> values) {
       List<Field> fields = values.stream().map(transform).collect(Collectors.toList());
       return new ObjectValue(fields);
     }
@@ -784,7 +855,8 @@ public interface Field {
      * @return the value, or null value if the optional is empty.
      */
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public static Value<?> optional(Optional<? extends Value<?>> optionalValue) {
+    @NotNull
+    public static Value<?> optional(@NotNull Optional<? extends Value<?>> optionalValue) {
       if (optionalValue.isPresent()) {
         return optionalValue.get();
       }
@@ -799,7 +871,9 @@ public interface Field {
      * @return list of values.
      * @param <T> the raw type
      */
-    private static <T> List<Value<?>> asList(T[] array, Function<T, Value<?>> f) {
+    @NotNull
+    private static <T> List<Value<?>> asList(
+        T @NotNull [] array, @NotNull Function<T, Value<?>> f) {
       return Arrays.stream(array).map(f).collect(Collectors.toList());
     }
 
@@ -811,7 +885,9 @@ public interface Field {
      * @return list of values.
      * @param <T> the raw type
      */
-    private static <T> List<Value<?>> asList(List<T> values, Function<T, Value<?>> f) {
+    @NotNull
+    private static <T> List<Value<?>> asList(
+        @NotNull List<T> values, @NotNull Function<T, Value<?>> f) {
       return values.stream().map(f).collect(Collectors.toList());
     }
 
@@ -823,12 +899,12 @@ public interface Field {
       }
 
       @Override
-      public Boolean raw() {
+      public @NotNull Boolean raw() {
         return this.bool;
       }
 
       @Override
-      public ValueType type() {
+      public @NotNull ValueType type() {
         return ValueType.BOOLEAN;
       }
     }
@@ -841,12 +917,12 @@ public interface Field {
       }
 
       @Override
-      public Number raw() {
+      public @NotNull Number raw() {
         return number;
       }
 
       @Override
-      public ValueType type() {
+      public @NotNull ValueType type() {
         return ValueType.NUMBER;
       }
     }
@@ -859,12 +935,12 @@ public interface Field {
       }
 
       @Override
-      public String raw() {
+      public @NotNull String raw() {
         return s;
       }
 
       @Override
-      public ValueType type() {
+      public @NotNull ValueType type() {
         return ValueType.STRING;
       }
     }
@@ -882,7 +958,7 @@ public interface Field {
       }
 
       @Override
-      public ValueType type() {
+      public @NotNull ValueType type() {
         return ValueType.ARRAY;
       }
     }
@@ -895,7 +971,7 @@ public interface Field {
       }
 
       @Override
-      public ValueType type() {
+      public @NotNull ValueType type() {
         return ValueType.OBJECT;
       }
 
@@ -905,21 +981,21 @@ public interface Field {
       }
     }
 
-    public static final class NullValue extends Value<Object> {
+    public static final class NullValue extends Value<Void> {
       // Should not be able to instantiate this outside of class.
       private NullValue() {}
 
       @Override
-      public Object raw() {
-        return null;
+      public Void raw() {
+        return null; // can't really return an instance of void :-)
       }
 
       @Override
-      public ValueType type() {
+      public @NotNull ValueType type() {
         return ValueType.NULL;
       }
 
-      public static NullValue instance = new NullValue();
+      public static @NotNull NullValue instance = new NullValue();
     }
 
     public static final class ExceptionValue extends Value<Throwable> {
@@ -930,7 +1006,7 @@ public interface Field {
       }
 
       @Override
-      public ValueType type() {
+      public @NotNull ValueType type() {
         return ValueType.EXCEPTION;
       }
 

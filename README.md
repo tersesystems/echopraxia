@@ -175,7 +175,7 @@ basicLogger.info("Message name {}", fb -> fb.list(
 ));
 ```
 
-So far so good, but logging strings and numbers can get tedious.  Let's go into custom field builders.  
+So far so good. But logging strings and numbers can get tedious.  Let's go into custom field builders.  
 
 ### Custom Field Builders
 
@@ -263,6 +263,47 @@ MyLogger myLogger = MyLoggerFactory.getLogger();
 ```
 
 Subclassing the logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere.
+
+### Nulls and Exceptions
+
+By default, values are `@NotNull`, and passing in `null` to values is not recommended.  If you want to handle nulls, you can extend the field builder as necessary:
+
+```java
+public interface NullableFieldBuilder extends Field.Builder {
+  // extend as necessary
+  default Field nullableString(String name, String nullableString) {
+    Value<?> nullableValue = (value == null) ? Value.nullValue() : Value.string(nullableString);
+    return keyValue(name, nullableValue);
+  }
+}
+```
+
+Field names are never allowed to be null and will throw an exception.
+
+```java
+logger.info("Message name {}", fb -> 
+  fb.only(fb.string(null, "some-value")) // null field names not allowed
+);
+```
+
+In addition, `fb.only()` will return an empty list if a null field is passed in:
+
+
+```java
+logger.info("Message name {}", fb -> 
+  Field field = null;
+  return fb.only(field); // returns an empty list of fields.
+);
+```
+
+Because a field builder function runs in a closure, if an exception occurs it will be caught by the default thread exception handler, which will print to console and terminate the JVM.  Consider setting a [default thread exception handler](https://www.logicbig.com/tutorials/core-java-tutorial/java-se-api/default-uncaught-exception-handler.html) that does additionally does logging, and avoid uncaught exceptions in closures:
+
+```java
+logger.info("Message name {}", fb -> {
+  String name = methodThatThrowsException(); // throws exception, not good
+  return fb.only(fb.string(name, "some-value"));
+});
+```
 
 ## Context
 

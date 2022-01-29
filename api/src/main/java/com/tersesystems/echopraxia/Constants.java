@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia;
 
+import org.jetbrains.annotations.NotNull;
+
 // Some package private constants
 class Constants {
 
@@ -22,12 +24,12 @@ class Constants {
     }
 
     @Override
-    public String name() {
+    public @NotNull String name() {
       return name;
     }
 
     @Override
-    public Value<?> value() {
+    public @NotNull Value<?> value() {
       return value;
     }
 
@@ -47,12 +49,12 @@ class Constants {
     }
 
     @Override
-    public String name() {
+    public @NotNull String name() {
       return name;
     }
 
     @Override
-    public Value<?> value() {
+    public @NotNull Value<?> value() {
       return value;
     }
 

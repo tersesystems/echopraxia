@@ -1,15 +1,16 @@
 package com.tersesystems.echopraxia;
 
-import com.tersesystems.echopraxia.core.CoreLogger;
+import static com.tersesystems.echopraxia.Level.*;
 
+import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-
-import static com.tersesystems.echopraxia.Level.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An echopraxia logger built around a field builder.
@@ -17,13 +18,17 @@ import static com.tersesystems.echopraxia.Level.*;
  * <p>This class is explicitly designed to be subclassed so that end users can customize it and
  * avoid the parameterized type tax.
  *
- * <p>{@code <pre> public class MyLogger extends Logger&lt;MyFieldBuilder&gt; { protected
- * MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) { super(core, fieldBuilder); } }
+ * <pre>{@code
+ * public class MyLogger extends Logger<MyFieldBuilder> {
+ *   protected MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) { super(core, fieldBuilder); }
+ * }
  *
- * <p>static class MyLoggerFactory { public static MyLogger getLogger() { return new
- * MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder); } }
+ * static class MyLoggerFactory {
+ *   public static MyLogger getLogger() { return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder); }
+ * }
  *
- * <p>MyLogger logger = MyLoggerFactory.getLogger(); </pre> }
+ * MyLogger logger = MyLoggerFactory.getLogger();
+ * }</pre>
  *
  * @param <FB> the field builder type.
  */
@@ -32,17 +37,19 @@ public class Logger<FB extends Field.Builder> {
   protected final CoreLogger core;
   protected final FB fieldBuilder;
 
-  protected Logger(CoreLogger core, FB fieldBuilder) {
+  protected Logger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     this.core = core;
     this.fieldBuilder = fieldBuilder;
   }
 
   /** @return the internal core logger. */
+  @NotNull
   public CoreLogger core() {
     return core;
   }
 
   /** @return the field builder. */
+  @NotNull
   public FB fieldBuilder() {
     return fieldBuilder;
   }
@@ -54,7 +61,8 @@ public class Logger<FB extends Field.Builder> {
    * @param <T> the type of the field builder.
    * @return a new logger using the given field builder.
    */
-  public <T extends Field.Builder> Logger<T> withFieldBuilder(T newBuilder) {
+  @NotNull
+  public <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
     if (this.fieldBuilder == newBuilder) {
       //noinspection unchecked
       return (Logger<T>) this;
@@ -69,7 +77,8 @@ public class Logger<FB extends Field.Builder> {
    * @param <T> the type of the field builder.
    * @return a new logger using the given field builder.
    */
-  public <T extends Field.Builder> Logger<T> withFieldBuilder(Class<T> newBuilderClass) {
+  @NotNull
+  public <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull Class<T> newBuilderClass) {
     try {
       final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();
       return new Logger<>(core(), newInstance);
@@ -90,7 +99,8 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @return the new logger.
    */
-  public Logger<FB> withCondition(Condition condition) {
+  @NotNull
+  public Logger<FB> withCondition(@NotNull Condition condition) {
     if (condition == Condition.always()) {
       return this;
     }
@@ -110,17 +120,19 @@ public class Logger<FB extends Field.Builder> {
    * @param f the given function producing fields from a field builder.
    * @return the new logger.
    */
-  public Logger<FB> withFields(Field.BuilderFunction<FB> f) {
+  @NotNull
+  public Logger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
     return new Logger<>(core().withFields(f, fieldBuilder), fieldBuilder);
   }
 
   /**
    * Creates a new logger with context fields from thread context / MDC mapped as context fields.
    *
-   * Note that the context map is lazily evaluated on every logging statement.
+   * <p>Note that the context map is lazily evaluated on every logging statement.
    *
    * @return the new logger.
    */
+  @NotNull
   public Logger<FB> withThreadContext() {
     Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
         mapSupplier ->
@@ -143,7 +155,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @return true if the logger level is TRACE or higher and the condition is met.
    */
-  public boolean isTraceEnabled(Condition condition) {
+  public boolean isTraceEnabled(@NotNull Condition condition) {
     return core().isEnabled(TRACE, condition);
   }
 
@@ -152,7 +164,7 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param message the given message.
    */
-  public void trace(String message) {
+  public void trace(@Nullable String message) {
     core().log(TRACE, message);
   }
 
@@ -162,7 +174,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void trace(String message, Field.BuilderFunction<FB> f) {
+  public void trace(@Nullable String message, Field.BuilderFunction<FB> f) {
     core().log(TRACE, message, f, fieldBuilder);
   }
 
@@ -172,7 +184,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void trace(String message, Throwable e) {
+  public void trace(@Nullable String message, @NotNull Throwable e) {
     core().log(TRACE, message, e);
   }
 
@@ -182,7 +194,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @param message the message.
    */
-  public void trace(Condition condition, String message) {
+  public void trace(@NotNull Condition condition, @Nullable String message) {
     core().log(TRACE, condition, message);
   }
 
@@ -193,7 +205,10 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void trace(Condition condition, String message, Field.BuilderFunction<FB> f) {
+  public void trace(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(TRACE, condition, message, f, fieldBuilder);
   }
 
@@ -204,7 +219,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void trace(Condition condition, String message, Throwable e) {
+  public void trace(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core().log(TRACE, condition, message, e);
   }
 
@@ -220,7 +235,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @return true if the logger level is DEBUG or higher and the condition is met.
    */
-  public boolean isDebugEnabled(Condition condition) {
+  public boolean isDebugEnabled(@NotNull Condition condition) {
     return core().isEnabled(DEBUG, condition);
   }
 
@@ -229,7 +244,7 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param message the given message.
    */
-  public void debug(String message) {
+  public void debug(@Nullable String message) {
     core().log(DEBUG, message);
   }
 
@@ -239,7 +254,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void debug(String message, Field.BuilderFunction<FB> f) {
+  public void debug(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
     core().log(DEBUG, message, f, fieldBuilder);
   }
 
@@ -249,7 +264,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void debug(String message, Throwable e) {
+  public void debug(@Nullable String message, @NotNull Throwable e) {
     core().log(DEBUG, message, e);
   }
 
@@ -259,7 +274,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @param message the message.
    */
-  public void debug(Condition condition, String message) {
+  public void debug(@NotNull Condition condition, @Nullable String message) {
     core().log(DEBUG, condition, message);
   }
 
@@ -270,7 +285,10 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void debug(Condition condition, String message, Field.BuilderFunction<FB> f) {
+  public void debug(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(DEBUG, condition, message, f, fieldBuilder);
   }
 
@@ -281,7 +299,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void debug(Condition condition, String message, Throwable e) {
+  public void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core().log(DEBUG, condition, message, e);
   }
 
@@ -297,7 +315,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @return true if the logger level is INFO or higher and the condition is met.
    */
-  public boolean isInfoEnabled(Condition condition) {
+  public boolean isInfoEnabled(@NotNull Condition condition) {
     return core().isEnabled(INFO, condition);
   }
 
@@ -306,7 +324,7 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param message the given message.
    */
-  public void info(String message) {
+  public void info(@Nullable String message) {
     core().log(INFO, message);
   }
 
@@ -316,7 +334,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void info(String message, Field.BuilderFunction<FB> f) {
+  public void info(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
     core().log(INFO, message, f, fieldBuilder);
   }
 
@@ -326,7 +344,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void info(String message, Throwable e) {
+  public void info(@Nullable String message, @NotNull Throwable e) {
     core().log(INFO, message, e);
   }
 
@@ -336,7 +354,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @param message the message.
    */
-  public void info(Condition condition, String message) {
+  public void info(@NotNull Condition condition, @Nullable String message) {
     core().log(INFO, condition, message);
   }
 
@@ -347,7 +365,10 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void info(Condition condition, String message, Field.BuilderFunction<FB> f) {
+  public void info(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(INFO, condition, message, f, fieldBuilder);
   }
 
@@ -358,7 +379,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void info(Condition condition, String message, Throwable e) {
+  public void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core().log(INFO, condition, message, e);
   }
 
@@ -374,7 +395,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @return true if the logger level is WARN or higher and the condition is met.
    */
-  public boolean isWarnEnabled(Condition condition) {
+  public boolean isWarnEnabled(@NotNull Condition condition) {
     return core().isEnabled(WARN, condition);
   }
 
@@ -383,7 +404,7 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param message the given message.
    */
-  public void warn(String message) {
+  public void warn(@Nullable String message) {
     core().log(WARN, message);
   }
 
@@ -393,7 +414,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void warn(String message, Field.BuilderFunction<FB> f) {
+  public void warn(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
     core().log(WARN, message, f, fieldBuilder);
   }
 
@@ -403,7 +424,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void warn(String message, Throwable e) {
+  public void warn(@Nullable String message, @NotNull Throwable e) {
     core().log(WARN, message, e);
   }
 
@@ -413,7 +434,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @param message the message.
    */
-  public void warn(Condition condition, String message) {
+  public void warn(@NotNull Condition condition, @Nullable String message) {
     core().log(WARN, condition, message);
   }
 
@@ -424,7 +445,10 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void warn(Condition condition, String message, Field.BuilderFunction<FB> f) {
+  public void warn(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(WARN, condition, message, f, fieldBuilder);
   }
 
@@ -435,7 +459,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void warn(Condition condition, String message, Throwable e) {
+  public void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core().log(WARN, condition, message, e);
   }
 
@@ -451,7 +475,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @return true if the logger level is ERROR or higher and the condition is met.
    */
-  public boolean isErrorEnabled(Condition condition) {
+  public boolean isErrorEnabled(@NotNull Condition condition) {
     return core().isEnabled(ERROR, condition);
   }
 
@@ -460,7 +484,7 @@ public class Logger<FB extends Field.Builder> {
    *
    * @param message the given message.
    */
-  public void error(String message) {
+  public void error(@Nullable String message) {
     core().log(ERROR, message);
   }
 
@@ -470,7 +494,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void error(String message, Field.BuilderFunction<FB> f) {
+  public void error(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
     core().log(ERROR, message, f, fieldBuilder);
   }
 
@@ -480,7 +504,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void error(String message, Throwable e) {
+  public void error(@Nullable String message, @NotNull Throwable e) {
     core().log(ERROR, message, e);
   }
 
@@ -490,7 +514,7 @@ public class Logger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @param message the message.
    */
-  public void error(Condition condition, String message) {
+  public void error(@NotNull Condition condition, @Nullable String message) {
     core().log(ERROR, condition, message);
   }
 
@@ -501,7 +525,10 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param f the field builder function.
    */
-  public void error(Condition condition, String message, Field.BuilderFunction<FB> f) {
+  public void error(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(ERROR, condition, message, f, fieldBuilder);
   }
 
@@ -512,7 +539,7 @@ public class Logger<FB extends Field.Builder> {
    * @param message the message.
    * @param e the given exception.
    */
-  public void error(Condition condition, String message, Throwable e) {
+  public void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core().log(ERROR, condition, message, e);
   }
 }

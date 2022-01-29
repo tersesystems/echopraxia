@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.apache.logging.log4j.Marker;
+import org.jetbrains.annotations.NotNull;
 
 public class Log4JLoggingContext implements LoggingContext {
 
@@ -25,7 +26,7 @@ public class Log4JLoggingContext implements LoggingContext {
   }
 
   @Override
-  public List<Field> getFields() {
+  public @NotNull List<Field> getFields() {
     return fieldsSupplier.get();
   }
 

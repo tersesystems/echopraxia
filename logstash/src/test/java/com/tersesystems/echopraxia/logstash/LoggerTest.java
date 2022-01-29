@@ -36,6 +36,17 @@ class LoggerTest extends TestBase {
   }
 
   @Test
+  void testNullMessage() {
+    Logger<?> logger = getLogger();
+    logger.debug(null);
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo(null);
+  }
+
+  @Test
   void testArguments() {
     Logger<?> logger = getLogger();
     logger.debug(
@@ -46,12 +57,6 @@ class LoggerTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("hello will, you are 13, citizen status true");
-  }
-
-  private Logger<?> getLogger() {
-    LogstashCoreLogger logstashCoreLogger =
-        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
-    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 
   @Test
@@ -74,6 +79,42 @@ class LoggerTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("hello null");
+  }
+
+  @Test
+  void testNullStringArgument() {
+    Logger<?> logger = getLogger();
+    String value = null;
+    logger.debug("hello {}", fb -> fb.only(fb.string("name", value)));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("hello [FAILED toString()]");
+  }
+
+  @Test
+  void testNullFieldName() {
+    Logger<?> logger = getLogger();
+    String value = "value";
+    logger.debug("hello {}", fb -> fb.only(fb.string(null, value)));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("hello value");
+  }
+
+  @Test
+  void testNullNumber() {
+    Logger<?> logger = getLogger();
+    Number value = null;
+    logger.debug("hello {}", fb -> fb.only(fb.number("name", value)));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("hello [FAILED toString()]");
   }
 
   @Test
@@ -242,5 +283,11 @@ class LoggerTest extends TestBase {
       Field[] fields = {name, age, father, mother, interests};
       return object(fieldName, fields);
     }
+  }
+
+  private Logger<?> getLogger() {
+    LogstashCoreLogger logstashCoreLogger =
+        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 }

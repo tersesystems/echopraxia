@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia;
 
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The LoggingContext interface is used in conditions to expose contextual information added to a
@@ -15,5 +16,6 @@ public interface LoggingContext {
    *
    * @return list of fields that are part of logger's context.
    */
+  @NotNull
   List<Field> getFields();
 }

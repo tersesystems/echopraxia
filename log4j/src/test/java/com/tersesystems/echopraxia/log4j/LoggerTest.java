@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.log4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.fail;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
@@ -14,6 +15,44 @@ import javax.json.JsonValue;
 import org.junit.jupiter.api.Test;
 
 public class LoggerTest extends TestBase {
+
+  @Test
+  void testNullStringArgument() {
+    Logger<?> logger = getLogger();
+    String value = null;
+    logger.info("hello {}", fb -> fb.only(fb.string("name", value)));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("hello null");
+  }
+
+  @Test
+  void testNullFieldName() {
+    Logger<?> logger = getLogger();
+    String value = "value";
+    logger.debug("hello {}", fb -> fb.only(fb.string(null, value)));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("my argument is random_object={value1, value2}");
+  }
+
+  @Test
+  void testNullArrayElement() {
+    fail();
+  }
+
+  @Test
+  void testNullNumber() {
+    Logger<?> logger = getLogger();
+    Number value = null;
+    logger.debug("hello {}", fb -> fb.only(fb.number("name", value)));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("my argument is random_object={value1, value2}");
+  }
 
   @Test
   public void testLoggerWithStringField() {

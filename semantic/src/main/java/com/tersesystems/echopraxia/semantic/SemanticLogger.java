@@ -4,6 +4,7 @@ import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * SemanticLogger interface built around a datatype.
@@ -16,56 +17,62 @@ import java.util.function.Function;
  */
 public interface SemanticLogger<DataType> {
 
+  @NotNull
   CoreLogger core();
 
   boolean isErrorEnabled();
 
-  boolean isErrorEnabled(Condition c);
+  boolean isErrorEnabled(@NotNull Condition c);
 
-  void error(DataType data);
+  void error(@NotNull DataType data);
 
-  void error(Condition c, DataType data);
+  void error(@NotNull Condition c, @NotNull DataType data);
 
   boolean isWarnEnabled();
 
-  boolean isWarnEnabled(Condition c);
+  boolean isWarnEnabled(@NotNull Condition c);
 
-  void warn(DataType data);
+  void warn(@NotNull DataType data);
 
-  void warn(Condition c, DataType data);
+  void warn(@NotNull Condition c, @NotNull DataType data);
 
   boolean isInfoEnabled();
 
-  boolean isInfoEnabled(Condition c);
+  boolean isInfoEnabled(@NotNull Condition c);
 
-  void info(DataType data);
+  void info(@NotNull DataType data);
 
-  void info(Condition c, DataType data);
+  void info(@NotNull Condition c, @NotNull DataType data);
 
   boolean isDebugEnabled();
 
-  boolean isDebugEnabled(Condition c);
+  boolean isDebugEnabled(@NotNull Condition c);
 
-  void debug(DataType data);
+  void debug(@NotNull DataType data);
 
-  void debug(Condition c, DataType data);
+  void debug(@NotNull Condition c, @NotNull DataType data);
 
   boolean isTraceEnabled();
 
-  boolean isTraceEnabled(Condition c);
+  boolean isTraceEnabled(@NotNull Condition c);
 
-  void trace(DataType data);
+  void trace(@NotNull DataType data);
 
-  void trace(Condition c, DataType data);
+  void trace(@NotNull Condition c, @NotNull DataType data);
 
-  SemanticLogger<DataType> withCondition(Condition c);
+  @NotNull
+  SemanticLogger<DataType> withCondition(@NotNull Condition c);
 
-  SemanticLogger<DataType> withFields(Field.BuilderFunction<Field.Builder> f);
+  @NotNull
+  SemanticLogger<DataType> withFields(@NotNull Field.BuilderFunction<Field.Builder> f);
 
+  @NotNull
   SemanticLogger<DataType> withThreadContext();
 
+  @NotNull
   <FB extends Field.Builder> SemanticLogger<DataType> withFields(
-      Field.BuilderFunction<FB> f, FB builder);
+      @NotNull Field.BuilderFunction<FB> f, @NotNull FB builder);
 
-  SemanticLogger<DataType> withMessage(Function<DataType, String> messageFunction);
+  @NotNull
+  SemanticLogger<DataType> withMessage(@NotNull Function<DataType, String> messageFunction);
 }

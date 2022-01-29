@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.Message;
+import org.jetbrains.annotations.NotNull;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -74,12 +75,12 @@ public class Log4JBenchmarks {
     }
 
     @Override
-    public String name() {
+    public @NotNull String name() {
       return name;
     }
 
     @Override
-    public Value<?> value() {
+    public @NotNull Value<?> value() {
       return value;
     }
   }

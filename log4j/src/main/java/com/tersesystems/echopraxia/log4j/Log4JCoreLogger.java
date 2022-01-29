@@ -16,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.Message;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
@@ -37,7 +39,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public boolean isEnabled(Level level) {
+  public boolean isEnabled(@NotNull Level level) {
     if (this.condition == Condition.never()) {
       return false;
     }
@@ -58,7 +60,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public boolean isEnabled(Level level, Condition condition) {
+  public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
     if (condition == Condition.always()) {
       return isEnabled(level);
     }
@@ -82,7 +84,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(Level level, String message) {
+  public void log(@NotNull Level level, String message) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -91,17 +93,21 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public <B extends Field.Builder> void log(
-      Level level, String message, Field.BuilderFunction<B> f, B builder) {
+      @NotNull Level level,
+      @Nullable String messageTemplate,
+      @NotNull Field.BuilderFunction<B> f,
+      @NotNull B builder) {
     if (!condition.test(level, context)) {
       return;
     }
-    List<Field> argumentFields = f.apply(builder);
-    Throwable e = findThrowable(argumentFields);
-    logger.log(convertLevel(level), context.getMarker(), createMessage(message, argumentFields), e);
+    final List<Field> argumentFields = f.apply(builder);
+    final Throwable e = findThrowable(argumentFields);
+    final Message message = createMessage(messageTemplate, argumentFields);
+    logger.log(convertLevel(level), context.getMarker(), message, e);
   }
 
   @Override
-  public void log(Level level, String message, Throwable e) {
+  public void log(@NotNull Level level, String message, @NotNull Throwable e) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -113,7 +119,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(Level level, Condition condition, String message) {
+  public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -121,7 +127,11 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(Level level, Condition condition, String message, Throwable e) {
+  public void log(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull String message,
+      @NotNull Throwable e) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -130,7 +140,11 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public <B extends Field.Builder> void log(
-      Level level, Condition condition, String message, Field.BuilderFunction<B> f, B builder) {
+      @NotNull Level level,
+      @NotNull Condition condition,
+      String message,
+      Field.@NotNull BuilderFunction<B> f,
+      @NotNull B builder) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -138,26 +152,27 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public Condition condition() {
+  public @NotNull Condition condition() {
     return this.condition;
   }
 
   @Override
-  public <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder) {
+  public <B extends Field.Builder> @NotNull CoreLogger withFields(
+      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
     return new Log4JCoreLogger(logger, context.and(newContext), condition);
   }
 
   @Override
-  public CoreLogger withThreadContext(
-      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
+  public @NotNull CoreLogger withThreadContext(
+      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
     Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
     return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
   }
 
   @Override
-  public CoreLogger withCondition(Condition condition) {
+  public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
     if (condition == Condition.never()) {
       if (this.condition == Condition.never()) {
         return this;
