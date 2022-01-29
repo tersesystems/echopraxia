@@ -19,7 +19,7 @@ spotless {
 }
 
 subprojects { subproj ->
-    apply plugin: 'java'
+    apply plugin: 'java-library'
     apply plugin: 'com.diffplug.spotless'
 
     repositories {
@@ -61,9 +61,8 @@ subprojects { subproj ->
     }
 
     dependencies {
-        // https://mvnrepository.com/artifact/org.jetbrains/annotations
-        // https://github.com/JetBrains/java-annotations#using-the-annotations
-        compileOnly 'org.jetbrains:annotations:23.0.0'
+        // https://docs.gradle.org/6.7.1/release-notes.html
+        compileOnlyApi 'org.jetbrains:annotations:23.0.0'
 
         // Fix a dependency in log4jbenchmarks
         jmhImplementation 'org.jetbrains:annotations:23.0.0'
