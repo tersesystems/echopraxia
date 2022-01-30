@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The semantic logger factory. This is used to render complex objects specifically on their type.
@@ -188,7 +189,7 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public CoreLogger core() {
+    public @NotNull CoreLogger core() {
       return core;
     }
 
@@ -210,19 +211,19 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public boolean isErrorEnabled(Condition c) {
+    public boolean isErrorEnabled(@NotNull Condition c) {
       return core.isEnabled(Level.ERROR, c);
     }
 
     @Override
-    public void error(DataType data) {
+    public void error(@NotNull DataType data) {
       if (core.isEnabled(Level.ERROR)) {
         core.log(Level.ERROR, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
-    public void error(Condition c, DataType data) {
+    public void error(@NotNull Condition c, @NotNull DataType data) {
       if (core.isEnabled(Level.ERROR, c)) {
         core.log(Level.ERROR, convertMessage(data), builderFunction.apply(data), builder);
       }
@@ -234,7 +235,7 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public boolean isWarnEnabled(Condition c) {
+    public boolean isWarnEnabled(@NotNull Condition c) {
       return core.isEnabled(Level.WARN, c);
     }
 
@@ -243,14 +244,14 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public void warn(DataType data) {
+    public void warn(@NotNull DataType data) {
       if (core.isEnabled(Level.WARN)) {
         core.log(Level.WARN, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
-    public void warn(Condition c, DataType data) {
+    public void warn(@NotNull Condition c, @NotNull DataType data) {
       if (core.isEnabled(Level.WARN, c)) {
         core.log(Level.WARN, convertMessage(data), builderFunction.apply(data), builder);
       }
@@ -262,19 +263,19 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public boolean isInfoEnabled(Condition c) {
+    public boolean isInfoEnabled(@NotNull Condition c) {
       return core.isEnabled(Level.INFO, c);
     }
 
     @Override
-    public void info(DataType data) {
+    public void info(@NotNull DataType data) {
       if (core.isEnabled(Level.INFO)) {
         core.log(Level.INFO, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
-    public void info(Condition c, DataType data) {
+    public void info(@NotNull Condition c, @NotNull DataType data) {
       if (core.isEnabled(Level.INFO, c)) {
         core.log(Level.INFO, convertMessage(data), builderFunction.apply(data), builder);
       }
@@ -286,19 +287,19 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public boolean isDebugEnabled(Condition c) {
+    public boolean isDebugEnabled(@NotNull Condition c) {
       return core.isEnabled(Level.DEBUG, c);
     }
 
     @Override
-    public void debug(DataType data) {
+    public void debug(@NotNull DataType data) {
       if (core.isEnabled(Level.DEBUG)) {
         core.log(Level.DEBUG, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
-    public void debug(Condition c, DataType data) {
+    public void debug(@NotNull Condition c, @NotNull DataType data) {
       if (core.isEnabled(Level.DEBUG, c)) {
         core.log(Level.DEBUG, convertMessage(data), builderFunction.apply(data), builder);
       }
@@ -310,38 +311,39 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public boolean isTraceEnabled(Condition c) {
+    public boolean isTraceEnabled(@NotNull Condition c) {
       return core.isEnabled(Level.TRACE, c);
     }
 
     @Override
-    public void trace(DataType data) {
+    public void trace(@NotNull DataType data) {
       if (core.isEnabled(Level.TRACE)) {
         core.log(Level.TRACE, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
-    public void trace(Condition c, DataType data) {
+    public void trace(@NotNull Condition c, @NotNull DataType data) {
       if (core.isEnabled(Level.TRACE, c)) {
         core.log(Level.TRACE, convertMessage(data), builderFunction.apply(data), builder);
       }
     }
 
     @Override
-    public SemanticLogger<DataType> withCondition(Condition c) {
+    public @NotNull SemanticLogger<DataType> withCondition(@NotNull Condition c) {
       final CoreLogger coreLogger = core.withCondition(c);
       return new SemanticLoggerFactory.Impl<>(
           coreLogger, builder, messageFunction, builderFunction);
     }
 
     @Override
-    public SemanticLogger<DataType> withFields(Field.BuilderFunction<Field.Builder> f) {
+    public @NotNull SemanticLogger<DataType> withFields(
+        Field.@NotNull BuilderFunction<Field.Builder> f) {
       return withFields(f, builder);
     }
 
     @Override
-    public SemanticLogger<DataType> withThreadContext() {
+    public @NotNull SemanticLogger<DataType> withThreadContext() {
       Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
           mapSupplier ->
               () ->
@@ -354,15 +356,16 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public <CFB extends Field.Builder> SemanticLogger<DataType> withFields(
-        Field.BuilderFunction<CFB> ctxBuilderF, CFB ctxBuilder) {
+    public <CFB extends Field.Builder> @NotNull SemanticLogger<DataType> withFields(
+        Field.@NotNull BuilderFunction<CFB> ctxBuilderF, @NotNull CFB ctxBuilder) {
       final CoreLogger coreLogger = core.withFields(ctxBuilderF, ctxBuilder);
       return new SemanticLoggerFactory.Impl<>(
           coreLogger, builder, messageFunction, builderFunction);
     }
 
     @Override
-    public SemanticLogger<DataType> withMessage(Function<DataType, String> messageFunction) {
+    public @NotNull SemanticLogger<DataType> withMessage(
+        @NotNull Function<DataType, String> messageFunction) {
       return new SemanticLoggerFactory.Impl<>(core, builder, messageFunction, builderFunction);
     }
   }

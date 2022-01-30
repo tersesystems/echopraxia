@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
 /**
@@ -33,7 +34,7 @@ public class LogstashLoggingContext implements LoggingContext {
   }
 
   @Override
-  public List<Field> getFields() {
+  public @NotNull List<Field> getFields() {
     return fieldsSupplier.get();
   }
 

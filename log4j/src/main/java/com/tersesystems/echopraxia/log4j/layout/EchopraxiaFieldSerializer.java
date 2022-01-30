@@ -14,53 +14,63 @@ import javax.json.JsonValue;
 class EchopraxiaFieldSerializer {
 
   void convertField(JsonObjectBuilder builder, Field f) {
-    switch (f.value().type()) {
+    final String name = f.name();
+    final Value<?> v = f.value();
+
+    // if raw() is null and it's not NullValue, then chalk up an error and keep going.
+    if (v.type() == Value.ValueType.NULL || v.raw() == null) {
+      builder.addNull(name);
+      return;
+    }
+
+    switch (v.type()) {
       case ARRAY:
         final JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
         //noinspection unchecked
-        final List<Value<?>> arrayValues = (List<Value<?>>) f.value().raw();
+        final List<Value<?>> arrayValues = (List<Value<?>>) v.raw();
         for (Value<?> value : arrayValues) {
           addValue(value, arrayBuilder);
         }
-        builder.add(f.name(), arrayBuilder);
+        builder.add(name, arrayBuilder);
         break;
       case OBJECT:
         final JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         //noinspection unchecked
-        final List<Field> fields = (List<Field>) f.value().raw();
+        final List<Field> fields = (List<Field>) v.raw();
         addObject(fields, objectBuilder);
-        builder.add(f.name(), objectBuilder);
+        builder.add(name, objectBuilder);
         break;
       case STRING:
-        builder.add(f.name(), (String) f.value().raw());
+        builder.add(name, (String) v.raw());
         break;
       case NUMBER:
-        final Object raw = f.value().raw();
+        final Object raw = v.raw();
         if (raw instanceof Integer) {
-          builder.add(f.name(), (Integer) raw);
+          builder.add(name, (Integer) raw);
         } else if (raw instanceof Long) {
-          builder.add(f.name(), (Long) raw);
+          builder.add(name, (Long) raw);
         } else if (raw instanceof Double) {
-          builder.add(f.name(), (Double) raw);
+          builder.add(name, (Double) raw);
         } else if (raw instanceof BigDecimal) {
-          builder.add(f.name(), (BigDecimal) raw);
+          builder.add(name, (BigDecimal) raw);
         } else if (raw instanceof BigInteger) {
-          builder.add(f.name(), (BigInteger) raw);
+          builder.add(name, (BigInteger) raw);
         }
         break;
       case BOOLEAN:
-        builder.add(f.name(), (Boolean) f.value().raw());
+        builder.add(name, (Boolean) v.raw());
         break;
       case EXCEPTION:
         // do nothing for right now...
         break;
       case NULL:
-        builder.addNull(f.name());
+        builder.addNull(name); // should never be reached, but okay :-)
         break;
     }
   }
 
   private void addValue(Value<?> value, JsonArrayBuilder arrayBuilder) {
+    final Object rawValue = value.raw();
     switch (value.type()) {
       case ARRAY:
         JsonArrayBuilder newArrayBuilder = Json.createArrayBuilder();
@@ -70,29 +80,38 @@ class EchopraxiaFieldSerializer {
       case OBJECT:
         final JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
         //noinspection unchecked
-        List<Field> valueFields = (List<Field>) value.raw();
+        List<Field> valueFields = (List<Field>) rawValue;
         addObject(valueFields, objectBuilder);
         arrayBuilder.add(objectBuilder);
         break;
       case STRING:
-        arrayBuilder.add((String) value.raw());
+        if (rawValue == null) {
+          arrayBuilder.add(JsonValue.NULL);
+        } else {
+          arrayBuilder.add((String) rawValue);
+        }
         break;
       case NUMBER:
-        final Object raw = value.raw();
-        if (raw instanceof Integer) {
-          arrayBuilder.add((Integer) raw);
-        } else if (raw instanceof Long) {
-          arrayBuilder.add((Long) raw);
-        } else if (raw instanceof Double) {
-          arrayBuilder.add((Double) raw);
-        } else if (raw instanceof BigDecimal) {
-          arrayBuilder.add((BigDecimal) raw);
-        } else if (raw instanceof BigInteger) {
-          arrayBuilder.add((BigInteger) raw);
+        if (rawValue instanceof Integer) {
+          arrayBuilder.add((Integer) rawValue);
+        } else if (rawValue instanceof Long) {
+          arrayBuilder.add((Long) rawValue);
+        } else if (rawValue instanceof Double) {
+          arrayBuilder.add((Double) rawValue);
+        } else if (rawValue instanceof BigDecimal) {
+          arrayBuilder.add((BigDecimal) rawValue);
+        } else if (rawValue instanceof BigInteger) {
+          arrayBuilder.add((BigInteger) rawValue);
+        } else {
+          arrayBuilder.add(JsonValue.NULL);
         }
         break;
       case BOOLEAN:
-        arrayBuilder.add((Boolean) value.raw());
+        if (rawValue == null) {
+          arrayBuilder.add(JsonValue.NULL);
+        } else {
+          arrayBuilder.add((Boolean) rawValue);
+        }
         break;
       case EXCEPTION:
         // Do nothing for now...

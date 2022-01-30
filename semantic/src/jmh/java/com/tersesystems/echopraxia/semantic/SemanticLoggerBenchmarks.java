@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.semantic;
 
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
@@ -14,14 +15,14 @@ public class SemanticLoggerBenchmarks {
       SemanticLoggerFactory.getLogger(
           String.class, s -> "Message {}", s -> b -> b.onlyString("name", s));
 
-  //  @Benchmark
-  //  public void info() {
-  //    // SemanticLoggerBenchmarks.info  avgt   25  97.199 ± 3.323  ns/op
-  //    logger.info("string");
-  //  }
+  @Benchmark
+  public void info() {
+    // SemanticLoggerBenchmarks.info  avgt   25  97.199 ± 3.323  ns/op
+    logger.info("string");
+  }
 
   @Benchmark
-  public void isInfoEnabled() {
-    logger.isInfoEnabled();
+  public void isInfoEnabled(Blackhole blackhole) {
+    blackhole.consume(logger.isInfoEnabled());
   }
 }

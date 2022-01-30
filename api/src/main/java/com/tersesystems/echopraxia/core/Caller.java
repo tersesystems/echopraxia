@@ -1,7 +1,10 @@
 package com.tersesystems.echopraxia.core;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Caller {
 
+  @NotNull
   public static String resolveClassName() {
     // If we're on JDK 9, we can use
     // StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
@@ -20,6 +23,6 @@ public class Caller {
         }
       }
     }
-    return null;
+    throw new IllegalStateException("No stack trace elements found in thread!");
   }
 }

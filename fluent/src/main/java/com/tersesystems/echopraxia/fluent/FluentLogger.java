@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * FluentLogger class.
@@ -27,29 +29,36 @@ public class FluentLogger<FB extends Field.Builder> {
     this.builder = builder;
   }
 
+  @NotNull
   public CoreLogger core() {
     return core;
   }
 
+  @NotNull
   public FB fieldBuilder() {
     return builder;
   }
 
-  public FluentLogger<FB> withCondition(Condition c) {
+  @NotNull
+  public FluentLogger<FB> withCondition(@NotNull Condition c) {
     CoreLogger coreLogger = core.withCondition(c);
     return new FluentLogger<>(coreLogger, builder);
   }
 
-  public FluentLogger<FB> withFields(Field.BuilderFunction<FB> f) {
+  @NotNull
+  public FluentLogger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
     CoreLogger coreLogger = core.withFields(f, builder);
     return new FluentLogger<>(coreLogger, builder);
   }
 
-  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(T newBuilder) {
+  @NotNull
+  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     return new FluentLogger<>(core, newBuilder);
   }
 
-  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(Class<T> newBuilderClass) {
+  @NotNull
+  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(
+      @NotNull Class<T> newBuilderClass) {
     try {
       final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();
       return new FluentLogger<>(core, newInstance);
@@ -62,6 +71,7 @@ public class FluentLogger<FB extends Field.Builder> {
     }
   }
 
+  @NotNull
   public FluentLogger<FB> withThreadContext() {
     Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
         mapSupplier ->
@@ -121,26 +131,32 @@ public class FluentLogger<FB extends Field.Builder> {
     return core.isEnabled(level, condition);
   }
 
+  @NotNull
   public EntryBuilder atError() {
     return atLevel(Level.ERROR);
   }
 
+  @NotNull
   public EntryBuilder atWarn() {
     return atLevel(Level.WARN);
   }
 
+  @NotNull
   public EntryBuilder atInfo() {
     return atLevel(Level.INFO);
   }
 
+  @NotNull
   public EntryBuilder atDebug() {
     return atLevel(Level.DEBUG);
   }
 
+  @NotNull
   public EntryBuilder atTrace() {
     return atLevel(Level.TRACE);
   }
 
+  @NotNull
   public EntryBuilder atLevel(Level level) {
     return new EntryBuilder(level);
   }
@@ -155,22 +171,26 @@ public class FluentLogger<FB extends Field.Builder> {
       this.level = level;
     }
 
-    public EntryBuilder condition(Condition condition) {
+    @NotNull
+    public EntryBuilder condition(@NotNull Condition condition) {
       this.condition = this.condition.and(condition);
       return this;
     }
 
-    public EntryBuilder message(String message) {
+    @NotNull
+    public EntryBuilder message(@Nullable String message) {
       this.message = message;
       return this;
     }
 
-    public EntryBuilder argument(Function<FB, Field> f) {
+    @NotNull
+    public EntryBuilder argument(@NotNull Function<FB, Field> f) {
       this.argumentFnList.add(f);
       return this;
     }
 
-    public EntryBuilder exception(Throwable t) {
+    @NotNull
+    public EntryBuilder exception(@NotNull Throwable t) {
       return argument(b -> b.exception(t));
     }
 

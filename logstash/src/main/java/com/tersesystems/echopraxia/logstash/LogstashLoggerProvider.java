@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerProvider;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.ILoggerFactory;
 
 /**
@@ -11,11 +12,11 @@ import org.slf4j.ILoggerFactory;
  */
 public class LogstashLoggerProvider implements CoreLoggerProvider {
 
-  public CoreLogger getLogger(Class<?> clazz) {
+  public @NotNull CoreLogger getLogger(@NotNull Class<?> clazz) {
     return getLogger(clazz.getName());
   }
 
-  public CoreLogger getLogger(String name) {
+  public @NotNull CoreLogger getLogger(@NotNull String name) {
     ILoggerFactory factory = org.slf4j.LoggerFactory.getILoggerFactory();
     org.slf4j.Logger logger = factory.getLogger(name);
     return new LogstashCoreLogger(logger);

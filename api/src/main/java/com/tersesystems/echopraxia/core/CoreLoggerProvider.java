@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.core;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * The CoreLoggerProvider is a service provider interface used by LoggerFactory.
  *
@@ -7,7 +9,9 @@ package com.tersesystems.echopraxia.core;
  */
 public interface CoreLoggerProvider {
 
-  CoreLogger getLogger(Class<?> clazz);
+  @NotNull
+  CoreLogger getLogger(@NotNull Class<?> clazz);
 
-  CoreLogger getLogger(String name);
+  @NotNull
+  CoreLogger getLogger(@NotNull String name);
 }

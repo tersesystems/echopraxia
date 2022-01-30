@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * The core logger API.
@@ -24,7 +26,7 @@ public interface CoreLogger {
    * @param level the level to log at.
    * @return true if the instance is enabled for the given level, false otherwise.
    */
-  boolean isEnabled(Level level);
+  boolean isEnabled(@NotNull Level level);
 
   /**
    * Is the logger instance enabled for the given level and conditions?
@@ -33,15 +35,15 @@ public interface CoreLogger {
    * @param condition the explicit condition that must be met.
    * @return true if the instance is enabled for the given level, false otherwise.
    */
-  boolean isEnabled(Level level, Condition condition);
+  boolean isEnabled(@NotNull Level level, @NotNull Condition condition);
 
   /**
    * Log a message at the given level.
    *
    * @param level the level to log at.
-   * @param message the message string to be logged
+   * @param message the message string to be logged, may be null.
    */
-  void log(Level level, String message);
+  void log(@NotNull Level level, @Nullable String message);
 
   /**
    * Log a message at the given level.
@@ -53,7 +55,10 @@ public interface CoreLogger {
    * @param <B> the type of field builder.
    */
   <B extends Field.Builder> void log(
-      Level level, String message, Field.BuilderFunction<B> f, B builder);
+      @NotNull Level level,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<B> f,
+      @NotNull B builder);
 
   /**
    * Log a message at the given level.
@@ -62,7 +67,7 @@ public interface CoreLogger {
    * @param message the message string to be logged
    * @param e the exception (throwable) to log
    */
-  void log(Level level, String message, Throwable e);
+  void log(@NotNull Level level, @Nullable String message, @NotNull Throwable e);
 
   /**
    * Log a message at the given level.
@@ -71,7 +76,7 @@ public interface CoreLogger {
    * @param condition the given condition
    * @param message the message string to be logged
    */
-  void log(Level level, Condition condition, String message);
+  void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message);
 
   /**
    * Log a message at the given level.
@@ -81,7 +86,11 @@ public interface CoreLogger {
    * @param message the message string to be logged
    * @param e the exception (throwable) to log
    */
-  void log(Level level, Condition condition, String message, Throwable e);
+  void log(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull String message,
+      @NotNull Throwable e);
 
   /**
    * Log a message at the given level.
@@ -94,13 +103,18 @@ public interface CoreLogger {
    * @param <B> the type of field builder.
    */
   <B extends Field.Builder> void log(
-      Level level, Condition condition, String message, Field.BuilderFunction<B> f, B builder);
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<B> f,
+      @NotNull B builder);
 
   /**
    * Returns the given condition
    *
    * @return the given condition.
    */
+  @NotNull
   Condition condition();
 
   /**
@@ -120,7 +134,9 @@ public interface CoreLogger {
    * @param <B> the type of field builder.
    * @return the core logger with given context fields applied.
    */
-  <B extends Field.Builder> CoreLogger withFields(Field.BuilderFunction<B> f, B builder);
+  @NotNull
+  <B extends Field.Builder> CoreLogger withFields(
+      @NotNull Field.BuilderFunction<B> f, @NotNull B builder);
 
   /**
    * Pulls fields from thread context into logger context, if any exist and the implementation
@@ -129,8 +145,9 @@ public interface CoreLogger {
    * @param mapTransform a function that takes a context map and returns a list of fields.
    * @return the core logger with any thread context mapped into fields.
    */
+  @NotNull
   CoreLogger withThreadContext(
-      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform);
+      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform);
 
   /**
    * Adds the given condition to the logger.
@@ -138,5 +155,6 @@ public interface CoreLogger {
    * @param condition the given condition
    * @return the core logger with the condition applied.
    */
-  CoreLogger withCondition(Condition condition);
+  @NotNull
+  CoreLogger withCondition(@NotNull Condition condition);
 }

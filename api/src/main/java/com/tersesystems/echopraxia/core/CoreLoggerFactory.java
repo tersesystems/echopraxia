@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.core;
 import java.util.Iterator;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * The core logger factory.
@@ -11,14 +12,17 @@ import java.util.ServiceLoader;
  */
 public class CoreLoggerFactory {
 
-  public static CoreLogger getLogger(Class<?> clazz) {
+  @NotNull
+  public static CoreLogger getLogger(@NotNull Class<?> clazz) {
     return LazyHolder.INSTANCE.getLogger(clazz);
   }
 
-  public static CoreLogger getLogger(String name) {
+  @NotNull
+  public static CoreLogger getLogger(@NotNull String name) {
     return LazyHolder.INSTANCE.getLogger(name);
   }
 
+  @NotNull
   public static CoreLogger getLogger() {
     return getLogger(Caller.resolveClassName());
   }
