@@ -76,6 +76,7 @@ public class Main {
       logger.info("hi there {}", fb -> fb.only(fb.person("person", abe)));
     }
 
+    // You can also use a custom logger
     MyLogger myLogger = MyLoggerFactory.getLogger();
     myLogger.debug("Using my logger {}", fb -> fb.onlyDate("my date", new Date()));
 
