@@ -5,6 +5,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Async {
+
+  // An executor that has a single thread.  This is nice for ordering, but please
+  // see the README on how to configure executors for CPU & IO bound operations.
   private static final ExecutorService loggingExecutor =
       Executors.newSingleThreadExecutor(
           r -> {
@@ -14,6 +17,8 @@ public class Async {
             return t;
           });
 
+  // Simulate an expensive condition that will tie up the thread for an unreasonable
+  // amount of time.
   private static final Condition expensiveCondition =
       new Condition() {
         @Override

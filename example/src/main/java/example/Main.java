@@ -1,20 +1,19 @@
 package example;
 
+import static com.tersesystems.echopraxia.Field.Value;
+import static java.util.Collections.singletonList;
+
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
-
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-
-import static com.tersesystems.echopraxia.Field.Value;
-import static java.util.Collections.singletonList;
 
 public class Main {
 

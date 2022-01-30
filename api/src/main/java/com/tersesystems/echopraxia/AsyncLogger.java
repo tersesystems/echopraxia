@@ -148,7 +148,7 @@ public class AsyncLogger<FB extends Field.Builder> {
   /**
    * Logs using a condition and a logger handle at TRACE level.
    *
-   * @param c        the condition
+   * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
   public void trace(Condition c, Consumer<LoggerHandle<FB>> consumer) {
@@ -167,7 +167,7 @@ public class AsyncLogger<FB extends Field.Builder> {
   /**
    * Logs using a condition and a logger handle at DEBUG level.
    *
-   * @param c        the condition
+   * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
   public void debug(Condition c, Consumer<LoggerHandle<FB>> consumer) {
@@ -186,7 +186,7 @@ public class AsyncLogger<FB extends Field.Builder> {
   /**
    * Logs using a condition and a logger handle at INFO level.
    *
-   * @param c        the condition
+   * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
   public void info(Condition c, Consumer<LoggerHandle<FB>> consumer) {
@@ -205,7 +205,7 @@ public class AsyncLogger<FB extends Field.Builder> {
   /**
    * Logs using a condition and a logger handle at WARN level.
    *
-   * @param c        the condition
+   * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
   public void warn(Condition c, Consumer<LoggerHandle<FB>> consumer) {
@@ -224,7 +224,7 @@ public class AsyncLogger<FB extends Field.Builder> {
   /**
    * Logs using a condition and a logger handle at ERROR level.
    *
-   * @param c        the condition
+   * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
   public void error(Condition c, Consumer<LoggerHandle<FB>> consumer) {

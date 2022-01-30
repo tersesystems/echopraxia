@@ -450,6 +450,8 @@ private static final Executor loggingExecutor =
       });
 ```
 
+Using a single thread executor is nice because you can keep ordering of your logging statements, but it may not scale up in production.  Generally speaking, if you are CPU bound and want to distribute load over several cores, you should use `ForkJoinPool.commonPool()` or a bounded fork-join work stealing pool as your executor.  If your conditions involve blocking or you're IO bound, you should configure a thread pool executor.  Because of parallelism and concurrency, your logging statements may not appear in order, but you can add extra fields to ensure you can reorder statements appropriately.
+
 Putting it all together:
 
 ```java
