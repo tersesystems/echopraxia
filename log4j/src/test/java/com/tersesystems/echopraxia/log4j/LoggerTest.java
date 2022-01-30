@@ -38,17 +38,6 @@ public class LoggerTest extends TestBase {
   }
 
   @Test
-  void testNullArrayElement() {
-    Logger<?> logger = getLogger();
-    String[] values = {"1", null, "3"};
-    logger.debug("array field is {}", fb -> fb.only(fb.array("arrayName", values)));
-
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
-    assertThat(message).isEqualTo("array field is arrayName=[1, null, 3]");
-  }
-
-  @Test
   void testNullNumber() {
     Logger<?> logger = getLogger();
     Number value = null;
@@ -67,6 +56,17 @@ public class LoggerTest extends TestBase {
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
     assertThat(message).isEqualTo("boolean is null");
+  }
+
+  @Test
+  void testNullArrayElement() {
+    Logger<?> logger = getLogger();
+    String[] values = {"1", null, "3"};
+    logger.debug("array field is {}", fb -> fb.only(fb.array("arrayName", values)));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("array field is arrayName=[1, null, 3]");
   }
 
   @Test

@@ -90,7 +90,7 @@ class LoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello [FAILED toString()]");
+    assertThat(formattedMessage).isEqualTo("hello null");
   }
 
   @Test
@@ -114,7 +114,43 @@ class LoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello [FAILED toString()]");
+    assertThat(formattedMessage).isEqualTo("hello null");
+  }
+
+  @Test
+  void testNullBoolean() {
+    Logger<?> logger = getLogger();
+    logger.debug("boolean is {}", fb -> fb.only(fb.bool("name", (Boolean) null)));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("boolean is null");
+  }
+
+  @Test
+  void testNullArrayElement() {
+    Logger<?> logger = getLogger();
+    String[] values = {"1", null, "3"};
+    logger.debug("array field is {}", fb -> fb.only(fb.array("arrayName", values)));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("array field is arrayName=[1, null, 3]");
+  }
+
+  @Test
+  void testNullObject() {
+    Logger<?> logger = getLogger();
+    logger.debug(
+        "object is {}", fb -> fb.only(fb.object("name", Field.Value.object((Field) null))));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String message = event.getFormattedMessage();
+    assertThat(message)
+        .isEqualTo("object is name={}"); // {} here is literally an object with no fields
   }
 
   @Test
