@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.fail;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
@@ -31,27 +30,55 @@ public class LoggerTest extends TestBase {
   void testNullFieldName() {
     Logger<?> logger = getLogger();
     String value = "value";
-    logger.debug("hello {}", fb -> fb.only(fb.string(null, value)));
+    logger.debug("array field is {}", fb -> fb.only(fb.array(null, value)));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
-    assertThat(message).isEqualTo("my argument is random_object={value1, value2}");
+    assertThat(message).isEqualTo("array field is echopraxia-unknown-1=[value]");
   }
 
   @Test
   void testNullArrayElement() {
-    fail();
+    Logger<?> logger = getLogger();
+    String[] values = {"1", null, "3"};
+    logger.debug("array field is {}", fb -> fb.only(fb.array("arrayName", values)));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("array field is arrayName=[1, null, 3]");
   }
 
   @Test
   void testNullNumber() {
     Logger<?> logger = getLogger();
     Number value = null;
-    logger.debug("hello {}", fb -> fb.only(fb.number("name", value)));
+    logger.debug("number is {}", fb -> fb.only(fb.number("name", value)));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
-    assertThat(message).isEqualTo("my argument is random_object={value1, value2}");
+    assertThat(message).isEqualTo("number is null");
+  }
+
+  @Test
+  void testNullBoolean() {
+    Logger<?> logger = getLogger();
+    logger.debug("boolean is {}", fb -> fb.only(fb.bool("name", (Boolean) null)));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("boolean is null");
+  }
+
+  @Test
+  void testNullObject() {
+    Logger<?> logger = getLogger();
+    logger.debug(
+        "object is {}", fb -> fb.only(fb.object("name", Field.Value.object((Field) null))));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message)
+        .isEqualTo("object is name={}"); // {} here is literally an object with no fields
   }
 
   @Test

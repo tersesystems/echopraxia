@@ -7,6 +7,7 @@ import com.tersesystems.echopraxia.Constants.DefaultKeyValueField;
 import com.tersesystems.echopraxia.Constants.DefaultValueField;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -770,13 +771,14 @@ public interface Field {
      * Takes a list of objects and a transform function that maps from T to a value.
      *
      * @param values a list of values.
-     * @param transform the tranform function
+     * @param transform the transform function
      * @return the Value.
      * @param <T> the type of object.
      */
     @NotNull
     public static <T> Value.ArrayValue array(
         @NotNull Function<T, Value<?>> transform, @NotNull List<T> values) {
+      // Nulls are allowed in array.
       return new ArrayValue(asList(values, transform));
     }
 
@@ -791,6 +793,7 @@ public interface Field {
     @NotNull
     public static <T> Value.ArrayValue array(
         @NotNull Function<T, Value<?>> transform, T @NotNull [] values) {
+      // nulls are explicitly allowed in array.
       return new ArrayValue(asList(values, transform));
     }
 
@@ -802,7 +805,10 @@ public interface Field {
      */
     @NotNull
     public static Value.ObjectValue object(Field @NotNull ... fields) {
-      return new ObjectValue(Arrays.asList(fields));
+      // Null fields are not allowed.
+      final List<Field> nonNullList =
+          Arrays.stream(fields).filter(Objects::nonNull).collect(Collectors.toList());
+      return new ObjectValue(nonNullList);
     }
 
     /**
@@ -813,7 +819,10 @@ public interface Field {
      */
     @NotNull
     public static Value.ObjectValue object(@NotNull List<Field> fields) {
-      return new ObjectValue(fields);
+      // Null fields are not allowed.
+      final List<Field> nonNullList =
+          fields.stream().filter(Objects::nonNull).collect(Collectors.toList());
+      return new ObjectValue(nonNullList);
     }
 
     /**
@@ -827,7 +836,11 @@ public interface Field {
     @NotNull
     public static <T> Value.ObjectValue object(
         @NotNull Function<T, Field> transform, T @NotNull [] values) {
-      List<Field> fields = Arrays.stream(values).map(transform).collect(Collectors.toList());
+      List<Field> fields =
+          Arrays.stream(values)
+              .map(transform)
+              .filter(Objects::nonNull)
+              .collect(Collectors.toList());
       return new ObjectValue(fields);
     }
 
@@ -842,7 +855,8 @@ public interface Field {
     @NotNull
     public static <T> Value.ObjectValue object(
         @NotNull Function<T, Field> transform, @NotNull List<T> values) {
-      List<Field> fields = values.stream().map(transform).collect(Collectors.toList());
+      List<Field> fields =
+          values.stream().map(transform).filter(Objects::nonNull).collect(Collectors.toList());
       return new ObjectValue(fields);
     }
 
@@ -917,7 +931,7 @@ public interface Field {
       }
 
       @Override
-      public @NotNull Number raw() {
+      public Number raw() {
         return number;
       }
 
@@ -935,7 +949,7 @@ public interface Field {
       }
 
       @Override
-      public @NotNull String raw() {
+      public String raw() {
         return s;
       }
 
@@ -953,7 +967,7 @@ public interface Field {
       }
 
       @Override
-      public List<Value<?>> raw() {
+      public @NotNull List<Value<?>> raw() {
         return raw;
       }
 
