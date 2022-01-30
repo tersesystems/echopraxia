@@ -3,10 +3,7 @@ package example;
 import static com.tersesystems.echopraxia.Field.Value;
 import static java.util.Collections.singletonList;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.time.Instant;
@@ -88,12 +85,6 @@ public class Main {
               return t;
             });
 
-    final Logger<MyFieldBuilder> asyncLogger = logger.withExecutor(executor);
-    asyncLogger.asyncError(
-        error ->
-            error.log("This is a test {}", fb -> fb.onlyNumber("nanotime", System.nanoTime())));
-
-    // You can also use a custom logger
     MyLogger myLogger = MyLoggerFactory.getLogger();
     myLogger.debug("Using my logger {}", fb -> fb.onlyDate("my date", new Date()));
 

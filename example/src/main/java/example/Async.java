@@ -1,48 +1,44 @@
 package example;
 
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
-import java.util.concurrent.*;
-import java.util.function.Function;
-import org.slf4j.MDC;
+import com.tersesystems.echopraxia.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Async {
+  private static final ExecutorService loggingExecutor =
+      Executors.newSingleThreadExecutor(
+          r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true); // daemon means the thread won't stop JVM from exiting
+            t.setName("logging-thread");
+            return t;
+          });
 
-  private static final Logger<?> logger = LoggerFactory.getLogger();
+  private static final Condition expensiveCondition =
+      new Condition() {
+        @Override
+        public boolean test(Level level, LoggingContext context) {
+          try {
+            Thread.sleep(1000L);
+            return true;
+          } catch (InterruptedException e) {
+            return false;
+          }
+        }
+        ;
+      };
 
-  public static void main(String[] args) {
-    ExecutorService executor =
-        Executors.newSingleThreadExecutor(
-            r -> {
-              Thread t = new Thread(r);
-              t.setDaemon(true);
-              t.setName("logging-thread");
-              return t;
-            });
+  private static final AsyncLogger<?> logger =
+      LoggerFactory.getLogger().withExecutor(loggingExecutor).withCondition(expensiveCondition);
 
-    logger
-        .withExecutor(executor)
-        .withThreadContext()
-        .asyncInfo(
-            h -> {
-              MDC.put("herp", "derp");
-              h.log("This logs in the main flow, but does so asynchronously");
-            });
-
-    final CompletableFuture<Long> future =
-        CompletableFuture.supplyAsync(
-                () -> {
-                  String mdcvalue = MDC.get("herp");
-                  logger.info("supplyAsync: {}", fb -> fb.onlyString("mdcvalue", mdcvalue));
-                  return System.currentTimeMillis();
-                })
-            .thenApplyAsync(wireTap(), executor);
-  }
-
-  static <T> Function<T, T> wireTap() {
-    return element -> {
-      logger.info("wireTap: {}", fb -> fb.onlyString("element", element.toString()));
-      return element;
-    };
+  public static void main(String[] args) throws InterruptedException {
+    System.out.println("BEFORE logging block");
+    for (int i = 0; i < 10; i++) {
+      // This should take no time on the rendering thread :-)
+      logger.info(h -> h.log("Prints out after expensive condition"));
+    }
+    System.out.println("AFTER logging block");
+    System.out.println("Sleeping so that the JVM stays up");
+    Thread.sleep(1001L * 10L);
   }
 }

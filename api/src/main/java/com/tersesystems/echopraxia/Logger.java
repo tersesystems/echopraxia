@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -145,8 +144,8 @@ public class Logger<FB extends Field.Builder> {
     return new Logger<>(core().withThreadContext(mapTransform), fieldBuilder);
   }
 
-  public Logger<FB> withExecutor(Executor executor) {
-    return new Logger<>(core().withExecutor(executor), fieldBuilder);
+  public AsyncLogger<FB> withExecutor(Executor executor) {
+    return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
   }
 
   // ------------------------------------------------------------------------
@@ -229,14 +228,6 @@ public class Logger<FB extends Field.Builder> {
     core().log(TRACE, condition, message, e);
   }
 
-  public void asyncTrace(Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(TRACE, consumer, fieldBuilder);
-  }
-
-  public void asyncTrace(Condition c, Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(TRACE, c, consumer, fieldBuilder);
-  }
-
   // ------------------------------------------------------------------------
   // DEBUG
 
@@ -315,14 +306,6 @@ public class Logger<FB extends Field.Builder> {
    */
   public void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core().log(DEBUG, condition, message, e);
-  }
-
-  public void asyncDebug(Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(DEBUG, consumer, fieldBuilder);
-  }
-
-  public void asyncDebug(Condition c, Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(DEBUG, c, consumer, fieldBuilder);
   }
 
   // ------------------------------------------------------------------------
@@ -405,14 +388,6 @@ public class Logger<FB extends Field.Builder> {
     core().log(INFO, condition, message, e);
   }
 
-  public void asyncInfo(Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(INFO, consumer, fieldBuilder);
-  }
-
-  public void asyncInfo(Condition c, Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(INFO, c, consumer, fieldBuilder);
-  }
-
   // ------------------------------------------------------------------------
   // WARN
 
@@ -493,14 +468,6 @@ public class Logger<FB extends Field.Builder> {
     core().log(WARN, condition, message, e);
   }
 
-  public void asyncWarn(Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(WARN, consumer, fieldBuilder);
-  }
-
-  public void asyncWarn(Condition c, Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(WARN, c, consumer, fieldBuilder);
-  }
-
   // ------------------------------------------------------------------------
   // ERROR
 
@@ -579,13 +546,5 @@ public class Logger<FB extends Field.Builder> {
    */
   public void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core().log(ERROR, condition, message, e);
-  }
-
-  public void asyncError(Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(ERROR, consumer, fieldBuilder);
-  }
-
-  public void asyncError(Condition c, Consumer<LoggerHandle<FB>> consumer) {
-    core().asyncLog(ERROR, c, consumer, fieldBuilder);
   }
 }
