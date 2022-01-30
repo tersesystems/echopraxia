@@ -1,18 +1,20 @@
 package example;
 
-import static com.tersesystems.echopraxia.Field.Value;
-import static java.util.Collections.singletonList;
-
-import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
+
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+
+import static com.tersesystems.echopraxia.Field.Value;
+import static java.util.Collections.singletonList;
 
 public class Main {
 
@@ -73,17 +75,6 @@ public class Main {
     if (logger.isInfoEnabled(dateCondition)) {
       logger.info("hi there {}", fb -> fb.only(fb.person("person", abe)));
     }
-
-    // If you have conditions that are CPU expensive or may block on I/O network etc,
-    // then you can delegate logging to another thread (MDC / ThreadContext is copied).
-    final ExecutorService executor =
-        Executors.newSingleThreadExecutor(
-            r -> {
-              Thread t = new Thread(r);
-              t.setDaemon(true);
-              t.setName("condition-executor");
-              return t;
-            });
 
     MyLogger myLogger = MyLoggerFactory.getLogger();
     myLogger.debug("Using my logger {}", fb -> fb.onlyDate("my date", new Date()));
