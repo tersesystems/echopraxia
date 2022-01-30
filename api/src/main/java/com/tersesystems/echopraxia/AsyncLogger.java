@@ -145,6 +145,12 @@ public class AsyncLogger<FB extends Field.Builder> {
     core().asyncLog(TRACE, consumer, fieldBuilder);
   }
 
+  /**
+   * Logs using a condition and a logger handle at TRACE level.
+   *
+   * @param c        the condition
+   * @param consumer the consumer of the logger handle.
+   */
   public void trace(Condition c, Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(TRACE, c, consumer, fieldBuilder);
   }
@@ -158,6 +164,12 @@ public class AsyncLogger<FB extends Field.Builder> {
     core().asyncLog(DEBUG, consumer, fieldBuilder);
   }
 
+  /**
+   * Logs using a condition and a logger handle at DEBUG level.
+   *
+   * @param c        the condition
+   * @param consumer the consumer of the logger handle.
+   */
   public void debug(Condition c, Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(DEBUG, c, consumer, fieldBuilder);
   }
@@ -171,6 +183,12 @@ public class AsyncLogger<FB extends Field.Builder> {
     core().asyncLog(INFO, consumer, fieldBuilder);
   }
 
+  /**
+   * Logs using a condition and a logger handle at INFO level.
+   *
+   * @param c        the condition
+   * @param consumer the consumer of the logger handle.
+   */
   public void info(Condition c, Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(INFO, c, consumer, fieldBuilder);
   }
@@ -184,6 +202,12 @@ public class AsyncLogger<FB extends Field.Builder> {
     core().asyncLog(WARN, consumer, fieldBuilder);
   }
 
+  /**
+   * Logs using a condition and a logger handle at WARN level.
+   *
+   * @param c        the condition
+   * @param consumer the consumer of the logger handle.
+   */
   public void warn(Condition c, Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(WARN, c, consumer, fieldBuilder);
   }
@@ -197,6 +221,12 @@ public class AsyncLogger<FB extends Field.Builder> {
     core().asyncLog(ERROR, consumer, fieldBuilder);
   }
 
+  /**
+   * Logs using a condition and a logger handle at ERROR level.
+   *
+   * @param c        the condition
+   * @param consumer the consumer of the logger handle.
+   */
   public void error(Condition c, Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(ERROR, c, consumer, fieldBuilder);
   }
