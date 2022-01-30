@@ -415,7 +415,7 @@ if (logger.isInfoEnabled(condition)) {
 }
 ```
 
-### Handling Expensive Conditions with Asynchronous Logging
+### Asynchronous Logging for Expensive Conditions
 
 By default, conditions are evaluated in the running thread.  This can be a problem if conditions rely on external elements such as network calls or database lookups, or involve resources with locks.
 
@@ -426,6 +426,15 @@ In `AsyncLogger`, the argument is a `Consumer` of `LoggerHandle`.  `LoggerHandle
 ```java
 AsyncLogger<?> logger = LoggerFactory.getLogger().withExecutor(loggingExecutor);
 logger.info(h -> h.log("Message template {}", fb -> fb.onlyString("foo", "bar")));
+```
+
+The consumer is run on a thread specified by the executor, and can also be used appropriately for expensive logging operations.
+
+In the unfortunate event of an exception, the underlying (SLF4J|Log4J) logger will be called at `error` level from the relevant core logger:
+
+```java
+// only happens if uncaught exception from consumer
+logger.error("Uncaught exception when running asyncLog", cause);
 ```
 
 One important detail is that the logging executor should be a daemon thread, so that it does not block JVM exit:
@@ -528,7 +537,7 @@ public class GreetingController {
 }
 ```
 
-There are other ways to handle this wrapping, for example [extending executors](https://medium.com/asyncparadigm/logging-in-a-multithreaded-environment-and-with-completablefuture-construct-using-mdc-1c34c691cef0), but that's a bigger topic.
+There are other ways to handle this wrapping, for example subclassing the `AsyncLogger` and overriding the logging methods.  There are also fancy [executor-based ways to extend context](https://medium.com/asyncparadigm/logging-in-a-multithreaded-environment-and-with-completablefuture-construct-using-mdc-1c34c691cef0), but that's a different topic.
 
 ### Dynamic Conditions with Scripts
 
