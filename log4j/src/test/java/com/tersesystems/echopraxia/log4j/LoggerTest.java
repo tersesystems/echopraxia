@@ -16,6 +16,16 @@ import org.junit.jupiter.api.Test;
 public class LoggerTest extends TestBase {
 
   @Test
+  void testNullMessage() {
+    Logger<?> logger = getLogger();
+    logger.debug(null);
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("null");
+  }
+
+  @Test
   void testNullStringArgument() {
     Logger<?> logger = getLogger();
     String value = null;
