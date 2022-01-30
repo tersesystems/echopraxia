@@ -47,6 +47,54 @@ public class Log4JCoreLogger implements CoreLogger {
     this.executor = executor;
   }
 
+  public Logger logger() {
+    return this.logger;
+  }
+
+  @Override
+  public @NotNull Condition condition() {
+    return this.condition;
+  }
+
+  @Override
+  public <B extends Field.Builder> @NotNull CoreLogger withFields(
+      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
+    Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
+    return new Log4JCoreLogger(logger, context.and(newContext), condition, executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withThreadContext(
+      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
+    Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
+    Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
+    if (condition == Condition.never()) {
+      if (this.condition == Condition.never()) {
+        return this;
+      }
+      return new Log4JCoreLogger(logger, context, condition, executor);
+    }
+    if (condition == Condition.always()) {
+      return this;
+    }
+    return new Log4JCoreLogger(logger, context, this.condition.and(condition), executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
+    return new Log4JCoreLogger(logger, context, this.condition, executor);
+  }
+
+  public CoreLogger withMarker(Marker marker) {
+    Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
+  }
+
   @Override
   public boolean isEnabled(@NotNull Level level) {
     if (this.condition == Condition.never()) {
@@ -151,7 +199,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public <B extends Field.Builder> void log(
       @NotNull Level level,
       @NotNull Condition condition,
-      String message,
+      @Nullable String message,
       Field.@NotNull BuilderFunction<B> f,
       @NotNull B builder) {
     if (!condition.test(level, context)) {
@@ -162,25 +210,86 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public <FB extends Field.Builder> void asyncLog(
-      Level level, Consumer<LoggerHandle<FB>> consumer, FB builder) {
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     runAsyncLog(
         consumer,
         new LoggerHandle<FB>() {
           @Override
-          public void log(String message) {
+          public void log(@Nullable String message) {
             Log4JCoreLogger.this.log(level, message);
           }
 
           @Override
-          public void log(String message, Field.BuilderFunction<FB> f) {
+          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
             Log4JCoreLogger.this.log(level, message, f, builder);
           }
 
           @Override
-          public void log(String message, Throwable e) {
+          public void log(@Nullable String message, @NotNull Throwable e) {
             Log4JCoreLogger.this.log(level, message, e);
           }
         });
+  }
+
+  @Override
+  public <FB extends Field.Builder> void asyncLog(
+      @NotNull Level level,
+      @NotNull Condition c,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
+    runAsyncLog(
+        consumer,
+        new LoggerHandle<FB>() {
+          @Override
+          public void log(@Nullable String message) {
+            Log4JCoreLogger.this.log(level, c, message);
+          }
+
+          @Override
+          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+            Log4JCoreLogger.this.log(level, c, message, f, builder);
+          }
+
+          @Override
+          public void log(@Nullable String message, @NotNull Throwable e) {
+            Log4JCoreLogger.this.log(level, c, message, e);
+          }
+        });
+  }
+
+  protected Message createMessage(String message) {
+    return createMessage(message, Collections.emptyList());
+  }
+
+  protected Message createMessage(String template, List<Field> arguments) {
+    List<Field> contextFields = context.getFields();
+    return new EchopraxiaFieldsMessage(template, arguments, contextFields);
+  }
+
+  protected org.apache.logging.log4j.Level convertLevel(Level level) {
+    switch (level) {
+      case ERROR:
+        return org.apache.logging.log4j.Level.ERROR;
+      case WARN:
+        return org.apache.logging.log4j.Level.WARN;
+      case INFO:
+        return org.apache.logging.log4j.Level.INFO;
+      case DEBUG:
+        return org.apache.logging.log4j.Level.DEBUG;
+      case TRACE:
+        return org.apache.logging.log4j.Level.TRACE;
+    }
+    throw new IllegalStateException("Unknown level " + level);
+  }
+
+  protected Throwable findThrowable(List<Field> fields) {
+    for (Field field : fields) {
+      final Value<?> value = field.value();
+      if (value instanceof Value.ExceptionValue) {
+        return ((Value.ExceptionValue) value).raw();
+      }
+    }
+    return null;
   }
 
   protected <FB extends Field.Builder> void runAsyncLog(
@@ -215,111 +324,5 @@ public class Log4JCoreLogger implements CoreLogger {
               logger.error("Uncaught exception when running asyncLog", cause);
               return null;
             });
-  }
-
-  @Override
-  public <FB extends Field.Builder> void asyncLog(
-      Level level, Condition c, Consumer<LoggerHandle<FB>> consumer, FB builder) {
-    runAsyncLog(
-        consumer,
-        new LoggerHandle<FB>() {
-          @Override
-          public void log(String message) {
-            Log4JCoreLogger.this.log(level, c, message);
-          }
-
-          @Override
-          public void log(String message, Field.BuilderFunction<FB> f) {
-            Log4JCoreLogger.this.log(level, c, message, f, builder);
-          }
-
-          @Override
-          public void log(String message, Throwable e) {
-            Log4JCoreLogger.this.log(level, c, message, e);
-          }
-        });
-  }
-
-  @Override
-  public @NotNull Condition condition() {
-    return this.condition;
-  }
-
-  @Override
-  public <B extends Field.Builder> @NotNull CoreLogger withFields(
-      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
-    Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
-    return new Log4JCoreLogger(logger, context.and(newContext), condition, executor);
-  }
-
-  @Override
-  public @NotNull CoreLogger withThreadContext(
-      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
-    Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
-    Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
-    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
-  }
-
-  @Override
-  public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
-    if (condition == Condition.never()) {
-      if (this.condition == Condition.never()) {
-        return this;
-      }
-      return new Log4JCoreLogger(logger, context, condition, executor);
-    }
-    if (condition == Condition.always()) {
-      return this;
-    }
-    return new Log4JCoreLogger(logger, context, this.condition.and(condition), executor);
-  }
-
-  @Override
-  public CoreLogger withExecutor(Executor executor) {
-    return new Log4JCoreLogger(logger, context, this.condition, executor);
-  }
-
-  public CoreLogger withMarker(Marker marker) {
-    Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
-    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
-  }
-
-  private Message createMessage(String message) {
-    return createMessage(message, Collections.emptyList());
-  }
-
-  private <B extends Field.Builder> Message createMessage(String template, List<Field> arguments) {
-    List<Field> contextFields = context.getFields();
-    return new EchopraxiaFieldsMessage(template, arguments, contextFields);
-  }
-
-  private org.apache.logging.log4j.Level convertLevel(Level level) {
-    switch (level) {
-      case ERROR:
-        return org.apache.logging.log4j.Level.ERROR;
-      case WARN:
-        return org.apache.logging.log4j.Level.WARN;
-      case INFO:
-        return org.apache.logging.log4j.Level.INFO;
-      case DEBUG:
-        return org.apache.logging.log4j.Level.DEBUG;
-      case TRACE:
-        return org.apache.logging.log4j.Level.TRACE;
-    }
-    throw new IllegalStateException("Unknown level " + level);
-  }
-
-  private Throwable findThrowable(List<Field> fields) {
-    for (Field field : fields) {
-      final Value<?> value = field.value();
-      if (value instanceof Value.ExceptionValue) {
-        return ((Value.ExceptionValue) value).raw();
-      }
-    }
-    return null;
-  }
-
-  public Logger logger() {
-    return this.logger;
   }
 }

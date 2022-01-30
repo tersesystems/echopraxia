@@ -16,6 +16,7 @@ import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
@@ -96,83 +97,8 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public CoreLogger withExecutor(Executor executor) {
+  public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
     return new LogstashCoreLogger(logger, context, condition, executor);
-  }
-
-  @Override
-  public <FB extends Field.Builder> void asyncLog(
-      Level level, Consumer<LoggerHandle<FB>> consumer, FB builder) {
-    runAsyncLog(
-        consumer,
-        new LoggerHandle<FB>() {
-          @Override
-          public void log(String message) {
-            LogstashCoreLogger.this.log(level, message);
-          }
-
-          @Override
-          public void log(String message, Field.BuilderFunction<FB> f) {
-            LogstashCoreLogger.this.log(level, message, f, builder);
-          }
-
-          @Override
-          public void log(String message, Throwable e) {
-            LogstashCoreLogger.this.log(level, message, e);
-          }
-        });
-  }
-
-  protected <FB extends Field.Builder> void runAsyncLog(
-      Consumer<LoggerHandle<FB>> consumer, LoggerHandle<FB> handle) {
-    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
-    Runnable runnable =
-        () -> {
-          if (copyOfContextMap != null) {
-            MDC.setContextMap(copyOfContextMap);
-          }
-          consumer.accept(handle);
-        };
-
-    // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
-    CompletableFuture.runAsync(runnable, executor)
-        .exceptionally(
-            e -> {
-              // Usually we get to this point when you have thread local dependent code in your
-              // logger.withContext() block, and your executor doesn't have those thread locals
-              // so you NPE.
-              //
-              // We need to log this error, but since it could be part of the logger context
-              // that is causing this error, we can't log the error with the same logger.
-              //
-              // Fallback to the underlying SLF4J logger to render it.
-              final Throwable cause = e.getCause(); // strip the CompletionException
-              logger.error("Uncaught exception when running asyncLog", cause);
-              return null;
-            });
-  }
-
-  @Override
-  public <FB extends Field.Builder> void asyncLog(
-      Level level, Condition c, Consumer<LoggerHandle<FB>> consumer, FB builder) {
-    runAsyncLog(
-        consumer,
-        new LoggerHandle<FB>() {
-          @Override
-          public void log(String message) {
-            LogstashCoreLogger.this.log(level, c, message);
-          }
-
-          @Override
-          public void log(String message, Field.BuilderFunction<FB> f) {
-            LogstashCoreLogger.this.log(level, c, message, f, builder);
-          }
-
-          @Override
-          public void log(String message, Throwable e) {
-            LogstashCoreLogger.this.log(level, c, message, e);
-          }
-        });
   }
 
   public CoreLogger withMarkers(Marker... markers) {
@@ -352,13 +278,62 @@ public class LogstashCoreLogger implements CoreLogger {
   public <B extends Field.Builder> void log(
       @NotNull Level level,
       @NotNull Condition condition,
-      String message,
+      @Nullable String message,
       Field.@NotNull BuilderFunction<B> f,
       @NotNull B builder) {
     if (!condition.test(level, context)) {
       return;
     }
     log(level, message, f, builder);
+  }
+
+  @Override
+  public <FB extends Field.Builder> void asyncLog(
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+    runAsyncLog(
+        consumer,
+        new LoggerHandle<FB>() {
+          @Override
+          public void log(@Nullable String message) {
+            LogstashCoreLogger.this.log(level, message);
+          }
+
+          @Override
+          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+            LogstashCoreLogger.this.log(level, message, f, builder);
+          }
+
+          @Override
+          public void log(@Nullable String message, @NotNull Throwable e) {
+            LogstashCoreLogger.this.log(level, message, e);
+          }
+        });
+  }
+
+  @Override
+  public <FB extends Field.Builder> void asyncLog(
+      @NotNull Level level,
+      @NotNull Condition c,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
+    runAsyncLog(
+        consumer,
+        new LoggerHandle<FB>() {
+          @Override
+          public void log(@Nullable String message) {
+            LogstashCoreLogger.this.log(level, c, message);
+          }
+
+          @Override
+          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+            LogstashCoreLogger.this.log(level, c, message, f, builder);
+          }
+
+          @Override
+          public void log(@Nullable String message, @NotNull Throwable e) {
+            LogstashCoreLogger.this.log(level, c, message, e);
+          }
+        });
   }
 
   // Top level conversion to Logback must be StructuredArgument, with an optional throwable
@@ -401,5 +376,34 @@ public class LogstashCoreLogger implements CoreLogger {
             .collect(Collectors.toList());
     markerList.addAll(markers);
     return Markers.aggregate(markerList);
+  }
+
+  protected <FB extends Field.Builder> void runAsyncLog(
+      Consumer<LoggerHandle<FB>> consumer, LoggerHandle<FB> handle) {
+    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
+    Runnable runnable =
+        () -> {
+          if (copyOfContextMap != null) {
+            MDC.setContextMap(copyOfContextMap);
+          }
+          consumer.accept(handle);
+        };
+
+    // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
+    CompletableFuture.runAsync(runnable, executor)
+        .exceptionally(
+            e -> {
+              // Usually we get to this point when you have thread local dependent code in your
+              // logger.withContext() block, and your executor doesn't have those thread locals
+              // so you NPE.
+              //
+              // We need to log this error, but since it could be part of the logger context
+              // that is causing this error, we can't log the error with the same logger.
+              //
+              // Fallback to the underlying SLF4J logger to render it.
+              final Throwable cause = e.getCause(); // strip the CompletionException
+              logger.error("Uncaught exception when running asyncLog", cause);
+              return null;
+            });
   }
 }

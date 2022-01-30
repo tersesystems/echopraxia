@@ -141,7 +141,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    *
    * @param consumer the consumer of the logger handle.
    */
-  public void trace(Consumer<LoggerHandle<FB>> consumer) {
+  public void trace(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(TRACE, consumer, fieldBuilder);
   }
 
@@ -151,7 +151,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  public void trace(Condition c, Consumer<LoggerHandle<FB>> consumer) {
+  public void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(TRACE, c, consumer, fieldBuilder);
   }
 
@@ -160,7 +160,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    *
    * @param consumer the consumer of the logger handle.
    */
-  public void debug(Consumer<LoggerHandle<FB>> consumer) {
+  public void debug(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(DEBUG, consumer, fieldBuilder);
   }
 
@@ -170,7 +170,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  public void debug(Condition c, Consumer<LoggerHandle<FB>> consumer) {
+  public void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(DEBUG, c, consumer, fieldBuilder);
   }
 
@@ -179,7 +179,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    *
    * @param consumer the consumer of the logger handle.
    */
-  public void info(Consumer<LoggerHandle<FB>> consumer) {
+  public void info(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(INFO, consumer, fieldBuilder);
   }
 
@@ -189,7 +189,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  public void info(Condition c, Consumer<LoggerHandle<FB>> consumer) {
+  public void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(INFO, c, consumer, fieldBuilder);
   }
 
@@ -198,7 +198,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    *
    * @param consumer the consumer of the logger handle.
    */
-  public void warn(Consumer<LoggerHandle<FB>> consumer) {
+  public void warn(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(WARN, consumer, fieldBuilder);
   }
 
@@ -208,7 +208,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  public void warn(Condition c, Consumer<LoggerHandle<FB>> consumer) {
+  public void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(WARN, c, consumer, fieldBuilder);
   }
 
@@ -217,7 +217,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    *
    * @param consumer the consumer of the logger handle.
    */
-  public void error(Consumer<LoggerHandle<FB>> consumer) {
+  public void error(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(ERROR, consumer, fieldBuilder);
   }
 
@@ -227,7 +227,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  public void error(Condition c, Consumer<LoggerHandle<FB>> consumer) {
+  public void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(ERROR, c, consumer, fieldBuilder);
   }
 }
