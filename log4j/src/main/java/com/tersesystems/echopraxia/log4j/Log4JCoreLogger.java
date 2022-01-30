@@ -163,93 +163,81 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB extends Field.Builder> void asyncLog(
       Level level, Consumer<LoggerHandle<FB>> consumer, FB builder) {
-    final Map<String, String> copyOfContextMap = ThreadContext.getImmutableContext();
-    final ThreadContext.ContextStack contextStack = ThreadContext.cloneStack();
-    CompletableFuture.runAsync(
-        () -> {
-          Thread current = Thread.currentThread();
-          final Thread.UncaughtExceptionHandler beforeHandler =
-              current.getUncaughtExceptionHandler();
-          try {
-            final LoggerHandle<FB> handle =
-                new LoggerHandle<FB>() {
-                  @Override
-                  public void log(String message) {
-                    Log4JCoreLogger.this.log(level, message);
-                  }
-
-                  @Override
-                  public void log(String message, Field.BuilderFunction<FB> f) {
-                    Log4JCoreLogger.this.log(level, message, f, builder);
-                  }
-
-                  @Override
-                  public void log(String message, Throwable e) {
-                    Log4JCoreLogger.this.log(level, message, e);
-                  }
-                };
-            Thread.UncaughtExceptionHandler handler =
-                (th, ex) -> handle.log("Uncaught exception", ex);
-            current.setUncaughtExceptionHandler(handler);
-            ThreadContext.clearAll();
-            if (copyOfContextMap != null) {
-              ThreadContext.putAll(copyOfContextMap);
-            }
-            if (contextStack != null) {
-              ThreadContext.setStack(contextStack);
-            }
-            consumer.accept(handle);
-          } finally {
-            current.setUncaughtExceptionHandler(beforeHandler);
+    runAsyncLog(
+        consumer,
+        new LoggerHandle<FB>() {
+          @Override
+          public void log(String message) {
+            Log4JCoreLogger.this.log(level, message);
           }
-        },
-        executor);
+
+          @Override
+          public void log(String message, Field.BuilderFunction<FB> f) {
+            Log4JCoreLogger.this.log(level, message, f, builder);
+          }
+
+          @Override
+          public void log(String message, Throwable e) {
+            Log4JCoreLogger.this.log(level, message, e);
+          }
+        });
+  }
+
+  protected <FB extends Field.Builder> void runAsyncLog(
+      Consumer<LoggerHandle<FB>> consumer, LoggerHandle<FB> handle) {
+    final Map<String, String> copyOfContextMap = ThreadContext.getImmutableContext();
+    final ThreadContext.ContextStack contextStack = ThreadContext.getImmutableStack();
+    Runnable runnable =
+        () -> {
+          ThreadContext.clearAll();
+          if (copyOfContextMap != null) {
+            ThreadContext.putAll(copyOfContextMap);
+          }
+          if (contextStack != null) {
+            ThreadContext.setStack(contextStack);
+          }
+          consumer.accept(handle);
+        };
+
+    // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
+    CompletableFuture.runAsync(runnable, executor)
+        .exceptionally(
+            e -> {
+              // Usually we get to this point when you have thread local dependent code in your
+              // logger.withContext() block, and your executor doesn't have those thread locals
+              // so you NPE.
+              //
+              // We need to log this error, but since it could be part of the logger context
+              // that is causing this error, we can't log the error with the same logger.
+              //
+              // Fallback to the underlying logger to render it.
+              final Throwable cause = e.getCause(); // strip the CompletionException
+              logger.error("Uncaught exception when running asyncLog", cause);
+              return null;
+            });
   }
 
   @Override
   public <FB extends Field.Builder> void asyncLog(
       Level level, Condition c, Consumer<LoggerHandle<FB>> consumer, FB builder) {
-    final Map<String, String> copyOfContextMap = ThreadContext.getImmutableContext();
-    final ThreadContext.ContextStack contextStack = ThreadContext.cloneStack();
-    CompletableFuture.runAsync(
-        () -> {
-          Thread current = Thread.currentThread();
-          final Thread.UncaughtExceptionHandler beforeHandler =
-              current.getUncaughtExceptionHandler();
-          try {
-            final LoggerHandle<FB> handle =
-                new LoggerHandle<FB>() {
-                  @Override
-                  public void log(String message) {
-                    Log4JCoreLogger.this.log(level, c, message);
-                  }
-
-                  @Override
-                  public void log(String message, Field.BuilderFunction<FB> f) {
-                    Log4JCoreLogger.this.log(level, c, message, f, builder);
-                  }
-
-                  @Override
-                  public void log(String message, Throwable e) {
-                    Log4JCoreLogger.this.log(level, c, message, e);
-                  }
-                };
-            Thread.UncaughtExceptionHandler handler =
-                (th, ex) -> handle.log("Uncaught exception", ex);
-            current.setUncaughtExceptionHandler(handler);
-            ThreadContext.clearAll();
-            if (copyOfContextMap != null) {
-              ThreadContext.putAll(copyOfContextMap);
-            }
-            if (contextStack != null) {
-              ThreadContext.setStack(contextStack);
-            }
-            consumer.accept(handle);
-          } finally {
-            current.setUncaughtExceptionHandler(beforeHandler);
+    runAsyncLog(
+        consumer,
+        new LoggerHandle<FB>() {
+          @Override
+          public void log(String message) {
+            Log4JCoreLogger.this.log(level, c, message);
           }
-        },
-        executor);
+
+          @Override
+          public void log(String message, Field.BuilderFunction<FB> f) {
+            Log4JCoreLogger.this.log(level, c, message, f, builder);
+          }
+
+          @Override
+          public void log(String message, Throwable e) {
+            Log4JCoreLogger.this.log(level, c, message, e);
+          }
+        });
   }
 
   @Override

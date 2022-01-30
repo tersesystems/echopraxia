@@ -588,5 +588,4 @@ public class Logger<FB extends Field.Builder> {
   public void asyncError(Condition c, Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(ERROR, c, consumer, fieldBuilder);
   }
-
 }
