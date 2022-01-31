@@ -105,6 +105,9 @@ public class Logger<FB extends Field.Builder> {
     if (condition == Condition.always()) {
       return this;
     }
+    if (condition == Condition.never()) {
+      return new NeverLogger<>(core, fieldBuilder);
+    }
     // Reduce allocation if we can help it
     final CoreLogger coreLogger = core().withCondition(condition);
     if (coreLogger == core()) {
