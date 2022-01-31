@@ -419,16 +419,18 @@ if (logger.isInfoEnabled(condition)) {
 
 By default, conditions are evaluated in the running thread.  This can be a problem if conditions rely on external elements such as network calls or database lookups, or involve resources with locks.
 
-Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  An `AsyncLogger` is created when calling the `withExecutor` method.
+Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  An `AsyncLogger` is created when calling the `withExecutor` method.  All statements are placed on a work queue and run on a thread specified by the executor at a later time.
 
-In `AsyncLogger`, the argument is a `Consumer` of `LoggerHandle`.  `LoggerHandle` takes the same arguments as described above, i.e.
+All the usual logging statements are available in `AsyncLogger`, i.e. `logger.debug` will log as usual.  However, there are no predicates in the `AsyncLogger` -- instead, a `Consumer` of `LoggerHandle` is used.  `LoggerHandle` takes the same arguments as described above, i.e.
 
 ```java
 AsyncLogger<?> logger = LoggerFactory.getLogger().withExecutor(loggingExecutor);
-logger.info(h -> h.log("Message template {}", fb -> fb.onlyString("foo", "bar")));
+logger.info(handle -> {
+  // do conditional logic that would normally happen in an if block
+  // this may be expensive or blocking because it runs asynchronously
+  handle.log("Message template {}", fb -> fb.onlyString("foo", "bar");
+});
 ```
-
-The consumer is run on a thread specified by the executor, and can also be used appropriately for expensive logging operations.
 
 In the unfortunate event of an exception, the underlying (SLF4J|Log4J) logger will be called at `error` level from the relevant core logger:
 
@@ -450,7 +452,7 @@ private static final Executor loggingExecutor =
       });
 ```
 
-Using a single thread executor is nice because you can keep ordering of your logging statements, but it may not scale up in production.  Generally speaking, if you are CPU bound and want to distribute load over several cores, you should use `ForkJoinPool.commonPool()` or a bounded fork-join work stealing pool as your executor.  If your conditions involve blocking or you're IO bound, you should configure a thread pool executor.  Because of parallelism and concurrency, your logging statements may not appear in order, but you can add extra fields to ensure you can reorder statements appropriately.
+Using a single thread executor is nice because you can keep ordering of your logging statements, but it may not scale up in production.  Generally speaking, if you are CPU bound and want to distribute load over several cores, you should use `ForkJoinPool.commonPool()` or a bounded fork-join work stealing pool as your executor.  If your conditions involve blocking, or work is IO bound, you should configure a thread pool executor.  Because of parallelism and concurrency, your logging statements may not appear in order, but you can add extra fields to ensure you can reorder statements appropriately.
 
 Putting it all together:
 
@@ -485,7 +487,7 @@ public class Async {
     System.out.println("BEFORE logging block");
     for (int i = 0; i < 10; i++) {
       // This should take no time on the rendering thread :-)
-      logger.info(h -> h.log("Prints out after expensive condition"));
+      logger.info("Prints out after expensive condition");
     }
     System.out.println("AFTER logging block");
     System.out.println("Sleeping so that the JVM stays up");
