@@ -153,6 +153,7 @@ public class Logger<FB extends Field.Builder> implements LoggerLike<FB, Logger<F
     return new Logger<>(core().withThreadContext(mapTransform), fieldBuilder);
   }
 
+  // not overridden, not sure if should be part of LoggerLike
   public AsyncLogger<FB> withExecutor(Executor executor) {
     return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
   }
