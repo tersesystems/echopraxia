@@ -1,10 +1,19 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.log4j.appender.ListAppender.getListAppender;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
+import com.tersesystems.echopraxia.AsyncLogger;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.log4j.appender.ListAppender;
+import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
 import javax.json.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -56,5 +65,89 @@ public class ConditionTest extends TestBase {
     JsonObject entry = getEntry();
     final JsonObject fields = entry.getJsonObject("fields");
     assertThat(fields.getString("herp")).isEqualTo("derp");
+  }
+
+  @Test
+  void testAsyncCondition() {
+    Condition c =
+        (level, ctx) -> {
+          try {
+            Thread.sleep(900L);
+          } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+          }
+          return true;
+        };
+
+    AtomicBoolean logged = new AtomicBoolean(false);
+    AsyncLogger<?> loggerWithCondition =
+        getLogger().withExecutor(ForkJoinPool.commonPool()).withCondition(c);
+    loggerWithCondition.info(
+        handle -> {
+          handle.log("async logging test");
+          logged.set(true);
+        });
+
+    final ListAppender listAppender = getListAppender("ListAppender");
+    final List<String> messages = listAppender.getMessages();
+    assertThat(messages).isEmpty();
+
+    await().atMost(1, SECONDS).until(logged::get);
+
+    JsonObject entry = getEntry();
+    String message = entry.getString("message");
+    assertThat(message).isEqualTo("async logging test");
+  }
+
+  @Test
+  void testFailedAsyncCondition() {
+    AtomicBoolean logged = new AtomicBoolean(false);
+    Condition c =
+        (level, ctx) -> {
+          if (System.currentTimeMillis() > 0) {
+            logged.set(true);
+            throw new RuntimeException("oh noes!");
+          }
+          return true;
+        };
+    AsyncLogger<?> loggerWithCondition =
+        getLogger().withExecutor(ForkJoinPool.commonPool()).withCondition(c);
+    loggerWithCondition.info(
+        handle -> {
+          handle.log("async logging test");
+          logged.set(true);
+        });
+
+    await().atLeast(100, MILLISECONDS).until(logged::get);
+    JsonObject entry = getEntry();
+    String message = entry.getString("message");
+    assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
+    String exceptionMessage = entry.getJsonObject("exception").getString("exception_message");
+    assertThat(exceptionMessage).isEqualTo("oh noes!");
+  }
+
+  @Test
+  void testFailedLogging() {
+    AtomicBoolean logged = new AtomicBoolean(false);
+    AsyncLogger<?> loggerWithCondition = getLogger().withExecutor(ForkJoinPool.commonPool());
+    loggerWithCondition.info(
+        handle -> {
+          handle.log(
+              "async logging test",
+              fb -> {
+                if (System.currentTimeMillis() > 0) {
+                  logged.set(true);
+                  throw new RuntimeException("oh noes!");
+                }
+                return fb.onlyString("foo", "bar");
+              });
+        });
+
+    await().atLeast(100, MILLISECONDS).until(logged::get);
+    JsonObject entry = getEntry();
+    String message = entry.getString("message");
+    assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
+    String exceptionMessage = entry.getJsonObject("exception").getString("exception_message");
+    assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 }
