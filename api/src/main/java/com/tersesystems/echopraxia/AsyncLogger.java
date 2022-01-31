@@ -102,6 +102,10 @@ public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, Asy
     if (condition == Condition.always()) {
       return this;
     }
+    if (condition == Condition.never()) {
+      return new NeverAsyncLogger<>(core().withCondition(Condition.never()), fieldBuilder);
+    }
+
     // Reduce allocation if we can help it
     final CoreLogger coreLogger = core().withCondition(condition);
     if (coreLogger == core()) {

@@ -110,8 +110,9 @@ public class Logger<FB extends Field.Builder> implements LoggerLike<FB, Logger<F
       return this;
     }
     if (condition == Condition.never()) {
-      return new NeverLogger<>(core, fieldBuilder);
+      return new NeverLogger<>(core().withCondition(Condition.never()), fieldBuilder);
     }
+
     // Reduce allocation if we can help it
     final CoreLogger coreLogger = core().withCondition(condition);
     if (coreLogger == core()) {
