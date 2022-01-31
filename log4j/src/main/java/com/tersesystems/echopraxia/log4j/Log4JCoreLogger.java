@@ -5,11 +5,16 @@ import static com.tersesystems.echopraxia.Field.Value;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.LoggerHandle;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.Logger;
@@ -25,17 +30,69 @@ public class Log4JCoreLogger implements CoreLogger {
   private final Logger logger;
   private final Log4JLoggingContext context;
   private final Condition condition;
+  private final Executor executor;
 
   Log4JCoreLogger(Logger log4jLogger) {
     this.logger = log4jLogger;
     this.context = new Log4JLoggingContext();
     this.condition = Condition.always();
+    this.executor = ForkJoinPool.commonPool();
   }
 
-  protected Log4JCoreLogger(Logger log4jLogger, Log4JLoggingContext context, Condition condition) {
+  protected Log4JCoreLogger(
+      Logger log4jLogger, Log4JLoggingContext context, Condition condition, Executor executor) {
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
+    this.executor = executor;
+  }
+
+  public Logger logger() {
+    return this.logger;
+  }
+
+  @Override
+  public @NotNull Condition condition() {
+    return this.condition;
+  }
+
+  @Override
+  public <B extends Field.Builder> @NotNull CoreLogger withFields(
+      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
+    Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
+    return new Log4JCoreLogger(logger, context.and(newContext), condition, executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withThreadContext(
+      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
+    Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
+    Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
+    if (condition == Condition.never()) {
+      if (this.condition == Condition.never()) {
+        return this;
+      }
+      return new Log4JCoreLogger(logger, context, condition, executor);
+    }
+    if (condition == Condition.always()) {
+      return this;
+    }
+    return new Log4JCoreLogger(logger, context, this.condition.and(condition), executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
+    return new Log4JCoreLogger(logger, context, this.condition, executor);
+  }
+
+  public CoreLogger withMarker(Marker marker) {
+    Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
+    return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
@@ -142,7 +199,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public <B extends Field.Builder> void log(
       @NotNull Level level,
       @NotNull Condition condition,
-      String message,
+      @Nullable String message,
       Field.@NotNull BuilderFunction<B> f,
       @NotNull B builder) {
     if (!condition.test(level, context)) {
@@ -152,54 +209,64 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull Condition condition() {
-    return this.condition;
+  public <FB extends Field.Builder> void asyncLog(
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+    runAsyncLog(
+        consumer,
+        new LoggerHandle<FB>() {
+          @Override
+          public void log(@Nullable String message) {
+            Log4JCoreLogger.this.log(level, message);
+          }
+
+          @Override
+          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+            Log4JCoreLogger.this.log(level, message, f, builder);
+          }
+
+          @Override
+          public void log(@Nullable String message, @NotNull Throwable e) {
+            Log4JCoreLogger.this.log(level, message, e);
+          }
+        });
   }
 
   @Override
-  public <B extends Field.Builder> @NotNull CoreLogger withFields(
-      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
-    Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
-    return new Log4JCoreLogger(logger, context.and(newContext), condition);
+  public <FB extends Field.Builder> void asyncLog(
+      @NotNull Level level,
+      @NotNull Condition c,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
+    runAsyncLog(
+        consumer,
+        new LoggerHandle<FB>() {
+          @Override
+          public void log(@Nullable String message) {
+            Log4JCoreLogger.this.log(level, c, message);
+          }
+
+          @Override
+          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+            Log4JCoreLogger.this.log(level, c, message, f, builder);
+          }
+
+          @Override
+          public void log(@Nullable String message, @NotNull Throwable e) {
+            Log4JCoreLogger.this.log(level, c, message, e);
+          }
+        });
   }
 
-  @Override
-  public @NotNull CoreLogger withThreadContext(
-      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
-    Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
-    Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
-    return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
-  }
-
-  @Override
-  public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
-    if (condition == Condition.never()) {
-      if (this.condition == Condition.never()) {
-        return this;
-      }
-      return new Log4JCoreLogger(logger, context, condition);
-    }
-    if (condition == Condition.always()) {
-      return this;
-    }
-    return new Log4JCoreLogger(logger, context, this.condition.and(condition));
-  }
-
-  public CoreLogger withMarker(Marker marker) {
-    Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
-    return new Log4JCoreLogger(logger, this.context.and(newContext), condition);
-  }
-
-  private Message createMessage(String message) {
+  protected Message createMessage(String message) {
     return createMessage(message, Collections.emptyList());
   }
 
-  private <B extends Field.Builder> Message createMessage(String template, List<Field> arguments) {
+  protected Message createMessage(String template, List<Field> arguments) {
     List<Field> contextFields = context.getFields();
     return new EchopraxiaFieldsMessage(template, arguments, contextFields);
   }
 
-  private org.apache.logging.log4j.Level convertLevel(Level level) {
+  protected org.apache.logging.log4j.Level convertLevel(Level level) {
     switch (level) {
       case ERROR:
         return org.apache.logging.log4j.Level.ERROR;
@@ -215,7 +282,7 @@ public class Log4JCoreLogger implements CoreLogger {
     throw new IllegalStateException("Unknown level " + level);
   }
 
-  private Throwable findThrowable(List<Field> fields) {
+  protected Throwable findThrowable(List<Field> fields) {
     for (Field field : fields) {
       final Value<?> value = field.value();
       if (value instanceof Value.ExceptionValue) {
@@ -225,7 +292,37 @@ public class Log4JCoreLogger implements CoreLogger {
     return null;
   }
 
-  public Logger logger() {
-    return this.logger;
+  protected <FB extends Field.Builder> void runAsyncLog(
+      Consumer<LoggerHandle<FB>> consumer, LoggerHandle<FB> handle) {
+    final Map<String, String> copyOfContextMap = ThreadContext.getImmutableContext();
+    final ThreadContext.ContextStack contextStack = ThreadContext.getImmutableStack();
+    Runnable runnable =
+        () -> {
+          ThreadContext.clearAll();
+          if (copyOfContextMap != null) {
+            ThreadContext.putAll(copyOfContextMap);
+          }
+          if (contextStack != null) {
+            ThreadContext.setStack(contextStack);
+          }
+          consumer.accept(handle);
+        };
+
+    // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
+    CompletableFuture.runAsync(runnable, executor)
+        .exceptionally(
+            e -> {
+              // Usually we get to this point when you have thread local dependent code in your
+              // logger.withContext() block, and your executor doesn't have those thread locals
+              // so you NPE.
+              //
+              // We need to log this error, but since it could be part of the logger context
+              // that is causing this error, we can't log the error with the same logger.
+              //
+              // Fallback to the underlying logger to render it.
+              final Throwable cause = e.getCause(); // strip the CompletionException
+              logger.error("Uncaught exception when running asyncLog", cause);
+              return null;
+            });
   }
 }

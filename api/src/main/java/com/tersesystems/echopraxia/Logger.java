@@ -6,6 +6,7 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -141,6 +142,10 @@ public class Logger<FB extends Field.Builder> {
                     .map(e -> fieldBuilder.string(e.getKey(), e.getValue()))
                     .collect(Collectors.toList());
     return new Logger<>(core().withThreadContext(mapTransform), fieldBuilder);
+  }
+
+  public AsyncLogger<FB> withExecutor(Executor executor) {
+    return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
   }
 
   // ------------------------------------------------------------------------

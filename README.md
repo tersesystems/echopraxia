@@ -103,7 +103,7 @@ You will need to integrate the `com.tersesystems.echopraxia.log4j.layout` packag
 </Configuration>
 ```
 
-If you want to seperate the context fields from the argument fields, you can define them seperately:
+If you want to separate the context fields from the argument fields, you can define them separately:
 
 ```xml
 <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
@@ -278,7 +278,7 @@ public interface NullableFieldBuilder extends Field.Builder {
 }
 ```
 
-Field names are never allowed to be null and will throw an exception.
+Field names are never allowed to be null.  If a field name is null, it will be replaced at runtime with `unknown-echopraxia-N` where N is an incrementing number.
 
 ```java
 logger.info("Message name {}", fb -> 
@@ -296,11 +296,20 @@ logger.info("Message name {}", fb ->
 );
 ```
 
-Because a field builder function runs in a closure, if an exception occurs it will be caught by the default thread exception handler, which will print to console and terminate the JVM.  Consider setting a [default thread exception handler](https://www.logicbig.com/tutorials/core-java-tutorial/java-se-api/default-uncaught-exception-handler.html) that does additionally does logging, and avoid uncaught exceptions in closures:
+Because a field builder function runs in a closure, if an exception occurs it will be caught by the default thread exception handler.  If it's the main thread, it will print to console and terminate the JVM, but other threads .  Consider setting a [default thread exception handler](https://www.logicbig.com/tutorials/core-java-tutorial/java-se-api/default-uncaught-exception-handler.html) that additionally logs, and avoid uncaught exceptions in field builder closures:
 
 ```java
 logger.info("Message name {}", fb -> {
-  String name = methodThatThrowsException(); // throws exception, not good
+  String name = methodThatThrowsException(); // BAD
+  return fb.only(fb.string(name, "some-value"));
+});
+```
+
+Instead, only call field builder methods inside the closure and keep any construction logic outside:
+
+```java
+String name = methodThatThrowsException(); // GOOD
+logger.info("Message name {}", fb -> {
   return fb.only(fb.string(name, "some-value"));
 });
 ```
@@ -368,8 +377,6 @@ final Condition mustHaveFoo = (level, context) ->
         context.getFields().stream().anyMatch(field -> field.name().equals("foo"));
 ```
 
-Conditions should be cheap to evaluate, and should be "safe" - i.e. they should not do things like network calls, database lookups, or rely on locks.
-
 Conditions can be used either on the logger, on the statement, or against the predicate check.
 
 > **NOTE**: Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.
@@ -408,7 +415,133 @@ if (logger.isInfoEnabled(condition)) {
 }
 ```
 
-## Dynamic Conditions with Scripts
+### Asynchronous Logging for Expensive Conditions
+
+By default, conditions are evaluated in the running thread.  This can be a problem if conditions rely on external elements such as network calls or database lookups, or involve resources with locks.
+
+Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  An `AsyncLogger` is created when calling the `withExecutor` method.
+
+In `AsyncLogger`, the argument is a `Consumer` of `LoggerHandle`.  `LoggerHandle` takes the same arguments as described above, i.e.
+
+```java
+AsyncLogger<?> logger = LoggerFactory.getLogger().withExecutor(loggingExecutor);
+logger.info(h -> h.log("Message template {}", fb -> fb.onlyString("foo", "bar")));
+```
+
+The consumer is run on a thread specified by the executor, and can also be used appropriately for expensive logging operations.
+
+In the unfortunate event of an exception, the underlying (SLF4J|Log4J) logger will be called at `error` level from the relevant core logger:
+
+```java
+// only happens if uncaught exception from consumer
+logger.error("Uncaught exception when running asyncLog", cause);
+```
+
+One important detail is that the logging executor should be a daemon thread, so that it does not block JVM exit:
+
+```java
+private static final Executor loggingExecutor =
+  Executors.newSingleThreadExecutor(
+      r -> {
+        Thread t = new Thread(r);
+        t.setDaemon(true); // daemon means the thread won't stop JVM from exiting
+        t.setName("logging-thread");
+        return t;
+      });
+```
+
+Using a single thread executor is nice because you can keep ordering of your logging statements, but it may not scale up in production.  Generally speaking, if you are CPU bound and want to distribute load over several cores, you should use `ForkJoinPool.commonPool()` or a bounded fork-join work stealing pool as your executor.  If your conditions involve blocking or you're IO bound, you should configure a thread pool executor.  Because of parallelism and concurrency, your logging statements may not appear in order, but you can add extra fields to ensure you can reorder statements appropriately.
+
+Putting it all together:
+
+```java
+public class Async {
+  private static final ExecutorService loggingExecutor =
+      Executors.newSingleThreadExecutor(
+          r -> {
+            Thread t = new Thread(r);
+            t.setDaemon(true); // daemon means the thread won't stop JVM from exiting
+            t.setName("echopraxia-logging-thread");
+            return t;
+          });
+
+  private static final Condition expensiveCondition = new Condition() {
+    @Override
+    public boolean test(Level level, LoggingContext context) {
+      try {
+        Thread.sleep(1000L);
+        return true;
+      } catch (InterruptedException e) {
+        return false;
+      }
+    };
+  };
+
+  private static final AsyncLogger<?> logger = LoggerFactory.getLogger()
+    .withExecutor(loggingExecutor)
+    .withCondition(expensiveCondition);
+
+  public static void main(String[] args) throws InterruptedException {
+    System.out.println("BEFORE logging block");
+    for (int i = 0; i < 10; i++) {
+      // This should take no time on the rendering thread :-)
+      logger.info(h -> h.log("Prints out after expensive condition"));
+    }
+    System.out.println("AFTER logging block");
+    System.out.println("Sleeping so that the JVM stays up");
+    Thread.sleep(1001L * 10L);
+  }
+}
+```
+
+Note that because logging is asynchronous, you must be very careful when accessing thread local state.  Thread local state associated with logging, i.e. MDC / ThreadContext is automatically carried through, but in some cases you may need to do additional work.
+
+For example, if you are using Spring Boot and are using `RequestContextHolder.getRequestAttributes()` when constructing context fields, you must call `RequestContextHolder.setRequestAttributes(requestAttributes)` so that the attributes are available to the thread:
+
+```java
+public class GreetingController {
+  private static final String template = "Hello, %s!";
+  private final AtomicLong counter = new AtomicLong();
+
+  private static final AsyncLogger<HttpRequestFieldBuilder> logger =
+    LoggerFactory.getLogger()
+      .withFieldBuilder(HttpRequestFieldBuilder.class)
+      .withExecutor(ForkJoinPool.commonPool())
+      .withFields(
+        fb -> {
+          // Any fields that you set in context you can set conditions on later,
+          // i.e. on the URI path, content type, or extra headers.
+          HttpServletRequest request =
+            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+              .getRequest();
+          return fb.requestFields(request);
+        });
+
+  @GetMapping("/greeting")
+  public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
+    logger.info(wrap(h -> h.log("This logs asynchronously with HTTP request fields")));
+    return new Greeting(counter.incrementAndGet(), String.format(template, name));
+  }
+
+  private Consumer<LoggerHandle<HttpRequestFieldBuilder>> wrap(Consumer<LoggerHandle<HttpRequestFieldBuilder>> c) {
+    // Because this takes place in the fork-join common pool, we need to set request
+    // attributes in the thread before logging so we can get request fields.
+    final RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
+    return h -> {
+      try {
+        RequestContextHolder.setRequestAttributes(requestAttributes);
+        c.accept(h);
+      } finally {
+        RequestContextHolder.resetRequestAttributes();
+      }
+    };
+  }
+}
+```
+
+There are other ways to handle this wrapping, for example subclassing the `AsyncLogger` and overriding the logging methods.  There are also fancy [executor-based ways to extend context](https://medium.com/asyncparadigm/logging-in-a-multithreaded-environment-and-with-completablefuture-construct-using-mdc-1c34c691cef0), but that's a different topic.
+
+### Dynamic Conditions with Scripts
 
 One of the limitations of logging is that it's not that easy to change logging levels in an application at run-time.  In modern applications, you typically have complex inputs and may want to enable logging for some very specific inputs without turning on your logging globally.
 
@@ -434,7 +567,7 @@ Gradle:
 implementation "com.tersesystems.echopraxia:scripting:1.1.3" 
 ```
 
-### String Based Scripts
+#### String Based Scripts
 
 You also have the option of passing in a string directly:
 
@@ -448,7 +581,7 @@ String scriptString = b.toString();
 Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
 ```
 
-### File Based Scripts
+#### File Based Scripts
 
 Creating a script condition is done with `ScriptCondition.create`:
 
@@ -475,7 +608,7 @@ library echopraxia {
 }
 ```
 
-### Watched Scripts
+#### Watched Scripts
 
 You can also change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
 
@@ -506,7 +639,7 @@ logger.info(condition, "Statement only logs if condition is met!")
 watchService.close();
 ```
 
-### Custom Source Scripts
+#### Custom Source Scripts
 
 You also have the option of creating your own `ScriptHandle` which can be backed by whatever you like, for example you can call out to Consul or a feature flag system for script work:
 

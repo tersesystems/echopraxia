@@ -3,8 +3,11 @@ package com.tersesystems.echopraxia.core;
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.LoggerHandle;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
@@ -157,4 +160,39 @@ public interface CoreLogger {
    */
   @NotNull
   CoreLogger withCondition(@NotNull Condition condition);
+
+  /**
+   * Returns a logger with the given executor for asynchronous logging.
+   *
+   * @param executor the executor to use.
+   * @return the core logger with the executor applied.
+   */
+  @NotNull
+  CoreLogger withExecutor(@NotNull Executor executor);
+
+  /**
+   * Logs a statement asynchronously using an executor.
+   *
+   * @param <FB> the field builder type
+   * @param level the logging level
+   * @param consumer the consumer of the logger handle
+   * @param builder the field builder.
+   */
+  <FB extends Field.Builder> void asyncLog(
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder);
+
+  /**
+   * Logs a statement asynchronously using an executor and the given condition.
+   *
+   * @param <FB> the field builder type
+   * @param level the logging level
+   * @param condition the condition
+   * @param consumer the consumer of the logger handle
+   * @param builder the field builder.
+   */
+  <FB extends Field.Builder> void asyncLog(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder);
 }
