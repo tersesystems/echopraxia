@@ -44,7 +44,7 @@ public class LoggerBenchmarks {
 
   @Benchmark
   public void infoWithParameterizedString() {
-    //CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  324.000 ± 38.974  ns/op
+    // CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  324.000 ± 38.974  ns/op
     logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
   }
 

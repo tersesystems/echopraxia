@@ -1,19 +1,13 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.Field.Value;
+
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.LoggerHandle;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
-import org.apache.logging.log4j.ThreadContext;
-import org.apache.logging.log4j.message.Message;
-import org.apache.logging.log4j.spi.ExtendedLogger;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -23,8 +17,13 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import static com.tersesystems.echopraxia.Field.Value;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.ThreadContext;
+import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.spi.ExtendedLogger;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
@@ -116,7 +115,7 @@ public class Log4JCoreLogger implements CoreLogger {
       return false;
     }
     return logger.isEnabled(convertLevel(level), context.getMarker(), (Message) null, null)
-      && this.condition.and(condition).test(level, context);
+        && this.condition.and(condition).test(level, context);
   }
 
   @Override
