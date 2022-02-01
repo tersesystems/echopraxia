@@ -78,14 +78,14 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
+    if (condition == Condition.always()) {
+      return this;
+    }
     if (condition == Condition.never()) {
       if (this.condition == Condition.never()) {
         return this;
       }
       return new Log4JCoreLogger(logger, context, condition, executor);
-    }
-    if (condition == Condition.always()) {
-      return this;
     }
     return new Log4JCoreLogger(logger, context, this.condition.and(condition), executor);
   }
