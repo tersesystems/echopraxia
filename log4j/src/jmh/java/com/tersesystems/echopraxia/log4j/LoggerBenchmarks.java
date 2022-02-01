@@ -38,13 +38,13 @@ public class LoggerBenchmarks {
 
   @Benchmark
   public void infoWithContextString() {
-    // Log4JBenchmarks.infoWithContextString        avgt    5  247.300 ±  2.810  ns/op
+    // LoggerBenchmarks.infoWithContextString            avgt    5  315.648 ±  1.348  ns/op
     logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
   }
 
   @Benchmark
   public void infoWithParameterizedString() {
-    // Log4JBenchmarks.infoWithParameterizedString  avgt    5  412.990 ± 27.346  ns/op
+    //CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  324.000 ± 38.974  ns/op
     logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
   }
 

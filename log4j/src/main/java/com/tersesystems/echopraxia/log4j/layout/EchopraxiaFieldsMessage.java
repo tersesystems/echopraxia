@@ -28,8 +28,7 @@ public class EchopraxiaFieldsMessage implements Message {
     // getFormattedMessage() on it, because ParameterFormatter is a package
     // private class, and ReusableParameterizedMessage.set methods are also
     // package private.
-    final ParameterizedMessage pm = new ParameterizedMessage(getFormat(), getParameters());
-    return pm.getFormattedMessage();
+    return ParameterizedMessage.format(getFormat(), getParameters());
   }
 
   @Override
