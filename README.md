@@ -379,6 +379,8 @@ final Condition mustHaveFoo = (level, context) ->
 
 Conditions can be used either on the logger, on the statement, or against the predicate check.
 
+There are two specialized conditions, `Condition.always()` and `Condition.never()`.  Echopraxia has optimizations for conditions; it will treat `Condition.always()` as a no-op, and return a `NeverLogger` that has no operations for logging.  The JVM can recognize that logging has no effect at all, and will [eliminate the method call as dead code](https://shipilev.net/jvm/anatomy-quarks/27-compiler-blackholes/).
+
 > **NOTE**: Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.
 > 
 > Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).
@@ -421,7 +423,9 @@ By default, conditions are evaluated in the running thread.  This can be a probl
 
 Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  An `AsyncLogger` is created when calling the `withExecutor` method.  All statements are placed on a work queue and run on a thread specified by the executor at a later time.
 
-All the usual logging statements are available in `AsyncLogger`, i.e. `logger.debug` will log as usual.  However, there are no predicates in the `AsyncLogger` -- instead, a `Consumer` of `LoggerHandle` is used.  `LoggerHandle` takes the same arguments as described above, i.e.
+All the usual logging statements are available in `AsyncLogger`, i.e. `logger.debug` will log as usual.  
+
+However, there are no predicates in the `AsyncLogger` -- instead, a `Consumer` of `LoggerHandle` is used, which serves the same purpose as the `if (isLogging*()) { .. }` block.
 
 ```java
 AsyncLogger<?> logger = LoggerFactory.getLogger().withExecutor(loggingExecutor);
