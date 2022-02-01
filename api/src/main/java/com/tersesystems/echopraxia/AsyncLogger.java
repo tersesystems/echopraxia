@@ -1,17 +1,18 @@
 package com.tersesystems.echopraxia;
 
 import static com.tersesystems.echopraxia.Level.*;
-import static com.tersesystems.echopraxia.Level.WARN;
 
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An asynchronous echopraxia logger built around a LoggerHandle.
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <FB> the field builder type
  */
-public class AsyncLogger<FB extends Field.Builder> {
+public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, AsyncLogger<FB>> {
 
   protected final CoreLogger core;
   protected final FB fieldBuilder;
@@ -35,12 +36,14 @@ public class AsyncLogger<FB extends Field.Builder> {
   }
 
   /** @return the internal core logger. */
+  @Override
   @NotNull
   public CoreLogger core() {
     return core;
   }
 
   /** @return the field builder. */
+  @Override
   @NotNull
   public FB fieldBuilder() {
     return fieldBuilder;
@@ -53,6 +56,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param <T> the type of the field builder.
    * @return a new logger using the given field builder.
    */
+  @Override
   @NotNull
   public <T extends Field.Builder> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     if (this.fieldBuilder == newBuilder) {
@@ -92,11 +96,16 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param condition the given condition.
    * @return the new logger.
    */
+  @Override
   @NotNull
   public AsyncLogger<FB> withCondition(@NotNull Condition condition) {
     if (condition == Condition.always()) {
       return this;
     }
+    if (condition == Condition.never()) {
+      return new NeverAsyncLogger<>(core().withCondition(Condition.never()), fieldBuilder);
+    }
+
     // Reduce allocation if we can help it
     final CoreLogger coreLogger = core().withCondition(condition);
     if (coreLogger == core()) {
@@ -113,6 +122,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    * @param f the given function producing fields from a field builder.
    * @return the new logger.
    */
+  @Override
   @NotNull
   public AsyncLogger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
     return new AsyncLogger<>(core().withFields(f, fieldBuilder), fieldBuilder);
@@ -125,6 +135,7 @@ public class AsyncLogger<FB extends Field.Builder> {
    *
    * @return the new logger.
    */
+  @Override
   @NotNull
   public AsyncLogger<FB> withThreadContext() {
     Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
@@ -135,6 +146,13 @@ public class AsyncLogger<FB extends Field.Builder> {
                     .collect(Collectors.toList());
     return new AsyncLogger<>(core().withThreadContext(mapTransform), fieldBuilder);
   }
+
+  public AsyncLogger<FB> withExecutor(Executor executor) {
+    return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
+  }
+
+  // ------------------------------------------------------------------------
+  // TRACE
 
   /**
    * Logs using a logger handle at TRACE level.
@@ -156,6 +174,79 @@ public class AsyncLogger<FB extends Field.Builder> {
   }
 
   /**
+   * Logs statement at TRACE level.
+   *
+   * @param message the given message.
+   */
+  @Override
+  public void trace(@Nullable String message) {
+    asyncLog(TRACE, message);
+  }
+
+  /**
+   * Logs statement at TRACE level using a field builder function.
+   *
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void trace(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+    asyncLog(TRACE, message, f);
+  }
+
+  /**
+   * Logs statement at TRACE level with exception.
+   *
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void trace(@Nullable String message, @NotNull Throwable e) {
+    asyncLog(TRACE, message, e);
+  }
+
+  /**
+   * Conditionally logs statement at TRACE level.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   */
+  @Override
+  public void trace(@NotNull Condition condition, @Nullable String message) {
+    asyncLog(TRACE, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at TRACE level using a field builder function.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void trace(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(TRACE, condition, message, f);
+  }
+
+  /**
+   * Conditionally logs statement at TRACE level with exception.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void trace(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+    asyncLog(TRACE, condition, message, e);
+  }
+
+  // ------------------------------------------------------------------------
+  // DEBUG
+
+  /**
    * Logs using a logger handle at DEBUG level.
    *
    * @param consumer the consumer of the logger handle.
@@ -173,6 +264,79 @@ public class AsyncLogger<FB extends Field.Builder> {
   public void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(DEBUG, c, consumer, fieldBuilder);
   }
+
+  /**
+   * Logs statement at DEBUG level.
+   *
+   * @param message the given message.
+   */
+  @Override
+  public void debug(@Nullable String message) {
+    asyncLog(DEBUG, message);
+  }
+
+  /**
+   * Logs statement at DEBUG level using a field builder function.
+   *
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void debug(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(DEBUG, message, f);
+  }
+
+  /**
+   * Logs statement at DEBUG level with exception.
+   *
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void debug(@Nullable String message, @NotNull Throwable e) {
+    asyncLog(DEBUG, message, e);
+  }
+
+  /**
+   * Conditionally logs statement at DEBUG level.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   */
+  @Override
+  public void debug(@NotNull Condition condition, @Nullable String message) {
+    asyncLog(DEBUG, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at DEBUG level using a field builder function.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void debug(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(DEBUG, condition, message, f);
+  }
+
+  /**
+   * Conditionally logs statement at DEBUG level with exception.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+    asyncLog(DEBUG, condition, message, e);
+  }
+
+  // ------------------------------------------------------------------------
+  // INFO
 
   /**
    * Logs using a logger handle at INFO level.
@@ -194,6 +358,79 @@ public class AsyncLogger<FB extends Field.Builder> {
   }
 
   /**
+   * Logs statement at INFO level.
+   *
+   * @param message the given message.
+   */
+  @Override
+  public void info(@Nullable String message) {
+    asyncLog(INFO, message);
+  }
+
+  /**
+   * Logs statement at INFO level using a field builder function.
+   *
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void info(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(INFO, message, f);
+  }
+
+  /**
+   * Logs statement at INFO level with exception.
+   *
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void info(@Nullable String message, @NotNull Throwable e) {
+    asyncLog(INFO, message, e);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   */
+  @Override
+  public void info(@NotNull Condition condition, @Nullable String message) {
+    asyncLog(INFO, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level using a field builder function.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void info(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(INFO, condition, message, f);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level with exception.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+    asyncLog(INFO, condition, message, e);
+  }
+
+  // ------------------------------------------------------------------------
+  // WARN
+
+  /**
    * Logs using a logger handle at WARN level.
    *
    * @param consumer the consumer of the logger handle.
@@ -213,6 +450,78 @@ public class AsyncLogger<FB extends Field.Builder> {
   }
 
   /**
+   * Logs statement at WARN level.
+   *
+   * @param message the given message.
+   */
+  public void warn(@Nullable String message) {
+    asyncLog(WARN, message);
+  }
+
+  /**
+   * Logs statement at WARN level using a field builder function.
+   *
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void warn(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(WARN, message, f);
+  }
+
+  /**
+   * Logs statement at WARN level with exception.
+   *
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void warn(@Nullable String message, @NotNull Throwable e) {
+    asyncLog(WARN, message, e);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   */
+  @Override
+  public void warn(@NotNull Condition condition, @Nullable String message) {
+    asyncLog(WARN, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level using a field builder function.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void warn(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(WARN, condition, message, f);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level with exception.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+    asyncLog(WARN, condition, message, e);
+  }
+
+  // ------------------------------------------------------------------------
+  // ERROR
+
+  /**
    * Logs using a logger handle at ERROR level.
    *
    * @param consumer the consumer of the logger handle.
@@ -229,5 +538,103 @@ public class AsyncLogger<FB extends Field.Builder> {
    */
   public void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(ERROR, c, consumer, fieldBuilder);
+  }
+
+  /**
+   * Logs statement at INFO level.
+   *
+   * @param message the given message.
+   */
+  @Override
+  public void error(@Nullable String message) {
+    asyncLog(ERROR, message);
+  }
+
+  /**
+   * Logs statement at INFO level using a field builder function.
+   *
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void error(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(ERROR, message, f);
+  }
+
+  /**
+   * Logs statement at INFO level with exception.
+   *
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void error(@Nullable String message, @NotNull Throwable e) {
+    asyncLog(ERROR, message, e);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   */
+  @Override
+  public void error(@NotNull Condition condition, @Nullable String message) {
+    asyncLog(ERROR, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level using a field builder function.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param f the field builder function.
+   */
+  @Override
+  public void error(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
+    asyncLog(ERROR, condition, message, f);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level with exception.
+   *
+   * @param condition the given condition.
+   * @param message the message.
+   * @param e the given exception.
+   */
+  @Override
+  public void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+    asyncLog(ERROR, condition, message, e);
+  }
+
+  protected void asyncLog(@NotNull Level level, String message) {
+    core.asyncLog(level, h -> h.log(message), fieldBuilder);
+  }
+
+  protected void asyncLog(@NotNull Level level, Condition condition, String message) {
+    core.asyncLog(level, condition, h -> h.log(message), fieldBuilder);
+  }
+
+  protected void asyncLog(@NotNull Level level, String message, Throwable e) {
+    core.asyncLog(level, h -> h.log(message, e), fieldBuilder);
+  }
+
+  protected void asyncLog(@NotNull Level level, Condition condition, String message, Throwable e) {
+    core.asyncLog(level, condition, h -> h.log(message, e), fieldBuilder);
+  }
+
+  protected void asyncLog(@NotNull Level level, String message, Field.BuilderFunction<FB> f) {
+    core.asyncLog(level, h -> h.log(message, f), fieldBuilder);
+  }
+
+  protected void asyncLog(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @Nullable String message,
+      Field.BuilderFunction<FB> f) {
+    core.asyncLog(level, condition, h -> h.log(message, f), fieldBuilder);
   }
 }

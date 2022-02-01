@@ -1,6 +1,8 @@
 package example;
 
-import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.AsyncLogger;
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,17 +22,13 @@ public class Async {
   // Simulate an expensive condition that will tie up the thread for an unreasonable
   // amount of time.
   private static final Condition expensiveCondition =
-      new Condition() {
-        @Override
-        public boolean test(Level level, LoggingContext context) {
-          try {
-            Thread.sleep(1000L);
-            return true;
-          } catch (InterruptedException e) {
-            return false;
-          }
+      (level, context) -> {
+        try {
+          Thread.sleep(1000L);
+          return true;
+        } catch (InterruptedException e) {
+          return false;
         }
-        ;
       };
 
   private static final AsyncLogger<?> logger =
@@ -40,7 +38,7 @@ public class Async {
     System.out.println("BEFORE logging block");
     for (int i = 0; i < 10; i++) {
       // This should take no time on the rendering thread :-)
-      logger.info(h -> h.log("Prints out after expensive condition"));
+      logger.info("Prints out after expensive condition");
     }
     System.out.println("AFTER logging block");
     System.out.println("Sleeping so that the JVM stays up");
