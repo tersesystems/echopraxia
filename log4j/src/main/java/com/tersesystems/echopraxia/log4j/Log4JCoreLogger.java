@@ -21,18 +21,19 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
 
-  private final Logger logger;
+  private final ExtendedLogger logger;
   private final Log4JLoggingContext context;
   private final Condition condition;
   private final Executor executor;
 
-  Log4JCoreLogger(Logger log4jLogger) {
+  Log4JCoreLogger(ExtendedLogger log4jLogger) {
     this.logger = log4jLogger;
     this.context = new Log4JLoggingContext();
     this.condition = Condition.always();
@@ -40,7 +41,10 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   protected Log4JCoreLogger(
-      Logger log4jLogger, Log4JLoggingContext context, Condition condition, Executor executor) {
+      ExtendedLogger log4jLogger,
+      Log4JLoggingContext context,
+      Condition condition,
+      Executor executor) {
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
@@ -73,14 +77,14 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
+    if (condition == Condition.always()) {
+      return this;
+    }
     if (condition == Condition.never()) {
       if (this.condition == Condition.never()) {
         return this;
       }
       return new Log4JCoreLogger(logger, context, condition, executor);
-    }
-    if (condition == Condition.always()) {
-      return this;
     }
     return new Log4JCoreLogger(logger, context, this.condition.and(condition), executor);
   }
@@ -90,30 +94,16 @@ public class Log4JCoreLogger implements CoreLogger {
     return new Log4JCoreLogger(logger, context, this.condition, executor);
   }
 
-  public CoreLogger withMarker(Marker marker) {
+  @NotNull
+  public CoreLogger withMarker(@NotNull Marker marker) {
     Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
     return new Log4JCoreLogger(logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
   public boolean isEnabled(@NotNull Level level) {
-    if (this.condition == Condition.never()) {
-      return false;
-    }
-    Marker marker = context.getMarker();
-    switch (level) {
-      case ERROR:
-        return logger.isErrorEnabled(marker) && condition.test(level, context);
-      case WARN:
-        return logger.isWarnEnabled(marker) && condition.test(level, context);
-      case INFO:
-        return logger.isInfoEnabled(marker) && condition.test(level, context);
-      case DEBUG:
-        return logger.isDebugEnabled(marker) && condition.test(level, context);
-      case TRACE:
-        return logger.isTraceEnabled(marker) && condition.test(level, context);
-    }
-    throw new IllegalStateException("No branch found for level " + level);
+    return logger.isEnabled(convertLevel(level), context.getMarker(), (Message) null, null)
+        && condition.test(level, context);
   }
 
   @Override
@@ -124,20 +114,8 @@ public class Log4JCoreLogger implements CoreLogger {
     if (condition == Condition.never()) {
       return false;
     }
-    Marker marker = context.getMarker();
-    switch (level) {
-      case ERROR:
-        return logger.isErrorEnabled(marker) && this.condition.and(condition).test(level, context);
-      case WARN:
-        return logger.isWarnEnabled(marker) && this.condition.and(condition).test(level, context);
-      case INFO:
-        return logger.isInfoEnabled(marker) && this.condition.and(condition).test(level, context);
-      case DEBUG:
-        return logger.isDebugEnabled(marker) && this.condition.and(condition).test(level, context);
-      case TRACE:
-        return logger.isTraceEnabled(marker) && this.condition.and(condition).test(level, context);
-    }
-    throw new IllegalStateException("No branch found for level " + level);
+    return logger.isEnabled(convertLevel(level), context.getMarker(), (Message) null, null)
+        && this.condition.and(condition).test(level, context);
   }
 
   @Override
@@ -164,7 +142,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(@NotNull Level level, String message, @NotNull Throwable e) {
+  public void log(@NotNull Level level, @Nullable String message, @NotNull Throwable e) {
     if (!condition.test(level, context)) {
       return;
     }
@@ -187,7 +165,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public void log(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull String message,
+      @Nullable String message,
       @NotNull Throwable e) {
     if (!condition.test(level, context)) {
       return;
@@ -200,7 +178,7 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      Field.@NotNull BuilderFunction<B> f,
+      @NotNull Field.BuilderFunction<B> f,
       @NotNull B builder) {
     if (!condition.test(level, context)) {
       return;
@@ -220,7 +198,7 @@ public class Log4JCoreLogger implements CoreLogger {
           }
 
           @Override
-          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+          public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
             Log4JCoreLogger.this.log(level, message, f, builder);
           }
 

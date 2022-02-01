@@ -12,6 +12,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.ThreadContext;
+import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.junit.jupiter.api.Test;
 
 public class ContextTest extends TestBase {
@@ -19,7 +20,7 @@ public class ContextTest extends TestBase {
   @Test
   void testMarkers() {
     Marker securityMarker = MarkerManager.getMarker("SECURITY");
-    final Log4JCoreLogger core = new Log4JCoreLogger(LogManager.getLogger());
+    final Log4JCoreLogger core = new Log4JCoreLogger((ExtendedLogger) LogManager.getLogger());
     Logger<?> logger =
         LoggerFactory.getLogger(core.withMarker(securityMarker), Field.Builder.instance());
     logger.error("Message {}", fb -> fb.onlyString("field_name", "field_value"));
@@ -37,7 +38,7 @@ public class ContextTest extends TestBase {
     // AND we have a SECURITY marker in context
     // isTraceEnabled should return true even without an explicit marker.
     final Marker securityMarker = MarkerManager.getMarker("SECURITY");
-    final Log4JCoreLogger core = new Log4JCoreLogger(LogManager.getLogger());
+    final Log4JCoreLogger core = new Log4JCoreLogger((ExtendedLogger) LogManager.getLogger());
     Logger<?> logger =
         LoggerFactory.getLogger(core.withMarker(securityMarker), Field.Builder.instance());
 

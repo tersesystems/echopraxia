@@ -92,7 +92,7 @@ public interface CoreLogger {
   void log(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull String message,
+      @Nullable String message,
       @NotNull Throwable e);
 
   /**
