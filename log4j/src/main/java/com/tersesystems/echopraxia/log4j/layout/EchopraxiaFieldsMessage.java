@@ -13,22 +13,19 @@ public class EchopraxiaFieldsMessage implements Message {
   private final String message;
   private final List<Field> argumentFields;
   private final List<Field> contextFields;
+  private final String formattedMessage;
 
   public EchopraxiaFieldsMessage(
       String message, List<Field> argumentFields, List<Field> contextFields) {
     this.message = message;
     this.argumentFields = argumentFields;
     this.contextFields = contextFields;
+    this.formattedMessage = ParameterizedMessage.format(getFormat(), getParameters());
   }
 
   @Override
   public String getFormattedMessage() {
-    // If I'm reading this right, there's no way to format a message through
-    // log4j without creating a ParameterizedMessage and then calling
-    // getFormattedMessage() on it, because ParameterFormatter is a package
-    // private class, and ReusableParameterizedMessage.set methods are also
-    // package private.
-    return ParameterizedMessage.format(getFormat(), getParameters());
+    return formattedMessage;
   }
 
   @Override
