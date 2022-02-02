@@ -32,7 +32,9 @@ public class CoreLoggerFactory {
       ServiceLoader<CoreLoggerProvider> loader = ServiceLoader.load(CoreLoggerProvider.class);
       Iterator<CoreLoggerProvider> iterator = loader.iterator();
       if (iterator.hasNext()) {
-        return iterator.next();
+        final CoreLoggerProvider provider = iterator.next();
+        provider.initialize();
+        return provider;
       } else {
         String msg = "No CoreLoggerProvider implementation found in classpath!";
         throw new ServiceConfigurationError(msg);

@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface CoreLoggerProvider {
 
+  void initialize();
+
   @NotNull
   CoreLogger getLogger(@NotNull Class<?> clazz);
 

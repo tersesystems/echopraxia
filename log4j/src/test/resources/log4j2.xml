@@ -6,7 +6,7 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT" follow="true">
-            <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
+            <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json" locationInfoEnabled="true">
                 <EventTemplateAdditionalField
                         key="marker"
                         format="JSON"
