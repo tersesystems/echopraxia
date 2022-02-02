@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.concurrent.TimeUnit;
@@ -17,57 +18,65 @@ public class LoggerBenchmarks {
   private static final Logger<?> logger = LoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
 
+  private static final Logger<?> neverLogger = logger.withCondition(Condition.never());
+  private static final Logger<?> alwaysLogger = logger.withCondition(Condition.always());
+  private static final Logger<?> conditionLogger = logger.withCondition((level, context) -> level.equals(Level.ERROR));
+  private static final Logger<?> fieldBuilderLogger = logger.withFieldBuilder(Field.Builder.instance());
+
   @Benchmark
   public void info() {
-    // LoggerBenchmarks.info                         avgt    5   47.464 ± 0.414  ns/op
     logger.info("Message");
   }
 
   @Benchmark
+  public void infoWithNever() {
+    neverLogger.info("Message");
+  }
+
+  @Benchmark
+  public void infoWithAlways() {
+    alwaysLogger.info("Message");
+  }
+
+  @Benchmark
+  public void infoWithFieldBuilder() {
+    fieldBuilderLogger.info("Message");
+  }
+
+  @Benchmark
+  public void infoWithErrorCondition() {
+    conditionLogger.info("Message");
+  }
+
+  @Benchmark
   public void isInfoEnabled(Blackhole blackhole) {
-    // LoggerBenchmarks.isInfoEnabled       avgt    5  2.821 ± 0.063  ns/op
     blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark
   public void infoWithStringArg() {
-    // LoggerBenchmarks.infoWithStringArg            avgt    5   75.672 ± 0.749  ns/op
     logger.info("Message", fb -> fb.onlyString("foo", "bar"));
   }
 
   @Benchmark
   public void infoWithContextString() {
-    // LoggerBenchmarks.infoWithContextString        avgt    5  116.451 ± 6.000  ns/op
     logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
   }
 
   @Benchmark
   public void infoWithParameterizedString() {
-    // LoggerBenchmarks.infoWithParameterizedString  avgt    5   75.732 ± 0.421  ns/op
     logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
   }
 
   @Benchmark
   public void infoWithException() {
-    // LoggerBenchmarks.infoWithException            avgt    5  175.756 ± 1.843  ns/op
     logger.info("Message", exception);
   }
 
   @Benchmark
-  public void infoWithNever() {
-    // LoggerBenchmarks.infoWithNever                avgt    5   11.358 ± 0.165  ns/op
-    logger.withCondition(Condition.never()).info("Message");
+  public void traceWithParameterizedString() {
+    // should never log
+    logger.trace("Message {}", fb -> fb.onlyString("foo", "bar"));
   }
 
-  @Benchmark
-  public void infoWithAlways() {
-    // LoggerBenchmarks.infoWithAlways               avgt    5   57.670 ± 0.318  ns/op
-    logger.withCondition(Condition.always()).info("Message");
-  }
-
-  @Benchmark
-  public void infoWithFieldBuilder() {
-    // LoggerBenchmarks.infoWithFieldBuilder         avgt    5   51.013 ± 0.436  ns/op
-    logger.withFieldBuilder(Field.Builder.instance()).info("Message");
-  }
 }
