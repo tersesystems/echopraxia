@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.logstash;
 
 import static com.tersesystems.echopraxia.Field.Value;
+import static org.slf4j.event.EventConstants.*;
 
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
@@ -23,12 +24,14 @@ import org.slf4j.Marker;
 /** Logstash implementation of CoreLogger. */
 public class LogstashCoreLogger implements CoreLogger {
 
-  private final org.slf4j.Logger logger;
+  private final ch.qos.logback.classic.Logger logger;
   private final LogstashLoggingContext context;
   private final Condition condition;
   private final Executor executor;
+  private final String fqcn;
 
-  protected LogstashCoreLogger(org.slf4j.Logger logger) {
+  protected LogstashCoreLogger(String fqcn, ch.qos.logback.classic.Logger logger) {
+    this.fqcn = fqcn;
     this.logger = logger;
     this.context = LogstashLoggingContext.empty();
     this.condition = Condition.always();
@@ -36,10 +39,12 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   public LogstashCoreLogger(
-      org.slf4j.Logger logger,
+      String fqcn,
+      ch.qos.logback.classic.Logger logger,
       LogstashLoggingContext context,
       Condition condition,
       Executor executor) {
+    this.fqcn = fqcn;
     this.logger = logger;
     this.context = context;
     this.condition = condition;
@@ -51,7 +56,7 @@ public class LogstashCoreLogger implements CoreLogger {
    *
    * @return the SLF4J logger.
    */
-  public org.slf4j.Logger logger() {
+  public ch.qos.logback.classic.Logger logger() {
     return logger;
   }
 
@@ -70,7 +75,7 @@ public class LogstashCoreLogger implements CoreLogger {
       Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
-    return new LogstashCoreLogger(logger, this.context.and(newContext), condition, executor);
+    return new LogstashCoreLogger(fqcn, logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
@@ -79,7 +84,7 @@ public class LogstashCoreLogger implements CoreLogger {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(MDC::getCopyOfContextMap);
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(fieldSupplier, Collections::emptyList);
-    return new LogstashCoreLogger(logger, this.context.and(newContext), condition, executor);
+    return new LogstashCoreLogger(fqcn, logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
@@ -91,20 +96,20 @@ public class LogstashCoreLogger implements CoreLogger {
       if (this.condition == Condition.never()) {
         return this;
       }
-      return new LogstashCoreLogger(logger, context, condition, executor);
+      return new LogstashCoreLogger(fqcn, logger, context, condition, executor);
     }
-    return new LogstashCoreLogger(logger, context, this.condition.and(condition), executor);
+    return new LogstashCoreLogger(fqcn, logger, context, this.condition.and(condition), executor);
   }
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new LogstashCoreLogger(logger, context, condition, executor);
+    return new LogstashCoreLogger(fqcn, logger, context, condition, executor);
   }
 
   public CoreLogger withMarkers(Marker... markers) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
-    return new LogstashCoreLogger(logger, this.context.and(newContext), condition, executor);
+    return new LogstashCoreLogger(fqcn, logger, this.context.and(newContext), condition, executor);
   }
 
   @Override
@@ -113,19 +118,8 @@ public class LogstashCoreLogger implements CoreLogger {
       return false;
     }
     Marker marker = convertMarkers(context.getFields(), context.getMarkers());
-    switch (level) {
-      case ERROR:
-        return logger.isErrorEnabled(marker) && condition.test(level, context);
-      case WARN:
-        return logger.isWarnEnabled(marker) && condition.test(level, context);
-      case INFO:
-        return logger.isInfoEnabled(marker) && condition.test(level, context);
-      case DEBUG:
-        return logger.isDebugEnabled(marker) && condition.test(level, context);
-      case TRACE:
-        return logger.isTraceEnabled(marker) && condition.test(level, context);
-    }
-    throw new IllegalStateException("No branch found for level " + level);
+    return logger.isEnabledFor(marker, convertLogbackLevel(level))
+        && condition.test(level, context);
   }
 
   @Override
@@ -137,19 +131,8 @@ public class LogstashCoreLogger implements CoreLogger {
       return false;
     }
     Marker marker = convertMarkers(context.getFields(), context.getMarkers());
-    switch (level) {
-      case ERROR:
-        return logger.isErrorEnabled(marker) && this.condition.and(condition).test(level, context);
-      case WARN:
-        return logger.isWarnEnabled(marker) && this.condition.and(condition).test(level, context);
-      case INFO:
-        return logger.isInfoEnabled(marker) && this.condition.and(condition).test(level, context);
-      case DEBUG:
-        return logger.isDebugEnabled(marker) && this.condition.and(condition).test(level, context);
-      case TRACE:
-        return logger.isTraceEnabled(marker) && this.condition.and(condition).test(level, context);
-    }
-    throw new IllegalStateException("No branch found for level " + level);
+    return logger.isEnabledFor(marker, convertLogbackLevel(level))
+        && this.condition.and(condition).test(level, context);
   }
 
   @Override
@@ -159,23 +142,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
 
     Marker m = convertMarkers(context.getFields(), context.getMarkers());
-    switch (level) {
-      case ERROR:
-        logger.error(m, message);
-        break;
-      case WARN:
-        logger.warn(m, message);
-        break;
-      case INFO:
-        logger.info(m, message);
-        break;
-      case DEBUG:
-        logger.debug(m, message);
-        break;
-      case TRACE:
-        logger.trace(m, message);
-        break;
-    }
+    logger.log(m, fqcn, convertLevel(level), message, null, null);
   }
 
   @Override
@@ -189,43 +156,9 @@ public class LogstashCoreLogger implements CoreLogger {
     }
 
     final Marker m = convertMarkers(context.getFields(), context.getMarkers());
-    switch (level) {
-      case ERROR:
-        if (logger.isErrorEnabled(m)) {
-          final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args);
-          logger.error(m, message, arguments);
-        }
-        break;
-      case WARN:
-        if (logger.isWarnEnabled(m)) {
-          final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args);
-          logger.warn(m, message, arguments);
-        }
-        break;
-      case INFO:
-        if (logger.isInfoEnabled(m)) {
-          final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args);
-          logger.info(m, message, arguments);
-        }
-        break;
-      case DEBUG:
-        if (logger.isDebugEnabled(m)) {
-          final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args);
-          logger.debug(m, message, arguments);
-        }
-        break;
-      case TRACE:
-        if (logger.isTraceEnabled(m)) {
-          final List<Field> args = f.apply(builder);
-          final Object[] arguments = convertArguments(args);
-          logger.trace(m, message, arguments);
-        }
-        break;
-    }
+    final List<Field> args = f.apply(builder);
+    final Object[] arguments = convertArguments(args);
+    logger.log(m, fqcn, convertLevel(level), message, arguments, null);
   }
 
   @Override
@@ -235,23 +168,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
 
     Marker m = convertMarkers(context.getFields(), context.getMarkers());
-    switch (level) {
-      case ERROR:
-        logger.error(m, message, e);
-        break;
-      case WARN:
-        logger.warn(m, message, e);
-        break;
-      case INFO:
-        logger.info(m, message, e);
-        break;
-      case DEBUG:
-        logger.debug(m, message, e);
-        break;
-      case TRACE:
-        logger.trace(m, message, e);
-        break;
-    }
+    logger.log(m, fqcn, convertLevel(level), message, null, e);
   }
 
   @Override
@@ -266,7 +183,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public void log(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull String message,
+      @Nullable String message,
       @NotNull Throwable e) {
     if (!condition.test(level, context)) {
       return;
@@ -279,7 +196,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      Field.@NotNull BuilderFunction<B> f,
+      @NotNull Field.BuilderFunction<B> f,
       @NotNull B builder) {
     if (!condition.test(level, context)) {
       return;
@@ -299,7 +216,7 @@ public class LogstashCoreLogger implements CoreLogger {
           }
 
           @Override
-          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+          public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
             LogstashCoreLogger.this.log(level, message, f, builder);
           }
 
@@ -325,7 +242,7 @@ public class LogstashCoreLogger implements CoreLogger {
           }
 
           @Override
-          public void log(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+          public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
             LogstashCoreLogger.this.log(level, c, message, f, builder);
           }
 
@@ -405,5 +322,37 @@ public class LogstashCoreLogger implements CoreLogger {
               logger.error("Uncaught exception when running asyncLog", cause);
               return null;
             });
+  }
+
+  private ch.qos.logback.classic.Level convertLogbackLevel(Level level) {
+    switch (level) {
+      case ERROR:
+        return ch.qos.logback.classic.Level.ERROR;
+      case WARN:
+        return ch.qos.logback.classic.Level.WARN;
+      case INFO:
+        return ch.qos.logback.classic.Level.INFO;
+      case DEBUG:
+        return ch.qos.logback.classic.Level.DEBUG;
+      case TRACE:
+        return ch.qos.logback.classic.Level.TRACE;
+    }
+    throw new IllegalStateException("No level found!");
+  }
+
+  private int convertLevel(Level level) {
+    switch (level) {
+      case ERROR:
+        return ERROR_INT;
+      case WARN:
+        return WARN_INT;
+      case INFO:
+        return INFO_INT;
+      case DEBUG:
+        return DEBUG_INT;
+      case TRACE:
+        return TRACE_INT;
+    }
+    throw new IllegalStateException("No level found!");
   }
 }

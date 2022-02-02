@@ -7,7 +7,7 @@ import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 
 /** The factory for FluentLogger. */
 public class FluentLoggerFactory {
-  private static final String FQCN = FluentLogger.class.getName();
+  public static final String FQCN = FluentLogger.class.getName();
 
   /**
    * Creates a logger using the given class name.

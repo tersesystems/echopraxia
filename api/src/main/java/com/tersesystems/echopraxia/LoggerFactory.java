@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LoggerFactory {
 
-  private static final String FQCN = Logger.class.getName();
+  public static final String FQCN = Logger.class.getName();
 
   /**
    * Creates a logger using the given class name.

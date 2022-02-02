@@ -28,7 +28,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SemanticLoggerFactory {
 
-  static final String FQCN = SemanticLogger.class.getName();
+  public static final String FQCN = SemanticLogger.class.getName();
 
   /**
    * Creates a semantic logger using a logger class and explicit field builder.
