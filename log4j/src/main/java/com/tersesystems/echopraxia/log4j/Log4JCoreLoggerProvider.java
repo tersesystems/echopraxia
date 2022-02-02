@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.log4j;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerProvider;
 import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.apache.logging.log4j.spi.LoggerContext;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,9 +22,22 @@ public class Log4JCoreLoggerProvider implements CoreLoggerProvider {
     // LocationAwareLogEventFactory seems to be the entry point to an event.
     // after that it comes from getSource() which has a StackTraceElement.
     //
-    // Does not seem to be anything like getFrameworkPackages to filter the source,
-    // I think you would have to do this through a custom JSON exception resolver.
-    // and again for any other layouts.
+    // From https://logging.apache.org/log4j/2.x/faq.html#logger-wrapper
+    //
+    // Log4j remembers the fully qualified class name (FQCN) of the logger and uses this to walk the
+    // stack trace for every log event when configured to print location. (Be aware that logging
+    // with location is slow and may impact the performance of your application.)
+    //
+    // The problem with custom logger wrappers is that they have a different FQCN than the actual
+    // logger, so Log4j can’t find the place where your custom logger was called.
+    //
+    // The solution is to provide the correct FQCN. The easiest way to do this is to let Log4j
+    // generate the logger wrapper for you. Log4j comes with a Logger wrapper generator tool. This
+    // tool was originally meant to support custom log levels and is documented here.
+    //
+    // The generated logger code will take care of the FQCN.
+    //
+    // https://logging.apache.org/log4j/2.x/manual/customloglevels.html#CustomLoggers
   }
 
   @Override
