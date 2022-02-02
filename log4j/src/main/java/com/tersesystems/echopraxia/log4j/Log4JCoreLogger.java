@@ -21,20 +21,26 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.spi.AbstractLogger;
 import org.apache.logging.log4j.spi.ExtendedLogger;
+import org.apache.logging.log4j.spi.ExtendedLoggerWrapper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
 
-  private final ExtendedLogger logger;
+  private static final String FQCN = Log4JCoreLogger.class.getName();
+
+  private final ExtendedLoggerWrapper logger;
   private final Log4JLoggingContext context;
   private final Condition condition;
   private final Executor executor;
 
-  Log4JCoreLogger(ExtendedLogger log4jLogger) {
-    this.logger = log4jLogger;
+  Log4JCoreLogger(Logger log4jLogger) {
+    this.logger =
+        new ExtendedLoggerWrapper(
+            (AbstractLogger) log4jLogger, log4jLogger.getName(), log4jLogger.getMessageFactory());
     this.context = new Log4JLoggingContext();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
@@ -45,7 +51,10 @@ public class Log4JCoreLogger implements CoreLogger {
       Log4JLoggingContext context,
       Condition condition,
       Executor executor) {
-    this.logger = log4jLogger;
+    this.logger =
+        new ExtendedLoggerWrapper(
+            (AbstractLogger) log4jLogger, log4jLogger.getName(), log4jLogger.getMessageFactory());
+    ;
     this.context = context;
     this.condition = condition;
     this.executor = executor;
@@ -123,7 +132,8 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return;
     }
-    logger.log(convertLevel(level), context.getMarker(), createMessage(message));
+    logger.logIfEnabled(
+        FQCN, convertLevel(level), context.getMarker(), createMessage(message), null);
   }
 
   @Override
@@ -138,7 +148,7 @@ public class Log4JCoreLogger implements CoreLogger {
     final List<Field> argumentFields = f.apply(builder);
     final Throwable e = findThrowable(argumentFields);
     final Message message = createMessage(messageTemplate, argumentFields);
-    logger.log(convertLevel(level), context.getMarker(), message, e);
+    logger.logIfEnabled(FQCN, convertLevel(level), context.getMarker(), message, e);
   }
 
   @Override
@@ -146,7 +156,8 @@ public class Log4JCoreLogger implements CoreLogger {
     if (!condition.test(level, context)) {
       return;
     }
-    logger.log(
+    logger.logIfEnabled(
+        FQCN,
         convertLevel(level),
         context.getMarker(),
         createMessage(message, Collections.emptyList()),
