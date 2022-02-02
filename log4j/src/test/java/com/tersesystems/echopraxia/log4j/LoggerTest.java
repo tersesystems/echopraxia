@@ -105,6 +105,19 @@ public class LoggerTest extends TestBase {
   }
 
   @Test
+  public void testLoggerLocation() {
+    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    logger.info("Boring Message");
+
+    JsonObject entry = getEntry();
+    final JsonObject fields = entry.getJsonObject("source");
+    assertThat(fields.getString("class")).isEqualTo("com.tersesystems.echopraxia.log4j.LoggerTest");
+    assertThat(fields.getString("method")).isEqualTo("testLoggerLocation");
+    assertThat(fields.getString("file")).isEqualTo("LoggerTest.java");
+    assertThat(fields.getJsonNumber("line").intValue()).isEqualTo(110);
+  }
+
+  @Test
   public void testLoggerWithObjectField() {
     Logger<?> logger = LoggerFactory.getLogger(getClass());
     logger.info(

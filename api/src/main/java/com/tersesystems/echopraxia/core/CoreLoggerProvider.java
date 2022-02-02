@@ -12,8 +12,8 @@ public interface CoreLoggerProvider {
   void initialize();
 
   @NotNull
-  CoreLogger getLogger(@NotNull Class<?> clazz);
+  CoreLogger getLogger(@NotNull String fqcn, @NotNull Class<?> clazz);
 
   @NotNull
-  CoreLogger getLogger(@NotNull String name);
+  CoreLogger getLogger(@NotNull String fqcn, @NotNull String name);
 }

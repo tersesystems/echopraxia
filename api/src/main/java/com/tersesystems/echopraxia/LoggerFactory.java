@@ -12,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LoggerFactory {
 
+  private static final String FQCN = Logger.class.getName();
+
   /**
    * Creates a logger using the given class name.
    *
@@ -20,7 +22,7 @@ public class LoggerFactory {
    */
   @NotNull
   public static Logger<Field.Builder> getLogger(Class<?> clazz) {
-    final CoreLogger core = CoreLoggerFactory.getLogger(clazz);
+    final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, clazz);
     return getLogger(core, Field.Builder.instance());
   }
 
@@ -47,7 +49,7 @@ public class LoggerFactory {
    */
   @NotNull
   public static Logger<Field.Builder> getLogger(@NotNull String name) {
-    final CoreLogger core = CoreLoggerFactory.getLogger(name);
+    final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, name);
     return getLogger(core, Field.Builder.instance());
   }
 
@@ -73,7 +75,7 @@ public class LoggerFactory {
    */
   @NotNull
   public static Logger<Field.Builder> getLogger() {
-    CoreLogger core = CoreLoggerFactory.getLogger(Caller.resolveClassName());
+    CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
     return getLogger(core, Field.Builder.instance());
   }
 
@@ -86,7 +88,7 @@ public class LoggerFactory {
    */
   @NotNull
   public static <FB extends Field.Builder> Logger<FB> getLogger(@NotNull FB fieldBuilder) {
-    CoreLogger core = CoreLoggerFactory.getLogger(Caller.resolveClassName());
+    CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
     return getLogger(core, fieldBuilder);
   }
 
