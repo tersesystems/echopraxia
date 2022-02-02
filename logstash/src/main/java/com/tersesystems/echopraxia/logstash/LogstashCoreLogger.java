@@ -23,12 +23,12 @@ import org.slf4j.Marker;
 /** Logstash implementation of CoreLogger. */
 public class LogstashCoreLogger implements CoreLogger {
 
-  private final org.slf4j.Logger logger;
+  private final ch.qos.logback.classic.Logger logger;
   private final LogstashLoggingContext context;
   private final Condition condition;
   private final Executor executor;
 
-  protected LogstashCoreLogger(org.slf4j.Logger logger) {
+  protected LogstashCoreLogger(ch.qos.logback.classic.Logger logger) {
     this.logger = logger;
     this.context = LogstashLoggingContext.empty();
     this.condition = Condition.always();
@@ -36,7 +36,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   public LogstashCoreLogger(
-      org.slf4j.Logger logger,
+      ch.qos.logback.classic.Logger logger,
       LogstashLoggingContext context,
       Condition condition,
       Executor executor) {
@@ -51,7 +51,7 @@ public class LogstashCoreLogger implements CoreLogger {
    *
    * @return the SLF4J logger.
    */
-  public org.slf4j.Logger logger() {
+  public ch.qos.logback.classic.Logger logger() {
     return logger;
   }
 
@@ -158,6 +158,8 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
+    // Use 
+    // public void log(Marker marker, String fqcn, int levelInt, String message, Object[] argArray, Throwable t)
     Marker m = convertMarkers(context.getFields(), context.getMarkers());
     switch (level) {
       case ERROR:
