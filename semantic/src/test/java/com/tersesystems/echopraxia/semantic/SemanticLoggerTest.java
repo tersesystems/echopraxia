@@ -7,6 +7,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import com.tersesystems.echopraxia.logstash.LogstashCoreLogger;
 import java.util.List;
@@ -46,7 +47,9 @@ public class SemanticLoggerTest {
 
   @Test
   public void testLoggerWithLogstashEscape() {
-    LogstashCoreLogger coreLogger = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
+    LogstashCoreLogger coreLogger =
+        (LogstashCoreLogger)
+            CoreLoggerFactory.getLogger(SemanticLoggerFactory.FQCN, Caller.resolveClassName());
     SemanticLogger<Person> logger =
         SemanticLoggerFactory.getLogger(
             coreLogger.withMarkers(MarkerFactory.getMarker("SECURITY")),

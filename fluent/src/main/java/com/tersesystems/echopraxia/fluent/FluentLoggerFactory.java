@@ -1,12 +1,13 @@
 package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
+import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 
 /** The factory for FluentLogger. */
 public class FluentLoggerFactory {
+  private static final String FQCN = FluentLogger.class.getName();
 
   /**
    * Creates a logger using the given class name.
@@ -27,7 +28,7 @@ public class FluentLoggerFactory {
    * @param <FB> the type of field builder.
    */
   public static <FB extends Field.Builder> FluentLogger<FB> getLogger(Class<?> clazz, FB builder) {
-    CoreLogger coreLogger = LoggerFactory.getLogger(clazz).core();
+    CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, clazz);
     return getLogger(coreLogger, builder);
   }
 
@@ -50,7 +51,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   public static <FB extends Field.Builder> FluentLogger<FB> getLogger(String name, FB builder) {
-    CoreLogger coreLogger = LoggerFactory.getLogger(name).core();
+    CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, name);
     return getLogger(coreLogger, builder);
   }
 

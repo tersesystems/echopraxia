@@ -28,6 +28,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SemanticLoggerFactory {
 
+  static final String FQCN = SemanticLogger.class.getName();
+
   /**
    * Creates a semantic logger using a logger class and explicit field builder.
    *
@@ -46,7 +48,7 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<FB>> f,
       FB builder) {
-    CoreLogger coreLogger = CoreLoggerFactory.getLogger(clazz);
+    CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, clazz);
     return getLogger(coreLogger, dataTypeClass, messageFunction, f, builder);
   }
 
@@ -68,7 +70,7 @@ public class SemanticLoggerFactory {
       Function<DataType, String> messageFunction,
       Function<DataType, Field.BuilderFunction<FB>> f,
       FB builder) {
-    CoreLogger coreLogger = CoreLoggerFactory.getLogger(name);
+    CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, name);
     return getLogger(coreLogger, dataTypeClass, messageFunction, f, builder);
   }
 

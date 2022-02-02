@@ -7,6 +7,7 @@ import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.time.Instant;
@@ -178,7 +179,9 @@ public class Main {
 
   static class MyLoggerFactory {
     public static MyLogger getLogger() {
-      return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder);
+      return new MyLogger(
+          CoreLoggerFactory.getLogger(MyLogger.class.getName(), Caller.resolveClassName()),
+          myFieldBuilder);
     }
   }
 }

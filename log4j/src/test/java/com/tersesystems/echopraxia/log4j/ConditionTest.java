@@ -122,7 +122,7 @@ public class ConditionTest extends TestBase {
     JsonObject entry = getEntry();
     String message = entry.getString("message");
     assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    String exceptionMessage = entry.getJsonObject("exception").getString("exception_message");
+    String exceptionMessage = entry.getJsonObject("thrown").getString("message");
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 
@@ -147,7 +147,7 @@ public class ConditionTest extends TestBase {
     JsonObject entry = getEntry();
     String message = entry.getString("message");
     assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    String exceptionMessage = entry.getJsonObject("exception").getString("exception_message");
+    String exceptionMessage = entry.getJsonObject("thrown").getString("message");
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 }

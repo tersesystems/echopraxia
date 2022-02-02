@@ -6,7 +6,7 @@
 
     <Appenders>
         <Console name="Console" target="SYSTEM_OUT" follow="true">
-            <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json" locationInfoEnabled="true">
+            <JsonTemplateLayout eventTemplateUri="classpath:JsonLayout.json" locationInfoEnabled="true">
                 <EventTemplateAdditionalField
                         key="marker"
                         format="JSON"
@@ -26,7 +26,7 @@
             </JsonTemplateLayout>
         </Console>
         <List name="ListAppender">
-            <JsonTemplateLayout eventTemplateUri="classpath:LogstashJsonEventLayoutV1.json">
+            <JsonTemplateLayout eventTemplateUri="classpath:JsonLayout.json" locationInfoEnabled="true">
                 <EventTemplateAdditionalField
                         key="marker"
                         format="JSON"

@@ -13,18 +13,13 @@ import org.jetbrains.annotations.NotNull;
 public class CoreLoggerFactory {
 
   @NotNull
-  public static CoreLogger getLogger(@NotNull Class<?> clazz) {
-    return LazyHolder.INSTANCE.getLogger(clazz);
+  public static CoreLogger getLogger(String fqcn, @NotNull Class<?> clazz) {
+    return LazyHolder.INSTANCE.getLogger(fqcn, clazz);
   }
 
   @NotNull
-  public static CoreLogger getLogger(@NotNull String name) {
-    return LazyHolder.INSTANCE.getLogger(name);
-  }
-
-  @NotNull
-  public static CoreLogger getLogger() {
-    return getLogger(Caller.resolveClassName());
+  public static CoreLogger getLogger(String fqcn, @NotNull String name) {
+    return LazyHolder.INSTANCE.getLogger(fqcn, name);
   }
 
   private static class LazyHolder {
