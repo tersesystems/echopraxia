@@ -28,7 +28,7 @@ public class ConditionTest extends TestBase {
 
   private Logger<?> getLogger() {
     final LogstashCoreLogger logstashCoreLogger =
-        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+        new LogstashCoreLogger(LoggerFactory.FQCN, factory.getLogger(getClass().getName()));
     return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 

@@ -323,7 +323,7 @@ class LoggerTest extends TestBase {
 
   private Logger<?> getLogger() {
     LogstashCoreLogger logstashCoreLogger =
-        new LogstashCoreLogger(factory.getLogger(getClass().getName()));
+        new LogstashCoreLogger(LoggerFactory.FQCN, factory.getLogger(getClass().getName()));
     return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 }

@@ -10,10 +10,9 @@ import ch.qos.logback.core.read.ListAppender;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.BeforeEach;
-import org.slf4j.ILoggerFactory;
 
 public class TestBase {
-  protected ILoggerFactory factory;
+  protected LoggerContext factory;
 
   @BeforeEach
   public void before() {

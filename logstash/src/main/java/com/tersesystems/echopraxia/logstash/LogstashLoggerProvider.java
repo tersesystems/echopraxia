@@ -26,8 +26,7 @@ public class LogstashLoggerProvider implements CoreLoggerProvider {
   }
 
   public @NotNull CoreLogger getLogger(@NotNull String fqcn, @NotNull String name) {
-    org.slf4j.Logger logger = loggerContext.getLogger(name);
-    return new LogstashCoreLogger(logger);
+    return new LogstashCoreLogger(fqcn, loggerContext.getLogger(name));
   }
 
   public void addEchopraxiaPackages(List<String> frameworkPackages) {
