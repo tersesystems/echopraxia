@@ -39,7 +39,7 @@ public class Log4JCoreLogger implements CoreLogger {
     this.fqcn = fqcn;
     this.logger =
         new ExtendedLoggerWrapper(
-             log4jLogger, log4jLogger.getName(), log4jLogger.getMessageFactory());
+            log4jLogger, log4jLogger.getName(), log4jLogger.getMessageFactory());
     this.context = new Log4JLoggingContext();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
@@ -54,7 +54,7 @@ public class Log4JCoreLogger implements CoreLogger {
     this.fqcn = fqcn;
     this.logger =
         new ExtendedLoggerWrapper(
-          log4jLogger, log4jLogger.getName(), log4jLogger.getMessageFactory());
+            log4jLogger, log4jLogger.getName(), log4jLogger.getMessageFactory());
     ;
     this.context = context;
     this.condition = condition;
@@ -134,7 +134,7 @@ public class Log4JCoreLogger implements CoreLogger {
       return;
     }
     logger.logIfEnabled(
-      fqcn, convertLevel(level), context.getMarker(), createMessage(message), null);
+        fqcn, convertLevel(level), context.getMarker(), createMessage(message), null);
   }
 
   @Override
@@ -158,7 +158,7 @@ public class Log4JCoreLogger implements CoreLogger {
       return;
     }
     logger.logIfEnabled(
-      fqcn,
+        fqcn,
         convertLevel(level),
         context.getMarker(),
         createMessage(message, Collections.emptyList()),

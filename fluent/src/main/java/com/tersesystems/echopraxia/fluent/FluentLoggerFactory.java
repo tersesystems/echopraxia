@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;

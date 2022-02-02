@@ -3,7 +3,6 @@ package com.tersesystems.echopraxia.log4j;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.util.concurrent.TimeUnit;
@@ -16,7 +15,8 @@ import org.openjdk.jmh.infra.Blackhole;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class CoreLoggerBenchmarks {
-  private static final CoreLogger logger = CoreLoggerFactory.getLogger(Logger.class.getName(), CoreLoggerBenchmarks.class.getName());
+  private static final CoreLogger logger =
+      CoreLoggerFactory.getLogger(Logger.class.getName(), CoreLoggerBenchmarks.class.getName());
   private static final Exception exception = new RuntimeException();
   private static final Field.Builder builder = Field.Builder.instance();
 

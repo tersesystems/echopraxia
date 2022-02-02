@@ -199,7 +199,7 @@ public class LoggerTest extends TestBase {
     final String message = entry.getString("message");
     assertThat(message).isEqualTo("Message");
 
-    final JsonValue ex = entry.get("exception");
+    final JsonValue ex = entry.get("thrown");
     assertThat(ex).isNotNull();
   }
 
@@ -213,7 +213,7 @@ public class LoggerTest extends TestBase {
     final String message = entry.getString("message");
     assertThat(message).isEqualTo("Message exception=java.lang.RuntimeException: Some exception");
 
-    final JsonValue ex = entry.get("exception");
+    final JsonValue ex = entry.get("thrown");
     assertThat(ex).isNotNull();
   }
 

@@ -10,7 +10,6 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
-
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -180,7 +179,9 @@ public class Main {
 
   static class MyLoggerFactory {
     public static MyLogger getLogger() {
-      return new MyLogger(CoreLoggerFactory.getLogger(MyLogger.class.getName(), Caller.resolveClassName()), myFieldBuilder);
+      return new MyLogger(
+          CoreLoggerFactory.getLogger(MyLogger.class.getName(), Caller.resolveClassName()),
+          myFieldBuilder);
     }
   }
 }
