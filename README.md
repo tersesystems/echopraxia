@@ -456,7 +456,11 @@ private static final Executor loggingExecutor =
       });
 ```
 
-Using a single thread executor is nice because you can keep ordering of your logging statements, but it may not scale up in production.  Generally speaking, if you are CPU bound and want to distribute load over several cores, you should use `ForkJoinPool.commonPool()` or a bounded fork-join work stealing pool as your executor.  If your conditions involve blocking, or work is IO bound, you should configure a thread pool executor.  Because of parallelism and concurrency, your logging statements may not appear in order, but you can add extra fields to ensure you can reorder statements appropriately.
+Using a single thread executor is nice because you can keep ordering of your logging statements, but it may not scale up in production.  Generally speaking, if you are CPU bound and want to distribute load over several cores, you should use `ForkJoinPool.commonPool()` or a bounded fork-join work stealing pool as your executor.  If your conditions involve blocking, or work is IO bound, you should configure a thread pool executor.  
+
+Likewise, ff your conditions involve calls to external services (for example, calling Consul or a remote HTTP service), you should consider using a failure handling library like [failsafe](https://failsafe.dev/) to set up appropriate circuit breakers, bulkheads, timeouts, and rate limiters to manage interactions.
+
+Because of parallelism and concurrency, your logging statements may not appear in order, but you can add extra fields to ensure you can reorder statements appropriately.
 
 Putting it all together:
 
@@ -643,27 +647,6 @@ logger.info(condition, "Statement only logs if condition is met!")
 // Note that the watch service creates a daemon thread to watch the directory.
 // To free up the thread and stop watching, you should call close() as appropriate:
 watchService.close();
-```
-
-#### Custom Source Scripts
-
-You also have the option of creating your own `ScriptHandle` which can be backed by whatever you like, for example you can call out to Consul or a feature flag system for script work:
-
-```groovy
-ScriptHandle handle = new ScriptHandle() {
-  @Override
-  public boolean isInvalid() {
-    return callConsulToCheckWeHaveNewest();
-  }
-
-  @Override
-  public String script() throws IOException {
-    return callConsulForScript();
-  }
-    
-  // ...report / path etc 
-};
-ScriptCondition.create(false, handle);
 ```
 
 ## Semantic Logging
