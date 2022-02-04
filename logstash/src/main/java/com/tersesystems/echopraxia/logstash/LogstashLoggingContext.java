@@ -21,6 +21,7 @@ import org.slf4j.Marker;
  */
 public class LogstashLoggingContext implements LoggingContext {
 
+  // XXX possible to make this faster by having an EmptyLoggingContext object?
   private static final LogstashLoggingContext EMPTY =
       new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
 

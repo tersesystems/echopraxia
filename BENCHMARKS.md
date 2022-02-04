@@ -20,24 +20,27 @@ Uses logback 1.2.10 and logstash-logback-encoder 7.0.1.
 
 ```
 Benchmark                                         Mode  Cnt    Score    Error  Units
-CoreLoggerBenchmarks.info                         avgt    5   46.720 ±  0.738  ns/op
-CoreLoggerBenchmarks.infoWithException            avgt    5  157.549 ±  0.671  ns/op
-CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5   68.739 ±  0.832  ns/op
-CoreLoggerBenchmarks.isEnabled                    avgt    5    3.190 ±  0.044  ns/op
-LoggerBenchmarks.info                             avgt    5   51.689 ±  0.464  ns/op
-LoggerBenchmarks.infoWithAlways                   avgt    5   54.344 ±  1.687  ns/op
-LoggerBenchmarks.infoWithContextString            avgt    5  129.888 ± 11.851  ns/op
-LoggerBenchmarks.infoWithException                avgt    5  165.892 ±  2.760  ns/op
-LoggerBenchmarks.infoWithFieldBuilder             avgt    5   47.062 ±  0.237  ns/op
-LoggerBenchmarks.infoWithNever                    avgt    5   10.088 ±  0.522  ns/op
-LoggerBenchmarks.infoWithParameterizedString      avgt    5   70.574 ±  0.538  ns/op
-LoggerBenchmarks.infoWithStringArg                avgt    5   72.281 ±  0.456  ns/op
-LoggerBenchmarks.isInfoEnabled                    avgt    5    4.920 ±  0.041  ns/op
-SLF4JLoggerBenchmarks.info                        avgt    5   46.025 ±  0.549  ns/op
-SLF4JLoggerBenchmarks.infoWithArgument            avgt    5   49.617 ±  0.844  ns/op
-SLF4JLoggerBenchmarks.infoWithArrayArgs           avgt    5   47.900 ±  0.361  ns/op
-SLF4JLoggerBenchmarks.infoWithException           avgt    5  158.507 ±  6.367  ns/op
-SLF4JLoggerBenchmarks.isInfoEnabled               avgt    5    2.799 ±  0.107  ns/op
+CoreLoggerBenchmarks.info                         avgt    5   51.434 ±  1.222  ns/op
+CoreLoggerBenchmarks.infoWithContext              avgt    5  142.198 ±  7.249  ns/op
+CoreLoggerBenchmarks.infoWithException            avgt    5  165.357 ±  3.833  ns/op
+CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5   74.048 ±  0.583  ns/op
+CoreLoggerBenchmarks.isEnabled                    avgt    5    4.181 ±  0.047  ns/op
+LoggerBenchmarks.info                             avgt    5   50.968 ±  1.053  ns/op
+LoggerBenchmarks.infoWithAlways                   avgt    5   52.356 ±  3.655  ns/op
+LoggerBenchmarks.infoWithContextString            avgt    5  151.646 ±  5.972  ns/op
+LoggerBenchmarks.infoWithErrorCondition           avgt    5    4.965 ±  0.452  ns/op
+LoggerBenchmarks.infoWithException                avgt    5  183.519 ± 98.789  ns/op
+LoggerBenchmarks.infoWithFieldBuilder             avgt    5   55.997 ±  5.033  ns/op
+LoggerBenchmarks.infoWithNever                    avgt    5    0.520 ±  0.010  ns/op
+LoggerBenchmarks.infoWithParameterizedString      avgt    5   76.596 ±  7.575  ns/op
+LoggerBenchmarks.infoWithStringArg                avgt    5   77.015 ±  3.494  ns/op
+LoggerBenchmarks.isInfoEnabled                    avgt    5    5.350 ±  0.157  ns/op
+LoggerBenchmarks.traceWithParameterizedString     avgt    5    3.339 ±  0.025  ns/op
+SLF4JLoggerBenchmarks.info                        avgt    5   47.127 ±  1.358  ns/op
+SLF4JLoggerBenchmarks.infoWithArgument            avgt    5   53.454 ±  1.314  ns/op
+SLF4JLoggerBenchmarks.infoWithArrayArgs           avgt    5   68.225 ±  0.674  ns/op
+SLF4JLoggerBenchmarks.infoWithException           avgt    5  166.585 ±  1.972  ns/op
+SLF4JLoggerBenchmarks.isInfoEnabled               avgt    5    2.824 ±  0.012  ns/op
 ```
 
 ## Log4J Implementation
@@ -51,25 +54,25 @@ Uses Log4J 2.17.1 with layout-template-json.
 `SLF4JLoggerBenchmarks` show the Log4J API being called directly for comparison.
 
 ```
-Benchmark                                         Mode  Cnt    Score     Error  Units
-CoreLoggerBenchmarks.info                         avgt    5  234.448 ±  51.178  ns/op
-CoreLoggerBenchmarks.infoWithException            avgt    5  231.395 ±  45.475  ns/op
-CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  317.741 ±  54.581  ns/op
-CoreLoggerBenchmarks.isEnabled                    avgt    5    4.917 ±   0.039  ns/op
-Log4JBenchmarks.info                              avgt    5  187.168 ±   6.510  ns/op
-Log4JBenchmarks.infoWithArgument                  avgt    5  397.714 ±   6.262  ns/op
-Log4JBenchmarks.infoWithArrayArgs                 avgt    5  940.645 ± 166.913  ns/op
-Log4JBenchmarks.infoWithException                 avgt    5  214.765 ±  45.950  ns/op
-Log4JBenchmarks.isInfoEnabled                     avgt    5    3.105 ±   0.457  ns/op
-LoggerBenchmarks.info                             avgt    5  226.581 ±  91.389  ns/op
-LoggerBenchmarks.infoWithAlways                   avgt    5  252.319 ±  77.834  ns/op
-LoggerBenchmarks.infoWithContextString            avgt    5  335.941 ±  13.313  ns/op
-LoggerBenchmarks.infoWithException                avgt    5  220.949 ±  61.092  ns/op
-LoggerBenchmarks.infoWithFieldBuilder             avgt    5  254.228 ±  50.595  ns/op
-LoggerBenchmarks.infoWithNever                    avgt    5    4.867 ±   0.033  ns/op
-LoggerBenchmarks.infoWithParameterizedString      avgt    5  379.208 ±  43.844  ns/op
-LoggerBenchmarks.infoWithStringArg                avgt    5  250.326 ±  43.937  ns/op
-LoggerBenchmarks.isInfoEnabled                    avgt    5    6.167 ±   0.036  ns/op
+Benchmark                                         Mode  Cnt    Score    Error  Units
+CoreLoggerBenchmarks.info                         avgt    5  198.648 ± 33.391  ns/op
+CoreLoggerBenchmarks.infoWithException            avgt    5  199.548 ± 32.006  ns/op
+CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  356.200 ± 60.041  ns/op
+CoreLoggerBenchmarks.isEnabled                    avgt    5    6.810 ±  0.389  ns/op
+Log4JBenchmarks.info                              avgt    5  175.318 ±  1.622  ns/op
+Log4JBenchmarks.infoWithArgument                  avgt    5  169.173 ±  0.762  ns/op
+Log4JBenchmarks.infoWithArrayArgs                 avgt    5  174.232 ±  4.343  ns/op
+Log4JBenchmarks.infoWithException                 avgt    5  173.121 ±  1.406  ns/op
+Log4JBenchmarks.isInfoEnabled                     avgt    5    3.731 ±  0.037  ns/op
+LoggerBenchmarks.info                             avgt    5  213.721 ± 12.908  ns/op
+LoggerBenchmarks.infoWithAlways                   avgt    5  217.051 ± 11.712  ns/op
+LoggerBenchmarks.infoWithContextString            avgt    5  412.614 ±  1.549  ns/op
+LoggerBenchmarks.infoWithException                avgt    5  226.292 ±  7.383  ns/op
+LoggerBenchmarks.infoWithFieldBuilder             avgt    5  218.845 ±  6.774  ns/op
+LoggerBenchmarks.infoWithNever                    avgt    5   36.835 ±  0.431  ns/op
+LoggerBenchmarks.infoWithParameterizedString      avgt    5  380.021 ± 43.017  ns/op
+LoggerBenchmarks.infoWithStringArg                avgt    5  287.335 ± 53.580  ns/op
+LoggerBenchmarks.isInfoEnabled                    avgt    5    7.747 ±  0.249  ns/op
 ```
 
 ## Fluent Logger
