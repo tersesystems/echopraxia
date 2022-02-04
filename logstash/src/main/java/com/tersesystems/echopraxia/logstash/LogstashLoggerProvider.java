@@ -3,8 +3,8 @@ package com.tersesystems.echopraxia.logstash;
 import ch.qos.logback.classic.LoggerContext;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerProvider;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.LoggerFactory;
 
 /**
  * Logstash implementation of a logger provider.
@@ -13,13 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LogstashLoggerProvider implements CoreLoggerProvider {
 
-  private LoggerContext loggerContext;
-
-  @Override
-  public void initialize() {
-    this.loggerContext = (LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
-    addEchopraxiaPackages(loggerContext.getFrameworkPackages());
-  }
+  private final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
 
   public @NotNull CoreLogger getLogger(@NotNull String fqcn, @NotNull Class<?> clazz) {
     return getLogger(fqcn, clazz.getName());
@@ -27,17 +21,5 @@ public class LogstashLoggerProvider implements CoreLoggerProvider {
 
   public @NotNull CoreLogger getLogger(@NotNull String fqcn, @NotNull String name) {
     return new LogstashCoreLogger(fqcn, loggerContext.getLogger(name));
-  }
-
-  public void addEchopraxiaPackages(List<String> frameworkPackages) {
-    // CallerData uses substring match: if (currentClass.startsWith(s))
-    // https://github.com/qos-ch/logback/blob/master/logback-classic/src/main/java/ch/qos/logback/classic/spi/CallerData.java#L113
-    addFrameworkPackage(frameworkPackages, "com.tersesystems.echopraxia");
-  }
-
-  public void addFrameworkPackage(List<String> frameworkPackages, String packageName) {
-    if (!frameworkPackages.contains(packageName)) {
-      frameworkPackages.add(packageName);
-    }
   }
 }

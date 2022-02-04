@@ -9,9 +9,6 @@ import org.jetbrains.annotations.NotNull;
 public class Log4JCoreLoggerProvider implements CoreLoggerProvider {
 
   @Override
-  public void initialize() {}
-
-  @Override
   public @NotNull CoreLogger getLogger(@NotNull String fqcn, @NotNull Class<?> clazz) {
     return getLogger(fqcn, clazz.getName());
   }

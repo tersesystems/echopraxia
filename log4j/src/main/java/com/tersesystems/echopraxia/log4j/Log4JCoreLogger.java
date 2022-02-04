@@ -315,4 +315,8 @@ public class Log4JCoreLogger implements CoreLogger {
               return null;
             });
   }
+
+  public String toString() {
+    return "Log4JCoreLogger[" + logger.getName() + "]";
+  }
 }

@@ -355,4 +355,8 @@ public class LogstashCoreLogger implements CoreLogger {
     }
     throw new IllegalStateException("No level found!");
   }
+
+  public String toString() {
+    return "LogstashCoreLogger[" + logger.getName() + "]";
+  }
 }
