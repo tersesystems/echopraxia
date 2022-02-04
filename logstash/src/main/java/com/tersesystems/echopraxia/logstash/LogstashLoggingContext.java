@@ -2,11 +2,14 @@ package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.LoggingContext;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import net.logstash.logback.marker.LogstashMarker;
+import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
@@ -87,8 +90,30 @@ public class LogstashLoggingContext implements LoggingContext {
       } else if (ctxFields.isEmpty()) {
         return thisFields;
       } else {
+        // Stream.concat is actually faster than explicit ArrayList!
+        // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
         return Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
       }
     };
+  }
+
+  // Convert markers explicitly.
+  org.slf4j.Marker convertMarkers() {
+    final List<Field> fields = getFields();
+    final List<Marker> markers = getMarkers();
+
+    // XXX there should be a way to cache this if we know it hasn't changed, since it
+    // could be calculated repeatedly.
+    if (fields.isEmpty() && markers.isEmpty()) {
+      return null;
+    }
+
+    final List<Marker> markerList = new ArrayList<>();
+    for (Field field : fields) {
+      LogstashMarker append = Markers.append(field.name(), field.value());
+      markerList.add(append);
+    }
+    markerList.addAll(markers);
+    return Markers.aggregate(markerList);
   }
 }

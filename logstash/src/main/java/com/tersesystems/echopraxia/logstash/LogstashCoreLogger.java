@@ -12,10 +12,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.argument.StructuredArguments;
-import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
@@ -117,7 +115,7 @@ public class LogstashCoreLogger implements CoreLogger {
     if (condition == Condition.never()) {
       return false;
     }
-    Marker marker = convertMarkers(context.getFields(), context.getMarkers());
+    Marker marker = context.convertMarkers();
     return logger.isEnabledFor(marker, convertLogbackLevel(level))
         && condition.test(level, context);
   }
@@ -130,7 +128,7 @@ public class LogstashCoreLogger implements CoreLogger {
     if (condition == Condition.never()) {
       return false;
     }
-    Marker marker = convertMarkers(context.getFields(), context.getMarkers());
+    Marker marker = context.convertMarkers();
     return logger.isEnabledFor(marker, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context);
   }
@@ -141,7 +139,7 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
-    Marker m = convertMarkers(context.getFields(), context.getMarkers());
+    Marker m = context.convertMarkers();
     logger.log(m, fqcn, convertLevel(level), message, null, null);
   }
 
@@ -155,7 +153,7 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
-    final Marker m = convertMarkers(context.getFields(), context.getMarkers());
+    final Marker m = context.convertMarkers();
     final List<Field> args = f.apply(builder);
     final Object[] arguments = convertArguments(args);
     logger.log(m, fqcn, convertLevel(level), message, arguments, null);
@@ -167,7 +165,7 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
-    Marker m = convertMarkers(context.getFields(), context.getMarkers());
+    Marker m = context.convertMarkers();
     logger.log(m, fqcn, convertLevel(level), message, null, e);
   }
 
@@ -277,22 +275,6 @@ public class LogstashCoreLogger implements CoreLogger {
       arguments.add(throwable.raw());
     }
     return arguments.toArray();
-  }
-
-  // Convert markers explicitly.
-  protected org.slf4j.Marker convertMarkers(List<Field> fields, List<Marker> markers) {
-    // XXX there should be a way to cache this if we know it hasn't changed, since it
-    // could be calculated repeatedly.
-    if (fields.isEmpty() && markers.isEmpty()) {
-      return null;
-    }
-
-    final List<Marker> markerList =
-        fields.stream()
-            .map(field -> Markers.append(field.name(), field.value()))
-            .collect(Collectors.toList());
-    markerList.addAll(markers);
-    return Markers.aggregate(markerList);
   }
 
   protected <FB extends Field.Builder> void runAsyncLog(

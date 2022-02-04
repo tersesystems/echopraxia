@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,10 +74,14 @@ public class FluentLogger<FB extends Field.Builder> {
   public FluentLogger<FB> withThreadContext() {
     Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
         mapSupplier ->
-            () ->
-                mapSupplier.get().entrySet().stream()
-                    .map(e -> builder.string(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
+            () -> {
+              List<Field> list = new ArrayList<>();
+              for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
+                Field string = builder.string(e.getKey(), e.getValue());
+                list.add(string);
+              }
+              return list;
+            };
     CoreLogger coreLogger = core.withThreadContext(mapTransform);
     return new FluentLogger<>(coreLogger, builder);
   }
@@ -199,7 +202,14 @@ public class FluentLogger<FB extends Field.Builder> {
           level,
           condition,
           message,
-          b -> argumentFnList.stream().map(f -> f.apply(b)).collect(Collectors.toList()),
+          b -> {
+            List<Field> list = new ArrayList<>();
+            for (Function<FB, Field> f : argumentFnList) {
+              Field apply = f.apply(b);
+              list.add(apply);
+            }
+            return list;
+          },
           builder);
     }
   }

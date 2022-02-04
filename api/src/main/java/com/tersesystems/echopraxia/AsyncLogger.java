@@ -4,13 +4,13 @@ import static com.tersesystems.echopraxia.Level.*;
 
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -140,10 +140,14 @@ public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, Asy
   public AsyncLogger<FB> withThreadContext() {
     Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
         mapSupplier ->
-            () ->
-                mapSupplier.get().entrySet().stream()
-                    .map(e -> fieldBuilder.string(e.getKey(), e.getValue()))
-                    .collect(Collectors.toList());
+            () -> {
+              List<Field> list = new ArrayList<>();
+              for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
+                Field string = fieldBuilder.string(e.getKey(), e.getValue());
+                list.add(string);
+              }
+              return list;
+            };
     return new AsyncLogger<>(core().withThreadContext(mapTransform), fieldBuilder);
   }
 
