@@ -140,9 +140,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
 
     Marker m = context.convertMarkers();
-    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      logger.log(m, fqcn, convertLevel(level), message, null, null);
-    }
+    logger.log(m, fqcn, convertLevel(level), message, null, null);
   }
 
   @Override
@@ -155,12 +153,10 @@ public class LogstashCoreLogger implements CoreLogger {
       return;
     }
 
-    Marker m = context.convertMarkers();
-    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      final List<Field> args = f.apply(builder);
-      final Object[] arguments = convertArguments(args);
-      logger.log(m, fqcn, convertLevel(level), message, arguments, null);
-    }
+    final Marker m = context.convertMarkers();
+    final List<Field> args = f.apply(builder);
+    final Object[] arguments = convertArguments(args);
+    logger.log(m, fqcn, convertLevel(level), message, arguments, null);
   }
 
   @Override
@@ -170,9 +166,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
 
     Marker m = context.convertMarkers();
-    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      logger.log(m, fqcn, convertLevel(level), message, null, e);
-    }
+    logger.log(m, fqcn, convertLevel(level), message, null, e);
   }
 
   @Override
