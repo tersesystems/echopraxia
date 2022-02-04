@@ -178,10 +178,12 @@ public class Main {
   }
 
   static class MyLoggerFactory {
+    // only change FQCN if you are overriding Logger.info, as caller data will still be the same.
+    private static final String FQCN = Logger.class.getName();
+
     public static MyLogger getLogger() {
       return new MyLogger(
-          CoreLoggerFactory.getLogger(MyLogger.class.getName(), Caller.resolveClassName()),
-          myFieldBuilder);
+          CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName()), myFieldBuilder);
     }
   }
 }

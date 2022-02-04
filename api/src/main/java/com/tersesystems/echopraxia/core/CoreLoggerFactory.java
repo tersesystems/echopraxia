@@ -28,7 +28,6 @@ public class CoreLoggerFactory {
       Iterator<CoreLoggerProvider> iterator = loader.iterator();
       if (iterator.hasNext()) {
         final CoreLoggerProvider provider = iterator.next();
-        provider.initialize();
         return provider;
       } else {
         String msg = "No CoreLoggerProvider implementation found in classpath!";

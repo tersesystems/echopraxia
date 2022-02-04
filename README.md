@@ -252,10 +252,12 @@ public class MyLogger extends Logger<PersonBuilder> {
 }
 
 public class MyLoggerFactory {
+  private static final String FQCN = Logger.class.getName(); // used for caller info
   private static final PersonBuilder PERSON_BUILDER_SINGLETON = new PersonBuilder();
   
   public static MyLogger getLogger() {
-    return new MyLogger(CoreLoggerFactory.getLogger(), PERSON_BUILDER_SINGLETON);
+    CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
+    return new MyLogger(core, PERSON_BUILDER_SINGLETON);
   }
 }
 
