@@ -115,7 +115,7 @@ public class LogstashCoreLogger implements CoreLogger {
     if (condition == Condition.never()) {
       return false;
     }
-    Marker marker = context.convertMarkers();
+    Marker marker = context.getMarker();
     return logger.isEnabledFor(marker, convertLogbackLevel(level))
         && condition.test(level, context);
   }
@@ -128,14 +128,14 @@ public class LogstashCoreLogger implements CoreLogger {
     if (condition == Condition.never()) {
       return false;
     }
-    Marker marker = context.convertMarkers();
+    Marker marker = context.getMarker();
     return logger.isEnabledFor(marker, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context);
   }
 
   @Override
   public void log(@NotNull Level level, String message) {
-    Marker m = context.convertMarkers();
+    Marker m = context.getMarker();
     if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context)) {
       logger.log(m, fqcn, convertLevel(level), message, null, null);
     }
@@ -148,7 +148,7 @@ public class LogstashCoreLogger implements CoreLogger {
       Field.@NotNull BuilderFunction<FB> f,
       @NotNull FB builder) {
 
-    final Marker m = context.convertMarkers();
+    final Marker m = context.getMarker();
     if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context)) {
       final List<Field> args = f.apply(builder);
       final Object[] arguments = convertArguments(args);
@@ -158,7 +158,7 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public void log(@NotNull Level level, String message, @NotNull Throwable e) {
-    final Marker m = context.convertMarkers();
+    final Marker m = context.getMarker();
     if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context)) {
       logger.log(m, fqcn, convertLevel(level), message, null, e);
     }
@@ -166,7 +166,7 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public void log(@NotNull Level level, @NotNull Condition condition, String message) {
-    final Marker m = context.convertMarkers();
+    final Marker m = context.getMarker();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context)) {
       logger.log(m, fqcn, convertLevel(level), message, null, null);
@@ -179,7 +179,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Condition condition,
       @Nullable String message,
       @NotNull Throwable e) {
-    final Marker m = context.convertMarkers();
+    final Marker m = context.getMarker();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context)) {
       logger.log(m, fqcn, convertLevel(level), message, null, e);
@@ -193,7 +193,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Field.BuilderFunction<B> f,
       @NotNull B builder) {
-    final Marker m = context.convertMarkers();
+    final Marker m = context.getMarker();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context)) {
       final List<Field> args = f.apply(builder);

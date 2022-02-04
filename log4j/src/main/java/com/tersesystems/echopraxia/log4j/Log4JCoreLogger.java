@@ -130,11 +130,13 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public void log(@NotNull Level level, String message) {
-    if (!condition.test(level, context)) {
-      return;
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    // the isEnabled check always goes before the condition check, as conditions can be expensive
+    final Message m = createMessage(message);
+    if (logger.isEnabled(log4jLevel, marker, m, null) && condition.test(level, context)) {
+      logger.logIfEnabled(fqcn, log4jLevel, marker, m, null);
     }
-    logger.logIfEnabled(
-        fqcn, convertLevel(level), context.getMarker(), createMessage(message), null);
   }
 
   @Override
@@ -143,34 +145,37 @@ public class Log4JCoreLogger implements CoreLogger {
       @Nullable String messageTemplate,
       @NotNull Field.BuilderFunction<B> f,
       @NotNull B builder) {
-    if (!condition.test(level, context)) {
-      return;
-    }
+    // because the isEnabled check looks for message and throwable, we have to
+    // calculate them right up front.
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     final List<Field> argumentFields = f.apply(builder);
     final Throwable e = findThrowable(argumentFields);
     final Message message = createMessage(messageTemplate, argumentFields);
-    logger.logIfEnabled(fqcn, convertLevel(level), context.getMarker(), message, e);
+    if (logger.isEnabled(log4jLevel, marker, message, e) && condition.test(level, context)) {
+      logger.logIfEnabled(fqcn, log4jLevel, marker, message, e);
+    }
   }
 
   @Override
   public void log(@NotNull Level level, @Nullable String message, @NotNull Throwable e) {
-    if (!condition.test(level, context)) {
-      return;
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    final Message m = createMessage(message);
+    if (logger.isEnabled(log4jLevel, marker, m, e) && condition.test(level, context)) {
+      logger.logIfEnabled(fqcn, log4jLevel, marker, m, e);
     }
-    logger.logIfEnabled(
-        fqcn,
-        convertLevel(level),
-        context.getMarker(),
-        createMessage(message, Collections.emptyList()),
-        e);
   }
 
   @Override
   public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
-    if (!condition.test(level, context)) {
-      return;
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    final Message m = createMessage(message);
+    if (logger.isEnabled(log4jLevel, marker, m, null)
+        && this.condition.and(condition).test(level, context)) {
+      logger.logIfEnabled(fqcn, log4jLevel, marker, m, null);
     }
-    log(level, message);
   }
 
   @Override
@@ -179,23 +184,31 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Condition condition,
       @Nullable String message,
       @NotNull Throwable e) {
-    if (!condition.test(level, context)) {
-      return;
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    final Message m = createMessage(message);
+    if (logger.isEnabled(log4jLevel, marker, m, e)
+        && this.condition.and(condition).test(level, context)) {
+      logger.logIfEnabled(fqcn, log4jLevel, marker, m, e);
     }
-    log(level, message, e);
   }
 
   @Override
   public <B extends Field.Builder> void log(
       @NotNull Level level,
       @NotNull Condition condition,
-      @Nullable String message,
+      @Nullable String messageTemplate,
       @NotNull Field.BuilderFunction<B> f,
       @NotNull B builder) {
-    if (!condition.test(level, context)) {
-      return;
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    final List<Field> argumentFields = f.apply(builder);
+    final Throwable e = findThrowable(argumentFields);
+    final Message message = createMessage(messageTemplate, argumentFields);
+    if (logger.isEnabled(log4jLevel, marker, message, e)
+        && this.condition.and(condition).test(level, context)) {
+      logger.logIfEnabled(fqcn, log4jLevel, marker, message, e);
     }
-    log(level, message, f, builder);
   }
 
   @Override

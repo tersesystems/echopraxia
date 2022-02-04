@@ -98,7 +98,7 @@ public class LogstashLoggingContext implements LoggingContext {
   }
 
   // Convert markers explicitly.
-  org.slf4j.Marker convertMarkers() {
+  org.slf4j.Marker getMarker() {
     final List<Field> fields = getFields();
     final List<Marker> markers = getMarkers();
 
