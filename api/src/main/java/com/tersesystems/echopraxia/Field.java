@@ -5,10 +5,7 @@ import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.Constants.DefaultKeyValueField;
 import com.tersesystems.echopraxia.Constants.DefaultValueField;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -650,7 +647,12 @@ public interface Field {
       if (v.type() == ValueType.OBJECT) {
         final List<Field> fieldList = ((ObjectValue) v).raw();
         StringBuilder b = new StringBuilder("{");
-        final String s = fieldList.stream().map(Field::toString).collect(Collectors.joining(", "));
+        StringJoiner joiner = new StringJoiner(", ");
+        for (Field field : fieldList) {
+          String toString = field.toString();
+          joiner.add(toString);
+        }
+        final String s = joiner.toString();
         b.append(s);
         b.append("}");
         return b.toString();
@@ -820,8 +822,12 @@ public interface Field {
     @NotNull
     public static Value.ObjectValue object(@NotNull List<Field> fields) {
       // Null fields are not allowed.
-      final List<Field> nonNullList =
-          fields.stream().filter(Objects::nonNull).collect(Collectors.toList());
+      final List<Field> nonNullList = new ArrayList<>();
+      for (Field field : fields) {
+        if (field != null) {
+          nonNullList.add(field);
+        }
+      }
       return new ObjectValue(nonNullList);
     }
 
@@ -855,8 +861,13 @@ public interface Field {
     @NotNull
     public static <T> Value.ObjectValue object(
         @NotNull Function<T, Field> transform, @NotNull List<T> values) {
-      List<Field> fields =
-          values.stream().map(transform).filter(Objects::nonNull).collect(Collectors.toList());
+      List<Field> fields = new ArrayList<>();
+      for (T value : values) {
+        Field field = transform.apply(value);
+        if (field != null) {
+          fields.add(field);
+        }
+      }
       return new ObjectValue(fields);
     }
 
@@ -902,7 +913,12 @@ public interface Field {
     @NotNull
     private static <T> List<Value<?>> asList(
         @NotNull List<T> values, @NotNull Function<T, Value<?>> f) {
-      return values.stream().map(f).collect(Collectors.toList());
+      List<Value<?>> list = new ArrayList<>();
+      for (T value : values) {
+        Value<?> value1 = f.apply(value);
+        list.add(value1);
+      }
+      return list;
     }
 
     public static final class BooleanValue extends Value<Boolean> {
