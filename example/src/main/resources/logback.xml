@@ -10,14 +10,16 @@
         <resetJUL>true</resetJUL>
     </contextListener>
 
-    <appender name="TEXT" class="ch.qos.logback.core.FileAppender">
-        <file>application.log</file>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%-5level [%thread]: %message%n%caller{2}</pattern>
+            <!-- <pattern>%-5level [%thread]: %message%n%caller{2}</pattern> -->
+            <pattern>%-5level [%thread]: %message%n%ex</pattern>
         </encoder>
     </appender>
 
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+    <appender name="JSON" class="ch.qos.logback.core.FileAppender">
+        <file>application.log</file>
+        <immediateFlush>false</immediateFlush>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
             <providers>
@@ -41,7 +43,7 @@
 
     <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="TEXT"/>
+        <appender-ref ref="JSON"/>
     </root>
 
 </configuration>

@@ -10,6 +10,8 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
+import org.jetbrains.annotations.NotNull;
+
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -41,9 +43,21 @@ public class Main {
           .withFieldBuilder(myFieldBuilder)
           .withFields(fb -> fb.onlyDate("last_accessed_date", lastAccessedDate));
 
-  public static void main(String[] args) {
+  public static void main(String[] args) throws InterruptedException {
     Main m = new Main();
-    m.doStuff();
+    while (true) {
+      m.doStuff();
+      busySleep(100000); // 10 microseconds
+    }
+  }
+
+  public static void busySleep(long nanos)
+  {
+    long elapsed;
+    final long startTime = System.nanoTime();
+    do {
+      elapsed = System.nanoTime() - startTime;
+    } while (elapsed < nanos);
   }
 
   // Example method that will do logging.
@@ -77,7 +91,7 @@ public class Main {
     }
 
     // You can also use a custom logger
-    MyLogger myLogger = MyLoggerFactory.getLogger();
+    MyLogger myLogger = MyLoggerFactory.getLogger(logger.core());
     myLogger.debug("Using my logger {}", fb -> fb.onlyDate("my date", new Date()));
 
     // Render some statements from context, always uses fb.string
@@ -182,8 +196,11 @@ public class Main {
     private static final String FQCN = Logger.class.getName();
 
     public static MyLogger getLogger() {
-      return new MyLogger(
-          CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName()), myFieldBuilder);
+      return getLogger(CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName()));
+    }
+
+    public static MyLogger getLogger(@NotNull CoreLogger core) {
+      return new MyLogger(core, myFieldBuilder);
     }
   }
 }
