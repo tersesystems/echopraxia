@@ -627,38 +627,13 @@ public interface Field {
 
     @NotNull
     public String toString() {
-      return valueToString(this);
-    }
-
-    /**
-     * Turns a given value into a string in a line oriented format.
-     *
-     * @param v the value
-     * @return the value as a string.
-     */
-    @NotNull
-    private static String valueToString(@NotNull Value<?> v) {
-      final Object raw = v.raw();
+      final Object raw = raw();
       if (raw == null) { // if null value or a raw value was set to null, keep going.
         return "null";
       }
-
-      // render an object with curly braces to distinguish from array.
-      if (v.type() == ValueType.OBJECT) {
-        final List<Field> fieldList = ((ObjectValue) v).raw();
-        StringBuilder b = new StringBuilder("{");
-        StringJoiner joiner = new StringJoiner(", ");
-        for (Field field : fieldList) {
-          String toString = field.toString();
-          joiner.add(toString);
-        }
-        final String s = joiner.toString();
-        b.append(s);
-        b.append("}");
-        return b.toString();
-      }
-
-      return raw.toString();
+      final StringBuilder b = new StringBuilder(255);
+      Constants.ValueFormatter.formatToBuffer(b, this);
+      return b.toString();
     }
 
     /**

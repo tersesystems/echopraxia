@@ -47,7 +47,7 @@ public class Main {
     Main m = new Main();
     while (true) {
       m.doStuff();
-      busySleep(100000); // 10 microseconds
+      busySleep(1000); // 10 microseconds
     }
   }
 
