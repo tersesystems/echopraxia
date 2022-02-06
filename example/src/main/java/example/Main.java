@@ -52,7 +52,9 @@ public class Main {
 
     while (true) {
       m.doStuff();
-      busySleep(1000); // give the GC a chance to breath
+      Thread.sleep(1000L);
+      // Can turn this down to nanoseconds for load testing...
+      //busySleep(1000); // give the GC a chance to breath
     }
   }
 

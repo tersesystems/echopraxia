@@ -17,7 +17,7 @@
         </filter>
         <encoder>
             <!-- <pattern>%-5level [%thread]: %message%n%caller{2}</pattern> -->
-            <pattern>%-5level [%thread]: %message%n%ex</pattern>
+            <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex</pattern>
         </encoder>
     </appender>
 
