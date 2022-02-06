@@ -46,7 +46,7 @@ public class Main {
     Main m = new Main();
     while (true) {
       m.doStuff();
-      busySleep(1000); // 10 microseconds
+      busySleep(1000); // give the GC a chance to breath
     }
   }
 
