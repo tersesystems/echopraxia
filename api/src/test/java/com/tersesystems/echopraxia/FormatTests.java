@@ -76,8 +76,6 @@ public class FormatTests {
                 fb.bool("boolName", true),
                 fb.array("arrayName", array(Field.Value.string("a"), Field.Value.nullValue())),
                 fb.nullField("nullName")));
-    assertThat(f.toString())
-        .isEqualTo(
-            "foo={value, 43, true, arrayName=[a, null], null}");
+    assertThat(f.toString()).isEqualTo("foo={value, 43, true, arrayName=[a, null], null}");
   }
 }
