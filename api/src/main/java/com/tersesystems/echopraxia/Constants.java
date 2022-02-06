@@ -1,9 +1,8 @@
 package com.tersesystems.echopraxia;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
+import org.jetbrains.annotations.NotNull;
 
 // Some package private constants
 class Constants {
@@ -31,7 +30,7 @@ class Constants {
   }
 
   /** This is a field that prints out value to a message template if possible. */
-  static final class DefaultValueField implements ValueField, FormatToBuffer{
+  static final class DefaultValueField implements ValueField, FormatToBuffer {
     private final String name;
     private final Value<?> value;
 

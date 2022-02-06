@@ -10,13 +10,12 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
-import org.jetbrains.annotations.NotNull;
-
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 public class Main {
 
@@ -51,8 +50,7 @@ public class Main {
     }
   }
 
-  public static void busySleep(long nanos)
-  {
+  public static void busySleep(long nanos) {
     long elapsed;
     final long startTime = System.nanoTime();
     do {
