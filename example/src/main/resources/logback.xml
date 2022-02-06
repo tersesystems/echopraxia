@@ -11,39 +11,45 @@
     </contextListener>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- only show INFO on console -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
         <encoder>
             <!-- <pattern>%-5level [%thread]: %message%n%caller{2}</pattern> -->
             <pattern>%-5level [%thread]: %message%n%ex</pattern>
         </encoder>
     </appender>
 
-    <appender name="JSON" class="ch.qos.logback.core.FileAppender">
-        <file>application.log</file>
-        <immediateFlush>false</immediateFlush>
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
-            <providers>
-                <timestamp>
-                    <timeZone>UTC</timeZone>
-                </timestamp>
-                <version/>
-                <message/>
-                <loggerName/>
-                <threadName/>
-                <logLevel/>
-                <logLevelValue/><!-- numeric value is useful for filtering >= -->
-                <stackHash/>
-                <!-- <mdc/> --> <!-- not showing mdc as we want to demo withContext() -->
-                <logstashMarkers/>
-                <arguments/>
-                <stackTrace/>
-            </providers>
-        </encoder>
+    <appender name="ASYNCJSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>application.log</file>
+            <immediateFlush>false</immediateFlush>
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+                <providers>
+                    <timestamp>
+                        <timeZone>UTC</timeZone>
+                    </timestamp>
+                    <version/>
+                    <message/>
+                    <loggerName/>
+                    <threadName/>
+                    <logLevel/>
+                    <logLevelValue/><!-- numeric value is useful for filtering >= -->
+                    <stackHash/>
+                    <!-- <mdc/> --> <!-- not showing mdc as we want to demo withContext() -->
+                    <logstashMarkers/>
+                    <arguments/>
+                    <stackTrace/>
+                </providers>
+            </encoder>
+        </appender>
     </appender>
 
     <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="JSON"/>
+        <appender-ref ref="ASYNCJSON"/>
     </root>
 
 </configuration>
