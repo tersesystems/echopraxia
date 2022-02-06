@@ -52,12 +52,11 @@ class Constants {
     public String toString() {
       final StringBuilder builder = getThreadLocalStringBuilder();
       formatToBuffer(builder);
-      return value.toString();
+      return builder.toString();
     }
 
     public void formatToBuffer(StringBuilder b) {
-      // Render value here
-      b.append(name).append("=");
+      // Render value only here
       ValueFormatter.formatToBuffer(b, value);
     }
   }
@@ -127,16 +126,14 @@ class Constants {
       final Object raw = v.raw();
       if (raw == null) { // if null value or a raw value was set to null, keep going.
         b.append("null");
-      }
-
-      // render an object with curly braces to distinguish from array.
-      if (v.type() == Field.Value.ValueType.OBJECT) {
+      } else if (v.type() == Field.Value.ValueType.OBJECT) {
+        // render an object with curly braces to distinguish from array.
         final List<Field> fieldList = ((Field.Value.ObjectValue) v).raw();
         b.append("{");
         for (int i = 0; i < fieldList.size(); i++) {
           Field field = fieldList.get(i);
           ((FormatToBuffer) field).formatToBuffer(b);
-          if (i != fieldList.size()) {
+          if (i < fieldList.size() - 1) {
             b.append(", ");
           }
         }
