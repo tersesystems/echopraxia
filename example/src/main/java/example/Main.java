@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 
 public class Main {
 
@@ -43,7 +44,12 @@ public class Main {
           .withFields(fb -> fb.onlyDate("last_accessed_date", lastAccessedDate));
 
   public static void main(String[] args) throws InterruptedException {
+    // Always a good idea to set this up for any internal JDK stuff
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+
     Main m = new Main();
+
     while (true) {
       m.doStuff();
       busySleep(1000); // give the GC a chance to breath
