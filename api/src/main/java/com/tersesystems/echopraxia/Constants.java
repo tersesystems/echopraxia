@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia;
 
+import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
 
@@ -8,9 +9,14 @@ class Constants {
 
   public static final String ECHOPRAXIA_UNKNOWN = "echopraxia-unknown-";
 
+  private static final int DEFAULT_STRING_BUILDER_SIZE = 255;
+
   public static final LongAdder unknownFieldAdder = new LongAdder();
 
   private static final Field.Builder builderInstance = new Field.Builder() {};
+
+  // Cut down on allocation pressure by reusing stringbuilder
+  private static final ThreadLocal<StringBuilder> threadLocalStringBuilder = new ThreadLocal<>();
 
   private Constants() {}
 
@@ -18,8 +24,13 @@ class Constants {
     return builderInstance;
   }
 
+  // keep this package private for now
+  interface FormatToBuffer {
+    void formatToBuffer(StringBuilder b);
+  }
+
   /** This is a field that prints out value to a message template if possible. */
-  static final class DefaultValueField implements ValueField {
+  static final class DefaultValueField implements ValueField, FormatToBuffer {
     private final String name;
     private final Value<?> value;
 
@@ -39,12 +50,20 @@ class Constants {
     }
 
     public String toString() {
+      final StringBuilder builder = getThreadLocalStringBuilder();
+      formatToBuffer(builder);
       return value.toString();
+    }
+
+    public void formatToBuffer(StringBuilder b) {
+      // Render value here
+      b.append(name).append("=");
+      ValueFormatter.formatToBuffer(b, value);
     }
   }
 
   /** This is a field that prints out key=value to a message template if possible. */
-  static final class DefaultKeyValueField implements KeyValueField {
+  static final class DefaultKeyValueField implements KeyValueField, FormatToBuffer {
     private final String name;
     private final Value<?> value;
 
@@ -64,7 +83,15 @@ class Constants {
     }
 
     public String toString() {
-      return name + "=" + value;
+      final StringBuilder builder = getThreadLocalStringBuilder();
+      // Render key=value here
+      formatToBuffer(builder);
+      return builder.toString();
+    }
+
+    public void formatToBuffer(StringBuilder b) {
+      b.append(name).append("=");
+      ValueFormatter.formatToBuffer(b, value);
     }
   }
 
@@ -82,5 +109,41 @@ class Constants {
       return value;
     }
     return Field.Value.nullValue();
+  }
+
+  private static StringBuilder getThreadLocalStringBuilder() {
+    StringBuilder buffer = threadLocalStringBuilder.get();
+    if (buffer == null) {
+      buffer = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
+      threadLocalStringBuilder.set(buffer);
+    }
+    buffer.setLength(0);
+    return buffer;
+  }
+
+  static class ValueFormatter {
+
+    static void formatToBuffer(StringBuilder b, Field.Value<?> v) {
+      final Object raw = v.raw();
+      if (raw == null) { // if null value or a raw value was set to null, keep going.
+        b.append("null");
+      }
+
+      // render an object with curly braces to distinguish from array.
+      if (v.type() == Field.Value.ValueType.OBJECT) {
+        final List<Field> fieldList = ((Field.Value.ObjectValue) v).raw();
+        b.append("{");
+        for (int i = 0; i < fieldList.size(); i++) {
+          Field field = fieldList.get(i);
+          ((FormatToBuffer) field).formatToBuffer(b);
+          if (i != fieldList.size()) {
+            b.append(", ");
+          }
+        }
+        b.append("}");
+      } else {
+        b.append(raw);
+      }
+    }
   }
 }

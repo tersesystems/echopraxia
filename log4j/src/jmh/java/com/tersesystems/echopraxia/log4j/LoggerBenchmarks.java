@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.concurrent.TimeUnit;
@@ -14,61 +15,75 @@ import org.openjdk.jmh.infra.Blackhole;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class LoggerBenchmarks {
-  private static final Logger<?> logger = LoggerFactory.getLogger();
-
+  private static final com.tersesystems.echopraxia.Logger<?> logger = LoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
+
+  private static final com.tersesystems.echopraxia.Logger<?> neverLogger =
+      logger.withCondition(Condition.never());
+  private static final com.tersesystems.echopraxia.Logger<?> alwaysLogger =
+      logger.withCondition(Condition.always());
+  private static final com.tersesystems.echopraxia.Logger<?> conditionLogger =
+      logger.withCondition((level, context) -> level.equals(Level.ERROR));
+  private static final com.tersesystems.echopraxia.Logger<?> fieldBuilderLogger =
+      logger.withFieldBuilder(Field.Builder.instance());
+  private static final Logger<?> contextLogger =
+      logger.withFields(fb -> fb.onlyString("foo", "bar"));
 
   @Benchmark
   public void info() {
-    // Log4JBenchmarks.info                         avgt    5  142.433 ± 27.654  ns/op
     logger.info("Message");
   }
 
   @Benchmark
+  public void infoWithNever() {
+    neverLogger.info("Message");
+  }
+
+  @Benchmark
+  public void infoWithAlways() {
+    alwaysLogger.info("Message");
+  }
+
+  @Benchmark
+  public void infoWithFieldBuilder() {
+    fieldBuilderLogger.info("Message");
+  }
+
+  @Benchmark
+  public void infoWithErrorCondition() {
+    conditionLogger.info("Message");
+  }
+
+  @Benchmark
   public void isInfoEnabled(Blackhole blackhole) {
-    // Log4JBenchmarks.isInfoEnabled                avgt    5    5.556 ±  0.056  ns/op
     blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark
   public void infoWithStringArg() {
-    // Log4JBenchmarks.infoWithStringArg            avgt    5  288.263 ±  0.753  ns/op
+    // No {} in the message template
     logger.info("Message", fb -> fb.onlyString("foo", "bar"));
   }
 
   @Benchmark
   public void infoWithContextString() {
-    // LoggerBenchmarks.infoWithContextString            avgt    5  315.648 ±  1.348  ns/op
-    logger.withFields(fb -> fb.onlyString("foo", "bar")).info("Message");
+    contextLogger.info("Message");
   }
 
   @Benchmark
   public void infoWithParameterizedString() {
-    // CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  324.000 ± 38.974  ns/op
+    // {} in message template
     logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
   }
 
   @Benchmark
   public void infoWithException() {
-    // Log4JBenchmarks.infoWithException            avgt    5  238.892 ± 54.381  ns/op
     logger.info("Message", exception);
   }
 
   @Benchmark
-  public void infoWithNever() {
-    // Log4JBenchmarks.infoWithNever                avgt    5  176.454 ± 57.493  ns/op
-    logger.withCondition(Condition.never()).info("Message");
-  }
-
-  @Benchmark
-  public void infoWithAlways() {
-    // Log4JBenchmarks.infoWithAlways               avgt    5  152.703 ± 52.607  ns/op
-    logger.withCondition(Condition.always()).info("Message");
-  }
-
-  @Benchmark
-  public void infoWithFieldBuilder() {
-    // Log4JBenchmarks.infoWithFieldBuilder         avgt    5  156.345 ± 80.493  ns/op
-    logger.withFieldBuilder(Field.Builder.instance()).info("Message");
+  public void traceWithParameterizedString() {
+    // should never log
+    logger.trace("Message {}", fb -> fb.onlyString("foo", "bar"));
   }
 }

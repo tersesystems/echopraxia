@@ -6,13 +6,25 @@ repositories {
     mavenCentral()
 }
 
-// "gradle :example:run" to run this
+// ./gradlew :example:run            # to run in place
+
+// To profile and tweak JVM profiles
+// ./gradlew example:installDist
+// cd example/build/install/example
+// bin/example
 mainClassName  = "example.Main"
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
     }
+
+    // https://docs.gradle.org/current/userguide/application_plugin.html
+    // -XX:+UnlockDiagnosticVMOptions -XX:+TraceClassLoading -XX:+LogCompilation
+    // YOURKIT_HOME=/home/wsargent/YourKit-JavaProfiler-2020.7
+    // -agentpath:$YOURKIT_HOME/bin/linux-x86-64/libyjpagent.so
+    // applicationDefaultJvmArgs = ['-Dgreeting.language=en']
+
 }
 
 dependencies {
