@@ -18,6 +18,9 @@ import org.jetbrains.annotations.NotNull;
 public interface SemanticLogger<DataType> {
 
   @NotNull
+  String getName();
+
+  @NotNull
   CoreLogger core();
 
   boolean isErrorEnabled();

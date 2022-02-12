@@ -35,6 +35,11 @@ public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, Asy
     this.fieldBuilder = fieldBuilder;
   }
 
+  @Override
+  public @NotNull String getName() {
+    return core.getName();
+  }
+
   /** @return the internal core logger. */
   @Override
   @NotNull
