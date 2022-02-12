@@ -34,6 +34,11 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
+  public @NotNull String getName() {
+    return "wheee";
+  }
+
+  @Override
   public boolean isEnabled(@NotNull Level level) {
     return false;
   }
@@ -87,9 +92,10 @@ public class FakeCoreLogger implements CoreLogger {
       @Nullable String message,
       Field.@NotNull BuilderFunction<B> f,
       @NotNull B builder) {
-    if (isEnabledFor(level) && this.condition.test(level, context)) {
+    List<Field> args = f.apply(builder);
+    FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
+    if (isEnabledFor(level) && this.condition.test(level, context.and(argContext))) {
       List<Field> fields = context.getFields();
-      List<Field> args = f.apply(builder);
       System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);
     }
   }
@@ -129,9 +135,12 @@ public class FakeCoreLogger implements CoreLogger {
       @Nullable String message,
       Field.@NotNull BuilderFunction<B> f,
       @NotNull B builder) {
-    if (isEnabledFor(level) && this.condition.and(condition).test(level, context)) {
-      List<Field> fields = context.getFields();
-      List<Field> args = f.apply(builder);
+    // When passing a condition through with explicit arguments, we pull the args and make
+    // them available through context.
+    List<Field> fields = context.getFields();
+    List<Field> args = f.apply(builder);
+    FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
+    if (isEnabledFor(level) && this.condition.and(condition).test(level, context.and(argContext))) {
       System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);
     }
   }

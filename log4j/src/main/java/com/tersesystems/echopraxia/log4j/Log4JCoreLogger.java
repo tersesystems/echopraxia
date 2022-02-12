@@ -158,8 +158,12 @@ public class Log4JCoreLogger implements CoreLogger {
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     final List<Field> argumentFields = f.apply(builder);
     final Throwable e = findThrowable(argumentFields);
+    // When passing a condition through with explicit arguments, we pull the args and make
+    // them available through context.
+    Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
     final Message message = createMessage(messageTemplate, argumentFields);
-    if (logger.isEnabled(log4jLevel, marker, message, e) && condition.test(level, context)) {
+    if (logger.isEnabled(log4jLevel, marker, message, e)
+        && condition.test(level, context.and(argContext))) {
       logger.logIfEnabled(fqcn, log4jLevel, marker, message, e);
     }
   }
@@ -211,9 +215,12 @@ public class Log4JCoreLogger implements CoreLogger {
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     final List<Field> argumentFields = f.apply(builder);
     final Throwable e = findThrowable(argumentFields);
+    // When passing a condition through with explicit arguments, we pull the args and make
+    // them available through context.
+    Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
     final Message message = createMessage(messageTemplate, argumentFields);
     if (logger.isEnabled(log4jLevel, marker, message, e)
-        && this.condition.and(condition).test(level, context)) {
+        && this.condition.and(condition).test(level, context.and(argContext))) {
       logger.logIfEnabled(fqcn, log4jLevel, marker, message, e);
     }
   }
