@@ -19,18 +19,19 @@ public class CoreLoggerFactory {
   private static final Filters filters = new Filters(ClassLoader.getSystemClassLoader());
 
   @NotNull
-  public static CoreLogger getLogger(String fqcn, @NotNull Class<?> clazz) {
+  public static CoreLogger getLogger(@NotNull String fqcn, @NotNull Class<?> clazz) {
     CoreLogger core = LazyHolder.INSTANCE.getLogger(fqcn, clazz);
     return processFilters(core);
   }
 
   @NotNull
-  public static CoreLogger getLogger(String fqcn, @NotNull String name) {
+  public static CoreLogger getLogger(@NotNull String fqcn, @NotNull String name) {
     CoreLogger core = LazyHolder.INSTANCE.getLogger(fqcn, name);
     return processFilters(core);
   }
 
-  private static CoreLogger processFilters(CoreLogger core) {
+  @NotNull
+  private static CoreLogger processFilters(@NotNull CoreLogger core) {
     return filters.apply(core);
   }
 
@@ -50,64 +51,72 @@ public class CoreLoggerFactory {
   }
 
   private static class Filters {
-    private final Properties props;
+
     private final List<CoreLoggerFilter> filterList;
 
-    public Filters(ClassLoader classLoader) {
-      InputStream inputStream =
-          CoreLoggerFactory.class.getResourceAsStream("/echopraxia.properties");
-      props = new Properties();
-      try {
-        props.load(inputStream);
-        filterList = getFilters(classLoader);
-      } catch (IOException e) {
-        throw new RuntimeException(e);
+    private static final String PROPERTIES_FILE = "echopraxia.properties";
+
+    public Filters(@NotNull ClassLoader classLoader) {
+      InputStream inputStream = CoreLoggerFactory.class.getResourceAsStream("/" + PROPERTIES_FILE);
+
+      if (inputStream != null) {
+        try {
+          Properties props = new Properties();
+          props.load(inputStream);
+          filterList = getFilters(props, classLoader);
+        } catch (IOException e) {
+          throw new ServiceConfigurationError("", e);
+        }
+      } else {
+        filterList = Collections.emptyList();
       }
     }
 
-    private List<String> getFilterClass() {
+    @NotNull
+    private List<CoreLoggerFilter> getFilters(
+        @NotNull Properties props, @NotNull ClassLoader classLoader) {
       List<String> result = new LinkedList<>();
       String value;
       for (int i = 0; (value = props.getProperty("filter." + i)) != null; i++) {
         result.add(value);
       }
-      return result;
-    }
-
-    private List<CoreLoggerFilter> getFilters(ClassLoader classLoader) {
-      Stream<String> stream = getFilterClass().stream();
+      Stream<String> stream = result.stream();
       return stream
           .map(className -> this.getFilterInstance(classLoader, className))
           .collect(Collectors.toList());
     }
 
-    private CoreLoggerFilter getFilterInstance(ClassLoader classLoader, String className) {
+    @NotNull
+    private CoreLoggerFilter getFilterInstance(
+        @NotNull ClassLoader classLoader, @NotNull String className) {
       try {
         Class<?> aClass = classLoader.loadClass(className);
         if (!CoreLoggerFilter.class.isAssignableFrom(aClass)) {
           String msg = "Class " + className + " does not implement CoreLoggerFilter";
-          throw new RuntimeException(msg);
+          throw new ServiceConfigurationError(msg);
         }
+        //noinspection unchecked
         Class<CoreLoggerFilter> filterClass = (Class<CoreLoggerFilter>) aClass;
         Constructor<CoreLoggerFilter> declaredConstructor = filterClass.getDeclaredConstructor();
-        CoreLoggerFilter filter = declaredConstructor.newInstance();
-        return filter;
-      } catch (ClassNotFoundException e) {
-        throw new RuntimeException(e);
-      } catch (NoSuchMethodException e) {
-        throw new RuntimeException(e);
-      } catch (InvocationTargetException e) {
-        throw new RuntimeException(e);
-      } catch (InstantiationException e) {
-        throw new RuntimeException(e);
-      } catch (IllegalAccessException e) {
-        throw new RuntimeException(e);
+        return declaredConstructor.newInstance();
+      } catch (ClassNotFoundException
+          | NoSuchMethodException
+          | InvocationTargetException
+          | InstantiationException
+          | IllegalAccessException e) {
+        throw new ServiceConfigurationError("Cannot create an instance from " + className, e);
       }
     }
 
-    public CoreLogger apply(CoreLogger core) {
-      CoreLoggerFilter filter = filterList.get(0);
-      return filter.apply(() -> core).get();
+    @NotNull
+    public CoreLogger apply(@NotNull CoreLogger core) {
+      CoreLogger c = core;
+      //noinspection ForLoopReplaceableByForEach
+      for (int i = 0, filterListSize = filterList.size(); i < filterListSize; i++) {
+        CoreLoggerFilter next = filterList.get(i);
+        c = next.apply(c);
+      }
+      return c;
     }
   }
 }

@@ -22,9 +22,8 @@
     </appender>
 
     <appender name="ASYNCJSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-        <appender class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <appender class="ch.qos.logback.core.FileAppender">
             <file>application.log</file>
-            <immediateFlush>false</immediateFlush>
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
                 <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
                 <providers>
