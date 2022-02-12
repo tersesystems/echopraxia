@@ -191,6 +191,11 @@ public class SemanticLoggerFactory {
     }
 
     @Override
+    public @NotNull String getName() {
+      return core.getName();
+    }
+
+    @Override
     public @NotNull CoreLogger core() {
       return core;
     }

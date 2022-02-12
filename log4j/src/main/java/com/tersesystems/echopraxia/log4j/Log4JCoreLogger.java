@@ -61,8 +61,15 @@ public class Log4JCoreLogger implements CoreLogger {
     this.executor = executor;
   }
 
+  @NotNull
   public Logger logger() {
     return this.logger;
+  }
+
+  @Override
+  @NotNull
+  public String getName() {
+    return logger.getName();
   }
 
   @Override

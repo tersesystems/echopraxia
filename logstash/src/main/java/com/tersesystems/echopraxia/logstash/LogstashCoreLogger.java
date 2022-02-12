@@ -58,6 +58,12 @@ public class LogstashCoreLogger implements CoreLogger {
     return logger;
   }
 
+  @Override
+  @NotNull
+  public String getName() {
+    return logger.getName();
+  }
+
   /**
    * Returns the condition.
    *

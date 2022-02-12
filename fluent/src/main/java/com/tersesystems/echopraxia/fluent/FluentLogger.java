@@ -29,6 +29,11 @@ public class FluentLogger<FB extends Field.Builder> {
   }
 
   @NotNull
+  String getName() {
+    return core.getName();
+  }
+
+  @NotNull
   public CoreLogger core() {
     return core;
   }

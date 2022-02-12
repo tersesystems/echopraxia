@@ -24,6 +24,14 @@ import org.jetbrains.annotations.Nullable;
 public interface CoreLogger {
 
   /**
+   * The name of the logger.
+   *
+   * @return logger name.
+   */
+  @NotNull
+  String getName();
+
+  /**
    * Is the logger instance enabled for the given level and logger conditions?
    *
    * @param level the level to log at.

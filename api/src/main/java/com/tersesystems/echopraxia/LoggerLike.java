@@ -13,6 +13,9 @@ import org.jetbrains.annotations.Nullable;
 public interface LoggerLike<FB extends Field.Builder, SELF extends LoggerLike<FB, SELF>> {
 
   @NotNull
+  String getName();
+
+  @NotNull
   CoreLogger core();
 
   @NotNull
