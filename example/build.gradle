@@ -38,4 +38,6 @@ dependencies {
     implementation 'org.codehaus.janino:janino:3.1.6'
     implementation 'ch.qos.logback:logback-classic:1.2.10'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
+
+    implementation 'com.github.oshi:oshi-core:6.1.0'
 }

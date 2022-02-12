@@ -46,7 +46,12 @@
         </appender>
     </appender>
 
-    <root level="DEBUG">
+    <!--
+      Turn on DEBUG for your application packages so that you can rely solely on conditions for filtering.
+    -->
+    <logger name="example" level="DEBUG"/>
+
+    <root level="INFO">
         <appender-ref ref="CONSOLE"/>
         <appender-ref ref="ASYNCJSON"/>
     </root>
