@@ -1,41 +1,18 @@
 package com.tersesystems.echopraxia;
 
-import static com.tersesystems.echopraxia.Level.*;
-
 import com.tersesystems.echopraxia.core.CoreLogger;
+import org.jetbrains.annotations.NotNull;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-/**
- * An echopraxia logger built around a field builder.
- *
- * <p>This class is explicitly designed to be subclassed so that end users can customize it and
- * avoid the parameterized type tax.
- *
- * <pre>{@code
- * public class MyLogger extends Logger<MyFieldBuilder> {
- *   protected MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) { super(core, fieldBuilder); }
- * }
- *
- * static class MyLoggerFactory {
- *   public static MyLogger getLogger() { return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder); }
- * }
- *
- * MyLogger logger = MyLoggerFactory.getLogger();
- * }</pre>
- *
- * @param <FB> the field builder type.
- */
-public class Logger<FB extends Field.Builder> extends AbstractLogger<FB, Logger<FB>> {
+public class CustomLogger<FB extends Field.Builder> extends AbstractLogger<FB, CustomLogger<FB>> {
 
-  protected Logger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
+  protected CustomLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     super(core, fieldBuilder);
   }
 
@@ -69,10 +46,10 @@ public class Logger<FB extends Field.Builder> extends AbstractLogger<FB, Logger<
       final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();
       return new Logger<>(core(), newInstance);
     } catch (NoSuchMethodException
-        | SecurityException
-        | InstantiationException
-        | IllegalAccessException
-        | InvocationTargetException e) {
+             | SecurityException
+             | InstantiationException
+             | IllegalAccessException
+             | InvocationTargetException e) {
       throw new IllegalStateException(e);
     }
   }
@@ -87,7 +64,7 @@ public class Logger<FB extends Field.Builder> extends AbstractLogger<FB, Logger<
    */
   @Override
   @NotNull
-  public Logger<FB> withCondition(@NotNull Condition condition) {
+  public CustomLogger<FB> withCondition(@NotNull Condition condition) {
     if (condition == Condition.always()) {
       return this;
     }
@@ -113,36 +90,24 @@ public class Logger<FB extends Field.Builder> extends AbstractLogger<FB, Logger<
    */
   @Override
   @NotNull
-  public Logger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
+  public CustomLogger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
     return new Logger<>(core().withFields(f, fieldBuilder), fieldBuilder);
   }
 
-  /**
-   * Creates a new logger with context fields from thread context / MDC mapped as context fields.
-   *
-   * <p>Note that the context map is lazily evaluated on every logging statement.
-   *
-   * @return the new logger.
-   */
   @Override
   @NotNull
-  public Logger<FB> withThreadContext() {
+  public CustomLogger<FB> withThreadContext() {
     Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
-        mapSupplier ->
-            () -> {
-              List<Field> list = new ArrayList<>();
-              for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
-                Field string = fieldBuilder.string(e.getKey(), e.getValue());
-                list.add(string);
-              }
-              return list;
-            };
+      mapSupplier ->
+        () -> {
+          List<Field> list = new ArrayList<>();
+          for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
+            Field string = fieldBuilder.string(e.getKey(), e.getValue());
+            list.add(string);
+          }
+          return list;
+        };
     return new Logger<>(core().withThreadContext(mapTransform), fieldBuilder);
-  }
-
-  // not overridden, not sure if should be part of LoggerLike
-  public AsyncLogger<FB> withExecutor(Executor executor) {
-    return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
   }
 
 }
