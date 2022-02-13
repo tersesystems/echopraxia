@@ -25,33 +25,10 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, AsyncLogger<FB>> {
-
-  protected final CoreLogger core;
-  protected final FB fieldBuilder;
+public class AsyncLogger<FB extends Field.Builder> extends AbstractLogger<AsyncLogger<FB>, FB> {
 
   protected AsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
-    this.core = core;
-    this.fieldBuilder = fieldBuilder;
-  }
-
-  @Override
-  public @NotNull String getName() {
-    return core.getName();
-  }
-
-  /** @return the internal core logger. */
-  @Override
-  @NotNull
-  public CoreLogger core() {
-    return core;
-  }
-
-  /** @return the field builder. */
-  @Override
-  @NotNull
-  public FB fieldBuilder() {
-    return fieldBuilder;
+    super(AsyncLogger.class, core, fieldBuilder);
   }
 
   /**
@@ -61,7 +38,6 @@ public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, Asy
    * @param <T> the type of the field builder.
    * @return a new logger using the given field builder.
    */
-  @Override
   @NotNull
   public <T extends Field.Builder> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     if (this.fieldBuilder == newBuilder) {
@@ -93,30 +69,14 @@ public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, Asy
     }
   }
 
-  /**
-   * Creates a new logger with the given condition.
-   *
-   * <p>Note that the condition is lazily evaluated on every logging statement.
-   *
-   * @param condition the given condition.
-   * @return the new logger.
-   */
   @Override
-  @NotNull
-  public AsyncLogger<FB> withCondition(@NotNull Condition condition) {
-    if (condition == Condition.always()) {
-      return this;
-    }
-    if (condition == Condition.never()) {
-      return new NeverAsyncLogger<>(core().withCondition(Condition.never()), fieldBuilder);
-    }
-
-    // Reduce allocation if we can help it
-    final CoreLogger coreLogger = core().withCondition(condition);
-    if (coreLogger == core()) {
-      return this;
-    }
+  protected AsyncLogger<FB> newLogger(CoreLogger coreLogger) {
     return new AsyncLogger<>(coreLogger, fieldBuilder);
+  }
+
+  @Override
+  protected AsyncLogger<FB> neverLogger(CoreLogger coreLogger) {
+    return new NeverAsyncLogger<>(coreLogger, fieldBuilder);
   }
 
   /**
@@ -130,7 +90,7 @@ public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, Asy
   @Override
   @NotNull
   public AsyncLogger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
-    return new AsyncLogger<>(core().withFields(f, fieldBuilder), fieldBuilder);
+    return newLogger(core().withFields(f, fieldBuilder));
   }
 
   /**
@@ -153,11 +113,11 @@ public class AsyncLogger<FB extends Field.Builder> implements LoggerLike<FB, Asy
               }
               return list;
             };
-    return new AsyncLogger<>(core().withThreadContext(mapTransform), fieldBuilder);
+    return newLogger(core().withThreadContext(mapTransform));
   }
 
   public AsyncLogger<FB> withExecutor(Executor executor) {
-    return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
+    return newLogger(core().withExecutor(executor));
   }
 
   // ------------------------------------------------------------------------

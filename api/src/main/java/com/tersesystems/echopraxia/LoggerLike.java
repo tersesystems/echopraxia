@@ -1,11 +1,11 @@
 package com.tersesystems.echopraxia;
 
+import static com.tersesystems.echopraxia.Level.*;
+import static com.tersesystems.echopraxia.Level.ERROR;
+
 import com.tersesystems.echopraxia.core.CoreLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import static com.tersesystems.echopraxia.Level.*;
-import static com.tersesystems.echopraxia.Level.ERROR;
 
 /**
  * An interface covering base common functionality between AsyncLogger and Logger.
@@ -86,9 +86,9 @@ public interface LoggerLike<FB extends Field.Builder> {
    * @param f the field builder function.
    */
   default void trace(
-    @NotNull Condition condition,
-    @Nullable String message,
-    @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(TRACE, condition, message, f, fieldBuilder());
   }
 
@@ -177,9 +177,9 @@ public interface LoggerLike<FB extends Field.Builder> {
    * @param f the field builder function.
    */
   default void debug(
-    @NotNull Condition condition,
-    @Nullable String message,
-    @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(DEBUG, condition, message, f, fieldBuilder());
   }
 
@@ -246,9 +246,9 @@ public interface LoggerLike<FB extends Field.Builder> {
    * @param f the field builder function.
    */
   default void info(
-    @NotNull Condition condition,
-    @Nullable String message,
-    @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(INFO, condition, message, f, fieldBuilder());
   }
 
@@ -337,9 +337,9 @@ public interface LoggerLike<FB extends Field.Builder> {
    * @param f the field builder function.
    */
   default void warn(
-    @NotNull Condition condition,
-    @Nullable String message,
-    @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(WARN, condition, message, f, fieldBuilder());
   }
 
@@ -406,9 +406,9 @@ public interface LoggerLike<FB extends Field.Builder> {
    * @param f the field builder function.
    */
   default void error(
-    @NotNull Condition condition,
-    @Nullable String message,
-    @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Field.BuilderFunction<FB> f) {
     core().log(ERROR, condition, message, f, fieldBuilder());
   }
 
