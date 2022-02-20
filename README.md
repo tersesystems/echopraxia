@@ -624,18 +624,28 @@ To enable it, you must set the context property `echopraxia.async.caller` to `tr
 <configuration>
     
     <property scope="context" name="echopraxia.async.caller" value="true"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
+        <!-- https://logback.qos.ch/manual/layouts.html#caller -->
+        <encoder>
+            <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex%caller{2}</pattern>
+        </encoder>
+    </appender>
     
-    <appender name="JSON" class="...">
+    <appender name="JSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+      <appender class="ch.qos.logback.core.FileAppender">
         <!-- Extracts caller data from marker and sets it on logger event -->
         <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
         
+        <!-- Or https://github.com/logfellow/logstash-logback-encoder#caller-info-fields -->
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
-            <providers>
-                <!-- must add caller data to see method / line info in json -->
-                <callerData/>
-            </providers>
+          <providers>
+            <!-- must add caller data to see method / line info in json -->
+            <callerData/>
+          </providers>
         </encoder>
+      </appender>
     </appender>
 </configuration>
 ```
