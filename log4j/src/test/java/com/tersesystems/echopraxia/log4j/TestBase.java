@@ -30,7 +30,6 @@ public class TestBase {
     return AsyncLoggerFactory.getLogger();
   }
 
-
   void waitUntilMessages() {
     final ListAppender listAppender = getListAppender("ListAppender");
     org.awaitility.Awaitility.await().until(() -> !listAppender.getMessages().isEmpty());

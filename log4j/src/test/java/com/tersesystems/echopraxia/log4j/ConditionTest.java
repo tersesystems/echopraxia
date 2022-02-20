@@ -12,7 +12,6 @@ import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
 import java.util.List;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
 import javax.json.JsonObject;
@@ -80,8 +79,7 @@ public class ConditionTest extends TestBase {
         };
 
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition =
-        getAsyncLogger().withCondition(c);
+    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -110,8 +108,7 @@ public class ConditionTest extends TestBase {
           }
           return true;
         };
-    AsyncLogger<?> loggerWithCondition =
-        getAsyncLogger().withCondition(c);
+    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");

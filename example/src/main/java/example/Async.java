@@ -3,7 +3,6 @@ package example;
 import com.tersesystems.echopraxia.AsyncLogger;
 import com.tersesystems.echopraxia.AsyncLoggerFactory;
 import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -33,7 +32,9 @@ public class Async {
       };
 
   private static final AsyncLogger<?> logger =
-      AsyncLoggerFactory.getLogger().withExecutor(loggingExecutor).withCondition(expensiveCondition);
+      AsyncLoggerFactory.getLogger()
+          .withExecutor(loggingExecutor)
+          .withCondition(expensiveCondition);
 
   public static void main(String[] args) throws InterruptedException {
     System.out.println("BEFORE logging block");
