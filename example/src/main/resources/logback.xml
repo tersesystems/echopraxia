@@ -13,13 +13,14 @@
     </contextListener>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
+
         <!-- only show INFO on console -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
         </filter>
         <encoder>
-            <!-- <pattern>%-5level [%thread]: %message%n%caller{2}</pattern> -->
-            <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex</pattern>
+            <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex%caller{2}</pattern>
         </encoder>
     </appender>
 
