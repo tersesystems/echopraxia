@@ -1,3 +1,12 @@
+<!---freshmark shields
+output = [
+	link(shield('mvnrepository', 'mvnrepository', '{{group}}', 'blue'), 'https://mvnrepository.com/artifact/{{group}}'),
+	link(shield('License Apache', 'license', 'Apache', 'blue'), 'https://tldrlegal.com/license/apache-license-2.0-(apache-2.0)'),
+	].join('\n')
+-->
+[![mvnrepository](https://img.shields.io/badge/mvnrepository-com.tersesystems.echopraxia-blue.svg)](https://mvnrepository.com/artifact/com.tersesystems.echopraxia)
+[![License Apache](https://img.shields.io/badge/license-Apache-blue.svg)](https://tldrlegal.com/license/apache-license-2.0-(apache-2.0))
+<!---freshmark /shields -->
 # Echopraxia
 
 [Echopraxia](https://github.com/tersesystems/echopraxia) is a Java logging API designed around structured logging, rich context, and conditional logging.  There are Logback and Log4J2 implementations, but Echopraxia's API is completely dependency-free, meaning it can be implemented with any logging API, i.e. jboss-logging, JUL, JEP 264, or even directly.
@@ -51,14 +60,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
-  <version>1.2.0</version>
+  <version><VERSION></version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:logstash:1.2.0" 
+implementation "com.tersesystems.echopraxia:logstash:<VERSION>" 
 ```
 
 ## Log4J
@@ -71,14 +80,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>log4j</artifactId>
-  <version>1.2.0</version>
+  <version><VERSION></version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:log4j:1.2.0" 
+implementation "com.tersesystems.echopraxia:log4j:<VERSION>" 
 ```
 
 You will need to integrate the `com.tersesystems.echopraxia.log4j.layout` package into your `log4j2.xml` file, e.g. by using the `packages` attribute, and add an `EventTemplateAdditionalField` element:
@@ -666,14 +675,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>scripting</artifactId>
-  <version>1.2.0</version>
+  <version><VERSION></version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:scripting:1.2.0" 
+implementation "com.tersesystems.echopraxia:scripting:<VERSION>" 
 ```
 
 ### String Based Scripts
@@ -812,14 +821,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>semantic</artifactId>
-  <version>1.2.0</version>
+  <version><VERSION></version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:semantic:1.2.0" 
+implementation "com.tersesystems.echopraxia:semantic:<VERSION>" 
 ```
 
 ## Fluent Logging
@@ -853,14 +862,14 @@ Maven:
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>fluent</artifactId>
-  <version>1.2.0</version>
+  <version><VERSION></version>
 </dependency>
 ```
 
 Gradle:
 
 ```
-implementation "com.tersesystems.echopraxia:fluent:1.2.0" 
+implementation "com.tersesystems.echopraxia:fluent:<VERSION>" 
 ```
 
 ## Core Logger 
