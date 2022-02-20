@@ -347,7 +347,9 @@ You can also add fields directly to the logger using `logger.withFields` for con
 
 ```java
 Logger<?> loggerWithFoo = basicLogger.withFields(fb -> fb.onlyString("foo", "bar"));
-loggerWithFoo.info("JSON field will log automatically") // will log "foo": "bar" field in a JSON appender.
+
+// will log "foo": "bar" field in a JSON appender.
+loggerWithFoo.info("JSON field will log automatically") 
 ```
 
 This works very well for HTTP session and request data such as correlation ids.
@@ -444,7 +446,7 @@ if (logger.isInfoEnabled(condition)) {
 }
 ```
 
-### Asynchronous Logging for Expensive Conditions
+## Asynchronous Logging
 
 By default, conditions are evaluated in the running thread.  This can be a problem if conditions rely on external elements such as network calls or database lookups, or involve resources with locks.
 
@@ -531,7 +533,7 @@ public class Async {
 }
 ```
 
-#### Async Logging and Thread Local State 
+### Managing Thread Local State 
 
 Note that because logging is asynchronous, you must be very careful when accessing thread local state.  Thread local state associated with logging, i.e. MDC / ThreadContext is automatically carried through, but in some cases you may need to do additional work.
 
@@ -578,7 +580,7 @@ public class GreetingController {
 }
 ```
 
-#### Async Logging and Caller Info
+### Managing Caller Info
 
 Caller information -- the caller class, method, and line number -- is typically implemented in frameworks by processing a stacktrace.  This is a problem for asynchronous logging, because the caller information is in a different ~~castle~~thread.
 
@@ -586,7 +588,7 @@ Echopraxia can fix this by capturing the caller information just before starting
 
 You must specifically configure the implementation to capture async caller data.
 
-##### Log4J
+#### Log4J
 
 For Log4J, you must set `includeLocation=true` on the logger you want to capture caller data, and configure the appender to render caller data:
 
@@ -612,7 +614,7 @@ For Log4J, you must set `includeLocation=true` on the logger you want to capture
 </Configuration>      
 ```
 
-##### Logback
+#### Logback
 
 Logback is a little more complicated, because there is no direct way to get the logging event from a logger.  Instead, a special `caller` marker is added, and a filter is used to extract caller data from the marker and set it on the event, 
 
@@ -638,7 +640,7 @@ To enable it, you must set the context property `echopraxia.async.caller` to `tr
 </configuration>
 ```
 
-### Dynamic Conditions with Scripts
+## Dynamic Conditions with Scripts
 
 One of the limitations of logging is that it's not that easy to change logging levels in an application at run-time.  In modern applications, you typically have complex inputs and may want to enable logging for some very specific inputs without turning on your logging globally.
 
@@ -664,7 +666,7 @@ Gradle:
 implementation "com.tersesystems.echopraxia:scripting:1.2.0" 
 ```
 
-#### String Based Scripts
+### String Based Scripts
 
 You also have the option of passing in a string directly:
 
@@ -678,7 +680,7 @@ String scriptString = b.toString();
 Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
 ```
 
-#### File Based Scripts
+### File Based Scripts
 
 Creating a script condition is done with `ScriptCondition.create`:
 
@@ -705,7 +707,7 @@ library echopraxia {
 }
 ```
 
-#### Watched Scripts
+### Watched Scripts
 
 You can also change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
 
@@ -930,7 +932,7 @@ org.apache.logging.log4j.Logger log4jLogger = core.logger();
 
 ## Filters
 
-There are times when you want to add a field or a condition to all loggers.  Although you can wrap individual loggers or create your own wrapper around `LoggerFactory`, this can be a labor intensive process that requires lots of code modification, and must be handled for fluent, semantic, async, and regular loggers.
+There are times when you want to add a field or a condition to all loggers.  Although you can wrap individual loggers or create your own wrapper around `LoggerFactory`, this can be a labor-intensive process that requires lots of code modification, and must be handled for fluent, semantic, async, and regular loggers.
 
 Echopraxia includes filters that wrap around the `CoreLogger` returned by `CoreLoggerFactory` that provides the ability to modify the core logger from a single pipeline in the code.
 
