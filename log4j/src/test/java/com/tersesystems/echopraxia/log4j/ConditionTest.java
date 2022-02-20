@@ -81,7 +81,7 @@ public class ConditionTest extends TestBase {
 
     AtomicBoolean logged = new AtomicBoolean(false);
     AsyncLogger<?> loggerWithCondition =
-        getLogger().withExecutor(ForkJoinPool.commonPool()).withCondition(c);
+        getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -111,7 +111,7 @@ public class ConditionTest extends TestBase {
           return true;
         };
     AsyncLogger<?> loggerWithCondition =
-        getLogger().withExecutor(ForkJoinPool.commonPool()).withCondition(c);
+        getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -129,7 +129,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testFailedLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getLogger().withExecutor(ForkJoinPool.commonPool());
+    AsyncLogger<?> loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
         handle -> {
           handle.log(
