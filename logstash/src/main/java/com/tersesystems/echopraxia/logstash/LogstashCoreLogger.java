@@ -22,6 +22,9 @@ import org.slf4j.Marker;
 /** Logstash implementation of CoreLogger. */
 public class LogstashCoreLogger implements CoreLogger {
 
+  // The logger context property used to set up caller info for async logging.
+  public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
+
   private final ch.qos.logback.classic.Logger logger;
   private final LogstashLoggingContext context;
   private final Condition condition;
@@ -75,6 +78,11 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
+  public @NotNull String fqcn() {
+    return fqcn;
+  }
+
+  @Override
   public <B extends Field.Builder> @NotNull CoreLogger withFields(
       Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     LogstashLoggingContext newContext =
@@ -107,6 +115,15 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
+    return new LogstashCoreLogger(fqcn, logger, context, condition, executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
+    return new LogstashCoreLogger(fqcn, logger, context, condition, executor);
+  }
+
+  public LogstashCoreLogger withLocationEnabled(boolean locationEnabled) {
     return new LogstashCoreLogger(fqcn, logger, context, condition, executor);
   }
 
@@ -219,22 +236,23 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public <FB extends Field.Builder> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+    final LogstashCoreLogger callerLogger = asyncCallerLogger();
     runAsyncLog(
         consumer,
         new LoggerHandle<FB>() {
           @Override
           public void log(@Nullable String message) {
-            LogstashCoreLogger.this.log(level, message);
+            callerLogger.log(level, message);
           }
 
           @Override
           public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-            LogstashCoreLogger.this.log(level, message, f, builder);
+            callerLogger.log(level, message, f, builder);
           }
 
           @Override
           public void log(@Nullable String message, @NotNull Throwable e) {
-            LogstashCoreLogger.this.log(level, message, e);
+            callerLogger.log(level, message, e);
           }
         });
   }
@@ -245,24 +263,57 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
+    final LogstashCoreLogger callerLogger = asyncCallerLogger();
     runAsyncLog(
         consumer,
         new LoggerHandle<FB>() {
           @Override
           public void log(@Nullable String message) {
-            LogstashCoreLogger.this.log(level, c, message);
+            callerLogger.log(level, c, message);
           }
 
           @Override
           public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-            LogstashCoreLogger.this.log(level, c, message, f, builder);
+            callerLogger.log(level, c, message, f, builder);
           }
 
           @Override
           public void log(@Nullable String message, @NotNull Throwable e) {
-            LogstashCoreLogger.this.log(level, c, message, e);
+            callerLogger.log(level, c, message, e);
           }
         });
+  }
+
+  /**
+   * Returns a core logger with a context containing a LogstashCallerMarker with the caller data
+   * needed for the logging event.
+   *
+   * @return the core logger.
+   */
+  @NotNull
+  protected LogstashCoreLogger asyncCallerLogger() {
+    if (isAsyncCallerEnabled()) {
+      LogstashCallerMarker callerMarker = new LogstashCallerMarker(fqcn, new Throwable());
+      LogstashLoggingContext callerContext =
+          new LogstashLoggingContext(
+              Collections::emptyList, () -> Collections.singletonList(callerMarker));
+      final LogstashLoggingContext contextWithCaller = context.and(callerContext);
+      return new LogstashCoreLogger(fqcn, logger, contextWithCaller, condition, executor);
+    } else {
+      return this;
+    }
+  }
+
+  /**
+   * Returns true if the logback context property "echopraxia.async.caller" is "true", false
+   * otherwise.
+   *
+   * @return if caller data is enabled.
+   */
+  protected boolean isAsyncCallerEnabled() {
+    String locationEnabled =
+        logger.getLoggerContext().getProperty(ECHOPRAXIA_ASYNC_CALLER_PROPERTY);
+    return Boolean.parseBoolean(locationEnabled);
   }
 
   // Top level conversion to Logback must be StructuredArgument, with an optional throwable

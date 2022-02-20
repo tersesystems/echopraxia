@@ -47,7 +47,11 @@
         </List>
     </Appenders>
     <Loggers>
-        <Root level="debug">
+        <!--
+          For async logging to include correct caller info, you need to set
+          includeLocation="true" on the logger.
+        -->
+        <Root level="debug" includeLocation="true">
             <AppenderRef ref="Console"/>
             <AppenderRef ref="ListAppender"/>
         </Root>

@@ -35,7 +35,7 @@ public class ContextTest extends TestBase {
 
     final Marker securityMarker = MarkerFactory.getMarker("SECURITY");
     final LogstashCoreLogger core =
-        new LogstashCoreLogger(LoggerFactory.FQCN, factory.getLogger(getClass().getName()));
+        new LogstashCoreLogger(Logger.FQCN, loggerContext.getLogger(getClass().getName()));
     Logger<?> logger =
         LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
     logger.withFields(f -> f.onlyString("key", "value")).error("This has a marker");
@@ -58,7 +58,7 @@ public class ContextTest extends TestBase {
     // isTraceEnabled should return true even without an explicit marker.
     final Marker securityMarker = MarkerFactory.getMarker("SECURITY");
     final LogstashCoreLogger core =
-        new LogstashCoreLogger(LoggerFactory.FQCN, factory.getLogger(getClass().getName()));
+        new LogstashCoreLogger(Logger.FQCN, loggerContext.getLogger(getClass().getName()));
     final CoreLogger security = core.withMarkers(securityMarker);
     Logger<?> logger = LoggerFactory.getLogger(security, Field.Builder.instance());
 
@@ -190,11 +190,5 @@ public class ContextTest extends TestBase {
     final EmptyLogstashMarker m = (EmptyLogstashMarker) event.getMarker();
     Stream<Marker> stream = StreamSupport.stream(m.spliterator(), false);
     return stream.collect(Collectors.toList());
-  }
-
-  private Logger<?> getLogger() {
-    final LogstashCoreLogger logstashCoreLogger =
-        new LogstashCoreLogger(LoggerFactory.FQCN, factory.getLogger(getClass().getName()));
-    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 }

@@ -243,29 +243,53 @@ Logger<PersonBuilder> personLogger = basicLogger.withFieldBuilder(PersonBuilder.
 personLogger.info("Person {}", fb -> fb.only(fb.person("user", user)));
 ```
 
-If you are using a particular set of field builders for your domain and want them available by default, the `Logger` class is designed to be easy to subclass.
+### Custom Logger Factories
+
+If you are using a particular set of field builders for your domain and want them available by default, it's easy to create your own logger with your own field builder, using the support classes and interfaces.  
+
+Creating your own logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere.
 
 ```java
-public class MyLogger extends Logger<PersonBuilder> {
-  protected MyLogger(CoreLogger core, PersonBuilder fieldBuilder) {
+import com.tersesystems.echopraxia.core.*;
+import com.tersesystems.echopraxia.support.*;
+
+public class MyLogger extends AbstractLoggerSupport<MyLogger, PersonBuilder>
+        implements DefaultLoggerMethods<PersonBuilder> {
+
+  public MyLogger(CoreLogger core, PersonBuilder fieldBuilder) {
     super(core, fieldBuilder);
+  }
+
+  @Override
+  protected MyLogger newLogger(CoreLogger core) {
+    return new MyLogger(core, fieldBuilder());
+  }
+
+  // Custom method for this logger
+  public void personInfo(String personName, Person p) {
+    core.log(Level.INFO, "{}", fb -> fb.onlyPerson(personName, p), fieldBuilder());
   }
 }
 
 public class MyLoggerFactory {
-  private static final String FQCN = Logger.class.getName(); // used for caller info
-  private static final PersonBuilder PERSON_BUILDER_SINGLETON = new PersonBuilder();
-  
-  public static MyLogger getLogger() {
-    CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
-    return new MyLogger(core, PERSON_BUILDER_SINGLETON);
+  private static final String FQCN = MyLogger.class.getName();
+  private static final PersonBuilder fieldBuilder = new PersonBuilder();
+
+  public static MyLogger getLogger(Class<?> clazz) {
+    final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, clazz);
+    return new MyLogger(core, fieldBuilder);
   }
 }
 
-MyLogger myLogger = MyLoggerFactory.getLogger();
-```
+public class Main {
+  private static final MyLogger logger = MyLoggerFactory.getLogger(Main.class);
 
-Subclassing the logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere.
+  public static void main(String[] args) {
+    // ... create person object...
+    logger.personInfo("user", user);
+  }
+}
+```
 
 ### Nulls and Exceptions
 

@@ -1,5 +1,7 @@
 <configuration>
 
+    <property scope="context" name="echopraxia.async.caller" value="true"/>
+
     <!-- give the async appenders time to shutdown -->
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
         <delay>100</delay>
@@ -22,6 +24,7 @@
     </appender>
 
     <appender name="ASYNCJSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
+        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
         <appender class="ch.qos.logback.core.FileAppender">
             <file>application.log</file>
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -35,6 +38,14 @@
                     <loggerName/>
                     <threadName/>
                     <logLevel/>
+                    <!--
+                      caller data requires that both a property needs to be set:
+
+                      <property scope="context" name="echopraxia.async.caller" value="true"/>
+                      AND
+                      the LogstashCallerDataFilter is set on the appender calling for logger data
+                    -->
+                    <callerData/>
                     <logLevelValue/><!-- numeric value is useful for filtering >= -->
                     <stackHash/>
                     <!-- <mdc/> --> <!-- not showing mdc as we want to demo withContext() -->

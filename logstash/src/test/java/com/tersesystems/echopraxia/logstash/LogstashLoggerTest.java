@@ -8,9 +8,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.*;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Arrays;
@@ -20,7 +18,7 @@ import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.junit.jupiter.api.Test;
 
-class LoggerTest extends TestBase {
+class LogstashLoggerTest extends TestBase {
 
   private static final ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
 
@@ -44,6 +42,34 @@ class LoggerTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo(null);
+  }
+
+  @Test
+  public void testLoggerLocation() {
+    Logger<?> logger = getLogger();
+    logger.info("Boring Message");
+
+    // We can't go through the list appender here because it doesn't call the encoder,
+    // and CallerData expects a stack that has the encoder called from a stack containing
+    // the logger.info method (so we can't call the encoder directly from here).
+    final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
+    final String json = stringAppender.list.get(0);
+    assertThat(json).contains("testLoggerLocation"); // caller_method_name
+  }
+
+  @Test
+  public void testAsyncLoggerLocation() throws InterruptedException {
+    final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
+    AsyncLogger<?> asyncLogger = getAsyncLogger();
+    asyncLogger.info("Boring Message");
+
+    waitUntilMessages();
+
+    // The async logger's even more work, because we need to set a filter up so we
+    // can splice in the correct caller information before the encoder can call
+    // event.getCallerData().
+    final String json = stringAppender.list.get(0);
+    assertThat(json).contains("testAsyncLoggerLocation"); // caller_method_name
   }
 
   @Test
@@ -242,6 +268,16 @@ class LoggerTest extends TestBase {
                 + " father={Bert, 35, null, null, interests=[keyboards]},"
                 + " mother={Candace, 30, null, null, interests=[iceskating]}, interests=[yodelling]}");
 
+    String json = toJson(event);
+    assertThat(json)
+        .isEqualTo(
+            "{\"person\":{\"name\":\"Abe\",\"age\":1,"
+                + "\"father\":{\"name\":\"Bert\",\"age\":35,\"father\":null,\"mother\":null,\"interests\":[\"keyboards\"]},"
+                + "\"mother\":{\"name\":\"Candace\",\"age\":30,\"father\":null,\"mother\":null,\"interests\":[\"iceskating\"]},"
+                + "\"interests\":[\"yodelling\"]}}");
+  }
+
+  private String toJson(ILoggingEvent event) throws IOException {
     final StringWriter sw = new StringWriter();
     final Object[] argumentArray = event.getArgumentArray();
     final StructuredArgument argument = (StructuredArgument) argumentArray[0];
@@ -250,12 +286,7 @@ class LoggerTest extends TestBase {
       argument.writeTo(generator);
       generator.writeEndObject();
     }
-    assertThat(sw.toString())
-        .isEqualTo(
-            "{\"person\":{\"name\":\"Abe\",\"age\":1,"
-                + "\"father\":{\"name\":\"Bert\",\"age\":35,\"father\":null,\"mother\":null,\"interests\":[\"keyboards\"]},"
-                + "\"mother\":{\"name\":\"Candace\",\"age\":30,\"father\":null,\"mother\":null,\"interests\":[\"iceskating\"]},"
-                + "\"interests\":[\"yodelling\"]}}");
+    return sw.toString();
   }
 
   // Example class with several fields on it.
@@ -319,11 +350,5 @@ class LoggerTest extends TestBase {
       Field[] fields = {name, age, father, mother, interests};
       return object(fieldName, fields);
     }
-  }
-
-  private Logger<?> getLogger() {
-    LogstashCoreLogger logstashCoreLogger =
-        new LogstashCoreLogger(LoggerFactory.FQCN, factory.getLogger(getClass().getName()));
-    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
   }
 }

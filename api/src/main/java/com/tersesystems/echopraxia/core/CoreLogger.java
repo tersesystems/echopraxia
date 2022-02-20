@@ -32,6 +32,81 @@ public interface CoreLogger {
   String getName();
 
   /**
+   * Returns the given condition.
+   *
+   * @return the given condition.
+   */
+  @NotNull
+  Condition condition();
+
+  /**
+   * Returns the fully qualified caller name.
+   *
+   * @return the fully qualified caller name.
+   */
+  @NotNull
+  String fqcn();
+
+  /**
+   * Adds the given fields to the logger context. The given function will be evaluated only, when
+   * logging. If you are dependent on thread local data, you should check that you only call the
+   * logger when appropriate.
+   *
+   * <p>That is, don't put something like this in your function:
+   *
+   * <p>{@code HttpServletRequest request = ((ServletRequestAttributes)
+   * RequestContextHolder.getRequestAttributes()).getRequest();}
+   *
+   * <p>if you're exposing your logger outside the context of an HTTP request.
+   *
+   * @param f the field builder function
+   * @param builder the field builder
+   * @param <B> the type of field builder.
+   * @return the core logger with given context fields applied.
+   */
+  @NotNull
+  <B extends Field.Builder> CoreLogger withFields(
+      @NotNull Field.BuilderFunction<B> f, @NotNull B builder);
+
+  /**
+   * Pulls fields from thread context into logger context, if any exist and the implementation
+   * supports it. The implementation supplies the map, and the logger supplies the list of fields.
+   *
+   * @param mapTransform a function that takes a context map and returns a list of fields.
+   * @return the core logger with any thread context mapped into fields.
+   */
+  @NotNull
+  CoreLogger withThreadContext(
+      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform);
+
+  /**
+   * Adds the given condition to the logger.
+   *
+   * @param condition the given condition
+   * @return the core logger with the condition applied.
+   */
+  @NotNull
+  CoreLogger withCondition(@NotNull Condition condition);
+
+  /**
+   * Returns a logger with the given executor for asynchronous logging.
+   *
+   * @param executor the executor to use.
+   * @return the core logger with the executor applied.
+   */
+  @NotNull
+  CoreLogger withExecutor(@NotNull Executor executor);
+
+  /**
+   * Returns a logger with the given fully qualified caller name.
+   *
+   * @param fqcn the fully qualified class name, or null.
+   * @return the core logger with the fully qualified class name applied.
+   */
+  @NotNull
+  CoreLogger withFQCN(@NotNull String fqcn);
+
+  /**
    * Is the logger instance enabled for the given level and logger conditions?
    *
    * @param level the level to log at.
@@ -119,64 +194,6 @@ public interface CoreLogger {
       @Nullable String message,
       @NotNull Field.BuilderFunction<B> f,
       @NotNull B builder);
-
-  /**
-   * Returns the given condition
-   *
-   * @return the given condition.
-   */
-  @NotNull
-  Condition condition();
-
-  /**
-   * Adds the given fields to the logger context. The given function will be evaluated only, when
-   * logging. If you are dependent on thread local data, you should check that you only call the
-   * logger when appropriate.
-   *
-   * <p>That is, don't put something like this in your function:
-   *
-   * <p>{@code HttpServletRequest request = ((ServletRequestAttributes)
-   * RequestContextHolder.getRequestAttributes()).getRequest();}
-   *
-   * <p>if you're exposing your logger outside the context of an HTTP request.
-   *
-   * @param f the field builder function
-   * @param builder the field builder
-   * @param <B> the type of field builder.
-   * @return the core logger with given context fields applied.
-   */
-  @NotNull
-  <B extends Field.Builder> CoreLogger withFields(
-      @NotNull Field.BuilderFunction<B> f, @NotNull B builder);
-
-  /**
-   * Pulls fields from thread context into logger context, if any exist and the implementation
-   * supports it. The implementation supplies the map, and the logger supplies the list of fields.
-   *
-   * @param mapTransform a function that takes a context map and returns a list of fields.
-   * @return the core logger with any thread context mapped into fields.
-   */
-  @NotNull
-  CoreLogger withThreadContext(
-      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform);
-
-  /**
-   * Adds the given condition to the logger.
-   *
-   * @param condition the given condition
-   * @return the core logger with the condition applied.
-   */
-  @NotNull
-  CoreLogger withCondition(@NotNull Condition condition);
-
-  /**
-   * Returns a logger with the given executor for asynchronous logging.
-   *
-   * @param executor the executor to use.
-   * @return the core logger with the executor applied.
-   */
-  @NotNull
-  CoreLogger withExecutor(@NotNull Executor executor);
 
   /**
    * Logs a statement asynchronously using an executor.

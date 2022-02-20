@@ -26,12 +26,6 @@ public class ConditionTest extends TestBase {
     assertThat(message).isEqualTo("info");
   }
 
-  private Logger<?> getLogger() {
-    final LogstashCoreLogger logstashCoreLogger =
-        new LogstashCoreLogger(LoggerFactory.FQCN, factory.getLogger(getClass().getName()));
-    return LoggerFactory.getLogger(logstashCoreLogger, Field.Builder.instance());
-  }
-
   @Test
   void testConditionWithContext() {
     Condition hasInfoLevel = (level, context) -> level.equals(Level.INFO);
