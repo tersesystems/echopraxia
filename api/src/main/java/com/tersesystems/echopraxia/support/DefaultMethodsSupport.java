@@ -1,0 +1,21 @@
+package com.tersesystems.echopraxia.support;
+
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.core.CoreLogger;
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * Methods that are used by the defaults to do delegation to the core logger.
+ *
+ * @param <FB>
+ */
+public interface DefaultMethodsSupport<FB extends Field.Builder> {
+  @NotNull
+  String getName();
+
+  @NotNull
+  CoreLogger core();
+
+  @NotNull
+  FB fieldBuilder();
+}

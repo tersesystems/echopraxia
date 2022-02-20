@@ -20,14 +20,18 @@ public class FakeCoreLogger implements CoreLogger {
   private final FakeLoggingContext context;
   private final Condition condition;
   private final Executor executor;
+  private final String fqcn;
 
-  protected FakeCoreLogger() {
+  protected FakeCoreLogger(String fqcn) {
+    this.fqcn = fqcn;
     this.context = FakeLoggingContext.empty();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
   }
 
-  public FakeCoreLogger(FakeLoggingContext context, Condition condition, Executor executor) {
+  public FakeCoreLogger(
+      String fqcn, FakeLoggingContext context, Condition condition, Executor executor) {
+    this.fqcn = fqcn;
     this.context = context;
     this.condition = condition;
     this.executor = executor;
@@ -54,10 +58,16 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
+  public @NotNull String fqcn() {
+    return fqcn;
+  }
+
+  @Override
   public @NotNull <B extends Field.Builder> CoreLogger withFields(
       Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     FakeLoggingContext newContext = new FakeLoggingContext(() -> f.apply(builder));
-    return new FakeCoreLogger(context.and(newContext), this.condition.and(condition), executor);
+    return new FakeCoreLogger(
+        fqcn, context.and(newContext), this.condition.and(condition), executor);
   }
 
   @Override
@@ -68,12 +78,17 @@ public class FakeCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
-    return new FakeCoreLogger(context, this.condition.and(condition), executor);
+    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor);
   }
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new FakeCoreLogger(context, condition, executor);
+    return new FakeCoreLogger(fqcn, context, condition, executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
+    return new FakeCoreLogger(fqcn, context, condition, executor);
   }
 
   // -----------------------------------------------------------------------

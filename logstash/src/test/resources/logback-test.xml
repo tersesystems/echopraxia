@@ -1,5 +1,8 @@
 <configuration>
 
+    <!-- tell async logger to create a throwable -->
+    <property scope="context" name="echopraxia.async.caller" value="true"/>
+
     <!-- always create a logging event if the SECURITY marker exists -->
     <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">
         <Marker>SECURITY</Marker>
@@ -9,7 +12,27 @@
     <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
     </appender>
 
+    <appender name="STRINGLIST" class="com.tersesystems.echopraxia.logstash.EncodingListAppender">
+        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+            <providers>
+                <timestamp/>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <callerData/>
+                <mdc/>
+                <logstashMarkers/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
     <root level="DEBUG">
         <appender-ref ref="LIST"/>
+        <appender-ref ref="STRINGLIST"/>
     </root>
 </configuration>

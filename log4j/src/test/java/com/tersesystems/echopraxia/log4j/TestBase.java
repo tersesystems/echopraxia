@@ -24,6 +24,11 @@ public class TestBase {
     return LoggerFactory.getLogger();
   }
 
+  void waitUntilMessages() {
+    final ListAppender listAppender = getListAppender("ListAppender");
+    org.awaitility.Awaitility.await().until(() -> !listAppender.getMessages().isEmpty());
+  }
+
   JsonObject getEntry() {
     final ListAppender listAppender = getListAppender("ListAppender");
     final List<String> messages = listAppender.getMessages();

@@ -1,65 +1,28 @@
 package com.tersesystems.echopraxia;
 
-import static com.tersesystems.echopraxia.Level.*;
+import static com.tersesystems.echopraxia.support.Utilities.getNewInstance;
 
 import com.tersesystems.echopraxia.core.CoreLogger;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.tersesystems.echopraxia.support.AbstractLoggerSupport;
+import com.tersesystems.echopraxia.support.DefaultLoggerMethods;
 import java.util.concurrent.Executor;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * An echopraxia logger built around a field builder.
  *
- * <p>This class is explicitly designed to be subclassed so that end users can customize it and
- * avoid the parameterized type tax.
- *
- * <pre>{@code
- * public class MyLogger extends Logger<MyFieldBuilder> {
- *   protected MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) { super(core, fieldBuilder); }
- * }
- *
- * static class MyLoggerFactory {
- *   public static MyLogger getLogger() { return new MyLogger(CoreLoggerFactory.getLogger(), myFieldBuilder); }
- * }
- *
- * MyLogger logger = MyLoggerFactory.getLogger();
- * }</pre>
- *
  * @param <FB> the field builder type.
  */
-public class Logger<FB extends Field.Builder> implements LoggerLike<FB, Logger<FB>> {
+public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logger<FB>, FB>
+    implements DefaultLoggerMethods<FB> {
 
-  protected final CoreLogger core;
-  protected final FB fieldBuilder;
+  // This is where the logging methods are called, so the stacktrace element shows
+  // DefaultLoggerMethods as the caller.
+  public static final String FQCN = DefaultLoggerMethods.class.getName();
 
   protected Logger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
-    this.core = core;
-    this.fieldBuilder = fieldBuilder;
-  }
-
-  @Override
-  public @NotNull String getName() {
-    return core.getName();
-  }
-
-  /** @return the internal core logger. */
-  @Override
-  @NotNull
-  public CoreLogger core() {
-    return core;
-  }
-
-  /** @return the field builder. */
-  @Override
-  @NotNull
-  public FB fieldBuilder() {
-    return fieldBuilder;
+    super(core, fieldBuilder, Logger.class);
   }
 
   /**
@@ -69,14 +32,9 @@ public class Logger<FB extends Field.Builder> implements LoggerLike<FB, Logger<F
    * @param <T> the type of the field builder.
    * @return a new logger using the given field builder.
    */
-  @Override
   @NotNull
   public <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
-    if (this.fieldBuilder == newBuilder) {
-      //noinspection unchecked
-      return (Logger<T>) this;
-    }
-    return new Logger<>(core(), newBuilder);
+    return newLogger(newBuilder);
   }
 
   /**
@@ -88,512 +46,299 @@ public class Logger<FB extends Field.Builder> implements LoggerLike<FB, Logger<F
    */
   @NotNull
   public <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull Class<T> newBuilderClass) {
-    try {
-      final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();
-      return new Logger<>(core(), newInstance);
-    } catch (NoSuchMethodException
-        | SecurityException
-        | InstantiationException
-        | IllegalAccessException
-        | InvocationTargetException e) {
-      throw new IllegalStateException(e);
-    }
+    return newLogger(getNewInstance(newBuilderClass));
   }
 
   /**
-   * Creates a new logger with the given condition.
+   * Creates a new async logger using this field builder.
    *
-   * <p>Note that the condition is lazily evaluated on every logging statement.
-   *
-   * @param condition the given condition.
-   * @return the new logger.
+   * @param executor the executor
+   * @return an async logger.
    */
-  @Override
-  @NotNull
-  public Logger<FB> withCondition(@NotNull Condition condition) {
-    if (condition == Condition.always()) {
-      return this;
-    }
-    if (condition == Condition.never()) {
-      return new NeverLogger<>(core().withCondition(Condition.never()), fieldBuilder);
-    }
-
-    // Reduce allocation if we can help it
-    final CoreLogger coreLogger = core().withCondition(condition);
-    if (coreLogger == core()) {
-      return this;
-    }
-    return new Logger<>(coreLogger, fieldBuilder);
-  }
-
-  /**
-   * Creates a new logger with the given context fields.
-   *
-   * <p>Note that the field builder function is lazily evaluated on every logging statement.
-   *
-   * @param f the given function producing fields from a field builder.
-   * @return the new logger.
-   */
-  @Override
-  @NotNull
-  public Logger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
-    return new Logger<>(core().withFields(f, fieldBuilder), fieldBuilder);
-  }
-
-  /**
-   * Creates a new logger with context fields from thread context / MDC mapped as context fields.
-   *
-   * <p>Note that the context map is lazily evaluated on every logging statement.
-   *
-   * @return the new logger.
-   */
-  @Override
-  @NotNull
-  public Logger<FB> withThreadContext() {
-    Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
-        mapSupplier ->
-            () -> {
-              List<Field> list = new ArrayList<>();
-              for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
-                Field string = fieldBuilder.string(e.getKey(), e.getValue());
-                list.add(string);
-              }
-              return list;
-            };
-    return new Logger<>(core().withThreadContext(mapTransform), fieldBuilder);
-  }
-
-  // not overridden, not sure if should be part of LoggerLike
   public AsyncLogger<FB> withExecutor(Executor executor) {
     return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
   }
 
-  // ------------------------------------------------------------------------
-  // TRACE
-
-  /** @return true if the logger level is TRACE or higher. */
-  public boolean isTraceEnabled() {
-    return core().isEnabled(TRACE);
+  // This is not part of the AbstractLoggerSupport
+  protected <T extends Field.Builder> Logger<T> newLogger(T newBuilder) {
+    if (this.fieldBuilder == newBuilder) {
+      //noinspection unchecked
+      return (Logger<T>) this;
+    }
+    return new Logger<>(core(), newBuilder);
   }
 
-  /**
-   * @param condition the given condition.
-   * @return true if the logger level is TRACE or higher and the condition is met.
-   */
-  public boolean isTraceEnabled(@NotNull Condition condition) {
-    return core().isEnabled(TRACE, condition);
-  }
-
-  /**
-   * Logs statement at TRACE level.
-   *
-   * @param message the given message.
-   */
   @Override
-  public void trace(@Nullable String message) {
-    core().log(TRACE, message);
+  protected @NotNull Logger<FB> newLogger(CoreLogger core) {
+    return new Logger<>(core, fieldBuilder);
   }
 
-  /**
-   * Logs statement at TRACE level using a field builder function.
-   *
-   * @param message the message.
-   * @param f the field builder function.
-   */
   @Override
-  public void trace(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
-    core().log(TRACE, message, f, fieldBuilder);
+  protected @NotNull Logger<FB> neverLogger() {
+    return new NeverLogger<>(core.withCondition(Condition.never()), fieldBuilder);
   }
 
   /**
-   * Logs statement at TRACE level with exception.
+   * An optimized logger for use with {@code Condition.never()}.
    *
-   * @param message the message.
-   * @param e the given exception.
+   * @param <FB>
    */
-  @Override
-  public void trace(@Nullable String message, @NotNull Throwable e) {
-    core().log(TRACE, message, e);
-  }
+  public static class NeverLogger<FB extends Field.Builder> extends Logger<FB> {
 
-  /**
-   * Conditionally logs statement at TRACE level.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   */
-  @Override
-  public void trace(@NotNull Condition condition, @Nullable String message) {
-    core().log(TRACE, condition, message);
-  }
+    protected NeverLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
+      super(core, fieldBuilder);
+    }
 
-  /**
-   * Conditionally logs statement at TRACE level using a field builder function.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void trace(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
-    core().log(TRACE, condition, message, f, fieldBuilder);
-  }
+    @Override
+    public @NotNull Logger<FB> withThreadContext() {
+      return this;
+    }
 
-  /**
-   * Conditionally logs statement at TRACE level with exception.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void trace(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(TRACE, condition, message, e);
-  }
+    protected @NotNull Logger<FB> newLogger(CoreLogger core) {
+      return this;
+    }
 
-  // ------------------------------------------------------------------------
-  // DEBUG
+    @Override
+    public @NotNull <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
+      return new NeverLogger<T>(core, newBuilder);
+    }
 
-  /** @return true if the logger level is DEBUG or higher. */
-  public boolean isDebugEnabled() {
-    return core().isEnabled(DEBUG);
-  }
+    @Override
+    public @NotNull Logger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
+      return this;
+    }
 
-  /**
-   * @param condition the given condition.
-   * @return true if the logger level is DEBUG or higher and the condition is met.
-   */
-  public boolean isDebugEnabled(@NotNull Condition condition) {
-    return core().isEnabled(DEBUG, condition);
-  }
+    @Override
+    public @NotNull Logger<FB> withCondition(@NotNull Condition condition) {
+      return this;
+    }
 
-  /**
-   * Logs statement at DEBUG level.
-   *
-   * @param message the given message.
-   */
-  @Override
-  public void debug(@Nullable String message) {
-    core().log(DEBUG, message);
-  }
+    /** @return true if the logger level is TRACE or higher. */
+    public boolean isTraceEnabled() {
+      return false;
+    }
 
-  /**
-   * Logs statement at DEBUG level using a field builder function.
-   *
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void debug(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-    core().log(DEBUG, message, f, fieldBuilder);
-  }
+    /**
+     * @param condition the given condition.
+     * @return true if the logger level is TRACE or higher and the condition is met.
+     */
+    public boolean isTraceEnabled(@NotNull Condition condition) {
+      return false;
+    }
 
-  /**
-   * Logs statement at DEBUG level with exception.
-   *
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void debug(@Nullable String message, @NotNull Throwable e) {
-    core().log(DEBUG, message, e);
-  }
+    @Override
+    public void trace(@Nullable String message) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at DEBUG level.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   */
-  @Override
-  public void debug(@NotNull Condition condition, @Nullable String message) {
-    core().log(DEBUG, condition, message);
-  }
+    @Override
+    public void trace(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at DEBUG level using a field builder function.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void debug(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
-    core().log(DEBUG, condition, message, f, fieldBuilder);
-  }
+    @Override
+    public void trace(@Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at DEBUG level with exception.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(DEBUG, condition, message, e);
-  }
+    @Override
+    public void trace(@NotNull Condition condition, @Nullable String message) {
+      // do nothing
+    }
 
-  // ------------------------------------------------------------------------
-  // INFO
+    @Override
+    public void trace(
+        @NotNull Condition condition,
+        @Nullable String message,
+        Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  /** @return true if the logger level is INFO or higher. */
-  public boolean isInfoEnabled() {
-    return core().isEnabled(INFO);
-  }
+    @Override
+    public void trace(
+        @NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  /**
-   * @param condition the given condition.
-   * @return true if the logger level is INFO or higher and the condition is met.
-   */
-  public boolean isInfoEnabled(@NotNull Condition condition) {
-    return core().isEnabled(INFO, condition);
-  }
+    /** @return true if the logger level is DEBUG or higher. */
+    public boolean isDebugEnabled() {
+      return false;
+    }
 
-  /**
-   * Logs statement at INFO level.
-   *
-   * @param message the given message.
-   */
-  @Override
-  public void info(@Nullable String message) {
-    core().log(INFO, message);
-  }
+    /**
+     * @param condition the given condition.
+     * @return true if the logger level is DEBUG or higher and the condition is met.
+     */
+    public boolean isDebugEnabled(@NotNull Condition condition) {
+      return false;
+    }
 
-  /**
-   * Logs statement at INFO level using a field builder function.
-   *
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void info(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-    core().log(INFO, message, f, fieldBuilder);
-  }
+    @Override
+    public void debug(@Nullable String message) {
+      // do nothing
+    }
 
-  /**
-   * Logs statement at INFO level with exception.
-   *
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void info(@Nullable String message, @NotNull Throwable e) {
-    core().log(INFO, message, e);
-  }
+    @Override
+    public void debug(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   */
-  @Override
-  public void info(@NotNull Condition condition, @Nullable String message) {
-    core().log(INFO, condition, message);
-  }
+    @Override
+    public void debug(@Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level using a field builder function.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void info(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
-    core().log(INFO, condition, message, f, fieldBuilder);
-  }
+    @Override
+    public void debug(@NotNull Condition condition, @Nullable String message) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level with exception.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(INFO, condition, message, e);
-  }
+    @Override
+    public void debug(
+        @NotNull Condition condition,
+        @Nullable String message,
+        Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  // ------------------------------------------------------------------------
-  // WARN
+    @Override
+    public void debug(
+        @NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  /** @return true if the logger level is WARN or higher. */
-  public boolean isWarnEnabled() {
-    return core().isEnabled(WARN);
-  }
+    /** @return true if the logger level is INFO or higher. */
+    public boolean isInfoEnabled() {
+      return false;
+    }
 
-  /**
-   * @param condition the given condition.
-   * @return true if the logger level is WARN or higher and the condition is met.
-   */
-  public boolean isWarnEnabled(@NotNull Condition condition) {
-    return core().isEnabled(WARN, condition);
-  }
+    /**
+     * @param condition the given condition.
+     * @return true if the logger level is INFO or higher and the condition is met.
+     */
+    public boolean isInfoEnabled(@NotNull Condition condition) {
+      return false;
+    }
 
-  /**
-   * Logs statement at WARN level.
-   *
-   * @param message the given message.
-   */
-  public void warn(@Nullable String message) {
-    core().log(WARN, message);
-  }
+    @Override
+    public void info(@Nullable String message) {
+      // do nothing
+    }
 
-  /**
-   * Logs statement at WARN level using a field builder function.
-   *
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void warn(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-    core().log(WARN, message, f, fieldBuilder);
-  }
+    @Override
+    public void info(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  /**
-   * Logs statement at WARN level with exception.
-   *
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void warn(@Nullable String message, @NotNull Throwable e) {
-    core().log(WARN, message, e);
-  }
+    @Override
+    public void info(@Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   */
-  @Override
-  public void warn(@NotNull Condition condition, @Nullable String message) {
-    core().log(WARN, condition, message);
-  }
+    @Override
+    public void info(@NotNull Condition condition, @Nullable String message) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level using a field builder function.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void warn(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
-    core().log(WARN, condition, message, f, fieldBuilder);
-  }
+    @Override
+    public void info(
+        @NotNull Condition condition,
+        @Nullable String message,
+        Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level with exception.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(WARN, condition, message, e);
-  }
+    @Override
+    public void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  // ------------------------------------------------------------------------
-  // ERROR
+    /** @return true if the logger level is WARN or higher. */
+    public boolean isWarnEnabled() {
+      return false;
+    }
 
-  /** @return true if the logger level is ERROR or higher. */
-  public boolean isErrorEnabled() {
-    return core().isEnabled(ERROR);
-  }
+    /**
+     * @param condition the given condition.
+     * @return true if the logger level is WARN or higher and the condition is met.
+     */
+    public boolean isWarnEnabled(@NotNull Condition condition) {
+      return false;
+    }
 
-  /**
-   * @param condition the given condition.
-   * @return true if the logger level is ERROR or higher and the condition is met.
-   */
-  public boolean isErrorEnabled(@NotNull Condition condition) {
-    return core().isEnabled(ERROR, condition);
-  }
+    @Override
+    public void warn(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  /**
-   * Logs statement at INFO level.
-   *
-   * @param message the given message.
-   */
-  @Override
-  public void error(@Nullable String message) {
-    core().log(ERROR, message);
-  }
+    @Override
+    public void warn(@Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  /**
-   * Logs statement at INFO level using a field builder function.
-   *
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void error(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-    core().log(ERROR, message, f, fieldBuilder);
-  }
+    @Override
+    public void warn(@NotNull Condition condition, @Nullable String message) {
+      // do nothing
+    }
 
-  /**
-   * Logs statement at INFO level with exception.
-   *
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void error(@Nullable String message, @NotNull Throwable e) {
-    core().log(ERROR, message, e);
-  }
+    @Override
+    public void warn(
+        @NotNull Condition condition,
+        @Nullable String message,
+        Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   */
-  @Override
-  public void error(@NotNull Condition condition, @Nullable String message) {
-    core().log(ERROR, condition, message);
-  }
+    @Override
+    public void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
 
-  /**
-   * Conditionally logs statement at INFO level using a field builder function.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param f the field builder function.
-   */
-  @Override
-  public void error(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
-    core().log(ERROR, condition, message, f, fieldBuilder);
-  }
+    /** @return true if the logger level is ERROR or higher. */
+    public boolean isErrorEnabled() {
+      return false;
+    }
 
-  /**
-   * Conditionally logs statement at INFO level with exception.
-   *
-   * @param condition the given condition.
-   * @param message the message.
-   * @param e the given exception.
-   */
-  @Override
-  public void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(ERROR, condition, message, e);
+    /**
+     * @param condition the given condition.
+     * @return true if the logger level is ERROR or higher and the condition is met.
+     */
+    public boolean isErrorEnabled(@NotNull Condition condition) {
+      return false;
+    }
+
+    @Override
+    public void error(@Nullable String message) {
+      // do nothing
+    }
+
+    @Override
+    public void error(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
+
+    @Override
+    public void error(@Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
+
+    @Override
+    public void error(@NotNull Condition condition, @Nullable String message) {
+      // do nothing
+    }
+
+    @Override
+    public void error(
+        @NotNull Condition condition,
+        @Nullable String message,
+        Field.@NotNull BuilderFunction<FB> f) {
+      // do nothing
+    }
+
+    @Override
+    public void error(
+        @NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
+      // do nothing
+    }
   }
 }
