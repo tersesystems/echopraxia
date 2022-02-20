@@ -17,9 +17,14 @@ Echopraxia is based around several main concepts that build and leverage on each
 
 * Structured Logging (API based around structured fields and values)
 * Contextual Logging (API based around building state in loggers)
-* Conditions (API based around context-aware functions and dynamic scripting)
+* Conditions (API based around context-aware functions)
+
+In addition, there are modules that expand on the core concepts:
+
 * Semantic Logging (API based around typed arguments)
 * Fluent Logging (API based around log entry builder)
+* Scripting (Conditions based on scripting language)
+* JDBC (Conditions stored and updated from JDBC database)
 * Filters (pipeline for adding fields and conditions to loggers)
 
 For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).

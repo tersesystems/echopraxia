@@ -10,4 +10,6 @@ include('scripting')
 include('fluent')
 include('semantic')
 include('filewatch')
+include('jdbc')
+
 // include('flow')
