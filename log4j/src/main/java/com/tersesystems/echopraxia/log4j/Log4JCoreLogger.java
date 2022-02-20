@@ -406,7 +406,7 @@ public class Log4JCoreLogger implements CoreLogger {
     // but pattern matching in Java isn't great for this.
     if (logger instanceof org.apache.logging.log4j.core.Logger) {
       final org.apache.logging.log4j.core.Logger coreLogger =
-        (org.apache.logging.log4j.core.Logger) logger;
+          (org.apache.logging.log4j.core.Logger) logger;
       final LoggerConfig loggerConfig = coreLogger.get();
       // I think this is equivalent to coreLogger.requiresLocation(), but this is
       // public while coreLogger.requiresLocation() is private.
