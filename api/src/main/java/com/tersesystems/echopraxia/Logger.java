@@ -52,9 +52,11 @@ public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logg
   /**
    * Creates a new async logger using this field builder.
    *
+   * @deprecated since 1.3, use {@code AsyncLoggerFactory.getLogger(logger.core(), logger.fieldBuilder())}
    * @param executor the executor
    * @return an async logger.
    */
+  @Deprecated()
   public AsyncLogger<FB> withExecutor(Executor executor) {
     return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
   }
