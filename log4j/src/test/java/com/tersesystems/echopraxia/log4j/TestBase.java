@@ -2,6 +2,8 @@ package com.tersesystems.echopraxia.log4j;
 
 import static com.tersesystems.echopraxia.log4j.appender.ListAppender.getListAppender;
 
+import com.tersesystems.echopraxia.AsyncLogger;
+import com.tersesystems.echopraxia.AsyncLoggerFactory;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
@@ -23,6 +25,11 @@ public class TestBase {
   Logger<?> getLogger() {
     return LoggerFactory.getLogger();
   }
+
+  AsyncLogger<?> getAsyncLogger() {
+    return AsyncLoggerFactory.getLogger();
+  }
+
 
   void waitUntilMessages() {
     final ListAppender listAppender = getListAppender("ListAppender");
