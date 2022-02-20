@@ -531,6 +531,8 @@ public class Async {
 }
 ```
 
+#### Async Logging and Thread Local State 
+
 Note that because logging is asynchronous, you must be very careful when accessing thread local state.  Thread local state associated with logging, i.e. MDC / ThreadContext is automatically carried through, but in some cases you may need to do additional work.
 
 For example, if you are using Spring Boot and are using `RequestContextHolder.getRequestAttributes()` when constructing context fields, you must call `RequestContextHolder.setRequestAttributes(requestAttributes)` so that the attributes are available to the thread:
@@ -576,7 +578,65 @@ public class GreetingController {
 }
 ```
 
-There are other ways to handle this wrapping, for example subclassing the `AsyncLogger` and overriding the logging methods.  There are also fancy [executor-based ways to extend context](https://medium.com/asyncparadigm/logging-in-a-multithreaded-environment-and-with-completablefuture-construct-using-mdc-1c34c691cef0), but that's a different topic.
+#### Async Logging and Caller Info
+
+Caller information -- the caller class, method, and line number -- is typically implemented in frameworks by processing a stacktrace.  This is a problem for asynchronous logging, because the caller information is in a different ~~castle~~thread.
+
+Echopraxia can fix this by capturing the caller information just before starting the async thread, but it must do so on request.  Crucially, although the throwable is created, the processing of stack trace elements still happens on the executor thread, ameliorating the [cost of caller information](https://ionutbalosin.com/2018/06/an-even-faster-way-than-stackwalker-api-for-asynchronously-processing-the-stack-frames/).
+
+You must specifically configure the implementation to capture async caller data.
+
+##### Log4J
+
+For Log4J, you must set `includeLocation=true` on the logger you want to capture caller data, and configure the appender to render caller data:
+
+```xml
+<Configuration packages="...">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+        <!-- must have location info enabled to get caller data -->
+        <JsonTemplateLayout 
+          eventTemplateUri="classpath:JsonLayout.json" 
+          locationInfoEnabled="true">
+            
+        </JsonTemplateLayout>
+    </Console>
+  </Appenders>
+    
+  <Loggers>
+    <!-- Must set includeLocation=true specifically for async caller info -->
+    <Root level="debug" includeLocation="true">
+      <AppenderRef ref="Console"/>
+    </Root>
+</Loggers>
+</Configuration>      
+```
+
+##### Logback
+
+Logback is a little more complicated, because there is no direct way to get the logging event from a logger.  Instead, a special `caller` marker is added, and a filter is used to extract caller data from the marker and set it on the event, 
+
+To enable it, you must set the context property `echopraxia.async.caller` to `true`, and add the `com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter` filter to the appender you want to render caller data:
+
+```xml
+<configuration>
+    
+    <property scope="context" name="echopraxia.async.caller" value="true"/>
+    
+    <appender name="JSON" class="...">
+        <!-- Extracts caller data from marker and sets it on logger event -->
+        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
+        
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+            <providers>
+                <!-- must add caller data to see method / line info in json -->
+                <callerData/>
+            </providers>
+        </encoder>
+    </appender>
+</configuration>
+```
 
 ### Dynamic Conditions with Scripts
 
