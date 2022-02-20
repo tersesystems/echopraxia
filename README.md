@@ -448,14 +448,14 @@ if (logger.isInfoEnabled(condition)) {
 
 By default, conditions are evaluated in the running thread.  This can be a problem if conditions rely on external elements such as network calls or database lookups, or involve resources with locks.
 
-Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  An `AsyncLogger` is created when calling the `withExecutor` method.  All statements are placed on a work queue and run on a thread specified by the executor at a later time.
+Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  All statements are placed on a work queue and run on a thread specified by the executor at a later time.
 
 All the usual logging statements are available in `AsyncLogger`, i.e. `logger.debug` will log as usual.  
 
 However, there are no predicates in the `AsyncLogger` -- instead, a `Consumer` of `LoggerHandle` is used, which serves the same purpose as the `if (isLogging*()) { .. }` block.
 
 ```java
-AsyncLogger<?> logger = LoggerFactory.getLogger().withExecutor(loggingExecutor);
+AsyncLogger<?> logger = AsyncLoggerFactory.getLogger().withExecutor(loggingExecutor);
 logger.info(handle -> {
   // do conditional logic that would normally happen in an if block
   // this may be expensive or blocking because it runs asynchronously
@@ -514,7 +514,7 @@ public class Async {
     };
   };
 
-  private static final AsyncLogger<?> logger = LoggerFactory.getLogger()
+  private static final AsyncLogger<?> logger = AsyncLoggerFactory.getLogger()
     .withExecutor(loggingExecutor)
     .withCondition(expensiveCondition);
 
@@ -541,7 +541,7 @@ public class GreetingController {
   private final AtomicLong counter = new AtomicLong();
 
   private static final AsyncLogger<HttpRequestFieldBuilder> logger =
-    LoggerFactory.getLogger()
+    AsyncLoggerFactory.getLogger()
       .withFieldBuilder(HttpRequestFieldBuilder.class)
       .withExecutor(ForkJoinPool.commonPool())
       .withFields(

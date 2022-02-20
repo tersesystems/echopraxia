@@ -17,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  * expensive to run inline with a business operation.
  *
  * <p>Instances of this class are usually created from {@code
- * LoggerFactory.getLogger().withExecutor(executor))}.
+ * AsyncLoggerFactory.getLogger().withExecutor(executor))}.
  *
  * @param <FB> the field builder type
  */
