@@ -7,10 +7,10 @@ import com.tersesystems.echopraxia.scripting.ScriptException;
 import java.sql.SQLException;
 import java.util.ResourceBundle;
 
-public class JdbcConditionFilter implements CoreLoggerFilter {
-  private final JdbcConditionStore conditionManager;
+public class SqliteConditionFilter implements CoreLoggerFilter {
+  private final JdbcConditionStore conditionStore;
 
-  public JdbcConditionFilter() {
+  public SqliteConditionFilter() {
     try {
       // https://github.com/xerial/sqlite-jdbc#how-to-specify-database-files
       // connection = DriverManager.getConnection("jdbc:sqlite::memory:");
@@ -19,13 +19,16 @@ public class JdbcConditionFilter implements CoreLoggerFilter {
       final ResourceBundle bundle = ResourceBundle.getBundle("echopraxia.sqlite");
       final String jdbcUrl = "jdbc:sqlite:conditions.db";
 
-      conditionManager =
+      conditionStore =
           new JdbcConditionStore(
+              true,
               jdbcUrl,
               bundle,
               (name, e) -> {
                 e.printStackTrace();
               });
+
+      conditionStore.runDDL(bundle);
     } catch (SQLException e) {
       throw new ScriptException(e);
     }
@@ -33,7 +36,7 @@ public class JdbcConditionFilter implements CoreLoggerFilter {
 
   @Override
   public CoreLogger apply(CoreLogger coreLogger) {
-    final Condition condition = conditionManager.create(coreLogger.getName());
+    final Condition condition = conditionStore.create(coreLogger.getName());
     return coreLogger.withCondition(condition);
   }
 }

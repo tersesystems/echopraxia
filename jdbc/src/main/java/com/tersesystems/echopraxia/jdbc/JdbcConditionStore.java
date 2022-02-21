@@ -34,22 +34,22 @@ public class JdbcConditionStore implements AutoCloseable {
             t.setName("jdbc-condition-store-" + threadCount.intValue());
             return t;
           });
+  private final String defaultScript;
 
-  public JdbcConditionStore(
+  public JdbcConditionStore(boolean createDDL,
       String jdbcUrl, ResourceBundle resources, BiConsumer<String, Throwable> exceptionConsumer)
       throws SQLException {
     this.exceptionConsumer = exceptionConsumer;
     connection = DriverManager.getConnection(jdbcUrl);
     connection.setAutoCommit(true);
 
-    initialize(resources);
-
     touchedStatement = connection.prepareStatement(resources.getString("touched"));
     selectStatement = connection.prepareStatement(resources.getString("select"));
     insertStatement = connection.prepareStatement(resources.getString("insert"));
+    defaultScript = resources.getString("defaultScript");
   }
 
-  private void initialize(ResourceBundle resources) throws SQLException {
+  public void runDDL(ResourceBundle resources) throws SQLException {
     try (Statement statement = connection.createStatement()) {
       statement.executeUpdate(resources.getString("create"));
       statement.execute(resources.getString("index"));
@@ -58,7 +58,7 @@ public class JdbcConditionStore implements AutoCloseable {
   }
 
   private String defaultScript() {
-    return "library echopraxia {\n  function evaluate: (string level, dict fields) -> true;\n}";
+    return defaultScript;
   }
 
   void insert(String name, String description, String script) throws SQLException {
