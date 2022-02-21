@@ -23,8 +23,6 @@ public class EncodingListAppender<E> extends UnsynchronizedAppenderBase<E> {
   protected void append(E e) {
     final byte[] encode = encoder.encode(e);
     final String s = new String(encode, StandardCharsets.UTF_8);
-    System.out.println("appender hash code = " + Integer.toHexString(hashCode()));
-    System.out.println("s = " + s);
     list.add(s);
   }
 }

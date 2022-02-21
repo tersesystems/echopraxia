@@ -625,17 +625,20 @@ For Log4J, you must set `includeLocation=true` on the logger you want to capture
 
 #### Logback
 
-Logback is a little more complicated, because there is no direct way to get the logging event from a logger.  Instead, a special `caller` marker is added, and a filter is used to extract caller data from the marker and set it on the event, 
+Logback is a little more complicated, because there is no direct way to get the logging event from a logger.  Instead, a special `caller` marker is added, and an appender is used to extract caller data from the marker and set it on the event, 
 
-To enable it, you must set the context property `echopraxia.async.caller` to `true`, and add the `com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter` filter to the appender you want to render caller data:
+To enable it, you must set the context property `echopraxia.async.caller` to `true`, and wrap your appenders with `com.tersesystems.echopraxia.logstash.CallerDataAppender`:
 
 ```xml
 <configuration>
     
     <property scope="context" name="echopraxia.async.caller" value="true"/>
 
+    <!-- loosen the rule so appenders use appender-refs -->
+    <newRule pattern="*/appender/appender-ref"
+             actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
+
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
         <!-- https://logback.qos.ch/manual/layouts.html#caller -->
         <encoder>
             <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex%caller{2}</pattern>
@@ -644,9 +647,7 @@ To enable it, you must set the context property `echopraxia.async.caller` to `tr
     
     <appender name="JSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
       <appender class="ch.qos.logback.core.FileAppender">
-        <!-- Extracts caller data from marker and sets it on logger event -->
-        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
-        
+        <filename>application.log</filename>
         <!-- Or https://github.com/logfellow/logstash-logback-encoder#caller-info-fields -->
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
           <providers>
@@ -656,6 +657,17 @@ To enable it, you must set the context property `echopraxia.async.caller` to `tr
         </encoder>
       </appender>
     </appender>
+
+    <root level="INFO">
+        <!--
+           CallerDataAppender sets the caller data on event from marker.
+           Note this depends on setting the newRule above!
+         -->
+        <appender class="com.tersesystems.echopraxia.logstash.CallerDataAppender">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="JSON"/>
+        </appender>
+    </root>
 </configuration>
 ```
 

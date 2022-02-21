@@ -3,6 +3,10 @@
     <!-- tell async logger to create a throwable -->
     <property scope="context" name="echopraxia.async.caller" value="true"/>
 
+    <!-- loosen the rule on appender refs so appenders can reference them -->
+    <newRule pattern="*/appender/appender-ref"
+             actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
+
     <!-- always create a logging event if the SECURITY marker exists -->
     <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">
         <Marker>SECURITY</Marker>
@@ -13,7 +17,6 @@
     </appender>
 
     <appender name="STRINGLIST" class="com.tersesystems.echopraxia.logstash.EncodingListAppender">
-        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
             <providers>
@@ -32,7 +35,9 @@
     </appender>
 
     <root level="DEBUG">
-        <appender-ref ref="LIST"/>
-        <appender-ref ref="STRINGLIST"/>
+        <appender class="com.tersesystems.echopraxia.logstash.CallerDataAppender">
+            <appender-ref ref="LIST"/>
+            <appender-ref ref="STRINGLIST"/>
+        </appender>
     </root>
 </configuration>

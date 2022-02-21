@@ -1,5 +1,9 @@
 <configuration>
 
+    <!-- loosen the rule on appender refs so appenders can reference them -->
+    <newRule pattern="*/appender/appender-ref"
+             actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
+
     <property scope="context" name="echopraxia.async.caller" value="true"/>
 
     <!-- give the async appenders time to shutdown -->
@@ -13,8 +17,6 @@
     </contextListener>
 
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
-
         <!-- only show INFO on console -->
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
@@ -25,7 +27,6 @@
     </appender>
 
     <appender name="ASYNCJSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-        <filter class="com.tersesystems.echopraxia.logstash.LogstashCallerDataFilter"/>
         <appender class="ch.qos.logback.core.FileAppender">
             <file>application.log</file>
             <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
@@ -64,8 +65,10 @@
     <logger name="example" level="DEBUG"/>
 
     <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="ASYNCJSON"/>
+        <appender class="com.tersesystems.echopraxia.logstash.CallerDataAppender">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="ASYNCJSON"/>
+        </appender>
     </root>
 
 </configuration>
