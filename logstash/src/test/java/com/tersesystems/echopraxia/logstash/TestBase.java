@@ -51,12 +51,16 @@ public class TestBase {
   }
 
   ListAppender<ILoggingEvent> getListAppender() {
-    return (ListAppender<ILoggingEvent>)
-        loggerContext().getLogger(ROOT_LOGGER_NAME).getAppender("LIST");
+    final ch.qos.logback.classic.Logger logger = loggerContext().getLogger(ROOT_LOGGER_NAME);
+    final TransformingAppender<ILoggingEvent> next =
+        (TransformingAppender<ILoggingEvent>) logger.iteratorForAppenders().next();
+    return (ListAppender<ILoggingEvent>) next.getAppender("LIST");
   }
 
   EncodingListAppender<ILoggingEvent> getStringAppender() {
-    return (EncodingListAppender<ILoggingEvent>)
-        loggerContext().getLogger(ROOT_LOGGER_NAME).getAppender("STRINGLIST");
+    final ch.qos.logback.classic.Logger logger = loggerContext().getLogger(ROOT_LOGGER_NAME);
+    final TransformingAppender<ILoggingEvent> next =
+        (TransformingAppender<ILoggingEvent>) logger.iteratorForAppenders().next();
+    return (EncodingListAppender<ILoggingEvent>) next.getAppender("STRINGLIST");
   }
 }

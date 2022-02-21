@@ -1,4 +1,10 @@
 <configuration>
+    <!-- tell async logger to create a throwable -->
+    <property scope="context" name="echopraxia.async.caller" value="true"/>
+
+    <!-- loosen the rule on appender refs so appenders can reference them -->
+    <newRule pattern="*/appender/appender-ref"
+             actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
 
     <!-- give the async appenders time to shutdown -->
     <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook">
@@ -33,7 +39,9 @@
     </appender>
 
     <root level="INFO">
-        <appender-ref ref="CONSOLE"/>
+        <appender class="com.tersesystems.echopraxia.logstash.CallerDataAppender">
+            <appender-ref name="CONSOLE"/>
+        </appender>
     </root>
 
 </configuration>
