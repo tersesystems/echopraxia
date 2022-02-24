@@ -18,10 +18,30 @@ public interface Condition {
    * Returns a condition which does a logical AND on this condition with the given condition.
    *
    * @param c the given condition.
-   * @return this condition AND given position.
+   * @return a condition that renders result of this condition AND given condition.
    */
   default Condition and(Condition c) {
     return (level, context) -> Condition.this.test(level, context) && c.test(level, context);
+  }
+
+  /**
+   * Returns a condition which does a logical AND on this condition with the given condition.
+   *
+   * @param c the given condition.
+   * @return a condition that renders result of this condition OR given condition.
+   */
+  default Condition or(Condition c) {
+    return (level, context) -> Condition.this.test(level, context) || c.test(level, context);
+  }
+
+  /**
+   * Returns a condition which does a logical XOR on this condition with the given condition.
+   *
+   * @param c the given condition.
+   * @return a condition that renders result of this condition XOR given condition.
+   */
+  default Condition xor(Condition c) {
+    return (level, context) -> Condition.this.test(level, context) ^ c.test(level, context);
   }
 
   /**
@@ -40,6 +60,36 @@ public interface Condition {
    */
   static Condition never() {
     return Conditions.NEVER;
+  }
+
+  /**
+   * A condition that returns true if level.isGreaterOrEqual(threshold).
+   *
+   * @param threshold the minimum threshold to meet.
+   * @return a condition that tests for the level to at least meet the threshold.
+   */
+  static Condition threshold(Level threshold) {
+    return (level, context) -> level.isGreaterOrEqual(threshold);
+  }
+
+  /**
+   * A condition that returns true if the level is equal to exactLevel.
+   *
+   * @param exactLevel the exact level to match.
+   * @return a condition returning if level.isEqual(exactLevel):
+   */
+  static Condition exactly(Level exactLevel) {
+    return (level, context) -> level.isEqual(exactLevel);
+  }
+
+  /** @return A condition that matches if the level is diagnostic: DEBUG or TRACE. */
+  static Condition diagnostic() {
+    return (level, context) -> level.isLessOrEqual(Level.DEBUG);
+  }
+
+  /** @return A condition that matches if the level is operational: INFO, WARN, or ERROR. */
+  static Condition operational() {
+    return (level, context) -> level.isGreaterOrEqual(Level.INFO);
   }
 }
 

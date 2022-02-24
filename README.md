@@ -1,3 +1,4 @@
+
 <!---freshmark shields
 output = [
 	link(shield('mvnrepository', 'mvnrepository', '{{group}}', 'blue'), 'https://mvnrepository.com/artifact/{{group}}'),
@@ -419,9 +420,49 @@ Conditions can be used either on the logger, on the statement, or against the pr
 
 There are two specialized conditions, `Condition.always()` and `Condition.never()`.  Echopraxia has optimizations for conditions; it will treat `Condition.always()` as a no-op, and return a `NeverLogger` that has no operations for logging.  The JVM can recognize that logging has no effect at all, and will [eliminate the method call as dead code](https://shipilev.net/jvm/anatomy-quarks/27-compiler-blackholes/).
 
-> **NOTE**: Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.
-> 
-> Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).
+Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide. Consider enabling setting your application logging to `TRACE` i.e. `<logger name="your.application.package" level="TRACE"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).  Conditions come with `and`, `or`, and `xor` functionality, and can provide more precise and expressive logging criteria than can be managed with filters and markers.
+
+For example, if you want to have logging that only activates during business hours, you can use the following:
+
+```java
+import com.tersesystems.echopraxia.Condition;
+
+public class MyBusinessConditions {
+  private static final Clock officeClock = Clock.system(ZoneId.of("America/Los_Angeles")) ;
+
+  public Condition businessHoursOnly() {
+    weekdays().and(between9and5());
+  }
+  
+  public Condition weekdays() {
+    return (level, context) -> {
+      LocalDate now = LocalDate.now(officeClock);
+      final DayOfWeek dayOfWeek = now.getDayOfWeek();
+      return ! (dayOfWeek.equals(DayOfWeek.SATURDAY) || dayOfWeek.equals(DayOfWeek.SUNDAY));
+    };
+  }
+  
+  public Condition between9and5() {
+    return (level, context) -> {
+      LocalTime now = LocalTime.now(officeClock);
+      // hour is zero based, so adjust for readability
+      final int hour = now.getHour() + 1; 
+      return (hour >= 8) && (hour <= 17); // 8 am to 5 pm
+    };
+  }
+
+  public Condition debugWhenHighCPU(long cpuLevel) {
+    // operational is "ERROR" and "WARN" and "INFO" levels only
+    // diagnostic is "DEBUG" and "TRACE" levels only
+    return Condition.operational().or(
+      Condition.diagnostic().and((level, ctx) -> {
+        cpuLevel(ctx.getFields()) > threshold;
+      })
+    );
+  }
+
+}
+```
 
 ### Logger
 
