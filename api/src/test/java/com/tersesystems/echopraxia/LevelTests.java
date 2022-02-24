@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia;
 
-import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 public class LevelTests {
 
@@ -15,7 +15,7 @@ public class LevelTests {
   public void testIsNotGreaterThan() {
     assertThat(Level.INFO.isGreater(Level.ERROR)).isFalse();
   }
-  
+
   @Test
   public void testIsGreaterThanOrEqual() {
     assertThat(Level.INFO.isGreaterOrEqual(Level.DEBUG)).isTrue();

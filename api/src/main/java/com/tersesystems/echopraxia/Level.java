@@ -11,8 +11,8 @@ public enum Level {
   // Order is significant, and compareTo uses ordinal values internally.
   TRACE, // 0
   DEBUG, // 1
-  INFO,  // 2
-  WARN,  // 3
+  INFO, // 2
+  WARN, // 3
   ERROR; // 4
 
   public boolean isGreater(Level r) {
