@@ -7,9 +7,31 @@ package com.tersesystems.echopraxia;
  * exercise caution when looking at cardinal/numeric values because they're all different.
  */
 public enum Level {
-  ERROR,
-  WARN,
-  INFO,
-  DEBUG,
-  TRACE
+
+  // Order is significant, and compareTo uses ordinal values internally.
+  TRACE, // 0
+  DEBUG, // 1
+  INFO,  // 2
+  WARN,  // 3
+  ERROR; // 4
+
+  public boolean isGreater(Level r) {
+    return compareTo(r) > 0;
+  }
+
+  public boolean isGreaterOrEqual(Level r) {
+    return compareTo(r) >= 0;
+  }
+
+  public boolean isLess(Level r) {
+    return compareTo(r) < 0;
+  }
+
+  public boolean isLessOrEqual(Level r) {
+    return compareTo(r) <= 0;
+  }
+
+  public boolean isEqual(Level r) {
+    return equals(r);
+  }
 }
