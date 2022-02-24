@@ -30,4 +30,8 @@ public enum Level {
   public boolean isLessOrEqual(Level r) {
     return compareTo(r) <= 0;
   }
+
+  public boolean isEqual(Level r) {
+    return equals(r);
+  }
 }
