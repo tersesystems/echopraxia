@@ -424,7 +424,7 @@ Conditions can be used either on the logger, on the statement, or against the pr
 
 There are two elemental conditions, `Condition.always()` and `Condition.never()`.  Echopraxia has optimizations for conditions; it will treat `Condition.always()` as a no-op, and return a `NeverLogger` that has no operations for logging.  The JVM can recognize that logging has no effect at all, and will [eliminate the method call as dead code](https://shipilev.net/jvm/anatomy-quarks/27-compiler-blackholes/).
 
-Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide. Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).  Conditions come with `and`, `or`, and `xor` functionality, and can provide more precise and expressive logging criteria than can be managed with filters and markers.
+Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide. Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).  Conditions come with `and`, `or`, and `xor` functionality, and can provide more precise and expressive logging criteria than can be managed with filters and markers.  This is particularly useful when combined with [filters](#filters).
 
 For example, if you want to have logging that only activates during business hours, you can use the following:
 
@@ -484,7 +484,6 @@ public class Logging {
 }
 ```
 
-
 ### Logger
 
 You can use conditions in a logger, and statements will only log if the condition is met:
@@ -525,7 +524,7 @@ Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using
 
 All the usual logging statements are available in `AsyncLogger`, i.e. `logger.debug` will log as usual.  
 
-However, there are no predicates in the `AsyncLogger` -- instead, a `Consumer` of `LoggerHandle` is used, which serves the same purpose as the `if (isLogging*()) { .. }` block.
+However, there are no `isLogging*` methods in the `AsyncLogger`. Instead, a `Consumer` of `LoggerHandle` is used, which serves the same purpose as the `if (isLogging*()) { .. }` block.
 
 ```java
 AsyncLogger<?> logger = AsyncLoggerFactory.getLogger().withExecutor(loggingExecutor);
@@ -536,11 +535,11 @@ logger.info(handle -> {
 });
 ```
 
-In the unfortunate event of an exception, the underlying (SLF4J|Log4J) logger will be called at `error` level from the relevant core logger:
+In the unfortunate event of an exception, the underlying  logger will be called at `error` level from the relevant core logger:
 
 ```java
 // only happens if uncaught exception from consumer
-logger.error("Uncaught exception when running asyncLog", cause);
+slf4jLogger.error("Uncaught exception when running asyncLog", cause);
 ```
 
 One important detail is that the logging executor should be a daemon thread, so that it does not block JVM exit:
@@ -560,7 +559,7 @@ Using a single thread executor is nice because you can keep ordering of your log
 
 Likewise, if your conditions involve calls to external services (for example, calling Consul or a remote HTTP service), you should consider using a failure handling library like [failsafe](https://failsafe.dev/) to set up appropriate circuit breakers, bulkheads, timeouts, and rate limiters to manage interactions.
 
-Because of parallelism and concurrency, your logging statements may not appear in order, but you can add extra fields to ensure you can reorder statements appropriately.
+Because of parallelism and concurrency, your logging statements may not appear in order if you have multiple threads running in your executor.  You can add extra fields to ensure you can reorder statements appropriately.
 
 Putting it all together:
 
