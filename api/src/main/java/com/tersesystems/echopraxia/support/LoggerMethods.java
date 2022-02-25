@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Logging methods specific to the synchronous Logger (isEnabled checks + base).
  *
- * @param <FB>
+ * @param <FB> the field builder type.
  */
 public interface LoggerMethods<FB extends Field.Builder> extends BaseLoggerMethods<FB> {
 

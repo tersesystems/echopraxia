@@ -84,7 +84,7 @@ public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logg
   /**
    * An optimized logger for use with {@code Condition.never()}.
    *
-   * @param <FB>
+   * @param <FB> the field builder type.
    */
   public static class NeverLogger<FB extends Field.Builder> extends Logger<FB> {
 

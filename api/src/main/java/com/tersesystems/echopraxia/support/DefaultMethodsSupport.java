@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Methods that are used by the defaults to do delegation to the core logger.
  *
- * @param <FB>
+ * @param <FB> the field builder type.
  */
 public interface DefaultMethodsSupport<FB extends Field.Builder> {
   @NotNull

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Logging Methods used in common between sync and async loggers.
  *
- * @param <FB>
+ * @param <FB> the field builder type.
  */
 public interface BaseLoggerMethods<FB extends Field.Builder> {
 

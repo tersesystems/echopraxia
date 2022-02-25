@@ -117,6 +117,7 @@ public interface Condition {
   /**
    * Searches through the fields for the given field name and value.
    *
+   * @param fieldName The name of the field.
    * @param predicate a predicate
    * @return true if no elements match the predicate, false otherwise.
    */

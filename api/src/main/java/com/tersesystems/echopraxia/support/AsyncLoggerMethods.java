@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Logging method API used by the AsyncLogger.
  *
- * @param <FB>
+ * @param <FB> the field builder type.
  */
 public interface AsyncLoggerMethods<FB extends Field.Builder> extends BaseLoggerMethods<FB> {
 
