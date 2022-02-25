@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConditionTests {
 
@@ -117,13 +117,13 @@ public class ConditionTests {
 
   @Test
   public void testValueMatch() {
-    Condition c = Condition.valueMatch("foo", v -> {
-      return ((Boolean) v.raw());
-    });
+    Condition c =
+        Condition.valueMatch(
+            "foo",
+            v -> {
+              return ((Boolean) v.raw());
+            });
     Field field = Constants.builder().bool("foo", true);
     assertThat(c.test(Level.ERROR, FakeLoggingContext.single(field))).isTrue();
   }
-
-
 }
-
