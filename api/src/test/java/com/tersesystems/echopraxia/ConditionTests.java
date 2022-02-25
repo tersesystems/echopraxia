@@ -100,4 +100,30 @@ public class ConditionTests {
     Condition c = Condition.diagnostic();
     assertThat(c.test(Level.ERROR, FakeLoggingContext.empty())).isFalse();
   }
+
+  @Test
+  public void testAnyMatch() {
+    Condition c = Condition.anyMatch(f -> f.name().equals("foo"));
+    Field field = Constants.builder().bool("foo", true);
+    assertThat(c.test(Level.ERROR, FakeLoggingContext.single(field))).isTrue();
+  }
+
+  @Test
+  public void testNoneMatch() {
+    Condition c = Condition.noneMatch(f -> f.name().equals("foo"));
+    Field field = Constants.builder().bool("foo", true);
+    assertThat(c.test(Level.ERROR, FakeLoggingContext.single(field))).isFalse();
+  }
+
+  @Test
+  public void testValueMatch() {
+    Condition c = Condition.valueMatch("foo", v -> {
+      return ((Boolean) v.raw());
+    });
+    Field field = Constants.builder().bool("foo", true);
+    assertThat(c.test(Level.ERROR, FakeLoggingContext.single(field))).isTrue();
+  }
+
+
 }
+
