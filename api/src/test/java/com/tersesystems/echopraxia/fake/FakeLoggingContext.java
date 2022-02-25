@@ -19,6 +19,10 @@ public class FakeLoggingContext implements LoggingContext {
     this.fieldsSupplier = f;
   }
 
+  public static FakeLoggingContext single(Field field) {
+    return new FakeLoggingContext(() -> Collections.singletonList(field));
+  }
+
   public static FakeLoggingContext empty() {
     return EMPTY;
   }

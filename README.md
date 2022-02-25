@@ -1,3 +1,4 @@
+
 <!---freshmark shields
 output = [
 	link(shield('mvnrepository', 'mvnrepository', '{{group}}', 'blue'), 'https://mvnrepository.com/artifact/{{group}}'),
@@ -411,17 +412,78 @@ private static final Logger<?> logger =
 Logging conditions can be handled gracefully using `Condition` functions.  A `Condition` will take a `Level` and a `LoggingContext` which will return the fields of the logger.
 
 ```java
-final Condition mustHaveFoo = (level, context) ->
-        context.getFields().stream().anyMatch(field -> field.name().equals("foo"));
+final Condition errorCondition = new Condition() {
+  @Override
+  public boolean test(Level level, LoggingContext context) {
+    return level.equals(Level.ERROR);
+  }
+};
 ```
 
 Conditions can be used either on the logger, on the statement, or against the predicate check.
 
-There are two specialized conditions, `Condition.always()` and `Condition.never()`.  Echopraxia has optimizations for conditions; it will treat `Condition.always()` as a no-op, and return a `NeverLogger` that has no operations for logging.  The JVM can recognize that logging has no effect at all, and will [eliminate the method call as dead code](https://shipilev.net/jvm/anatomy-quarks/27-compiler-blackholes/).
+There are two elemental conditions, `Condition.always()` and `Condition.never()`.  Echopraxia has optimizations for conditions; it will treat `Condition.always()` as a no-op, and return a `NeverLogger` that has no operations for logging.  The JVM can recognize that logging has no effect at all, and will [eliminate the method call as dead code](https://shipilev.net/jvm/anatomy-quarks/27-compiler-blackholes/).
 
-> **NOTE**: Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide.
-> 
-> Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).
+Conditions are a great way to manage diagnostic logging in your application with more flexibility than global log levels can provide. Consider enabling setting your application logging to `DEBUG` i.e. `<logger name="your.application.package" level="DEBUG"/>` and using [conditions to turn on and off debugging as needed](https://tersesystems.com/blog/2019/07/22/targeted-diagnostic-logging-in-production/).  Conditions come with `and`, `or`, and `xor` functionality, and can provide more precise and expressive logging criteria than can be managed with filters and markers.
+
+For example, if you want to have logging that only activates during business hours, you can use the following:
+
+```java
+import com.tersesystems.echopraxia.Condition;
+
+public class MyBusinessConditions {
+  private static final Clock officeClock = Clock.system(ZoneId.of("America/Los_Angeles")) ;
+
+  public Condition businessHoursOnly() {
+    return Condition.operational().and(weekdays().and(from9to5()));
+  }
+  
+  public Condition weekdays() {
+    return (level, context) -> {
+      LocalDate now = LocalDate.now(officeClock);
+      final DayOfWeek dayOfWeek = now.getDayOfWeek();
+      return ! (dayOfWeek.equals(DayOfWeek.SATURDAY) || dayOfWeek.equals(DayOfWeek.SUNDAY));
+    };
+  }
+  
+  public Condition from9to5() {
+    return (level, context) -> LocalTime.now(officeClock).query(temporal -> {
+      // hour is zero based, so adjust for readability
+      final int hour = temporal.get(ChronoField.HOUR_OF_DAY) + 1;
+      return (hour >= 9) && (hour <= 17); // 8 am to 5 pm
+    });
+  }
+}
+```
+
+If you want to log at an operational level most of the time but log debug statements when certain fields show up, use `anyMatch`:
+
+```java
+public class DebugConditions {
+  public Condition diagnosticOnFields(Set<String> fieldNames) {
+    // operational() is "ERROR" and "WARN" and "INFO" levels only
+    // diagnostic() is "DEBUG" and "TRACE" levels only
+    return Condition.operational().or(
+      Condition.diagnostic().and(Condition.anyMatch(f -> fieldNames.contains(f.name())))
+    );
+  }
+}
+```
+
+Likewise, if you want things not to be logged if there are some fields set, then use `noneMatch`, or use `valueMatch` if the value of the field is significant:
+
+```java
+public class Logging {
+  public Condition suppressOnFieldPresence(Set<String> fieldNames) {
+    return Condition.noneMatch(f -> fieldNames.contains(f.name()));
+  }
+  
+  public Condition suppressOnFlag() {
+    return Condition.valueMatch("suppressFlag", v -> v.type() == BOOLEAN ? (Boolean) v.raw() : false);
+  }
+}
+```
+
 
 ### Logger
 
