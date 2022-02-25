@@ -1,10 +1,9 @@
 package com.tersesystems.echopraxia;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
-import java.time.*;
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConditionTests {
 
@@ -100,15 +99,5 @@ public class ConditionTests {
   public void testDiagnosticNoMatch() {
     Condition c = Condition.diagnostic();
     assertThat(c.test(Level.ERROR, FakeLoggingContext.empty())).isFalse();
-  }
-
-  static final Clock officeClock = Clock.system(ZoneId.of("America/Los_Angeles"));
-
-  public Condition testWeekday() {
-    return (level, context) -> {
-      LocalTime now = LocalTime.now(officeClock);
-      final int hour = now.getHour() + 1; // hour is zero based, so adjust for readability
-      return (hour >= 8) && (hour <= 17); // 8 am to 5 pm
-    };
   }
 }

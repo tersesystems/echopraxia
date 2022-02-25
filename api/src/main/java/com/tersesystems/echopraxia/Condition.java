@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia;
 
+import java.util.function.Predicate;
+
 /**
  * A condition is used to conditionally log statements based on the level and context of the logger.
  */
@@ -90,6 +92,40 @@ public interface Condition {
   /** @return A condition that matches if the level is operational: INFO, WARN, or ERROR. */
   static Condition operational() {
     return (level, context) -> level.isGreaterOrEqual(Level.INFO);
+  }
+
+  /**
+   * Searches through the fields for any match of the predicate.
+   *
+   * @param predicate a predicate that the field must satisfy.
+   * @return true if the predicate is satisfied, false otherwise.
+   */
+  static Condition anyMatch(Predicate<Field> predicate) {
+    return (level, ctx) -> ctx.getFields().stream().anyMatch(predicate);
+  }
+
+  /**
+   * Searches through the fields for none match of the predicate.
+   *
+   * @param predicate a predicate
+   * @return true if no elements match the predicate, false otherwise.
+   */
+  static Condition noneMatch(Predicate<Field> predicate) {
+    return (level, ctx) -> ctx.getFields().stream().noneMatch(predicate);
+  }
+
+  /**
+   * Searches through the fields for the given field name and value.
+   *
+   * @param predicate a predicate
+   * @return true if no elements match the predicate, false otherwise.
+   */
+  static Condition valueMatch(String fieldName, Predicate<Field.Value<?>> predicate) {
+    return (level, ctx) ->
+        ctx.getFields().stream()
+            .filter(f -> f.name().equals(fieldName))
+            .map(Field::value)
+            .anyMatch(predicate);
   }
 }
 
