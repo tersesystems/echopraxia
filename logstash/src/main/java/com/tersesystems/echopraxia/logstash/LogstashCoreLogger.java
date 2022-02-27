@@ -186,7 +186,9 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public void log(@NotNull Level level, String message, @NotNull Throwable e) {
     final Marker m = context.getMarker();
-    if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context)) {
+    final LogstashLoggingContext argContext =
+      new LogstashLoggingContext(() -> Field.Builder.instance().onlyException(e), Collections::emptyList);
+    if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context.and(argContext))) {
       logger.log(m, fqcn, convertLevel(level), message, null, e);
     }
   }
@@ -207,8 +209,10 @@ public class LogstashCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Throwable e) {
     final Marker m = context.getMarker();
+    LogstashLoggingContext argContext =
+      new LogstashLoggingContext(() -> Field.Builder.instance().onlyException(e), Collections::emptyList);
     if (logger.isEnabledFor(m, convertLogbackLevel(level))
-        && this.condition.and(condition).test(level, context)) {
+      && this.condition.and(condition).test(level, context.and(argContext))) {
       logger.log(m, fqcn, convertLevel(level), message, null, e);
     }
   }
