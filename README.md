@@ -23,11 +23,16 @@ Echopraxia is based around several main concepts that build and leverage on each
 * Fluent Logging (API based around log entry builder)
 * Filters (pipeline for adding fields and conditions to loggers)
 
-For a worked example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
-
 Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
 
 Please see the [blog posts](https://tersesystems.com/category/logging/) for more background on logging stuff.
+
+## Examples 
+
+Simple examples and integrations with [dropwizard metrics](https://metrics.dropwizard.io/4.2.0/) and [OSHI](https://github.com/oshi/oshi) are available at [echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
+
+For a web application example,
+see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
 ## Statement of Intent
 
