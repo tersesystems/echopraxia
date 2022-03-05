@@ -184,36 +184,11 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(@NotNull Level level, String message, @NotNull Throwable e) {
-    final Marker m = context.getMarker();
-    final LogstashLoggingContext argContext =
-      new LogstashLoggingContext(() -> Field.Builder.instance().onlyException(e), Collections::emptyList);
-    if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context.and(argContext))) {
-      logger.log(m, fqcn, convertLevel(level), message, null, e);
-    }
-  }
-
-  @Override
   public void log(@NotNull Level level, @NotNull Condition condition, String message) {
     final Marker m = context.getMarker();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context)) {
       logger.log(m, fqcn, convertLevel(level), message, null, null);
-    }
-  }
-
-  @Override
-  public void log(
-      @NotNull Level level,
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Throwable e) {
-    final Marker m = context.getMarker();
-    LogstashLoggingContext argContext =
-      new LogstashLoggingContext(() -> Field.Builder.instance().onlyException(e), Collections::emptyList);
-    if (logger.isEnabledFor(m, convertLogbackLevel(level))
-      && this.condition.and(condition).test(level, context.and(argContext))) {
-      logger.log(m, fqcn, convertLevel(level), message, null, e);
     }
   }
 
@@ -253,11 +228,6 @@ public class LogstashCoreLogger implements CoreLogger {
           public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
             callerLogger.log(level, message, f, builder);
           }
-
-          @Override
-          public void log(@Nullable String message, @NotNull Throwable e) {
-            callerLogger.log(level, message, e);
-          }
         });
   }
 
@@ -279,11 +249,6 @@ public class LogstashCoreLogger implements CoreLogger {
           @Override
           public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
             callerLogger.log(level, c, message, f, builder);
-          }
-
-          @Override
-          public void log(@Nullable String message, @NotNull Throwable e) {
-            callerLogger.log(level, c, message, e);
           }
         });
   }

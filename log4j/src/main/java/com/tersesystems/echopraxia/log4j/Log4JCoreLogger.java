@@ -175,17 +175,6 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(@NotNull Level level, @Nullable String message, @NotNull Throwable e) {
-    final Marker marker = context.getMarker();
-    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final Message m = createMessage(message);
-    Log4JLoggingContext argContext = new Log4JLoggingContext(() -> Field.Builder.instance().onlyException(e), null);
-    if (logger.isEnabled(log4jLevel, marker, m, e) && condition.test(level, context.and(argContext))) {
-      logger.logMessage(fqcn, log4jLevel, marker, m, e);
-    }
-  }
-
-  @Override
   public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
@@ -193,22 +182,6 @@ public class Log4JCoreLogger implements CoreLogger {
     if (logger.isEnabled(log4jLevel, marker, m, null)
         && this.condition.and(condition).test(level, context)) {
       logger.logMessage(fqcn, log4jLevel, marker, m, null);
-    }
-  }
-
-  @Override
-  public void log(
-      @NotNull Level level,
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Throwable e) {
-    final Marker marker = context.getMarker();
-    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    Log4JLoggingContext argContext = new Log4JLoggingContext(() -> Field.Builder.instance().onlyException(e), null);
-    final Message m = createMessage(message);
-    if (logger.isEnabled(log4jLevel, marker, m, e)
-        && this.condition.and(condition).test(level, context.and(argContext))) {
-      logger.logMessage(fqcn, log4jLevel, marker, m, e);
     }
   }
 
@@ -268,18 +241,6 @@ public class Log4JCoreLogger implements CoreLogger {
               logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
             }
           }
-
-          @Override
-          public void log(@Nullable String messageTemplate, @NotNull Throwable e) {
-            final Marker marker = context.getMarker();
-            final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-            final Message message = createMessage(messageTemplate);
-            Log4JLoggingContext argContext = new Log4JLoggingContext(() -> Field.Builder.instance().onlyException(e), null);
-            if (logger.isEnabled(log4jLevel, marker, message, e)
-                && condition.test(level, context.and(argContext))) {
-              logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
-            }
-          }
         });
   }
 
@@ -316,18 +277,6 @@ public class Log4JCoreLogger implements CoreLogger {
             // them available through context.
             Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
             final Message message = createMessage(messageTemplate, argumentFields);
-            if (logger.isEnabled(log4jLevel, marker, message, e)
-                && condition.and(c).test(level, context.and(argContext))) {
-              logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
-            }
-          }
-
-          @Override
-          public void log(@Nullable String messageTemplate, @NotNull Throwable e) {
-            final Marker marker = context.getMarker();
-            final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-            final Message message = createMessage(messageTemplate);
-            Log4JLoggingContext argContext = new Log4JLoggingContext(() -> Field.Builder.instance().onlyException(e), null);
             if (logger.isEnabled(log4jLevel, marker, message, e)
                 && condition.and(c).test(level, context.and(argContext))) {
               logger.logMessage(log4jLevel, marker, fqcn, location, message, e);

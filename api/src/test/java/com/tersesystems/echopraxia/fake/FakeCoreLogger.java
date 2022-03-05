@@ -116,27 +116,7 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public void log(@NotNull Level level, @Nullable String message, @NotNull Throwable e) {
-    if (isEnabledFor(level) && this.condition.test(level, context)) {
-      List<Field> fields = context.getFields();
-      System.out.printf("" + message + " level %s fields %s\n", level, fields);
-    }
-  }
-
-  @Override
   public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
-    if (isEnabledFor(level) && this.condition.and(condition).test(level, context)) {
-      List<Field> fields = context.getFields();
-      System.out.printf("" + message + " level %s fields %s\n", level, fields);
-    }
-  }
-
-  @Override
-  public void log(
-      @NotNull Level level,
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Throwable e) {
     if (isEnabledFor(level) && this.condition.and(condition).test(level, context)) {
       List<Field> fields = context.getFields();
       System.out.printf("" + message + " level %s fields %s\n", level, fields);
