@@ -66,7 +66,7 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void trace(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(TRACE, h -> h.log(message, e), fieldBuilder());
+    core().asyncLog(TRACE, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   /**
@@ -101,7 +101,8 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void trace(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(TRACE, condition, h -> h.log(message, e), fieldBuilder());
+    core()
+        .asyncLog(TRACE, condition, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -152,7 +153,7 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void debug(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(DEBUG, h -> h.log(message, e), fieldBuilder());
+    core().asyncLog(DEBUG, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   /**
@@ -187,7 +188,8 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(DEBUG, condition, h -> h.log(message, e), fieldBuilder());
+    core()
+        .asyncLog(DEBUG, condition, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -238,7 +240,7 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void info(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(INFO, h -> h.log(message, e), fieldBuilder());
+    core().asyncLog(INFO, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   /**
@@ -273,7 +275,8 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(INFO, condition, h -> h.log(message, e), fieldBuilder());
+    core()
+        .asyncLog(INFO, condition, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -324,7 +327,7 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void warn(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(WARN, h -> h.log(message, e), fieldBuilder());
+    core().asyncLog(WARN, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   /**
@@ -359,7 +362,8 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(WARN, condition, h -> h.log(message, e), fieldBuilder());
+    core()
+        .asyncLog(WARN, condition, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -410,7 +414,7 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void error(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(ERROR, h -> h.log(message, e), fieldBuilder());
+    core().asyncLog(ERROR, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 
   /**
@@ -445,6 +449,7 @@ public interface DefaultAsyncLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(ERROR, condition, h -> h.log(message, e), fieldBuilder());
+    core()
+        .asyncLog(ERROR, condition, h -> h.log(message, fb -> fb.onlyException(e)), fieldBuilder());
   }
 }

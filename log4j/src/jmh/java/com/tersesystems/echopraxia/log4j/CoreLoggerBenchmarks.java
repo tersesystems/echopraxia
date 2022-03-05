@@ -37,6 +37,6 @@ public class CoreLoggerBenchmarks {
 
   @Benchmark
   public void infoWithException() {
-    logger.log(Level.INFO, "Message", exception);
+    logger.log(Level.INFO, "Message", fb -> fb.onlyException(exception), builder);
   }
 }

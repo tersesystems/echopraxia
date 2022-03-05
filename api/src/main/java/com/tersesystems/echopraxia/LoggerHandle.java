@@ -20,12 +20,4 @@ public interface LoggerHandle<FB extends Field.Builder> {
    * @param f the field builder function.
    */
   void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f);
-
-  /**
-   * Logs using a message and an exception.
-   *
-   * @param message the message.
-   * @param e the exception.
-   */
-  void log(@Nullable String message, @NotNull Throwable e);
 }

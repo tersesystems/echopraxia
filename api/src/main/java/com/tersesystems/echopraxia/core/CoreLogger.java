@@ -150,33 +150,10 @@ public interface CoreLogger {
    * Log a message at the given level.
    *
    * @param level the level to log at.
-   * @param message the message string to be logged
-   * @param e the exception (throwable) to log
-   */
-  void log(@NotNull Level level, @Nullable String message, @NotNull Throwable e);
-
-  /**
-   * Log a message at the given level.
-   *
-   * @param level the level to log at.
    * @param condition the given condition
    * @param message the message string to be logged
    */
   void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message);
-
-  /**
-   * Log a message at the given level.
-   *
-   * @param level the level to log at.
-   * @param condition the given condition
-   * @param message the message string to be logged
-   * @param e the exception (throwable) to log
-   */
-  void log(
-      @NotNull Level level,
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Throwable e);
 
   /**
    * Log a message at the given level.

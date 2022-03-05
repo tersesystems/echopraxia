@@ -58,7 +58,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void trace(@Nullable String message, @NotNull Throwable e) {
-    core().log(TRACE, message, e);
+    core().log(TRACE, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   /**
@@ -93,7 +93,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void trace(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(TRACE, condition, message, e);
+    core().log(TRACE, condition, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -138,7 +138,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void debug(@Nullable String message, @NotNull Throwable e) {
-    core().log(DEBUG, message, e);
+    core().log(DEBUG, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   /**
@@ -159,7 +159,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(DEBUG, condition, message, e);
+    core().log(DEBUG, condition, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   /**
@@ -218,7 +218,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void info(@Nullable String message, @NotNull Throwable e) {
-    core().log(INFO, message, e);
+    core().log(INFO, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   /**
@@ -253,7 +253,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(INFO, condition, message, e);
+    core().log(INFO, condition, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -298,7 +298,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void warn(@Nullable String message, @NotNull Throwable e) {
-    core().log(WARN, message, e);
+    core().log(WARN, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   /**
@@ -319,7 +319,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(WARN, condition, message, e);
+    core().log(WARN, condition, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   /**
@@ -378,7 +378,7 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void error(@Nullable String message, @NotNull Throwable e) {
-    core().log(ERROR, message, e);
+    core().log(ERROR, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 
   /**
@@ -413,6 +413,6 @@ public interface DefaultLoggerMethods<FB extends Field.Builder>
    * @param e the given exception.
    */
   default void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(ERROR, condition, message, e);
+    core().log(ERROR, condition, message, fb -> fb.onlyException(e), fieldBuilder());
   }
 }

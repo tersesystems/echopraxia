@@ -520,8 +520,6 @@ public interface Field {
      * @param t the value of the field.
      * @return a list containing a single field.
      */
-    // should probably deprecate this as  logger.error(msg, e) is the ideomatic form over fb ->
-    // fb.onlyException(e)
     @NotNull
     default List<Field> onlyException(@NotNull Throwable t) {
       return only(exception(t));
