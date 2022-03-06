@@ -39,4 +39,34 @@ public final class Utilities {
           return list;
         };
   }
+
+  public static <T> Supplier<T> memoize(Supplier<T> supplier) {
+    return new MemoizingSupplier<>(supplier);
+  }
+
+  @NotNull
+  static class MemoizingSupplier<T> implements Supplier<T> {
+    final Supplier<T> delegate;
+    transient volatile boolean initialized;
+    transient T value;
+
+    MemoizingSupplier(Supplier<T> delegate) {
+      this.delegate = delegate;
+    }
+
+    @Override
+    public T get() {
+      if (!initialized) {
+        synchronized (this) {
+          if (!initialized) {
+            T t = delegate.get();
+            value = t;
+            initialized = true;
+            return t;
+          }
+        }
+      }
+      return value;
+    }
+  }
 }

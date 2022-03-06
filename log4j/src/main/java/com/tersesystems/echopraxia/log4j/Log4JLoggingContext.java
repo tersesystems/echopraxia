@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.support.Utilities;
 import com.tersesystems.echopraxia.support.DefaultLoggingContext;
 import java.util.Collections;
 import java.util.List;
@@ -21,7 +22,7 @@ public class Log4JLoggingContext implements DefaultLoggingContext {
   }
 
   protected Log4JLoggingContext(Supplier<List<Field>> f, Marker m) {
-    this.fieldsSupplier = f;
+    this.fieldsSupplier = Utilities.memoize(f);
     this.marker = m;
   }
 
