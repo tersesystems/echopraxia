@@ -57,7 +57,7 @@ public class ScriptManagerTest {
     int parallel = 4;
     final ExecutorService executorService = Executors.newWorkStealingPool(parallel);
     LongAdder count = new LongAdder();
-    int limit = 30000000; // about 27 seconds on my laptop
+    int limit = 3000000; // about 27 seconds on my laptop
 
     try {
       for (int j = 0; j < parallel; j++) {
