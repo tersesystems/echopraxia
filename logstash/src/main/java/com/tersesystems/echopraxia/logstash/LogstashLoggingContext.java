@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.LoggingContext;
+import com.tersesystems.echopraxia.support.Utilities;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,7 +29,7 @@ public class LogstashLoggingContext implements LoggingContext {
   protected final Supplier<List<Marker>> markersSupplier;
 
   protected LogstashLoggingContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
-    this.fieldsSupplier = f;
+    this.fieldsSupplier = Utilities.memoize(f);
     this.markersSupplier = m;
   }
 
