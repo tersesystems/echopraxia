@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.LoggingContext;
+import com.tersesystems.echopraxia.support.DefaultLoggingContext;
 import com.tersesystems.echopraxia.support.Utilities;
 import java.util.ArrayList;
 import java.util.Collections;
