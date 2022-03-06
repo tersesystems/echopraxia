@@ -489,6 +489,94 @@ public class Logging {
 }
 ```
 
+### JSON Path
+
+In situations where you're looking through fields for a condition, using the Java Stream API can be verbose.  As an alternative, you can use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
+
+Tip: You can integrate IntelliJ IDEA with JSONPath using the [inject language](https://www.jetbrains.com/idea/guide/tips/evaluate-json-path-expressions/) settings page and adding `LoggingContext`.
+
+
+The `context.find` methods take a class as a type, and a [JSON path](https://www.ietf.org/archive/id/draft-ietf-jsonpath-base-03.html), which can be used to search through context fields (or arguments, if the condition is used in a logging statement).
+
+The basic types are `String`, the `Number` subclasses such as `Integer`, and `Boolean`.  If no matching path is found, an empty `Optional` is returned.
+
+```java
+Optional<String> optName = context.findString("$.person.name");
+```
+
+This also applies to `Throwable` exceptions:
+
+```java
+Optional<Throwable> optThrowable = context.findThrowable("$.exception");
+```
+
+Finding an object will return a `Map`:
+
+```java
+Optional<Map<String, ?>> mother = context.findObject("$.person.mother");
+```
+
+Tip: There is no facility for finding a property set to `null` value as it resolves to `Optional.empty()`, so you can query for the parent value and check `containsKey("foo")` and `get("foo") == null`.
+
+For a `List`, in the case of an array:
+
+```java
+List<String> interests = context.findList("$.person.mother.interests");
+```
+
+You can use [inline predicates](https://github.com/json-path/JsonPath#inline-predicates), which will return a `List` of the results:
+
+```java
+final Condition cheapBookCondition =
+  (level, context) -> ! context.findList("$.store.book[?(@.price < 10)]").isEmpty();
+```
+
+The inline and filter predicates are not available for exceptions. Instead, you must use `filter`:
+
+```java
+class FindException {
+  void logException() {
+    Condition throwableCondition =
+      (level, ctx) ->
+        ctx.findThrowable()
+          .filter(e -> "test message".equals(e.getMessage()))
+          .isPresent();
+    
+    logger.error(throwableCondition, "Error message", new RuntimeException("test message"));
+  }
+}
+```
+
+And you can also use [filter predicates](https://github.com/json-path/JsonPath#filter-predicates) using the `?` placeholder:
+
+```java
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.*;
+
+class FindWithFilterPredicates {
+  void logWithPredicate() {
+    Condition cheapBookCondition =
+      (level, context) -> {
+        Filter cheapFictionFilter = filter(where("category").is("fiction").and("price").lte(10D));
+        List<Map<String, ?>> books = context.findList("$.store.book[?]", cheapFictionFilter);
+        return books.size() > 0;
+      };
+
+    logger.info(
+      cheapBookCondition,
+      "found cheap books",
+      fb -> {
+        Field category = fb.string("category", "fiction");
+        Field price = fb.number("price", 5);
+        Field book = fb.object("book", category, price);
+        return fb.onlyObject("store", book);
+      });
+  }
+}
+```
+
+There are many more options available using JSONPath.  You can try out the [online evaluator](https://jsonpath.herokuapp.com/) to test out expressions.
+
 ### Logger
 
 You can use conditions in a logger, and statements will only log if the condition is met:

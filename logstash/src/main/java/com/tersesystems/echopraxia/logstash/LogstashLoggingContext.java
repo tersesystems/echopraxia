@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.LoggingContext;
-import com.tersesystems.echopraxia.support.DefaultLoggingContext;
+import com.tersesystems.echopraxia.support.AbstractLoggingContext;
 import com.tersesystems.echopraxia.support.Utilities;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,7 +20,7 @@ import org.slf4j.Marker;
  * <p>Note that this makes field evaluation lazy so that functions can pull things out of a thread
  * local (typically hard to do if when loggers are set up initially).
  */
-public class LogstashLoggingContext implements DefaultLoggingContext {
+public class LogstashLoggingContext extends AbstractLoggingContext {
 
   private static final LogstashLoggingContext EMPTY =
       new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);

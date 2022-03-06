@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.jayway.jsonpath.Criteria.where;
+import static com.jayway.jsonpath.Filter.*;
 import static com.tersesystems.echopraxia.Field.Value;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -9,13 +11,13 @@ import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
+import com.jayway.jsonpath.Filter;
+import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -175,6 +177,110 @@ public class ContextTest extends TestBase {
 
     final List<Marker> markers = getMarkers(event);
     testMarker(markers.get(0), "mdckey", "mdcvalue");
+  }
+
+  @Test
+  void testFindString() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) -> ctx.findString("$.arg1").filter(v -> v.equals("value1")).isPresent();
+    logger.info(c, "Matches on arg1", fb -> fb.onlyString("arg1", "value1"));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on arg1");
+  }
+
+  @Test
+  void testFindInteger() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) -> ctx.findNumber("$.arg1").filter(v -> v.intValue() == 1).isPresent();
+    logger.info(c, "Matches on arg1", fb -> fb.onlyNumber("arg1", 1));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on arg1");
+  }
+
+  @Test
+  void testFindDouble() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
+    logger.info(c, "Matches on arg1", fb -> fb.onlyNumber("arg1", 1.5));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on arg1");
+  }
+
+  @Test
+  void testInlinePredicate() {
+    Logger<?> logger = getLogger();
+    final Condition cheapBookCondition =
+        (level, context) -> !context.findList("$.store.book[?(@.price < 10)]").isEmpty();
+
+    logger.info(
+        cheapBookCondition,
+        "found cheap books",
+        fb -> {
+          Field category = fb.string("category", "fiction");
+          Field price = fb.number("price", 5);
+          Field book = fb.object("book", category, price);
+          return fb.onlyObject("store", book);
+        });
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("found cheap books");
+  }
+
+  @Test
+  void testJsonPathFilter() {
+    Logger<?> logger = getLogger();
+    final Condition cheapBookCondition =
+        (level, context) -> {
+          Filter cheapFictionFilter = filter(where("category").is("fiction").and("price").lte(10D));
+          List<Map<String, ?>> books = context.findList("$.store.book[?]", cheapFictionFilter);
+          return books.size() > 0;
+        };
+
+    logger.info(
+        cheapBookCondition,
+        "found cheap books",
+        fb -> {
+          Field category = fb.string("category", "fiction");
+          Field price = fb.number("price", 5);
+          Field book = fb.object("book", category, price);
+          return fb.onlyObject("store", book);
+        });
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("found cheap books");
+  }
+
+  @Test
+  void testFindException() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) ->
+            ctx.findThrowable("$.exception")
+                .filter(e -> "test message".equals(e.getMessage()))
+                .isPresent();
+    RuntimeException e = new RuntimeException("test message");
+    logger.info(c, "Matches on exception", e);
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on exception");
   }
 
   private void testMarker(Marker marker, String key, Object value) {

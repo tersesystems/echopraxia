@@ -1,7 +1,10 @@
 package com.tersesystems.echopraxia.fake;
 
+import com.jayway.jsonpath.Configuration;
+import com.tersesystems.echopraxia.EchopraxiaJsonProvider;
+import com.tersesystems.echopraxia.EchopraxiaMappingProvider;
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.support.DefaultLoggingContext;
+import com.tersesystems.echopraxia.support.AbstractLoggingContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -10,9 +13,15 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-public class FakeLoggingContext implements DefaultLoggingContext {
+public class FakeLoggingContext extends AbstractLoggingContext {
 
   private static final FakeLoggingContext EMPTY = new FakeLoggingContext(Collections::emptyList);
+
+  private static final Configuration configuration =
+      Configuration.builder()
+          .jsonProvider(new EchopraxiaJsonProvider())
+          .mappingProvider(new EchopraxiaMappingProvider())
+          .build();
 
   protected final Supplier<List<Field>> fieldsSupplier;
 
