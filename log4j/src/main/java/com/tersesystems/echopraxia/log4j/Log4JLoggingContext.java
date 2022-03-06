@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.LoggingContext;
 import com.tersesystems.echopraxia.support.Utilities;
+import com.tersesystems.echopraxia.support.DefaultLoggingContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-public class Log4JLoggingContext implements LoggingContext {
+public class Log4JLoggingContext implements DefaultLoggingContext {
 
   protected final Supplier<List<Field>> fieldsSupplier;
   protected final Marker marker;

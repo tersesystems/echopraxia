@@ -1,7 +1,8 @@
 package com.tersesystems.echopraxia.fake;
 
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.LoggingContext;
+import com.tersesystems.echopraxia.support.DefaultLoggingContext;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -9,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-public class FakeLoggingContext implements LoggingContext {
+public class FakeLoggingContext implements DefaultLoggingContext {
 
   private static final FakeLoggingContext EMPTY = new FakeLoggingContext(Collections::emptyList);
 
@@ -21,6 +22,10 @@ public class FakeLoggingContext implements LoggingContext {
 
   public static FakeLoggingContext single(Field field) {
     return new FakeLoggingContext(() -> Collections.singletonList(field));
+  }
+
+  public static FakeLoggingContext of(Field... fields) {
+    return new FakeLoggingContext(() -> Arrays.asList(fields));
   }
 
   public static FakeLoggingContext empty() {

@@ -20,7 +20,7 @@ import org.slf4j.Marker;
  * <p>Note that this makes field evaluation lazy so that functions can pull things out of a thread
  * local (typically hard to do if when loggers are set up initially).
  */
-public class LogstashLoggingContext implements LoggingContext {
+public class LogstashLoggingContext implements DefaultLoggingContext {
 
   private static final LogstashLoggingContext EMPTY =
       new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);

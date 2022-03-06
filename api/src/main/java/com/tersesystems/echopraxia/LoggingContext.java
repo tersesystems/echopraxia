@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia;
 
 import java.util.List;
+import java.util.Map;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * <p>Specific implementations may have more to expose, but everything should have fields at least.
  */
-public interface LoggingContext {
+public interface LoggingContext extends Map<String, Field.Value<?>> {
 
   /**
    * The list of fields that are contextual to the logger.
