@@ -40,12 +40,9 @@ public class EchopraxiaMappingProvider implements MappingProvider {
     Field.Value<?> value = (Field.Value<?>) source;
     switch (value.type()) {
       case STRING:
-        return (T) value.raw();
-      case NUMBER:
-        return (T) value.raw();
-      case BOOLEAN:
-        return (T) value.raw();
       case EXCEPTION:
+      case BOOLEAN:
+      case NUMBER:
         return (T) value.raw();
       case NULL:
         return null;
@@ -57,7 +54,7 @@ public class EchopraxiaMappingProvider implements MappingProvider {
   @Override
   public <T> T map(Object source, TypeRef<T> targetType, Configuration configuration) {
     try {
-      String msg = "source = " + source + " targetType = " + targetType;
+      String msg = "TypeRef are not supported, source = " + source + " targetType = " + targetType;
       throw new UnsupportedOperationException(msg);
     } catch (Exception e) {
       throw new MappingException(e);
