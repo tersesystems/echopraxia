@@ -66,6 +66,7 @@ public interface FindPathMethods {
    *
    * @param jsonPath a JSON path to evaluate.
    * @return optional map if found, empty() otherwise.
+   * @param <T> the type of value in the map.
    */
   @NotNull
   <T> Optional<Map<String, T>> findObject(@NotNull String jsonPath);
