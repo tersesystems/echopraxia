@@ -1,8 +1,12 @@
 package com.tersesystems.echopraxia.log4j;
 
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.Option;
+import com.tersesystems.echopraxia.EchopraxiaJsonProvider;
+import com.tersesystems.echopraxia.EchopraxiaMappingProvider;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.support.AbstractLoggingContext;
 import com.tersesystems.echopraxia.support.Utilities;
-import com.tersesystems.echopraxia.support.DefaultLoggingContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -11,10 +15,16 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-public class Log4JLoggingContext implements DefaultLoggingContext {
-
+public class Log4JLoggingContext extends AbstractLoggingContext {
   protected final Supplier<List<Field>> fieldsSupplier;
   protected final Marker marker;
+
+  private static final Configuration configuration =
+      Configuration.builder()
+          .jsonProvider(new EchopraxiaJsonProvider())
+          .mappingProvider(new EchopraxiaMappingProvider())
+          .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
+          .build();
 
   Log4JLoggingContext() {
     this.fieldsSupplier = Collections::emptyList;
