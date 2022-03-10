@@ -5,16 +5,16 @@ import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class EchopraxiaMappingProvider implements MappingProvider {
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> T map(Object source, Class<T> targetType, Configuration configuration) {
+  public <T> T map(
+      @Nullable Object source, @NotNull Class<T> targetType, Configuration configuration) {
     if (source == null) {
       return null;
     }
@@ -36,7 +36,12 @@ public class EchopraxiaMappingProvider implements MappingProvider {
   }
 
   @SuppressWarnings("unchecked")
-  private <T> T mapToValue(Object source) {
+  @Nullable
+  private <T> T mapToValue(@Nullable Object source) {
+    if (source == null) {
+      return null;
+    }
+
     Field.Value<?> value = (Field.Value<?>) source;
     switch (value.type()) {
       case STRING:
@@ -61,7 +66,16 @@ public class EchopraxiaMappingProvider implements MappingProvider {
     }
   }
 
-  private Object mapToObject(Object source) {
+  @SuppressWarnings("unchecked")
+  @Nullable
+  private Object mapToObject(@Nullable Object source) {
+    if (source == null) {
+      return null;
+    }
+    if (source == Field.Value.NullValue.instance) {
+      return null;
+    }
+
     if (source instanceof List) {
       List<Object> mapped = new ArrayList<>();
       List<?> array = (List<?>) source;
@@ -73,7 +87,8 @@ public class EchopraxiaMappingProvider implements MappingProvider {
       Map<String, Object> mapped = new HashMap<>();
       Map<String, ?> sourceMap = (Map<String, ?>) source;
       for (String key : sourceMap.keySet()) {
-        mapped.put(key, mapToObject(sourceMap.get(key)));
+        final Object mapValue = sourceMap.get(key);
+        mapped.put(key, mapToObject(mapValue));
       }
       return mapped;
     } else if (source instanceof Field.Value.ArrayValue) {
@@ -94,8 +109,6 @@ public class EchopraxiaMappingProvider implements MappingProvider {
         mapped.put(f.name(), mapToObject(f.value()));
       }
       return mapped;
-    } else if (source == Field.Value.NullValue.instance) {
-      return null;
     } else if (source instanceof Field.Value) {
       return ((Field.Value<?>) source).raw();
     } else {

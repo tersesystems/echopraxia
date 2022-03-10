@@ -307,6 +307,21 @@ public class ContextTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("Matches on exception");
   }
 
+  @Test
+  void testNullInNestedArray() {
+    Logger<?> logger = getLogger();
+    Condition c = (level, ctx) -> ctx.findList("$..interests").size() > 0;
+    logger.info(
+        c,
+        "Can manage null in array",
+        fb -> fb.onlyObject("foo", fb.onlyArray("interests", "foo", null, null)));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Can manage null in array");
+  }
+
   private void testMarker(Marker marker, String key, Object value) {
     final ObjectAppendingMarker m = (ObjectAppendingMarker) marker;
 
