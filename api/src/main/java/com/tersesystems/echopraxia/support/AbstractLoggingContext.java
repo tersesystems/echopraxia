@@ -1,6 +1,9 @@
 package com.tersesystems.echopraxia.support;
 
-import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
+import com.jayway.jsonpath.Predicate;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import com.tersesystems.echopraxia.EchopraxiaJsonProvider;
@@ -23,8 +26,6 @@ public abstract class AbstractLoggingContext implements LoggingContext {
           .mappingProvider(mappingProvider)
           .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
           .build();
-  private static final Configuration nullConfig =
-      Configuration.builder().jsonProvider(jsonProvider).mappingProvider(mappingProvider).build();
 
   @Override
   public @NotNull Optional<String> findString(@NotNull String jsonPath) {
@@ -47,12 +48,8 @@ public abstract class AbstractLoggingContext implements LoggingContext {
   }
 
   public boolean findNull(@NotNull String jsonPath) {
-    try {
-      Object o = JsonPath.parse(this, nullConfig).read(jsonPath);
-      return o == null;
-    } catch (PathNotFoundException e) {
-      return false;
-    }
+    Object o = JsonPath.parse(this, configuration).read(jsonPath);
+    return o instanceof Field.Value.NullValue;
   }
 
   @Override
