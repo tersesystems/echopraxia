@@ -6,7 +6,6 @@ import com.jayway.jsonpath.spi.json.JsonProvider;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
-
 import org.jetbrains.annotations.NotNull;
 
 public class EchopraxiaJsonProvider implements JsonProvider {
@@ -28,7 +27,8 @@ public class EchopraxiaJsonProvider implements JsonProvider {
 
   @Override
   public boolean isMap(Object obj) {
-    return (obj instanceof LoggingContext) || (obj instanceof Field.Value.ObjectValue || obj instanceof Map);
+    return (obj instanceof LoggingContext)
+        || (obj instanceof Field.Value.ObjectValue || obj instanceof Map);
   }
 
   @Override
@@ -63,8 +63,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     }
     if (obj instanceof Field.Value.ArrayValue) {
       return ((Field.Value.ArrayValue) obj).raw();
-    }
-    else
+    } else
       throw new JsonPathException(
           "Cannot iterate over " + obj != null ? obj.getClass().getName() : "null");
   }
@@ -79,10 +78,11 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     if (obj instanceof Map) {
       return ((Map<String, ?>) obj).keySet();
     } else if (obj instanceof Field.Value.ObjectValue) {
-      return ((Field.Value.ObjectValue) obj).raw().stream().map(Field::name).collect(Collectors.toList());
+      return ((Field.Value.ObjectValue) obj)
+          .raw().stream().map(Field::name).collect(Collectors.toList());
     } else {
       throw new JsonPathException(
-        "Cannot get property values for " + obj != null ? obj.getClass().getName() : "null");
+          "Cannot get property values for " + obj != null ? obj.getClass().getName() : "null");
     }
   }
 
@@ -118,9 +118,9 @@ public class EchopraxiaJsonProvider implements JsonProvider {
       list.remove(index);
     } else {
       throw new JsonPathException(
-        "removeProperty operation cannot be used with " + obj != null
-          ? obj.getClass().getName()
-          : "null");
+          "removeProperty operation cannot be used with " + obj != null
+              ? obj.getClass().getName()
+              : "null");
     }
   }
 
@@ -145,7 +145,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   @Override
   public void setArrayIndex(Object array, int idx, Object newValue) {
     // this is used to answer queries from created lists
-    if (! (array instanceof List)) {
+    if (!(array instanceof List)) {
       throw new UnsupportedOperationException();
     } else {
       List l = (List) array;

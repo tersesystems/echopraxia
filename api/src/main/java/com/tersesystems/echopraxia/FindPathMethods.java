@@ -17,6 +17,8 @@ public interface FindPathMethods {
   @NotNull
   Optional<Number> findNumber(@NotNull String jsonPath);
 
+  boolean findNull(@NotNull String jsonPath);
+
   @NotNull
   Optional<Throwable> findThrowable(@NotNull String jsonPath);
 

@@ -504,10 +504,17 @@ The basic types are `String`, the `Number` subclasses such as `Integer`, and `Bo
 Optional<String> optName = context.findString("$.person.name");
 ```
 
-This also applies to `Throwable` exceptions:
+This also applies to `Throwable` which are usually passed in as arguments:
 
 ```java
-Optional<Throwable> optThrowable = context.findThrowable("$.exception");
+Optional<Throwable> optThrowable = context.findThrowable();
+```
+
+Finding an explicitly null value return a `boolean`:
+
+```java
+// fb.onlyNull("keyWithNullValue") sets an explicitly null value
+boolean isNull = context.findNull("$.keyWithNullValue");
 ```
 
 Finding an object will return a `Map`:
@@ -516,9 +523,7 @@ Finding an object will return a `Map`:
 Optional<Map<String, ?>> mother = context.findObject("$.person.mother");
 ```
 
-Tip: There is no facility for finding a property set to `null` value as it resolves to `Optional.empty()`, so you can query for the parent value and check `containsKey("foo")` and `get("foo") == null`.
-
-For a `List`, in the case of an array:
+For a `List`, in the case of an array value or when using indefinite queries:
 
 ```java
 List<String> interests = context.findList("$.person.mother.interests");

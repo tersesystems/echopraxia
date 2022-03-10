@@ -241,6 +241,30 @@ public class ContextTest extends TestBase {
   }
 
   @Test
+  void testFindNull() {
+    Logger<?> logger = getLogger();
+    final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
+
+    logger.info(nullCondition, "found null", fb -> fb.onlyNullField("myNullField"));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("found null");
+  }
+
+  @Test
+  void testFindNullButString() {
+    Logger<?> logger = getLogger();
+    final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
+
+    logger.info(nullCondition, "found null", fb -> fb.onlyString("myNullField", "notnull"));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
   void testJsonPathFilter() {
     Logger<?> logger = getLogger();
     final Condition cheapBookCondition =
