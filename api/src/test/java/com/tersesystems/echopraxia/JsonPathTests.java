@@ -72,6 +72,21 @@ public class JsonPathTests {
   }
 
   @Test
+  public void testDeepScan() {
+    PersonBuilder builder = new PersonBuilder();
+
+    Person abe = new Person("Abe", 1, "yodelling");
+    abe.setFather(new Person("Bert", 35, "keyboards"));
+    abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
+
+    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    List mother = documentContext.read("$..mother", List.class);
+    System.out.println("mother = " + mother);
+    assertThat(mother).size().isEqualTo(3); // one explicit mother, two nulls
+  }
+
+  @Test
   public void testInlinePredicate() {
     PersonBuilder builder = new PersonBuilder();
 

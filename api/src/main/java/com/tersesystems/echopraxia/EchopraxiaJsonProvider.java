@@ -77,13 +77,20 @@ public class EchopraxiaJsonProvider implements JsonProvider {
 
     if (obj instanceof Map) {
       return ((Map<String, ?>) obj).keySet();
-    } else if (obj instanceof Field.Value.ObjectValue) {
+    }
+
+    if (obj instanceof Field.Value.ObjectValue) {
       return ((Field.Value.ObjectValue) obj)
           .raw().stream().map(Field::name).collect(Collectors.toList());
-    } else {
-      throw new JsonPathException(
-          "Cannot get property values for " + obj != null ? obj.getClass().getName() : "null");
     }
+
+    if (obj instanceof LoggingContext) {
+      return ((LoggingContext) obj)
+          .getFields().stream().map(Field::name).collect(Collectors.toList());
+    }
+
+    throw new JsonPathException(
+        "Cannot get property values for " + obj != null ? obj.getClass().getName() : "null");
   }
 
   private int arraySize(Object obj) {
