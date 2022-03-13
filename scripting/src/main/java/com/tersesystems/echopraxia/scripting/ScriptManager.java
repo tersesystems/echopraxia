@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.scripting;
 
 import static com.tersesystems.echopraxia.Field.Value;
+import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.Level;
@@ -9,16 +10,13 @@ import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
-import com.twineworks.tweakflow.lang.values.Arity2CallSite;
-import com.twineworks.tweakflow.lang.values.Values;
+import com.twineworks.tweakflow.lang.types.Types;
+import com.twineworks.tweakflow.lang.values.*;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ScriptManager class.
@@ -158,5 +156,26 @@ public class ScriptManager {
     LoadPath loadPath = new LoadPath.Builder().addStdLocation().add(memLocation).build();
     Runtime runtime = TweakFlow.compile(loadPath, path);
     return runtime.getModules().get(runtime.unitKey(path));
+  }
+
+  private com.twineworks.tweakflow.lang.values.Value compileContextFunction(
+      com.twineworks.tweakflow.lang.values.Value level, LoggingContext context) {
+    /*
+     library echopraxia {
+       function evaluate: (string level, function ctx) -> boolean
+          let {
+            findNumber: ctx("findNumber");
+            findString: ctx("findString");
+          }
+          findNumber("$.age") == 3 && findString("$.name") == "Will";
+     }
+    */
+    final FunctionParameter functionParameter =
+        new FunctionParameter(0, "functionName", Types.STRING, Values.NIL);
+    final FunctionSignature functionName =
+        new FunctionSignature(singletonList(functionParameter), Types.FUNCTION);
+    final UserFunctionValue userFunctionValue =
+        new UserFunctionValue(functionName, new ContextFunction(context));
+    return callSite.call(level, Values.make(userFunctionValue));
   }
 }
