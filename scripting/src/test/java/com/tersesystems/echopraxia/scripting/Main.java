@@ -58,7 +58,7 @@ public class Main {
   private static List<String> lines(String name) {
     return Arrays.asList(
         "library echopraxia {",
-        "  function evaluate: (string level, dict fields) ->",
+        "  function evaluate: (string level, function ctx) ->",
         "    level == \"" + name + "\";",
         "}");
   }

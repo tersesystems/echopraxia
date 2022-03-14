@@ -42,18 +42,25 @@ public class EchopraxiaMappingProvider implements MappingProvider {
       return null;
     }
 
-    Field.Value<?> value = (Field.Value<?>) source;
-    switch (value.type()) {
-      case STRING:
-      case EXCEPTION:
-      case BOOLEAN:
-      case NUMBER:
-        return (T) value.raw();
-      case NULL:
-        return null;
-      default:
-        throw new JsonPathException("No match for value " + value);
+    if (source instanceof Field.Value) {
+      Field.Value<?> value = (Field.Value<?>) source;
+      switch (value.type()) {
+        case STRING:
+        case EXCEPTION:
+        case BOOLEAN:
+        case NUMBER:
+          return (T) value.raw();
+        case NULL:
+          return null;
+        default:
+          throw new JsonPathException("No match for value " + value);
+      }
     }
+    return (T) source;
+  }
+
+  private Map<String, ?> mapThrowable(Throwable t) {
+    return null;
   }
 
   @Override

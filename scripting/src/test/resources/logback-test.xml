@@ -12,7 +12,9 @@
 <!--            <appender-ref ref="CONSOLE"/>-->
 <!--        </logger>-->
 
-    <root level="TRACE">
+    <logger name="com.tersesystems.echopraxia.scripting" level="DEBUG"/>
+    
+    <root level="INFO">
         <appender-ref ref="LIST"/>
     </root>
 </configuration>

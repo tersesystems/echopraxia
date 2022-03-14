@@ -21,8 +21,8 @@ public class ScriptConditionTest {
 
   public String buildScript() {
     StringBuilder b = new StringBuilder("library echopraxia {");
-    b.append("  function evaluate: (string level, dict fields) ->");
-    b.append("    fields[:correlation_id] == \"match\";");
+    b.append("  function evaluate: (string level, function ctx) ->");
+    b.append("    ctx(\"find_string\")(\"correlation_id\") == \"match\";");
     b.append("}");
     return b.toString();
   }

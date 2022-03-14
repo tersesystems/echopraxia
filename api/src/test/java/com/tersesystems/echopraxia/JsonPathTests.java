@@ -129,6 +129,40 @@ public class JsonPathTests {
     assertThat(results).isNotEmpty();
   }
 
+  @Test
+  public void testExceptionMessage() {
+    final Field.Builder fb = Field.Builder.instance();
+    LoggingContext context =
+        FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
+
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    String message = documentContext.read("$.exception.message", String.class);
+    assertThat(message).isEqualTo("some message");
+  }
+
+  @Test
+  public void testExceptionCauseMessage() {
+    final Field.Builder fb = Field.Builder.instance();
+    final RuntimeException cause = new RuntimeException("some other message");
+    LoggingContext context =
+        FakeLoggingContext.single(fb.exception(new RuntimeException("some message", cause)));
+
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    String message = documentContext.read("$.exception.cause.message", String.class);
+    assertThat(message).isEqualTo("some other message");
+  }
+
+  @Test
+  public void testExceptionStackTrace() {
+    final Field.Builder fb = Field.Builder.instance();
+    LoggingContext context =
+        FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
+
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    String methodName = documentContext.read("$.exception.stackTrace[0].methodName", String.class);
+    assertThat(methodName).isEqualTo("testExceptionStackTrace");
+  }
+
   // Example class with several fields on it.
   static class Person {
 

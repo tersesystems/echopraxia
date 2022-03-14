@@ -9,10 +9,10 @@ alias std.strings as str;
 
 library echopraxia {
 
-  # level: the logging level
-  # fields: the dictionary of fields
-  #
-  function evaluate: (string level, dict fields) ->
-    str.lower_case(fields[:person][:name]) == "will";
+  function evaluate: (string level, function ctx) ->
+    let {
+      find_string: ctx("find_string");
+    }
+    str.lower_case(find_string("$.person.name")) == "will";
     
 }
