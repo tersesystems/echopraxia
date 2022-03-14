@@ -291,6 +291,18 @@ public class ContextTest extends TestBase {
   }
 
   @Test
+  void testJsonPathMissingProperty() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException =
+      (level, ctx) -> ctx.findString("$.exception.message").isPresent();
+
+    logger.info(noFindException, "no exception in this message");
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
   void testFindException() {
     Logger<?> logger = getLogger();
     Condition c =
