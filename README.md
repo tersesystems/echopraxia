@@ -510,7 +510,16 @@ This also applies to `Throwable` which are usually passed in as arguments:
 Optional<Throwable> optThrowable = context.findThrowable();
 ```
 
-Finding an explicitly null value return a `boolean`:
+You can also treat a `Throwable` as a JSON object, i.e. the following will all work:
+
+```java
+String methodName = ctx.findString("$.exception.stackTrace[0].methodName");
+String className = ctx.findString("$.exception.className");
+String message = ctx.findString("$.exception.message");
+Optional<Throwable> cause = ctx.findThrowable("$.exception.cause");
+```
+
+Finding an explicitly null value returns a `boolean`:
 
 ```java
 // fb.onlyNull("keyWithNullValue") sets an explicitly null value
@@ -836,43 +845,83 @@ One of the limitations of logging is that it's not that easy to change logging l
 
 Script Conditions lets you tie your conditions to scripts that you can change and re-evaluate at runtime.
 
-The security concerns surrounding Groovy or Javascript make them unsuitable in a logging environment.  Fortunately, Echopraxia provides a [Tweakflow](https://twineworks.github.io/tweakflow) script integration that lets you evaluate logging statements **safely**.  Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
+The security concerns surrounding Groovy or Javascript make them unsuitable in a logging environment.  Fortunately, Echopraxia provides a [Tweakflow](https://twineworks.github.io/tweakflow) script integration that lets you evaluate logging statements **safely**.  
 
-Because Scripting has a dependency on Tweakflow, it is broken out into a distinct library that you must add to your build.
+Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
 
-Maven:
+### Script Syntax
 
-```
-<dependency>
-  <groupId>com.tersesystems.echopraxia</groupId>
-  <artifactId>scripting</artifactId>
-  <version><VERSION></version>
-</dependency>
-```
+The call site for a script is the function `evaluate` inside a library called `echopraxia`.  The level and context are
+passed through as `(string level, dict ctx)`, where `ctx` is a dictionary of functions that connect back to the logging context.
 
-Gradle:
+Methods in the context are snake case, separated by underscores. For example, to call the equivalent of `ctx.findString("$.person.name")`, you would call `ctx[:find_string]("$.person.name")`.  You can use the `let` construct in Tweakflow to make this clearer:
 
 ```
-implementation "com.tersesystems.echopraxia:scripting:<VERSION>" 
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+    let {
+      find_string: ctx[:find_string];
+    }
+    find_string("$.person.name") == "testing";
+}
 ```
 
-### String Based Scripts
+You can get access to the raw fields of the logging context with `ctx[:fields]`, although this will iterate over every field and is less efficient than using the `find` functions:
 
-You also have the option of passing in a string directly:
+```
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+    let {
+      fields: ctx[:fields]();
+    }
+    fields[:name] = "Will";
+}
+```
+
+Using `find_object` or `find_list` returns the appropriate type of `dict` or `list` respectively.  
+
+```
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+    let {
+      find_list: ctx["find_list"];
+      interests: find_list("$.obj.interests");
+    }
+    interests[1] == "drink";
+}
+```
+
+And you can use the Tweakflow standard library to allow for more advanced functionality, i.e.
+
+```
+import * as std from "std";
+alias std.strings as str;
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+    let {
+      find_string: ctx["find_string"];
+    }
+    str.lower_case(find_string("$.person.name")) == "will";
+}
+```
+
+### Creating Script Conditions
+
+The simplest way to handle a script is to pass it in directly as a string:
 
 ```java
+import com.tersesystems.echopraxia.scripting.*;
+
 StringBuilder b = new StringBuilder("");
 b.append("library echopraxia {");
-b.append("  function evaluate: (string level, dict fields) ->");
-b.append("    level == \"INFO\";");
+b.append("  function evaluate: (string level, dict ctx) ->");
+b.append("    level == \"info\";");
 b.append("}");
 String scriptString = b.toString();  
 Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
 ```
 
-### File Based Scripts
-
-Creating a script condition is done with `ScriptCondition.create`:
+You can also use a `Path` for file based scripts:
 
 ```java
 import com.tersesystems.echopraxia.scripting.*;
@@ -892,14 +941,17 @@ alias std.strings as str;
 library echopraxia {
   # level: the logging level
   # fields: the dictionary of fields
-  function evaluate: (string level, dict fields) ->
-    str.lower_case(fields[:person][:name]) == "will";   
+  function evaluate: (string level, dict ctx) ->
+    {
+      let find_string: ctx[:find_string]
+    }
+    str.lower_case(find_string("$.person.name")) == "will";   
 }
 ```
 
 ### Watched Scripts
 
-You can also change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
+You can change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
 
 To configure `ScriptWatchService`, pass it the directory that contains your script files:
 
@@ -926,6 +978,28 @@ logger.info(condition, "Statement only logs if condition is met!")
 // Note that the watch service creates a daemon thread to watch the directory.
 // To free up the thread and stop watching, you should call close() as appropriate:
 watchService.close();
+```
+
+You can see a worked example in [echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
+
+### Installation
+
+Because Scripting has a dependency on Tweakflow, it is broken out into a distinct library that you must add to your build.
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>scripting</artifactId>
+  <version><VERSION></version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:scripting:<VERSION>" 
 ```
 
 ## Semantic Logging
