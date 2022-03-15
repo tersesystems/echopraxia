@@ -4,10 +4,7 @@ import static com.jayway.jsonpath.Criteria.where;
 import static com.jayway.jsonpath.Filter.filter;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.jayway.jsonpath.Configuration;
-import com.jayway.jsonpath.DocumentContext;
-import com.jayway.jsonpath.Filter;
-import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
@@ -24,6 +21,8 @@ public class JsonPathTests {
     return Configuration.builder()
         .jsonProvider(jsonProvider)
         .mappingProvider(mappingProvider)
+        .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
+        .options(Option.SUPPRESS_EXCEPTIONS)
         .build();
   }
 
@@ -82,8 +81,7 @@ public class JsonPathTests {
     LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     List mother = documentContext.read("$..mother", List.class);
-    System.out.println("mother = " + mother);
-    assertThat(mother).size().isEqualTo(3); // one explicit mother, two nulls
+    assertThat(mother).size().isEqualTo(4);
   }
 
   @Test
@@ -127,6 +125,50 @@ public class JsonPathTests {
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     List<Field.Value<?>> results = documentContext.read("$.person.mother[?]", iceskatingFilter);
     assertThat(results).isNotEmpty();
+  }
+
+  @Test
+  public void testExceptionMessage() {
+    final Field.Builder fb = Field.Builder.instance();
+    LoggingContext context =
+        FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
+
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    String message = documentContext.read("$.exception.message", String.class);
+    assertThat(message).isEqualTo("some message");
+  }
+
+  @Test
+  public void testExceptionCauseMessage() {
+    final Field.Builder fb = Field.Builder.instance();
+    final RuntimeException cause = new RuntimeException("some other message");
+    LoggingContext context =
+        FakeLoggingContext.single(fb.exception(new RuntimeException("some message", cause)));
+
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    String message = documentContext.read("$.exception.cause.message", String.class);
+    assertThat(message).isEqualTo("some other message");
+  }
+
+  @Test
+  public void testExceptionStackTrace() {
+    final Field.Builder fb = Field.Builder.instance();
+    LoggingContext context =
+        FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
+
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    String methodName = documentContext.read("$.exception.stackTrace[0].methodName", String.class);
+    assertThat(methodName).isEqualTo("testExceptionStackTrace");
+  }
+
+  @Test
+  public void testExceptionStackTraceMissing() {
+    final Field.Builder fb = Field.Builder.instance();
+    LoggingContext context = FakeLoggingContext.empty();
+
+    final DocumentContext documentContext = JsonPath.parse(context, configuration());
+    String methodName = documentContext.read("$.exception.stackTrace[0].methodName", String.class);
+    assertThat(methodName).isNull();
   }
 
   // Example class with several fields on it.

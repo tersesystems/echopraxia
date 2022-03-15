@@ -10,6 +10,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class EchopraxiaJsonProvider implements JsonProvider {
 
+  private static final List<String> THROWABLE_KEYS =
+      Arrays.asList("message", "cause", "stackTrace", "className");
+  private static final List<String> STACK_TRACE_ELEMENT_KEYS =
+      Arrays.asList("methodName", "lineNumber", "fileName", "className");
+
   @Override
   public Object parse(String json) throws InvalidJsonException {
     throw new InvalidJsonException("Not implemented");
@@ -27,8 +32,12 @@ public class EchopraxiaJsonProvider implements JsonProvider {
 
   @Override
   public boolean isMap(Object obj) {
-    return (obj instanceof LoggingContext)
-        || (obj instanceof Field.Value.ObjectValue || obj instanceof Map);
+    return obj instanceof LoggingContext
+        || obj instanceof Field.Value.ObjectValue
+        || obj instanceof Field.Value.ExceptionValue
+        || obj instanceof Throwable
+        || obj instanceof StackTraceElement
+        || obj instanceof Map;
   }
 
   @Override
@@ -40,7 +49,9 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   }
 
   public boolean isArray(Object obj) {
-    return (obj instanceof Field.Value.ArrayValue || obj instanceof java.util.List);
+    return (obj instanceof Field.Value.ArrayValue
+        || obj instanceof java.util.List
+        || obj.getClass().isArray());
   }
 
   public int length(Object obj) {
@@ -89,6 +100,14 @@ public class EchopraxiaJsonProvider implements JsonProvider {
           .getFields().stream().map(Field::name).collect(Collectors.toList());
     }
 
+    if (obj instanceof Throwable) {
+      return THROWABLE_KEYS;
+    }
+
+    if (obj instanceof StackTraceElement) {
+      return STACK_TRACE_ELEMENT_KEYS;
+    }
+
     throw new JsonPathException(
         "Cannot get property values for " + obj != null ? obj.getClass().getName() : "null");
   }
@@ -99,6 +118,9 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     }
     if (obj instanceof List) {
       return ((List<?>) obj).size();
+    }
+    if (obj != null && obj.getClass().isArray()) {
+      return ((Object[]) obj).length;
     }
     throw new JsonPathException(
         "length operation cannot be applied to "
@@ -139,6 +161,9 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     if (obj instanceof List) {
       return ((List<?>) obj).get(idx);
     }
+    if (obj.getClass().isArray()) {
+      return ((Object[]) obj)[idx];
+    }
 
     throw new IllegalArgumentException("Object is not valid: " + obj.toString());
   }
@@ -171,6 +196,48 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     }
     if (obj instanceof Field.Value.ObjectValue) {
       return findValue(key, ((Field.Value.ObjectValue) obj).raw());
+    }
+    if (obj instanceof Field.Value.ExceptionValue) {
+      return findExceptionValue(key, ((Field.Value.ExceptionValue) obj).raw());
+    }
+    if (obj instanceof Throwable) {
+      return findExceptionValue(key, (Throwable) obj);
+    }
+    if (obj instanceof StackTraceElement) {
+      return findStackTraceValue(key, (StackTraceElement) obj);
+    }
+    return JsonProvider.UNDEFINED;
+  }
+
+  private Object findStackTraceValue(String key, StackTraceElement obj) {
+    if (key.equals("fileName")) {
+      return obj.getFileName();
+    }
+    if (key.equals("lineNumber")) {
+      return obj.getLineNumber();
+    }
+    if (key.equals("className")) {
+      return obj.getClassName();
+    }
+    if (key.equals("methodName")) {
+      return obj.getMethodName();
+    }
+    return JsonProvider.UNDEFINED;
+  }
+
+  private Object findExceptionValue(String key, Throwable throwable) {
+    // XXX Might be nice to do reflection based property introspection here
+    if (key.equals("message")) {
+      return throwable.getMessage();
+    }
+    if (key.equals("cause")) {
+      return throwable.getCause();
+    }
+    if (key.equals("stackTrace")) {
+      return throwable.getStackTrace();
+    }
+    if (key.equals("className")) {
+      return throwable.getClass().getName();
     }
     return JsonProvider.UNDEFINED;
   }

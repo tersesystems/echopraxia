@@ -19,21 +19,18 @@ import org.junit.jupiter.api.Test;
 
 public class ScriptConditionTest {
 
-  public String buildScript() {
-    StringBuilder b = new StringBuilder("library echopraxia {");
-    b.append("  function evaluate: (string level, dict fields) ->");
-    b.append("    fields[:correlation_id] == \"match\";");
-    b.append("}");
-    return b.toString();
-  }
-
   @Test
-  public void testStringCondition() {
-    Condition condition = ScriptCondition.create(false, buildScript(), Throwable::printStackTrace);
+  public void testFindStringCondition() {
+    Condition condition =
+        ScriptCondition.create(
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[\"find_string\"](\"correlation_id\") == \"match\";"
+                + "}",
+            Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger
-        .withFields(fb -> fb.only(fb.string("correlation_id", "match")))
-        .info("data of interest found");
+    logger.info("data of interest found", fb -> fb.only(fb.string("correlation_id", "match")));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -42,7 +39,138 @@ public class ScriptConditionTest {
   }
 
   @Test
-  public void testException() {
+  public void testFindNumberCondition() {
+    Condition condition =
+        ScriptCondition.create(
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[\"find_number\"](\"correlation_id\") == 123;"
+                + "}",
+            Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger.info("data of interest found", fb -> fb.onlyNumber("correlation_id", 123));
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @Test
+  public void testFindBooleanCondition() {
+    Condition condition =
+        ScriptCondition.create(
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[\"find_boolean\"](\"bool_value\") == true;"
+                + "}",
+            Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger.info("data of interest found", fb -> fb.onlyBool("bool_value", true));
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @Test
+  public void testFindNullCondition() {
+    Condition condition =
+        ScriptCondition.create(
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[:find_null](\"null_value\") == true;"
+                + "}",
+            Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger.info("data of interest found", fb -> fb.onlyNullField("null_value"));
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @Test
+  public void testFindObjectCondition() {
+    Condition condition =
+        ScriptCondition.create(
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    let {"
+                + "      find_object: ctx[:find_object];"
+                + "      obj: find_object(\"$.obj\");"
+                + "    }"
+                + "    obj[:foo] == 1337;"
+                + "}",
+            Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger.info(
+        "data of interest found",
+        fb -> fb.onlyObject("obj", fb.list(fb.number("foo", 1337), fb.number("bar", 0xDEADBEEF))));
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @Test
+  public void testFindListCondition() {
+    Condition condition =
+        ScriptCondition.create(
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    let {"
+                + "      find_list: ctx[\"find_list\"];"
+                + "      interests: find_list(\"$.obj.interests\");"
+                + "    }"
+                + "    interests[1] == \"drink\";"
+                + "}",
+            Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger.info(
+        "data of interest found",
+        fb -> fb.onlyObject("obj", fb.list(fb.array("interests", "food", "drink", "sleep"))));
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @Test
+  public void testGetFieldsCondition() {
+    Condition condition =
+        ScriptCondition.create(
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    let {"
+                + "      fields: ctx[:fields]();"
+                + "    }"
+                + "    fields[:obj][:interests][2] == \"sleep\";"
+                + "}",
+            Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger.info(
+        "data of interest found",
+        fb -> fb.onlyObject("obj", fb.list(fb.array("interests", "food", "drink", "sleep"))));
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @Test
+  public void testExceptionFromFile() {
     Path path = Paths.get("src/test/tweakflow/exception.tf");
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
@@ -58,7 +186,7 @@ public class ScriptConditionTest {
   }
 
   @Test
-  public void testCondition() {
+  public void testConditionFromFile() {
     Path path = Paths.get("src/test/tweakflow/condition.tf");
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
@@ -88,7 +216,17 @@ public class ScriptConditionTest {
 
   @Test
   public void testComplexCondition() {
-    Path path = Paths.get("src/test/tweakflow/complex.tf");
+    String path =
+        "import * as std from \"std\";"
+            + "alias std.strings as str;"
+            + "library echopraxia {"
+            + "  function evaluate: (string level, dict ctx) ->"
+            + "    let {"
+            + "      find_string: ctx[\"find_string\"];"
+            + "    }"
+            + "    str.lower_case(find_string(\"$.person.name\")) == \"will\";"
+            + "}";
+
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);

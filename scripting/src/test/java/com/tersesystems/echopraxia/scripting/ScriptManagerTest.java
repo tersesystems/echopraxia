@@ -17,7 +17,7 @@ public class ScriptManagerTest {
 
   public String buildScript() {
     StringBuilder b = new StringBuilder("library echopraxia {");
-    b.append("  function evaluate: (string level, dict fields) ->");
+    b.append("  function evaluate: (string level, dict ctx) ->");
     b.append("    true;");
     b.append("}");
     return b.toString();
