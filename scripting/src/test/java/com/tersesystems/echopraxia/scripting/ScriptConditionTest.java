@@ -25,8 +25,8 @@ public class ScriptConditionTest {
         ScriptCondition.create(
             false,
             "library echopraxia {"
-                + "  function evaluate: (string level, function ctx) ->"
-                + "    ctx(\"find_string\")(\"correlation_id\") == \"match\";"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[\"find_string\"](\"correlation_id\") == \"match\";"
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
@@ -44,8 +44,8 @@ public class ScriptConditionTest {
         ScriptCondition.create(
             false,
             "library echopraxia {"
-                + "  function evaluate: (string level, function ctx) ->"
-                + "    ctx(\"find_number\")(\"correlation_id\") == 123;"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[\"find_number\"](\"correlation_id\") == 123;"
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
@@ -63,8 +63,8 @@ public class ScriptConditionTest {
         ScriptCondition.create(
             false,
             "library echopraxia {"
-                + "  function evaluate: (string level, function ctx) ->"
-                + "    ctx(\"find_boolean\")(\"bool_value\") == true;"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[\"find_boolean\"](\"bool_value\") == true;"
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
@@ -82,8 +82,8 @@ public class ScriptConditionTest {
         ScriptCondition.create(
             false,
             "library echopraxia {"
-                + "  function evaluate: (string level, function ctx) ->"
-                + "    ctx(\"find_null\")(\"null_value\") == true;"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    ctx[:find_null](\"null_value\") == true;"
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
@@ -101,9 +101,9 @@ public class ScriptConditionTest {
         ScriptCondition.create(
             false,
             "library echopraxia {"
-                + "  function evaluate: (string level, function ctx) ->"
+                + "  function evaluate: (string level, dict ctx) ->"
                 + "    let {"
-                + "      find_object: ctx(\"find_object\");"
+                + "      find_object: ctx[:find_object];"
                 + "      obj: find_object(\"$.obj\");"
                 + "    }"
                 + "    obj[:foo] == 1337;"
@@ -126,9 +126,9 @@ public class ScriptConditionTest {
         ScriptCondition.create(
             false,
             "library echopraxia {"
-                + "  function evaluate: (string level, function ctx) ->"
+                + "  function evaluate: (string level, dict ctx) ->"
                 + "    let {"
-                + "      find_list: ctx(\"find_list\");"
+                + "      find_list: ctx[\"find_list\"];"
                 + "      interests: find_list(\"$.obj.interests\");"
                 + "    }"
                 + "    interests[1] == \"drink\";"
@@ -151,10 +151,9 @@ public class ScriptConditionTest {
         ScriptCondition.create(
             false,
             "library echopraxia {"
-                + "  function evaluate: (string level, function ctx) ->"
+                + "  function evaluate: (string level, dict ctx) ->"
                 + "    let {"
-                + "      get_fields: ctx(\"get_fields\");"
-                + "      fields: get_fields();"
+                + "      fields: ctx[:fields]();"
                 + "    }"
                 + "    fields[:obj][:interests][2] == \"sleep\";"
                 + "}",
@@ -221,9 +220,9 @@ public class ScriptConditionTest {
         "import * as std from \"std\";"
             + "alias std.strings as str;"
             + "library echopraxia {"
-            + "  function evaluate: (string level, function ctx) ->"
+            + "  function evaluate: (string level, dict ctx) ->"
             + "    let {"
-            + "      find_string: ctx(\"find_string\");"
+            + "      find_string: ctx[\"find_string\"];"
             + "    }"
             + "    str.lower_case(find_string(\"$.person.name\")) == \"will\";"
             + "}";

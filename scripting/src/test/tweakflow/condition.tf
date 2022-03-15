@@ -4,9 +4,9 @@
 library echopraxia {
 
   doc 'Evaluates if correlation_id matches given value'
-  function evaluate: (string level, function ctx) ->
+  function evaluate: (string level, dict ctx) ->
     let {
-      find_string: ctx("find_string");
+      find_string: ctx[:find_string];
     }
     find_string("correlation_id") == "match";
 }

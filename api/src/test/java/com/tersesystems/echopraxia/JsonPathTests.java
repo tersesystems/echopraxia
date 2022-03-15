@@ -81,8 +81,7 @@ public class JsonPathTests {
     LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     List mother = documentContext.read("$..mother", List.class);
-    System.out.println("mother = " + mother);
-    assertThat(mother).size().isEqualTo(3); // one explicit mother, two nulls
+    assertThat(mother).size().isEqualTo(4);
   }
 
   @Test
@@ -165,8 +164,7 @@ public class JsonPathTests {
   @Test
   public void testExceptionStackTraceMissing() {
     final Field.Builder fb = Field.Builder.instance();
-    LoggingContext context =
-      FakeLoggingContext.empty();
+    LoggingContext context = FakeLoggingContext.empty();
 
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     String methodName = documentContext.read("$.exception.stackTrace[0].methodName", String.class);

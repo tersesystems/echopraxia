@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
-
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractLoggingContext implements LoggingContext {
@@ -27,7 +26,8 @@ public abstract class AbstractLoggingContext implements LoggingContext {
           .options(Option.SUPPRESS_EXCEPTIONS)
           .build();
 
-  private final Supplier<DocumentContext> supplier = new Utilities.MemoizingSupplier<>(() -> JsonPath.parse(this, configuration));
+  private final Supplier<DocumentContext> supplier =
+      new Utilities.MemoizingSupplier<>(() -> JsonPath.parse(this, configuration));
 
   @Override
   public @NotNull Optional<String> findString(@NotNull String jsonPath) {
@@ -83,8 +83,7 @@ public abstract class AbstractLoggingContext implements LoggingContext {
   @Override
   public <T> @NotNull Optional<Map<String, T>> findObject(
       @NotNull String jsonPath, Predicate... predicates) {
-      return Optional.ofNullable(
-        getDocumentContext().read(jsonPath, Map.class, predicates));
+    return Optional.ofNullable(getDocumentContext().read(jsonPath, Map.class, predicates));
   }
 
   @SuppressWarnings("unchecked")
@@ -102,5 +101,4 @@ public abstract class AbstractLoggingContext implements LoggingContext {
   private DocumentContext getDocumentContext() {
     return supplier.get();
   }
-
 }
