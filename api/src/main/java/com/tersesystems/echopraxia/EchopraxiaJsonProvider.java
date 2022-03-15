@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 public class EchopraxiaJsonProvider implements JsonProvider {
 
   private static final List<String> THROWABLE_KEYS =
-      Arrays.asList("message", "cause", "stackTrace");
+      Arrays.asList("message", "cause", "stackTrace", "className");
   private static final List<String> STACK_TRACE_ELEMENT_KEYS =
       Arrays.asList("methodName", "lineNumber", "fileName", "className");
 
@@ -235,6 +235,9 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     }
     if (key.equals("stackTrace")) {
       return throwable.getStackTrace();
+    }
+    if (key.equals("className")) {
+      return throwable.getClass().getName();
     }
     return JsonProvider.UNDEFINED;
   }

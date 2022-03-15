@@ -24,49 +24,34 @@ public abstract class AbstractLoggingContext implements LoggingContext {
           .jsonProvider(jsonProvider)
           .mappingProvider(mappingProvider)
           .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
+          .options(Option.SUPPRESS_EXCEPTIONS)
           .build();
 
   private final Supplier<DocumentContext> supplier = new Utilities.MemoizingSupplier<>(() -> JsonPath.parse(this, configuration));
 
   @Override
   public @NotNull Optional<String> findString(@NotNull String jsonPath) {
-    try {
-      final String s = getDocumentContext().read(jsonPath, String.class);
-      return Optional.ofNullable(s);
-    } catch (PathNotFoundException pe) {
-      return Optional.empty();
-    }
+    final String s = getDocumentContext().read(jsonPath, String.class);
+    return Optional.ofNullable(s);
   }
 
   @Override
   @NotNull
   public Optional<Boolean> findBoolean(@NotNull String jsonPath) {
-    try {
-      final Boolean b = getDocumentContext().read(jsonPath, Boolean.class);
-      return Optional.ofNullable(b);
-    } catch (PathNotFoundException pe) {
-      return Optional.empty();
-    }
+    final Boolean b = getDocumentContext().read(jsonPath, Boolean.class);
+    return Optional.ofNullable(b);
   }
 
   @Override
   @NotNull
   public Optional<Number> findNumber(@NotNull String jsonPath) {
-    try {
-      final Number n = getDocumentContext().read(jsonPath, Number.class);
-      return Optional.ofNullable(n);
-    } catch (PathNotFoundException pe) {
-      return Optional.empty();
-    }
+    final Number n = getDocumentContext().read(jsonPath, Number.class);
+    return Optional.ofNullable(n);
   }
 
   public boolean findNull(@NotNull String jsonPath) {
-    try {
-      Object o = getDocumentContext().read(jsonPath);
-      return o instanceof Field.Value.NullValue;
-    } catch (PathNotFoundException pe) {
-      return false;
-    }
+    Object o = getDocumentContext().read(jsonPath);
+    return o instanceof Field.Value.NullValue;
   }
 
   @Override
@@ -91,23 +76,15 @@ public abstract class AbstractLoggingContext implements LoggingContext {
   @Override
   @NotNull
   public <T> Optional<Map<String, T>> findObject(@NotNull String jsonPath) {
-    try {
-      return Optional.ofNullable(getDocumentContext().read(jsonPath, Map.class));
-    } catch (PathNotFoundException pe) {
-      return Optional.empty();
-    }
+    return Optional.ofNullable(getDocumentContext().read(jsonPath, Map.class));
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> @NotNull Optional<Map<String, T>> findObject(
       @NotNull String jsonPath, Predicate... predicates) {
-    try {
       return Optional.ofNullable(
         getDocumentContext().read(jsonPath, Map.class, predicates));
-    } catch (PathNotFoundException pe) {
-      return Optional.empty();
-    }
   }
 
   @SuppressWarnings("unchecked")
