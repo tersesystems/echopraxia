@@ -7,6 +7,7 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
@@ -212,23 +213,37 @@ public class LogstashCoreLogger implements CoreLogger {
     }
   }
 
+  protected Function<Runnable, Runnable> mdcContext() {
+    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
+    return r -> {
+      if (copyOfContextMap != null) {
+        MDC.setContextMap(copyOfContextMap);
+      }
+      return r;
+    };
+  }
+
   @Override
   public <FB extends Field.Builder> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     final LogstashCoreLogger callerLogger = asyncCallerLogger();
-    runAsyncLog(
-        consumer,
-        new LoggerHandle<FB>() {
-          @Override
-          public void log(@Nullable String message) {
-            callerLogger.log(level, message);
-          }
+    Function<Runnable, Runnable> f = mdcContext();
+    Runnable runnable =
+        () -> {
+          consumer.accept(
+              new LoggerHandle<FB>() {
+                @Override
+                public void log(@Nullable String message) {
+                  callerLogger.log(level, message);
+                }
 
-          @Override
-          public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-            callerLogger.log(level, message, f, builder);
-          }
-        });
+                @Override
+                public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+                  callerLogger.log(level, message, f, builder);
+                }
+              });
+        };
+    runAsyncLog(f.apply(runnable));
   }
 
   @Override
@@ -238,19 +253,23 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
     final LogstashCoreLogger callerLogger = asyncCallerLogger();
-    runAsyncLog(
-        consumer,
-        new LoggerHandle<FB>() {
-          @Override
-          public void log(@Nullable String message) {
-            callerLogger.log(level, c, message);
-          }
+    Function<Runnable, Runnable> f = mdcContext();
+    final Runnable runnable =
+        () -> {
+          consumer.accept(
+              new LoggerHandle<FB>() {
+                @Override
+                public void log(@Nullable String message) {
+                  callerLogger.log(level, c, message);
+                }
 
-          @Override
-          public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
-            callerLogger.log(level, c, message, f, builder);
-          }
-        });
+                @Override
+                public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+                  callerLogger.log(level, c, message, f, builder);
+                }
+              });
+        };
+    runAsyncLog(f.apply(runnable));
   }
 
   /**
@@ -311,17 +330,7 @@ public class LogstashCoreLogger implements CoreLogger {
     return arguments.toArray();
   }
 
-  protected <FB extends Field.Builder> void runAsyncLog(
-      Consumer<LoggerHandle<FB>> consumer, LoggerHandle<FB> handle) {
-    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
-    Runnable runnable =
-        () -> {
-          if (copyOfContextMap != null) {
-            MDC.setContextMap(copyOfContextMap);
-          }
-          consumer.accept(handle);
-        };
-
+  protected <FB extends Field.Builder> void runAsyncLog(Runnable runnable) {
     // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
     CompletableFuture.runAsync(runnable, executor)
         .exceptionally(

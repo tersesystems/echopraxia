@@ -25,7 +25,6 @@ public class AsyncLogger<FB extends Field.Builder>
     extends AbstractLoggerSupport<AsyncLogger<FB>, FB> implements DefaultAsyncLoggerMethods<FB> {
 
   public static final String FQCN = DefaultAsyncLoggerMethods.class.getName();
-
   protected AsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     super(core.withFQCN(FQCN), fieldBuilder, AsyncLogger.class);
   }
