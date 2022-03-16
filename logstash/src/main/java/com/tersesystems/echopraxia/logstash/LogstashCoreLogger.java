@@ -7,7 +7,6 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionStage;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
@@ -31,6 +30,16 @@ public class LogstashCoreLogger implements CoreLogger {
   private final Condition condition;
   private final Executor executor;
   private final String fqcn;
+
+  private final Supplier<Function<Runnable, Runnable>> threadLocalFunction = () -> {
+    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
+    return r -> {
+      if (copyOfContextMap != null) {
+        MDC.setContextMap(copyOfContextMap);
+      }
+      return r;
+    };
+  };
 
   protected LogstashCoreLogger(String fqcn, ch.qos.logback.classic.Logger logger) {
     this.fqcn = fqcn;
@@ -213,21 +222,11 @@ public class LogstashCoreLogger implements CoreLogger {
     }
   }
 
-  protected Function<Runnable, Runnable> mdcContext() {
-    final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
-    return r -> {
-      if (copyOfContextMap != null) {
-        MDC.setContextMap(copyOfContextMap);
-      }
-      return r;
-    };
-  }
-
   @Override
   public <FB extends Field.Builder> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     final LogstashCoreLogger callerLogger = asyncCallerLogger();
-    Function<Runnable, Runnable> f = mdcContext();
+    Function<Runnable, Runnable> f = threadLocalFunction.get();
     Runnable runnable =
         () -> {
           consumer.accept(
@@ -253,7 +252,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
     final LogstashCoreLogger callerLogger = asyncCallerLogger();
-    Function<Runnable, Runnable> f = mdcContext();
+    Function<Runnable, Runnable> f = threadLocalFunction.get();
     final Runnable runnable =
         () -> {
           consumer.accept(
