@@ -22,19 +22,27 @@ public class FakeCoreLogger implements CoreLogger {
   private final Executor executor;
   private final String fqcn;
 
+  private final Supplier<Runnable> tlsSupplier;
+
   protected FakeCoreLogger(String fqcn) {
     this.fqcn = fqcn;
     this.context = FakeLoggingContext.empty();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
+    this.tlsSupplier = () -> (Runnable) () -> {};
   }
 
   public FakeCoreLogger(
-      String fqcn, FakeLoggingContext context, Condition condition, Executor executor) {
+      String fqcn,
+      FakeLoggingContext context,
+      Condition condition,
+      Executor executor,
+      Supplier<Runnable> tlsSupplier) {
     this.fqcn = fqcn;
     this.context = context;
     this.condition = condition;
     this.executor = executor;
+    this.tlsSupplier = tlsSupplier;
   }
 
   @Override
@@ -67,7 +75,7 @@ public class FakeCoreLogger implements CoreLogger {
       Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     FakeLoggingContext newContext = new FakeLoggingContext(() -> f.apply(builder));
     return new FakeCoreLogger(
-        fqcn, context.and(newContext), this.condition.and(condition), executor);
+        fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
   }
 
   @Override
@@ -77,18 +85,23 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
+  public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newSupplier) {
+    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor, newSupplier);
+  }
+
+  @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
-    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor);
+    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor, tlsSupplier);
   }
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new FakeCoreLogger(fqcn, context, condition, executor);
+    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier);
   }
 
   @Override
   public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
-    return new FakeCoreLogger(fqcn, context, condition, executor);
+    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier);
   }
 
   // -----------------------------------------------------------------------
