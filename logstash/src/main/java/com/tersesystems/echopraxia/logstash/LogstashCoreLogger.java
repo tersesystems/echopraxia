@@ -43,12 +43,12 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   public LogstashCoreLogger(
-      String fqcn,
-      ch.qos.logback.classic.Logger logger,
-      LogstashLoggingContext context,
-      Condition condition,
-      Executor executor,
-      Supplier<Runnable> threadContextSupplier) {
+      @NotNull String fqcn,
+      @NotNull ch.qos.logback.classic.Logger logger,
+      @NotNull LogstashLoggingContext context,
+      @NotNull Condition condition,
+      @NotNull Executor executor,
+      @NotNull Supplier<Runnable> threadContextSupplier) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = context;
@@ -105,7 +105,8 @@ public class LogstashCoreLogger implements CoreLogger {
       Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
-    return new LogstashCoreLogger(fqcn, logger, this.context.and(newContext), condition, executor, mdcContext());
+    return new LogstashCoreLogger(
+        fqcn, logger, this.context.and(newContext), condition, executor, mdcContext());
   }
 
   @Override
@@ -114,15 +115,21 @@ public class LogstashCoreLogger implements CoreLogger {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(MDC::getCopyOfContextMap);
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(fieldSupplier, Collections::emptyList);
-    return new LogstashCoreLogger(fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
+    return new LogstashCoreLogger(
+        fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
   }
 
-  public @NotNull CoreLogger withThreadContext(Supplier<Runnable> newSupplier) {
-    Supplier<Runnable> supplier = () -> {
-      final Runnable r1 = newSupplier.get();
-      final Runnable r2 = threadContextFunction.get();
-      return () -> { r1.run(); r2.run(); };
-    };
+  @Override
+  public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newSupplier) {
+    Supplier<Runnable> supplier =
+        () -> {
+          final Runnable r1 = newSupplier.get();
+          final Runnable r2 = threadContextFunction.get();
+          return () -> {
+            r1.run();
+            r2.run();
+          };
+        };
     return new LogstashCoreLogger(fqcn, logger, context, condition, executor, supplier);
   }
 
@@ -135,25 +142,30 @@ public class LogstashCoreLogger implements CoreLogger {
       if (this.condition == Condition.never()) {
         return this;
       }
-      return new LogstashCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+      return new LogstashCoreLogger(
+          fqcn, logger, context, condition, executor, threadContextFunction);
     }
-    return new LogstashCoreLogger(fqcn, logger, context, this.condition.and(condition), executor, threadContextFunction);
+    return new LogstashCoreLogger(
+        fqcn, logger, context, this.condition.and(condition), executor, threadContextFunction);
   }
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new LogstashCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+    return new LogstashCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction);
   }
 
   @Override
   public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
-    return new LogstashCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+    return new LogstashCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction);
   }
 
   public CoreLogger withMarkers(Marker... markers) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
-    return new LogstashCoreLogger(fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
+    return new LogstashCoreLogger(
+        fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
   }
 
   @Override
@@ -300,7 +312,8 @@ public class LogstashCoreLogger implements CoreLogger {
           new LogstashLoggingContext(
               Collections::emptyList, () -> Collections.singletonList(callerMarker));
       final LogstashLoggingContext contextWithCaller = context.and(callerContext);
-      return new LogstashCoreLogger(fqcn, logger, contextWithCaller, condition, executor, threadContextFunction);
+      return new LogstashCoreLogger(
+          fqcn, logger, contextWithCaller, condition, executor, threadContextFunction);
     } else {
       return this;
     }
