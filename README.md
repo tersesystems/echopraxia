@@ -297,9 +297,38 @@ public class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFiel
 }
 ```
 
+and a custom logger factory:
+
+```java
+public class PersonLoggerFactory {
+
+  private static final PersonFieldBuilder myFieldBuilder = new PersonFieldBuilder();
+
+  // the class containing the error/warn/info/debug/trace methods
+  private static final String FQCN = DefaultLoggerMethods.class.getName();
+
+  public static PersonLogger getLogger(Class<?> clazz) {
+    return getLogger(CoreLoggerFactory.getLogger(FQCN, clazz.getName()));
+  }
+
+  public static PersonLogger getLogger(String name) {
+    return getLogger(CoreLoggerFactory.getLogger(FQCN, name));
+  }
+
+  public static PersonLogger getLogger() {
+    return getLogger(CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName()));
+  }
+
+  public static PersonLogger getLogger(@NotNull CoreLogger core) {
+    return new PersonLogger(core, myFieldBuilder, PersonLogger.class);
+  }
+}
+```
+
 and then you can log a person as a raw parameter:
 
 ```java
+PersonLogger logger = PersonLoggerFactory.getLogger();
 Person abe = ...
 logger.info("Best person: {}", abe);
 ```
@@ -940,7 +969,7 @@ logger.info(condition, "Statement only logs if condition is met!")
 watchService.close();
 ```
 
-Please see the [scripting](https://github.com/tersesystems/echopraxia-examples/blob/main/scripting) for more details.
+Please see the [scripting example](https://github.com/tersesystems/echopraxia-examples/blob/main/script) for more details.
 
 ### Installation
 
