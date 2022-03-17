@@ -79,6 +79,9 @@ public interface CoreLogger {
   CoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform);
 
+  @NotNull
+  CoreLogger withThreadLocal(@NotNull Supplier<Runnable> supplier);
+
   /**
    * Provides a function to be run in the async logger to set up thread local storage variables
    * in the logging executor's thread.  Any existing function on the core logger is composed with the

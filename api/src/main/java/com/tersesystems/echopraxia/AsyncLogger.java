@@ -7,6 +7,8 @@ import com.tersesystems.echopraxia.support.AbstractLoggerSupport;
 import com.tersesystems.echopraxia.support.DefaultAsyncLoggerMethods;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -53,6 +55,15 @@ public class AsyncLogger<FB extends Field.Builder>
   public <T extends Field.Builder> AsyncLogger<T> withFieldBuilder(
       @NotNull Class<T> newBuilderClass) {
     return newLogger(getNewInstance(newBuilderClass));
+  }
+
+  /**
+   *
+   * @param supplier
+   * @return
+   */
+  public AsyncLogger<FB> withThreadLocal(Supplier<Runnable> supplier) {
+    return newLogger(core.withThreadLocal(supplier));
   }
 
   /**
