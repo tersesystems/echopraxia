@@ -225,10 +225,10 @@ Logger<BuilderWithDate> dateLogger = basicLogger.withFieldBuilder(BuilderWithDat
 dateLogger.info("Date {}", fb -> fb.onlyDate("creation_date", new Date()));
 ```
 
-This also applies to more complex objects:
+This also applies to more complex objects.  In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
 
 ```java
-public class PersonBuilder implements Field.Builder {
+public class PersonFieldBuilder implements Field.Builder {
 
   // Renders a `Person` as an object field.
   public Field person(String fieldName, Person p) {
@@ -254,7 +254,7 @@ And then you can do the same by calling `fb.person`:
 
 ```java
 Person user = ...
-Logger<PersonBuilder> personLogger = basicLogger.withFieldBuilder(PersonBuilder.class);
+Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.class);
 personLogger.info("Person {}", fb -> fb.only(fb.person("user", user)));
 ```
 
@@ -262,48 +262,46 @@ personLogger.info("Person {}", fb -> fb.only(fb.person("user", user)));
 
 If you are using a particular set of field builders for your domain and want them available by default, it's easy to create your own logger with your own field builder, using the support classes and interfaces.  
 
-Creating your own logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere.
+Creating your own logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere, and allow you to create custom methods that leverage field builders.
+
+Continuing from the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), you can build a `PersonLogger`:
 
 ```java
-import com.tersesystems.echopraxia.core.*;
-import com.tersesystems.echopraxia.support.*;
+public class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFieldBuilder>
+  implements DefaultLoggerMethods<PersonFieldBuilder> {
+  private static final String FQCN = PersonLogger.class.getName();
 
-public class MyLogger extends AbstractLoggerSupport<MyLogger, PersonBuilder>
-        implements DefaultLoggerMethods<PersonBuilder> {
+  protected PersonLogger(
+    @NotNull CoreLogger core, @NotNull PersonFieldBuilder fieldBuilder, Class<?> selfType) {
+    super(core, fieldBuilder, selfType);
+  }
 
-  public MyLogger(CoreLogger core, PersonBuilder fieldBuilder) {
-    super(core, fieldBuilder);
+  public void info(@Nullable String message, Person person) {
+    // when using custom methods, you must specify the caller as the class it's defined in.
+    this.core().withFQCN(FQCN).log(Level.INFO, message,
+      fb -> {
+        return fb.only(fb.person("person", person));
+      }, fieldBuilder);
   }
 
   @Override
-  protected MyLogger newLogger(CoreLogger core) {
-    return new MyLogger(core, fieldBuilder());
+  protected @NotNull PersonLogger newLogger(CoreLogger core) {
+    return new PersonLogger(core, fieldBuilder(), PersonLogger.class);
   }
 
-  // Custom method for this logger
-  public void personInfo(String personName, Person p) {
-    core.log(Level.INFO, "{}", fb -> fb.onlyPerson(personName, p), fieldBuilder());
-  }
-}
-
-public class MyLoggerFactory {
-  private static final String FQCN = MyLogger.class.getName();
-  private static final PersonBuilder fieldBuilder = new PersonBuilder();
-
-  public static MyLogger getLogger(Class<?> clazz) {
-    final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, clazz);
-    return new MyLogger(core, fieldBuilder);
+  @Override
+  protected @NotNull PersonLogger neverLogger() {
+    return new PersonLogger(
+      core.withCondition(Condition.never()), fieldBuilder(), PersonLogger.class);
   }
 }
+```
 
-public class Main {
-  private static final MyLogger logger = MyLoggerFactory.getLogger(Main.class);
+and then you can log a person as a raw parameter:
 
-  public static void main(String[] args) {
-    // ... create person object...
-    logger.personInfo("user", user);
-  }
-}
+```java
+Person abe = ...
+logger.info("Best person: {}", abe);
 ```
 
 ### Nulls and Exceptions
@@ -461,42 +459,15 @@ public class MyBusinessConditions {
 }
 ```
 
-If you want to log at an operational level most of the time but log debug statements when certain fields show up, use `anyMatch`:
-
-```java
-public class DebugConditions {
-  public Condition diagnosticOnFields(Set<String> fieldNames) {
-    // operational() is "ERROR" and "WARN" and "INFO" levels only
-    // diagnostic() is "DEBUG" and "TRACE" levels only
-    return Condition.operational().or(
-      Condition.diagnostic().and(Condition.anyMatch(f -> fieldNames.contains(f.name())))
-    );
-  }
-}
-```
-
-Likewise, if you want things not to be logged if there are some fields set, then use `noneMatch`, or use `valueMatch` if the value of the field is significant:
-
-```java
-public class Logging {
-  public Condition suppressOnFieldPresence(Set<String> fieldNames) {
-    return Condition.noneMatch(f -> fieldNames.contains(f.name()));
-  }
-  
-  public Condition suppressOnFlag() {
-    return Condition.valueMatch("suppressFlag", v -> v.type() == BOOLEAN ? (Boolean) v.raw() : false);
-  }
-}
-```
+This is only a part of the available functionality in conditions.  You can tie conditions directly to a backend, such as a database or key/value store, or trigger them to work in response to an exception or unusual metrics.  See the [redis example](https://github.com/tersesystems/echopraxia-examples/tree/main/redis), [jmx example](https://github.com/tersesystems/echopraxia-examples/tree/main/jmx), [metrics example](https://github.com/tersesystems/echopraxia-examples/tree/main/metrics), and [timed diagnostic example](https://github.com/tersesystems/echopraxia-examples/tree/main/timed-diagnostic).
 
 ### JSON Path
 
-In situations where you're looking through fields for a condition, using the Java Stream API can be verbose.  As an alternative, you can use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
+In situations where you're looking through fields for a condition, you can use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
 
 Tip: You can integrate IntelliJ IDEA with JSONPath using the [inject language](https://www.jetbrains.com/idea/guide/tips/evaluate-json-path-expressions/) settings page and adding `LoggingContext`.
 
-
-The `context.find` methods take a class as a type, and a [JSON path](https://www.ietf.org/archive/id/draft-ietf-jsonpath-base-03.html), which can be used to search through context fields (or arguments, if the condition is used in a logging statement).
+The `context.find*` methods take a class as a type, and a [JSON path](https://www.ietf.org/archive/id/draft-ietf-jsonpath-base-03.html), which can be used to search through context fields (or arguments, if the condition is used in a logging statement).
 
 The basic types are `String`, the `Number` subclasses such as `Integer`, and `Boolean`.  If no matching path is found, an empty `Optional` is returned.
 
@@ -710,6 +681,8 @@ public class Async {
 }
 ```
 
+Please see the [async example](https://github.com/tersesystems/echopraxia-examples/tree/main/async) for more details.
+
 ### Managing Thread Local State 
 
 Note that because logging is asynchronous, you must be very careful when accessing thread local state.  Thread local state associated with logging, i.e. MDC / ThreadContext is automatically carried through, but in some cases you may need to do additional work.
@@ -740,7 +713,7 @@ class GreetingController {
 }
 ```
 
-You can call `withThreadLocal` multiple times and it will compose with earlier blocks.
+You can call `withThreadLocal` multiple times, and it will compose with earlier blocks.
 
 ### Managing Caller Info
 
@@ -934,9 +907,11 @@ library echopraxia {
 }
 ```
 
+You also have the option to store scripts in a key-value store or in a database.  See the [sqlite condition store example](https://github.com/tersesystems/echopraxia-examples/tree/main/conditionstore) for details.
+
 ### Watched Scripts
 
-You can change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.  
+You can change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.
 
 To configure `ScriptWatchService`, pass it the directory that contains your script files:
 
@@ -965,7 +940,7 @@ logger.info(condition, "Statement only logs if condition is met!")
 watchService.close();
 ```
 
-You can see a worked example in [echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
+Please see the [scripting](https://github.com/tersesystems/echopraxia-examples/blob/main/scripting) for more details.
 
 ### Installation
 
@@ -1247,3 +1222,4 @@ public class SystemInfoFilter implements CoreLoggerFilter {
 }
 ```
 
+Please see the [system info example](https://github.com/tersesystems/echopraxia-examples/tree/main/system-info) for details.
