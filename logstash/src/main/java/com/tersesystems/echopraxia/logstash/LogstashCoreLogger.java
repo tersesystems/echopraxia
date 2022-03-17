@@ -30,7 +30,6 @@ public class LogstashCoreLogger implements CoreLogger {
   private final Condition condition;
   private final Executor executor;
   private final String fqcn;
-
   private final Supplier<Runnable> threadContextFunction;
 
   protected LogstashCoreLogger(String fqcn, ch.qos.logback.classic.Logger logger) {

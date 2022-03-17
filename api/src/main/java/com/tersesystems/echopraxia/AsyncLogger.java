@@ -8,7 +8,6 @@ import com.tersesystems.echopraxia.support.DefaultAsyncLoggerMethods;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,11 +57,26 @@ public class AsyncLogger<FB extends Field.Builder>
   }
 
   /**
+   * Provides a function to be run in the async logger to set up thread local storage variables in
+   * the logging executor's thread. Any existing function on the core logger is composed with the
+   * given function.
    *
-   * @param supplier
-   * @return
+   * <p>The method to supply is in two parts, with the supply portion run to save off the TLS
+   * variables, and the runnable portion applying the TLS variables in the thread:
+   *
+   * @param supplier the function to apply to manage TLS state.
+   * @return the logger with the thread local supplier applied.
    */
   public AsyncLogger<FB> withThreadLocal(Supplier<Runnable> supplier) {
+    //    Supplier<Runnable> s = () -> {
+    //      // Run before async thread execution
+    //      final RequestAttributes requestAttributes =
+    // RequestContextHolder.currentRequestAttributes();
+    //      // runnable.run() is called in the logging thread.
+    //      return () -> {
+    //        RequestContextHolder.setRequestAttributes(requestAttributes);
+    //      };
+    //    };
     return newLogger(core.withThreadLocal(supplier));
   }
 

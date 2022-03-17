@@ -79,27 +79,13 @@ public interface CoreLogger {
   CoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform);
 
-  @NotNull
-  CoreLogger withThreadLocal(@NotNull Supplier<Runnable> supplier);
-
   /**
-   * Provides a function to be run in the async logger to set up thread local storage variables
-   * in the logging executor's thread.  Any existing function on the core logger is composed with the
+   * Provides a function to be run in the async logger to set up thread local storage variables in
+   * the logging executor's thread. Any existing function on the core logger is composed with the
    * given function.
    *
-   * <p>
-   * The method to supply is in two parts, with the supply portion run to save off the TLS variables,
-   * and the runnable portion applying the TLS variables in the thread:
-   *
-   * <pre>{@code
-   * Supplier<Runnable> s = () -> {
-   *   // Run before async thread execution
-   *   final RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-   *   // runnable.run() is called in the logging thread.
-   *   return () -> {
-   *     RequestContextHolder.setRequestAttributes(requestAttributes);
-   *   };
-   * }</pre>
+   * <p>The method to supply is in two parts, with the supply portion run to save off the TLS
+   * variables, and the runnable portion applying the TLS variables in the thread:
    *
    * @param newSupplier the function to apply to manage TLS state.
    * @return the core logger with the thread local supplier applied.
