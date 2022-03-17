@@ -714,48 +714,33 @@ public class Async {
 
 Note that because logging is asynchronous, you must be very careful when accessing thread local state.  Thread local state associated with logging, i.e. MDC / ThreadContext is automatically carried through, but in some cases you may need to do additional work.
 
-For example, if you are using Spring Boot and are using `RequestContextHolder.getRequestAttributes()` when constructing context fields, you must call `RequestContextHolder.setRequestAttributes(requestAttributes)` so that the attributes are available to the thread:
+For example, if you are using Spring Boot and are using `RequestContextHolder.getRequestAttributes()` when constructing context fields, you must call `RequestContextHolder.setRequestAttributes(requestAttributes)` so that the attributes are available to the thread.
+
+You can add hooks into the logger to get and set thread local state appropriately using the `withThreadLocal` method, which returns a `Supplier<Runnable>`, where the `Supplier` is the "get" and the `Runnable` is the "set".  For example, in the [echopraxia-spring-boot-example](https://github.com/tersesystems/echopraxia-spring-boot-example), request attributes are thread local and must be carried across to the logging executor:
 
 ```java
-public class GreetingController {
-  private static final String template = "Hello, %s!";
-  private final AtomicLong counter = new AtomicLong();
-
-  private static final AsyncLogger<HttpRequestFieldBuilder> logger =
+class GreetingController {
+  private static final AsyncLogger<?> asyncLogger =
     AsyncLoggerFactory.getLogger()
       .withFieldBuilder(HttpRequestFieldBuilder.class)
-      .withExecutor(ForkJoinPool.commonPool())
-      .withFields(
-        fb -> {
-          // Any fields that you set in context you can set conditions on later,
-          // i.e. on the URI path, content type, or extra headers.
-          HttpServletRequest request =
-            ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-              .getRequest();
-          return fb.requestFields(request);
-        });
+      .withThreadLocal(
+        () -> {
+          // get the request attributes in rendering thread...
+          final RequestAttributes requestAttributes =
+            RequestContextHolder.currentRequestAttributes();
+          // ...and the "set" in the runnable will be called in the logging executor's thread
+          return () -> RequestContextHolder.setRequestAttributes(requestAttributes);
+        })
+      .withFields(fb -> fb.requestFields(httpServletRequest()));
 
-  @GetMapping("/greeting")
-  public Greeting greeting(@RequestParam(value = "name", defaultValue = "World") String name) {
-    logger.info(wrap(h -> h.log("This logs asynchronously with HTTP request fields")));
-    return new Greeting(counter.incrementAndGet(), String.format(template, name));
-  }
-
-  private Consumer<LoggerHandle<HttpRequestFieldBuilder>> wrap(Consumer<LoggerHandle<HttpRequestFieldBuilder>> c) {
-    // Because this takes place in the fork-join common pool, we need to set request
-    // attributes in the thread before logging so we can get request fields.
-    final RequestAttributes requestAttributes = RequestContextHolder.currentRequestAttributes();
-    return h -> {
-      try {
-        RequestContextHolder.setRequestAttributes(requestAttributes);
-        c.accept(h);
-      } finally {
-        RequestContextHolder.resetRequestAttributes();
-      }
-    };
+  private HttpServletRequest httpServletRequest() {
+    return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
+      .getRequest();
   }
 }
 ```
+
+You can call `withThreadLocal` multiple times and it will compose with earlier blocks.
 
 ### Managing Caller Info
 
