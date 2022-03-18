@@ -513,9 +513,9 @@ Optional<Throwable> optThrowable = context.findThrowable();
 You can also treat a `Throwable` as a JSON object, i.e. the following will all work:
 
 ```java
-String methodName = ctx.findString("$.exception.stackTrace[0].methodName");
-String className = ctx.findString("$.exception.className");
-String message = ctx.findString("$.exception.message");
+Optional<String> methodName = ctx.findString("$.exception.stackTrace[0].methodName");
+Optional<String> className = ctx.findString("$.exception.className");
+Optional<String> message = ctx.findString("$.exception.message");
 Optional<Throwable> cause = ctx.findThrowable("$.exception.cause");
 ```
 
