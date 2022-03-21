@@ -163,7 +163,6 @@ public class JsonPathTests {
 
   @Test
   public void testExceptionStackTraceMissing() {
-    final Field.Builder fb = Field.Builder.instance();
     LoggingContext context = FakeLoggingContext.empty();
 
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
