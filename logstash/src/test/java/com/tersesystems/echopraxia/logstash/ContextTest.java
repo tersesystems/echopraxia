@@ -206,6 +206,20 @@ public class ContextTest extends TestBase {
   }
 
   @Test
+  void testFindBoolean() {
+    Logger<?> logger = getLogger();
+    Condition c =
+      (level, ctx) -> ctx.findBoolean("$.arg1").orElse(false);
+    logger.info(c, "Matches on arg1", fb -> fb.onlyBool("arg1", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on arg1");
+  }
+
+
+  @Test
   void testFindDouble() {
     Logger<?> logger = getLogger();
     Condition c =
