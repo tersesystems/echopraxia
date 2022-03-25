@@ -100,8 +100,8 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <B extends Field.Builder> @NotNull CoreLogger withFields(
-      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
+  public <FB> @NotNull CoreLogger withFields(
+      @NotNull Function<FB, List<Field>> f, @NotNull FB builder) {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
     return new LogstashCoreLogger(
@@ -199,10 +199,10 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB extends Field.Builder> void log(
+  public <FB> void log(
       @NotNull Level level,
       String message,
-      Field.@NotNull BuilderFunction<FB> f,
+      @NotNull Function<FB, List<Field>> f,
       @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
@@ -227,12 +227,12 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <B extends Field.Builder> void log(
+  public <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<B> f,
-      @NotNull B builder) {
+      @NotNull Function<FB, List<Field>> f,
+      @NotNull FB builder) {
     final Marker m = context.getMarker();
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
@@ -247,7 +247,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB extends Field.Builder> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     final LogstashCoreLogger callerLogger = asyncCallerLogger();
     Runnable threadLocalRunnable = threadContextFunction.get();
@@ -262,7 +262,7 @@ public class LogstashCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+                public void log(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
                   callerLogger.log(level, message, f, builder);
                 }
               });
@@ -271,7 +271,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB extends Field.Builder> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level,
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
@@ -289,7 +289,7 @@ public class LogstashCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+                public void log(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
                   callerLogger.log(level, c, message, f, builder);
                 }
               });
@@ -356,7 +356,7 @@ public class LogstashCoreLogger implements CoreLogger {
     return arguments.toArray();
   }
 
-  protected <FB extends Field.Builder> void runAsyncLog(Runnable runnable) {
+  protected void runAsyncLog(Runnable runnable) {
     // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
     CompletableFuture.runAsync(runnable, executor)
         .exceptionally(

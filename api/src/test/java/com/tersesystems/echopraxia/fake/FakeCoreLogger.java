@@ -71,8 +71,8 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull <B extends Field.Builder> CoreLogger withFields(
-      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
+  public @NotNull <FB> CoreLogger withFields(
+      @NotNull Function<FB, List<Field>> f, @NotNull FB builder) {
     FakeLoggingContext newContext = new FakeLoggingContext(() -> f.apply(builder));
     return new FakeCoreLogger(
         fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
@@ -115,11 +115,11 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <B extends Field.Builder> void log(
+  public <FB> void log(
       @NotNull Level level,
       @Nullable String message,
-      Field.@NotNull BuilderFunction<B> f,
-      @NotNull B builder) {
+      @NotNull Function<FB, List<Field>> f,
+      @NotNull FB builder) {
     List<Field> args = f.apply(builder);
     FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
     if (isEnabledFor(level) && this.condition.test(level, context.and(argContext))) {
@@ -137,12 +137,12 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <B extends Field.Builder> void log(
+  public <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      Field.@NotNull BuilderFunction<B> f,
-      @NotNull B builder) {
+      @NotNull Function<FB, List<Field>> f,
+      @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
     List<Field> fields = context.getFields();
@@ -160,11 +160,11 @@ public class FakeCoreLogger implements CoreLogger {
   // -----------------------------------------------------------------------
 
   @Override
-  public <FB extends Field.Builder> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
 
   @Override
-  public <FB extends Field.Builder> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
       @NotNull Consumer<LoggerHandle<FB>> consumer,

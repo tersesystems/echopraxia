@@ -65,8 +65,7 @@ public interface CoreLogger {
    * @return the core logger with given context fields applied.
    */
   @NotNull
-  <B extends Field.Builder> CoreLogger withFields(
-      @NotNull Field.BuilderFunction<B> f, @NotNull B builder);
+  <B> CoreLogger withFields(@NotNull Function<B, List<Field>> f, @NotNull B builder);
 
   /**
    * Pulls fields from thread context into logger context, if any exist and the implementation
@@ -152,13 +151,13 @@ public interface CoreLogger {
    * @param message the message string to be logged
    * @param f the field builder function
    * @param builder the field builder
-   * @param <B> the type of field builder.
+   * @param <FB> the type of field builder.
    */
-  <B extends Field.Builder> void log(
+  <FB> void log(
       @NotNull Level level,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<B> f,
-      @NotNull B builder);
+      @NotNull Function<FB, List<Field>> f,
+      @NotNull FB builder);
 
   /**
    * Log a message at the given level.
@@ -177,14 +176,14 @@ public interface CoreLogger {
    * @param message the message string to be logged
    * @param f the field builder function
    * @param builder the field builder
-   * @param <B> the type of field builder.
+   * @param <FB> the type of field builder.
    */
-  <B extends Field.Builder> void log(
+  <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<B> f,
-      @NotNull B builder);
+      @NotNull Function<FB, List<Field>> f,
+      @NotNull FB builder);
 
   /**
    * Logs a statement asynchronously using an executor.
@@ -194,7 +193,7 @@ public interface CoreLogger {
    * @param consumer the consumer of the logger handle
    * @param builder the field builder.
    */
-  <FB extends Field.Builder> void asyncLog(
+  <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder);
 
   /**
@@ -206,7 +205,7 @@ public interface CoreLogger {
    * @param consumer the consumer of the logger handle
    * @param builder the field builder.
    */
-  <FB extends Field.Builder> void asyncLog(
+  <FB> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
