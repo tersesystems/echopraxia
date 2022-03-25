@@ -84,8 +84,8 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <B extends Field.Builder> @NotNull Log4JCoreLogger withFields(
-      Field.@NotNull BuilderFunction<B> f, @NotNull B builder) {
+  public <FB> @NotNull Log4JCoreLogger withFields(
+      @NotNull Function<FB, List<Field>> f, @NotNull FB builder) {
     Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
     return new Log4JCoreLogger(
         fqcn, logger, context.and(newContext), condition, executor, threadContextFunction);
@@ -176,11 +176,11 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <B extends Field.Builder> void log(
+  public <FB> void log(
       @NotNull Level level,
       @Nullable String messageTemplate,
-      @NotNull Field.BuilderFunction<B> f,
-      @NotNull B builder) {
+      @NotNull Function<FB, List<Field>> f,
+      @NotNull FB builder) {
     // because the isEnabled check looks for message and throwable, we have to
     // calculate them right up front.
     final Marker marker = context.getMarker();
@@ -209,12 +209,12 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <B extends Field.Builder> void log(
+  public <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String messageTemplate,
-      @NotNull Field.BuilderFunction<B> f,
-      @NotNull B builder) {
+      @NotNull Function<FB, List<Field>> f,
+      @NotNull FB builder) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     final List<Field> argumentFields = f.apply(builder);
@@ -230,7 +230,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB extends Field.Builder> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
@@ -252,7 +252,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
                 @Override
                 public void log(
-                    @Nullable String messageTemplate, @NotNull Field.BuilderFunction<FB> f) {
+                    @Nullable String messageTemplate, @NotNull Function<FB, List<Field>> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
@@ -274,7 +274,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB extends Field.Builder> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level,
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
@@ -300,7 +300,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
                 @Override
                 public void log(
-                    @Nullable String messageTemplate, @NotNull Field.BuilderFunction<FB> f) {
+                    @Nullable String messageTemplate, @NotNull Function<FB, List<Field>> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
@@ -373,7 +373,7 @@ public class Log4JCoreLogger implements CoreLogger {
     };
   }
 
-  protected <FB extends Field.Builder> void runAsyncLog(Runnable runnable) {
+  protected void runAsyncLog(Runnable runnable) {
     Function<Throwable, ? extends Void> exceptionHandler =
         e -> {
           // Usually we get to this point when you have thread local dependent code in your

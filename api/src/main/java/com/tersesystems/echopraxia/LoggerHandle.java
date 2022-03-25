@@ -1,10 +1,12 @@
 package com.tersesystems.echopraxia;
 
+import java.util.List;
+import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** The LoggerHandle class is used as a handle to a logger at a specific level. */
-public interface LoggerHandle<FB extends Field.Builder> {
+public interface LoggerHandle<FB> {
 
   /**
    * Logs using a message.
@@ -19,5 +21,5 @@ public interface LoggerHandle<FB extends Field.Builder> {
    * @param message the message template.
    * @param f the field builder function.
    */
-  void log(@Nullable String message, @NotNull Field.BuilderFunction<FB> f);
+  void log(@Nullable String message, @NotNull Function<FB, List<Field>> f);
 }
