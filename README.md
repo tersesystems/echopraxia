@@ -58,7 +58,7 @@ If you are doing significant operational logging, you should commit to a budget 
 
 ## Logstash
 
-There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) implementation of [event specific custom fields](https://github.com/logfellow/logstash-logback-encoder#event-specific-custom-fields).
+There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder).
 
 Maven:
 
