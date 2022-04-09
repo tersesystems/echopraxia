@@ -927,7 +927,7 @@ alias std.strings as str;
 
 library echopraxia {
   # level: the logging level
-  # fields: the dictionary of fields
+  # ctx: the logging context
   function evaluate: (string level, dict ctx) ->
     {
       let find_string: ctx[:find_string]
