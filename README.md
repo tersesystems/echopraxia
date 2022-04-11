@@ -42,6 +42,8 @@ Echopraxia is a structured logging API.  It is an appropriate solution **when yo
 
 SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations by anybody.  
 
+![logging.png](logging.png)
+
 Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
 
 ## Benchmarks
