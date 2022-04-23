@@ -1,11 +1,18 @@
 package com.tersesystems.echopraxia;
 
+import org.jetbrains.annotations.NotNull;
+
 /**
  * Marker interface for key values.
  *
  * <p>Indicates that the plain value should be rendered in message template.
  *
- * <p>This marker interface is used internally, but you typically won't need to use it directly. You
- * can call `Field.Builder.value` to get a instance of a field with this.
+ * <p>This marker interface is used internally.
  */
-public interface ValueField extends Field {}
+public interface ValueField extends Field {
+
+  @NotNull
+  static ValueField create(@NotNull String name, @NotNull Field.Value<?> value) {
+    return new Internals.DefaultValueField(name, value);
+  }
+}

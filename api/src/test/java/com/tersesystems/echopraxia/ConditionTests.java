@@ -104,14 +104,14 @@ public class ConditionTests {
   @Test
   public void testAnyMatch() {
     Condition c = Condition.anyMatch(f -> f.name().equals("foo"));
-    Field field = Constants.builder().bool("foo", true);
+    Field field = FieldBuilder.instance().bool("foo", true);
     assertThat(c.test(Level.ERROR, FakeLoggingContext.single(field))).isTrue();
   }
 
   @Test
   public void testNoneMatch() {
     Condition c = Condition.noneMatch(f -> f.name().equals("foo"));
-    Field field = Constants.builder().bool("foo", true);
+    Field field = FieldBuilder.instance().bool("foo", true);
     assertThat(c.test(Level.ERROR, FakeLoggingContext.single(field))).isFalse();
   }
 
@@ -123,7 +123,7 @@ public class ConditionTests {
             v -> {
               return ((Boolean) v.raw());
             });
-    Field field = Constants.builder().bool("foo", true);
+    Field field = FieldBuilder.instance().bool("foo", true);
     assertThat(c.test(Level.ERROR, FakeLoggingContext.single(field))).isTrue();
   }
 }

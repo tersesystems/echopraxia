@@ -95,7 +95,7 @@ public interface Field {
         return "null";
       }
       final StringBuilder b = new StringBuilder(255);
-      Constants.ValueFormatter.formatToBuffer(b, this);
+      Internals.ValueFormatter.formatToBuffer(b, this);
       return b.toString();
     }
 
