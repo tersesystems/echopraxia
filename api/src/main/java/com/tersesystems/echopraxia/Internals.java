@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
 
-// Some package private constants
+/** Internals class, super not public. */
 class Internals {
 
   public static final String ECHOPRAXIA_UNKNOWN = "echopraxia-unknown-";
