@@ -20,13 +20,13 @@ public class ScriptingBenchmarks {
   private static final Path watchedDir = Paths.get("src/jmh/tweakflow");
 
   public static String buildScript() {
-    return "library echopraxia {\n" +
-      "  function evaluate: (string level, dict ctx) ->\n" +
-      "    let {\n" +
-      "      find_number: ctx[:find_number];\n" +
-      "    }\n" +
-      "    find_number(\"$.some_field\") == 1;\n" +
-      "}\n";
+    return "library echopraxia {\n"
+        + "  function evaluate: (string level, dict ctx) ->\n"
+        + "    let {\n"
+        + "      find_number: ctx[:find_number];\n"
+        + "    }\n"
+        + "    find_number(\"$.some_field\") == 1;\n"
+        + "}\n";
   }
 
   private static final Condition fileCondition =
@@ -43,9 +43,8 @@ public class ScriptingBenchmarks {
 
   private static final Condition watchedCondition = ScriptCondition.create(false, watchedScript);
 
-  private static final LoggingContext passContext = LogstashLoggingContext.create(
-    ValueField.create("some_field", Field.Value.number(1))
-  );
+  private static final LoggingContext passContext =
+      LogstashLoggingContext.create(ValueField.create("some_field", Field.Value.number(1)));
 
   private static final LoggingContext failContext = LogstashLoggingContext.empty();
 

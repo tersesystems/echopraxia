@@ -4,7 +4,6 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.support.AbstractLoggingContext;
 import com.tersesystems.echopraxia.support.Utilities;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -39,9 +38,9 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
   }
 
   public static LogstashLoggingContext create(Field field) {
-    return new LogstashLoggingContext(() -> Collections.singletonList(field), Collections::emptyList);
+    return new LogstashLoggingContext(
+        () -> Collections.singletonList(field), Collections::emptyList);
   }
-
 
   public static LogstashLoggingContext empty() {
     return EMPTY;
