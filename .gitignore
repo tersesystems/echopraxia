@@ -5,10 +5,11 @@
 build
 
 .idea/
+.bsp/
 
 bin/
 
 project/
-
+target/
 
 *.log
