@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.core.CoreLogger;
@@ -18,7 +18,7 @@ public class CoreLoggerBenchmarks {
   private static final CoreLogger logger =
       CoreLoggerFactory.getLogger(Logger.class.getName(), CoreLoggerBenchmarks.class.getName());
   private static final Exception exception = new RuntimeException();
-  private static final Field.Builder builder = Field.Builder.instance();
+  private static final FieldBuilder builder = FieldBuilder.instance();
 
   @Benchmark
   public void info() {

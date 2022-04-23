@@ -5,6 +5,7 @@ import static com.tersesystems.echopraxia.Level.ERROR;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public interface DefaultLoggerMethods<FB extends Field.Builder>
+public interface DefaultLoggerMethods<FB extends FieldBuilder>
     extends LoggerMethods<FB>, DefaultMethodsSupport<FB> {
 
   // ------------------------------------------------------------------------

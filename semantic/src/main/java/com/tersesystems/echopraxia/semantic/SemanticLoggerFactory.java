@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
@@ -42,7 +43,7 @@ public class SemanticLoggerFactory {
    * @param <FB> the field builder type.
    * @return an implementation of semantic logger.
    */
-  public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       Class<?> clazz,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -64,7 +65,7 @@ public class SemanticLoggerFactory {
    * @param <FB> the field builder type.
    * @return an implementation of semantic logger.
    */
-  public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -88,8 +89,8 @@ public class SemanticLoggerFactory {
       String name,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
-    return getLogger(name, dataTypeClass, messageFunction, f, Field.Builder.instance());
+      Function<DataType, Field.BuilderFunction<FieldBuilder>> f) {
+    return getLogger(name, dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
   /**
@@ -106,8 +107,8 @@ public class SemanticLoggerFactory {
       Class<?> clazz,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
-    return getLogger(clazz, dataTypeClass, messageFunction, f, Field.Builder.instance());
+      Function<DataType, Field.BuilderFunction<FieldBuilder>> f) {
+    return getLogger(clazz, dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
   /**
@@ -122,9 +123,9 @@ public class SemanticLoggerFactory {
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<Field.Builder>> f) {
+      Function<DataType, Field.BuilderFunction<FieldBuilder>> f) {
     return getLogger(
-        Caller.resolveClassName(), dataTypeClass, messageFunction, f, Field.Builder.instance());
+        Caller.resolveClassName(), dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
   /**
@@ -138,10 +139,10 @@ public class SemanticLoggerFactory {
    * @return an implementation of semantic logger.
    * @param <FB> the field builder type.
    */
-  public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<Field.Builder>> f,
+      Function<DataType, Field.BuilderFunction<FB>> f,
       FB builder) {
     return getLogger(Caller.resolveClassName(), dataTypeClass, messageFunction, f, builder);
   }
@@ -160,7 +161,7 @@ public class SemanticLoggerFactory {
    * @return an implementation of semantic logger.
    * @param <FB> the field builder type.
    */
-  public static <DataType, FB extends Field.Builder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       CoreLogger coreLogger,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -172,7 +173,7 @@ public class SemanticLoggerFactory {
   // The implementation uses a field builder type, but we can cheat and hide this by only
   // exposing the interface, on the basis that people will generally put up with so many
   // magic generic angle bracket type things.
-  public static class Impl<DataType, FB extends Field.Builder> implements SemanticLogger<DataType> {
+  public static class Impl<DataType, FB extends FieldBuilder> implements SemanticLogger<DataType> {
 
     private final CoreLogger core;
     private final Function<DataType, Field.BuilderFunction<FB>> builderFunction;

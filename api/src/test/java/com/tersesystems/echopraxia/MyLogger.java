@@ -28,7 +28,7 @@ public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>
   }
 }
 
-class MyFieldBuilder implements Field.Builder {}
+class MyFieldBuilder implements FieldBuilder {}
 
 class MyLoggerFactory {
 

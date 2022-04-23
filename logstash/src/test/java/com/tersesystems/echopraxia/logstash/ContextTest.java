@@ -39,7 +39,7 @@ public class ContextTest extends TestBase {
     final LogstashCoreLogger core =
         new LogstashCoreLogger(Logger.FQCN, loggerContext.getLogger(getClass().getName()));
     Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarkers(securityMarker), Field.Builder.instance());
+        LoggerFactory.getLogger(core.withMarkers(securityMarker), FieldBuilder.instance());
     logger.withFields(f -> f.onlyString("key", "value")).error("This has a marker");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -62,7 +62,7 @@ public class ContextTest extends TestBase {
     final LogstashCoreLogger core =
         new LogstashCoreLogger(Logger.FQCN, loggerContext.getLogger(getClass().getName()));
     final CoreLogger security = core.withMarkers(securityMarker);
-    Logger<?> logger = LoggerFactory.getLogger(security, Field.Builder.instance());
+    Logger<?> logger = LoggerFactory.getLogger(security, FieldBuilder.instance());
 
     final org.slf4j.Logger slf4jLogger = core.logger();
 

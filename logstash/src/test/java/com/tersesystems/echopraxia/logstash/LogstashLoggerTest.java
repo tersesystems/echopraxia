@@ -229,7 +229,7 @@ class LogstashLoggerTest extends TestBase {
     assertThat(throwableProxy).isNotNull();
   }
 
-  interface UUIDFieldBuilder extends Field.Builder {
+  interface UUIDFieldBuilder extends FieldBuilder {
     default Field uuid(String name, UUID uuid) {
       return string(name, uuid.toString());
     }
@@ -334,7 +334,7 @@ class LogstashLoggerTest extends TestBase {
     }
   }
 
-  public static class MyFieldBuilder implements Field.Builder {
+  public static class MyFieldBuilder implements FieldBuilder {
 
     public MyFieldBuilder() {}
 

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logger<FB>, FB>
+public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logger<FB>, FB>
     implements DefaultLoggerMethods<FB> {
 
   // This is where the logging methods are called, so the stacktrace element shows
@@ -33,7 +33,7 @@ public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logg
    * @return a new logger using the given field builder.
    */
   @NotNull
-  public <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
+  public <T extends FieldBuilder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
     return newLogger(newBuilder);
   }
 
@@ -45,7 +45,7 @@ public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logg
    * @return a new logger using the given field builder.
    */
   @NotNull
-  public <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull Class<T> newBuilderClass) {
+  public <T extends FieldBuilder> Logger<T> withFieldBuilder(@NotNull Class<T> newBuilderClass) {
     return newLogger(getNewInstance(newBuilderClass));
   }
 
@@ -63,7 +63,7 @@ public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logg
   }
 
   // This is not part of the AbstractLoggerSupport
-  protected <T extends Field.Builder> Logger<T> newLogger(T newBuilder) {
+  protected <T extends FieldBuilder> Logger<T> newLogger(T newBuilder) {
     if (this.fieldBuilder == newBuilder) {
       //noinspection unchecked
       return (Logger<T>) this;
@@ -86,7 +86,7 @@ public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logg
    *
    * @param <FB> the field builder type.
    */
-  public static class NeverLogger<FB extends Field.Builder> extends Logger<FB> {
+  public static class NeverLogger<FB extends FieldBuilder> extends Logger<FB> {
 
     protected NeverLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
       super(core, fieldBuilder);
@@ -102,7 +102,7 @@ public class Logger<FB extends Field.Builder> extends AbstractLoggerSupport<Logg
     }
 
     @Override
-    public @NotNull <T extends Field.Builder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
+    public @NotNull <T extends FieldBuilder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
       return new NeverLogger<T>(core, newBuilder);
     }
 

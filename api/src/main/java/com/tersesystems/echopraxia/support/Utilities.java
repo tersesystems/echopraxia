@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.support;
 
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ public final class Utilities {
   }
 
   @NotNull
-  public static <FB extends Field.Builder>
+  public static <FB extends FieldBuilder>
       Function<Supplier<Map<String, String>>, Supplier<List<Field>>> getThreadContextFunction(
           @NotNull FB fieldBuilder) {
     return mapSupplier ->
