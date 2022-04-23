@@ -20,11 +20,12 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractLoggerSupport<
         SELF extends AbstractLoggerSupport<SELF, FB>, FB extends FieldBuilder>
     implements DefaultMethodsSupport<FB> {
+  private static final Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
+    threadContextFunction = buildThreadContextFunction();
+
   protected final CoreLogger core;
   protected final FB fieldBuilder;
   private final SELF myself;
-  protected final Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
-      threadContextFunction;
 
   @SuppressWarnings("unchecked")
   protected AbstractLoggerSupport(
@@ -32,7 +33,6 @@ public abstract class AbstractLoggerSupport<
     myself = (SELF) selfType.cast(this);
     this.core = core;
     this.fieldBuilder = fieldBuilder;
-    this.threadContextFunction = buildThreadContextFunction();
   }
 
   @Override
@@ -74,14 +74,14 @@ public abstract class AbstractLoggerSupport<
   }
 
   @NotNull
-  protected Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
+  private static Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
       buildThreadContextFunction() {
     return Utilities.getThreadContextFunction(
         contextMap -> {
           List<Field> list = new ArrayList<>();
           for (Map.Entry<String, String> e : contextMap.entrySet()) {
-            Field string = fieldBuilder.string(e.getKey(), e.getValue());
-            list.add(string);
+            Field field = FieldBuilder.instance().string(e.getKey(), e.getValue());
+            list.add(field);
           }
           return list;
         });
