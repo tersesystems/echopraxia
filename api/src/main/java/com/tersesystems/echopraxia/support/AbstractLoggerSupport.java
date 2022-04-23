@@ -21,7 +21,7 @@ public abstract class AbstractLoggerSupport<
         SELF extends AbstractLoggerSupport<SELF, FB>, FB extends FieldBuilder>
     implements DefaultMethodsSupport<FB> {
   private static final Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
-    threadContextFunction = buildThreadContextFunction();
+      threadContextFunction = buildThreadContextFunction();
 
   protected final CoreLogger core;
   protected final FB fieldBuilder;
