@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.support.Utilities.getThreadContextFunc
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import org.jetbrains.annotations.NotNull;
 
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <FB> the field builder.
  */
 public abstract class AbstractLoggerSupport<
-        SELF extends AbstractLoggerSupport<SELF, FB>, FB extends Field.Builder>
+        SELF extends AbstractLoggerSupport<SELF, FB>, FB extends FieldBuilder>
     implements DefaultMethodsSupport<FB> {
   protected final CoreLogger core;
   protected final FB fieldBuilder;

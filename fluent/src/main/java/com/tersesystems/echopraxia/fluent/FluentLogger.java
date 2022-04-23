@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public class FluentLogger<FB extends Field.Builder> {
+public class FluentLogger<FB extends FieldBuilder> {
 
   private final CoreLogger core;
   private final FB builder;
@@ -56,12 +57,12 @@ public class FluentLogger<FB extends Field.Builder> {
   }
 
   @NotNull
-  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(@NotNull T newBuilder) {
+  public <T extends FieldBuilder> FluentLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     return new FluentLogger<>(core, newBuilder);
   }
 
   @NotNull
-  public <T extends Field.Builder> FluentLogger<T> withFieldBuilder(
+  public <T extends FieldBuilder> FluentLogger<T> withFieldBuilder(
       @NotNull Class<T> newBuilderClass) {
     try {
       final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();

@@ -122,7 +122,7 @@ public class Log4JLoggerTest extends TestBase {
   public void testLoggerLocationWithAsyncLogger() {
     // note you must have includeLocation="true" in log4j2.xml to trigger the
     // throwable / stacktrace in the core logger...
-    AsyncLogger<?> asyncLogger = AsyncLoggerFactory.getLogger(getClass(), Field.Builder.instance());
+    AsyncLogger<?> asyncLogger = AsyncLoggerFactory.getLogger(getClass(), FieldBuilder.instance());
     asyncLogger.info("Boring Message");
 
     waitUntilMessages();

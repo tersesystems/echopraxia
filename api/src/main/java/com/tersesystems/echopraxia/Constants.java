@@ -13,14 +13,14 @@ class Constants {
 
   public static final LongAdder unknownFieldAdder = new LongAdder();
 
-  private static final Field.Builder builderInstance = new Field.Builder() {};
+  private static final FieldBuilder builderInstance = new FieldBuilder() {};
 
   // Cut down on allocation pressure by reusing stringbuilder
   private static final ThreadLocal<StringBuilder> threadLocalStringBuilder = new ThreadLocal<>();
 
   private Constants() {}
 
-  static Field.Builder builder() {
+  static FieldBuilder builder() {
     return builderInstance;
   }
 

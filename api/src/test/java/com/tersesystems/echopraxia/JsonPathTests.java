@@ -129,7 +129,7 @@ public class JsonPathTests {
 
   @Test
   public void testExceptionMessage() {
-    final Field.Builder fb = Field.Builder.instance();
+    final FieldBuilder fb = FieldBuilder.instance();
     LoggingContext context =
         FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
 
@@ -140,7 +140,7 @@ public class JsonPathTests {
 
   @Test
   public void testExceptionCauseMessage() {
-    final Field.Builder fb = Field.Builder.instance();
+    final FieldBuilder fb = FieldBuilder.instance();
     final RuntimeException cause = new RuntimeException("some other message");
     LoggingContext context =
         FakeLoggingContext.single(fb.exception(new RuntimeException("some message", cause)));
@@ -152,7 +152,7 @@ public class JsonPathTests {
 
   @Test
   public void testExceptionStackTrace() {
-    final Field.Builder fb = Field.Builder.instance();
+    final FieldBuilder fb = FieldBuilder.instance();
     LoggingContext context =
         FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
 
@@ -215,7 +215,7 @@ public class JsonPathTests {
     }
   }
 
-  public static class PersonBuilder implements Field.Builder {
+  public static class PersonBuilder implements FieldBuilder {
 
     public PersonBuilder() {}
 

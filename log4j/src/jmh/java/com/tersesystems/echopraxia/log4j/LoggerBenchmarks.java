@@ -1,10 +1,7 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.Level;
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -25,7 +22,7 @@ public class LoggerBenchmarks {
   private static final com.tersesystems.echopraxia.Logger<?> conditionLogger =
       logger.withCondition((level, context) -> level.equals(Level.ERROR));
   private static final com.tersesystems.echopraxia.Logger<?> fieldBuilderLogger =
-      logger.withFieldBuilder(Field.Builder.instance());
+      logger.withFieldBuilder(FieldBuilder.instance());
   private static final Logger<?> contextLogger =
       logger.withFields(fb -> fb.onlyString("foo", "bar"));
 

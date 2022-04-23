@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
@@ -17,7 +17,7 @@ public class CoreLoggerBenchmarks {
   private static final CoreLogger logger =
       CoreLoggerFactory.getLogger(CoreLoggerBenchmarks.class.getName(), CoreLoggerBenchmarks.class);
   private static final Exception exception = new RuntimeException();
-  private static final Field.Builder builder = Field.Builder.instance();
+  private static final FieldBuilder builder = FieldBuilder.instance();
 
   private static final CoreLogger contextLogger =
       logger.withFields(fb -> fb.onlyString("foo", "bar"), builder);

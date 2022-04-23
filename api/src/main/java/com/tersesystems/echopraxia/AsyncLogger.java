@@ -22,8 +22,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public class AsyncLogger<FB extends Field.Builder>
-    extends AbstractLoggerSupport<AsyncLogger<FB>, FB> implements DefaultAsyncLoggerMethods<FB> {
+public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<AsyncLogger<FB>, FB>
+    implements DefaultAsyncLoggerMethods<FB> {
 
   public static final String FQCN = DefaultAsyncLoggerMethods.class.getName();
 
@@ -39,7 +39,7 @@ public class AsyncLogger<FB extends Field.Builder>
    * @return a new logger using the given field builder.
    */
   @NotNull
-  public <T extends Field.Builder> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
+  public <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     return newLogger(newBuilder);
   }
 
@@ -51,7 +51,7 @@ public class AsyncLogger<FB extends Field.Builder>
    * @return a new logger using the given field builder.
    */
   @NotNull
-  public <T extends Field.Builder> AsyncLogger<T> withFieldBuilder(
+  public <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(
       @NotNull Class<T> newBuilderClass) {
     return newLogger(getNewInstance(newBuilderClass));
   }
@@ -95,7 +95,7 @@ public class AsyncLogger<FB extends Field.Builder>
   }
 
   @NotNull
-  protected <T extends Field.Builder> AsyncLogger<T> newLogger(@NotNull T fieldBuilder) {
+  protected <T extends FieldBuilder> AsyncLogger<T> newLogger(@NotNull T fieldBuilder) {
     if (this.fieldBuilder == fieldBuilder) {
       //noinspection unchecked
       return (AsyncLogger<T>) this;
@@ -110,7 +110,7 @@ public class AsyncLogger<FB extends Field.Builder>
   }
 
   // This must extend AsyncLogger so the return type is the same
-  private static class NeverAsyncLogger<FB extends Field.Builder> extends AsyncLogger<FB> {
+  private static class NeverAsyncLogger<FB extends FieldBuilder> extends AsyncLogger<FB> {
 
     protected NeverAsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
       super(core, fieldBuilder);
@@ -126,7 +126,7 @@ public class AsyncLogger<FB extends Field.Builder>
     }
 
     @Override
-    public @NotNull <T extends Field.Builder> AsyncLogger<T> withFieldBuilder(
+    public @NotNull <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(
         @NotNull T newBuilder) {
       return new NeverAsyncLogger<T>(core, newBuilder);
     }

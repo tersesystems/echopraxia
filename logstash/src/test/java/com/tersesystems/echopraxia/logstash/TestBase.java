@@ -43,11 +43,11 @@ public class TestBase {
   }
 
   Logger<?> getLogger() {
-    return LoggerFactory.getLogger(getCoreLogger(), Field.Builder.instance());
+    return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 
   AsyncLogger<?> getAsyncLogger() {
-    return AsyncLoggerFactory.getLogger(getCoreLogger(), Field.Builder.instance());
+    return AsyncLoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 
   ListAppender<ILoggingEvent> getListAppender() {

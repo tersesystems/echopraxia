@@ -4,6 +4,7 @@ import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
@@ -22,7 +23,7 @@ public class ContextTest extends TestBase {
     Log4JCoreLogger core =
         (Log4JCoreLogger) CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
     Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarker(securityMarker), Field.Builder.instance());
+        LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
     logger.error("Message {}", fb -> fb.onlyString("field_name", "field_value"));
 
     JsonObject entry = getEntry();
@@ -41,7 +42,7 @@ public class ContextTest extends TestBase {
     Log4JCoreLogger core =
         (Log4JCoreLogger) CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
     Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarker(securityMarker), Field.Builder.instance());
+        LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
 
     org.apache.logging.log4j.Logger log4jLogger = core.logger();
 
