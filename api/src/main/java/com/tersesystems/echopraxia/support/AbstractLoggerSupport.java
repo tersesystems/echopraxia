@@ -1,11 +1,14 @@
 package com.tersesystems.echopraxia.support;
 
-import static com.tersesystems.echopraxia.support.Utilities.getThreadContextFunction;
-
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.core.CoreLogger;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -20,6 +23,8 @@ public abstract class AbstractLoggerSupport<
   protected final CoreLogger core;
   protected final FB fieldBuilder;
   private final SELF myself;
+  protected final Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
+      threadContextFunction;
 
   @SuppressWarnings("unchecked")
   protected AbstractLoggerSupport(
@@ -27,6 +32,7 @@ public abstract class AbstractLoggerSupport<
     myself = (SELF) selfType.cast(this);
     this.core = core;
     this.fieldBuilder = fieldBuilder;
+    this.threadContextFunction = buildThreadContextFunction();
   }
 
   @Override
@@ -64,7 +70,21 @@ public abstract class AbstractLoggerSupport<
 
   @NotNull
   public SELF withThreadContext() {
-    return newLogger(core().withThreadContext(getThreadContextFunction(fieldBuilder)));
+    return newLogger(core().withThreadContext(threadContextFunction));
+  }
+
+  @NotNull
+  protected Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
+      buildThreadContextFunction() {
+    return Utilities.getThreadContextFunction(
+        contextMap -> {
+          List<Field> list = new ArrayList<>();
+          for (Map.Entry<String, String> e : contextMap.entrySet()) {
+            Field string = fieldBuilder.string(e.getKey(), e.getValue());
+            list.add(string);
+          }
+          return list;
+        });
   }
 
   /**
