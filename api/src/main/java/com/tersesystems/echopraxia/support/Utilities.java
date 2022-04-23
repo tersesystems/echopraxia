@@ -1,9 +1,7 @@
 package com.tersesystems.echopraxia.support;
 
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -27,18 +25,9 @@ public final class Utilities {
   }
 
   @NotNull
-  public static <FB extends FieldBuilder>
-      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> getThreadContextFunction(
-          @NotNull FB fieldBuilder) {
-    return mapSupplier ->
-        () -> {
-          List<Field> list = new ArrayList<>();
-          for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
-            Field string = fieldBuilder.string(e.getKey(), e.getValue());
-            list.add(string);
-          }
-          return list;
-        };
+  public static Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
+      getThreadContextFunction(@NotNull Function<Map<String, String>, List<Field>> f) {
+    return mapSupplier -> () -> f.apply(mapSupplier.get());
   }
 
   public static <T> Supplier<T> memoize(Supplier<T> supplier) {
