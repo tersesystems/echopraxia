@@ -200,7 +200,7 @@ So far so good. But logging strings and numbers can get tedious.  Let's go into 
 Echopraxia lets you specify custom field builders whenever you want to log domain objects:
 
 ```java
-public class BuilderWithDate implements Field.Builder {
+public class BuilderWithDate implements FieldBuilder {
   public BuilderWithDate() {}
 
   // Renders a date as an ISO 8601 string.
@@ -230,7 +230,7 @@ dateLogger.info("Date {}", fb -> fb.onlyDate("creation_date", new Date()));
 This also applies to more complex objects.  In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
 
 ```java
-public class PersonFieldBuilder implements Field.Builder {
+public class PersonFieldBuilder implements FieldBuilder {
 
   // Renders a `Person` as an object field.
   public Field person(String fieldName, Person p) {
@@ -340,7 +340,7 @@ logger.info("Best person: {}", abe);
 By default, values are `@NotNull`, and passing in `null` to values is not recommended.  If you want to handle nulls, you can extend the field builder as necessary:
 
 ```java
-public interface NullableFieldBuilder extends Field.Builder {
+public interface NullableFieldBuilder extends FieldBuilder {
   // extend as necessary
   default Field nullableString(String name, String nullableString) {
     Value<?> nullableValue = (value == null) ? Value.nullValue() : Value.string(nullableString);
