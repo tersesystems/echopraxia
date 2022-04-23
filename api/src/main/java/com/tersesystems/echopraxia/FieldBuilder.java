@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 public interface FieldBuilder extends Field.Builder {
 
   static @NotNull FieldBuilder instance() {
-    return Constants.builder();
+    return FieldBuilderInstance.getInstance();
   }
 
   /**
@@ -50,8 +50,8 @@ public interface FieldBuilder extends Field.Builder {
    * @return the field.
    */
   @NotNull
-  default Field value(@NotNull String name, @NotNull Field.Value<?> value) {
-    return new Constants.DefaultValueField(name, value);
+  default ValueField value(@NotNull String name, @NotNull Field.Value<?> value) {
+    return ValueField.create(name, value);
   }
 
   /**
@@ -64,8 +64,8 @@ public interface FieldBuilder extends Field.Builder {
    * @return the field.
    */
   @NotNull
-  default Field keyValue(@NotNull String name, @NotNull Field.Value<?> value) {
-    return new Constants.DefaultKeyValueField(name, value);
+  default KeyValueField keyValue(@NotNull String name, @NotNull Field.Value<?> value) {
+    return KeyValueField.create(name, value);
   }
 
   // ---------------------------------------------------------
@@ -536,5 +536,14 @@ public interface FieldBuilder extends Field.Builder {
   @NotNull
   default List<Field> onlyNullField(@NotNull String name) {
     return only(nullField(name));
+  }
+}
+
+// internal class so interface doesn't have to expose it
+class FieldBuilderInstance {
+  private static final FieldBuilder instance = new FieldBuilder() {};
+
+  static FieldBuilder getInstance() {
+    return instance;
   }
 }

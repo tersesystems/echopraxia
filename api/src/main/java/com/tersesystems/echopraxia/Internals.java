@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
 
 // Some package private constants
-class Constants {
+class Internals {
 
   public static final String ECHOPRAXIA_UNKNOWN = "echopraxia-unknown-";
 
@@ -13,16 +13,10 @@ class Constants {
 
   public static final LongAdder unknownFieldAdder = new LongAdder();
 
-  private static final FieldBuilder builderInstance = new FieldBuilder() {};
-
   // Cut down on allocation pressure by reusing stringbuilder
   private static final ThreadLocal<StringBuilder> threadLocalStringBuilder = new ThreadLocal<>();
 
-  private Constants() {}
-
-  static FieldBuilder builder() {
-    return builderInstance;
-  }
+  private Internals() {}
 
   // keep this package private for now
   interface FormatToBuffer {
@@ -34,7 +28,7 @@ class Constants {
     private final String name;
     private final Value<?> value;
 
-    public DefaultValueField(String name, Value<?> value) {
+    DefaultValueField(String name, Value<?> value) {
       this.name = requireName(name);
       this.value = requireValue(value);
     }
@@ -66,7 +60,7 @@ class Constants {
     private final String name;
     private final Value<?> value;
 
-    public DefaultKeyValueField(String name, Value<?> value) {
+    DefaultKeyValueField(String name, Value<?> value) {
       this.name = requireName(name);
       this.value = requireValue(value);
     }
