@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static com.jayway.jsonpath.Criteria.where;
 import static com.jayway.jsonpath.Filter.*;
 import static com.tersesystems.echopraxia.Field.Value;
+import static com.tersesystems.echopraxia.Field.Value.*;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,13 +11,11 @@ import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.jayway.jsonpath.Filter;
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -116,10 +114,10 @@ public class ContextTest extends TestBase {
     logger
         .withFields(
             fb -> {
-              Value.ArrayValue a4 = Value.array(true, false, true);
-              Value.ArrayValue a3 = Value.array("1", "2", "3");
-              Value.ArrayValue a2 = Value.array(1, 2, 3);
-              Field field = fb.array("a1", Value.array(a2, a3, a4));
+              Value.ArrayValue a4 = array(true, false, true);
+              Value.ArrayValue a3 = array("1", "2", "3");
+              Value.ArrayValue a2 = array(1, 2, 3);
+              Field field = fb.array("a1", array(a2, a3, a4));
               return singletonList(field);
             })
         .error("This has a marker");
@@ -277,38 +275,48 @@ public class ContextTest extends TestBase {
   }
 
   @Test
-  void testJsonPathFilter() {
-    Logger<?> logger = getLogger();
-    final Condition cheapBookCondition =
-        (level, context) -> {
-          Filter cheapFictionFilter = filter(where("category").is("fiction").and("price").lte(10D));
-          List<Map<String, ?>> books = context.findList("$.store.book[?]", cheapFictionFilter);
-          return books.size() > 0;
-        };
-
-    logger.info(
-        cheapBookCondition,
-        "found cheap books",
-        fb -> {
-          Field category = fb.string("category", "fiction");
-          Field price = fb.number("price", 5);
-          Field book = fb.object("book", category, price);
-          return fb.onlyObject("store", book);
-        });
-
-    final ListAppender<ILoggingEvent> listAppender = getListAppender();
-    final ILoggingEvent event = listAppender.list.get(0);
-    final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("found cheap books");
-  }
-
-  @Test
   void testJsonPathMissingProperty() {
     Logger<?> logger = getLogger();
     final Condition noFindException =
         (level, ctx) -> ctx.findString("$.exception.message").isPresent();
 
     logger.info(noFindException, "no exception in this message");
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void testMismatchedString() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException = (level, ctx) -> ctx.findString("$.notastring").isPresent();
+
+    // property is present but is boolean, not a string
+    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notastring", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void testMismatchedObject() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException = (level, ctx) -> ctx.findObject("$.notanobject").isPresent();
+
+    // property is present but is boolean, not a string
+    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notanobject", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void testMismatchedList() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException = (level, ctx) -> ctx.findList("$.notalist").size() > 0;
+
+    // property is present but is boolean, not a string
+    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notalist", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
@@ -332,6 +340,19 @@ public class ContextTest extends TestBase {
   }
 
   @Test
+  void testNullMessageInException() {
+    Logger<?> logger = getLogger();
+    Condition c = (level, ctx) -> ctx.findNull("$.exception.message");
+    RuntimeException e = new IllegalArgumentException((String) null);
+    logger.info(c, "Matches on null message in exception", e);
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on null message in exception");
+  }
+
+  @Test
   void testNullInNestedArray() {
     Logger<?> logger = getLogger();
     Condition c = (level, ctx) -> ctx.findList("$..interests").size() > 0;
@@ -344,6 +365,27 @@ public class ContextTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("Can manage null in array");
+  }
+
+  @Test
+  void testObjectArrayObject() {
+    Logger<?> logger = getLogger();
+    Condition c = (level, ctx) -> ctx.findBoolean("$.foo.array[2].one").get();
+    logger.info(
+        c,
+        "complex objects",
+        fb -> {
+          Value.ObjectValue objectValue =
+              object(fb.bool("one", true), fb.string("two", "t"), fb.number("three", 3));
+          final Value.ArrayValue arrayValue =
+              array(string("interests"), string("foo"), objectValue);
+          return fb.onlyObject("foo", fb.onlyArray("array", arrayValue));
+        });
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("complex objects");
   }
 
   private void testMarker(Marker marker, String key, Object value) {
