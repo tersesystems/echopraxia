@@ -33,6 +33,15 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     this.markersSupplier = m;
   }
 
+  public static LogstashLoggingContext create(List<Field> fields) {
+    return new LogstashLoggingContext(() -> fields, Collections::emptyList);
+  }
+
+  public static LogstashLoggingContext create(Field field) {
+    return new LogstashLoggingContext(
+        () -> Collections.singletonList(field), Collections::emptyList);
+  }
+
   public static LogstashLoggingContext empty() {
     return EMPTY;
   }
