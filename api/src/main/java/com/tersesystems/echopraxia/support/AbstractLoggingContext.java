@@ -6,7 +6,9 @@ import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import com.tersesystems.echopraxia.EchopraxiaJsonProvider;
 import com.tersesystems.echopraxia.EchopraxiaMappingProvider;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.Field.Value.*;
 import com.tersesystems.echopraxia.LoggingContext;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -16,37 +18,57 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractLoggingContext implements LoggingContext {
 
   private static final JsonProvider jsonProvider = new EchopraxiaJsonProvider();
-  private static final MappingProvider mappingProvider = new EchopraxiaMappingProvider();
+  private static final MappingProvider javaMappingProvider = new EchopraxiaMappingProvider();
 
   private static final Configuration configuration =
       Configuration.builder()
           .jsonProvider(jsonProvider)
-          .mappingProvider(mappingProvider)
           .options(Option.DEFAULT_PATH_LEAF_TO_NULL)
           .options(Option.SUPPRESS_EXCEPTIONS)
+          .mappingProvider(javaMappingProvider)
           .build();
 
   private final Supplier<DocumentContext> supplier =
       new Utilities.MemoizingSupplier<>(() -> JsonPath.parse(this, configuration));
 
   @Override
-  public @NotNull Optional<String> findString(@NotNull String jsonPath) {
-    final String s = getDocumentContext().read(jsonPath, String.class);
-    return Optional.ofNullable(s);
+  public @NotNull <T extends Field.Value<?>> Optional<T> findValue(
+      @NotNull String jsonPath, @NotNull Class<T> valueClass, Predicate... predicates) {
+    final Field.Value<?> s = getDocumentContext().read(jsonPath, Field.Value.class, predicates);
+    if (valueClass.isInstance(s)) {
+      return Optional.of(valueClass.cast(s));
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  public @NotNull <T extends Field.Value<?>> Optional<T> findValue(
+      @NotNull String jsonPath, @NotNull Class<T> valueClass) {
+    final Field.Value<?> s = getDocumentContext().read(jsonPath, Field.Value.class);
+    if (valueClass.isInstance(s)) {
+      return Optional.of(valueClass.cast(s));
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  @Override
+  @NotNull
+  public Optional<String> findString(@NotNull String jsonPath) {
+    return findValue(jsonPath, StringValue.class).map(StringValue::raw);
   }
 
   @Override
   @NotNull
   public Optional<Boolean> findBoolean(@NotNull String jsonPath) {
-    final Boolean b = getDocumentContext().read(jsonPath, Boolean.class);
-    return Optional.ofNullable(b);
+    return findValue(jsonPath, BooleanValue.class).map(BooleanValue::raw);
   }
 
   @Override
   @NotNull
   public Optional<Number> findNumber(@NotNull String jsonPath) {
-    final Number n = getDocumentContext().read(jsonPath, Number.class);
-    return Optional.ofNullable(n);
+    return findValue(jsonPath, NumberValue.class).map(NumberValue::raw);
   }
 
   public boolean findNull(@NotNull String jsonPath) {
@@ -57,12 +79,7 @@ public abstract class AbstractLoggingContext implements LoggingContext {
   @Override
   @NotNull
   public Optional<Throwable> findThrowable(@NotNull String jsonPath) {
-    try {
-      final Throwable t = getDocumentContext().read(jsonPath, Throwable.class);
-      return Optional.ofNullable(t);
-    } catch (PathNotFoundException pe) {
-      return Optional.empty();
-    }
+    return findValue(jsonPath, ExceptionValue.class).map(ExceptionValue::raw);
   }
 
   @Override
@@ -76,25 +93,34 @@ public abstract class AbstractLoggingContext implements LoggingContext {
   @Override
   @NotNull
   public <T> Optional<Map<String, T>> findObject(@NotNull String jsonPath) {
-    return Optional.ofNullable(getDocumentContext().read(jsonPath, Map.class));
+    Optional<ObjectValue> objectValue = findValue(jsonPath, ObjectValue.class);
+    return objectValue.map(obj -> javaMappingProvider.map(obj, Map.class, configuration));
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> @NotNull Optional<Map<String, T>> findObject(
       @NotNull String jsonPath, Predicate... predicates) {
+    // XXX fix this
     return Optional.ofNullable(getDocumentContext().read(jsonPath, Map.class, predicates));
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> @NotNull List<T> findList(@NotNull String jsonPath) {
-    return (List<T>) getDocumentContext().read(jsonPath, List.class);
+    Optional<ArrayValue> arrayValue = findValue(jsonPath, Field.Value.ArrayValue.class);
+    if (arrayValue.isPresent()) {
+      @NotNull List<Field.Value<?>> list = arrayValue.get().raw();
+      return javaMappingProvider.map(list, List.class, configuration);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public <T> @NotNull List<T> findList(@NotNull String jsonPath, Predicate... predicates) {
+    // XXX fix this
     return (List<T>) getDocumentContext().read(jsonPath, List.class, predicates);
   }
 

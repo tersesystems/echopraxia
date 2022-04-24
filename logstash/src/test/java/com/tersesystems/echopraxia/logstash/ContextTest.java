@@ -315,6 +315,42 @@ public class ContextTest extends TestBase {
   }
 
   @Test
+  void testMismatchedString() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException = (level, ctx) -> ctx.findString("$.notastring").isPresent();
+
+    // property is present but is boolean, not a string
+    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notastring", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void testMismatchedObject() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException = (level, ctx) -> ctx.findObject("$.notanobject").isPresent();
+
+    // property is present but is boolean, not a string
+    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notanobject", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
+  void testMismatchedList() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException = (level, ctx) -> ctx.findList("$.notalist").size() > 0;
+
+    // property is present but is boolean, not a string
+    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notalist", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list).isEmpty();
+  }
+
+  @Test
   void testFindException() {
     Logger<?> logger = getLogger();
     Condition c =

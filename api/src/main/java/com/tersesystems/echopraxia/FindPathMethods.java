@@ -9,6 +9,14 @@ import org.jetbrains.annotations.NotNull;
 /** Methods for finding values and fields using JSON path syntax. */
 public interface FindPathMethods {
 
+  @NotNull
+  <T extends Field.Value<?>> Optional<T> findValue(
+      @NotNull String jsonPath, @NotNull Class<T> valueClass, Predicate... predicates);
+
+  @NotNull
+  <T extends Field.Value<?>> Optional<T> findValue(
+      @NotNull String jsonPath, @NotNull Class<T> valueClass);
+
   /**
    * Finds a string value from the JSON path.
    *
