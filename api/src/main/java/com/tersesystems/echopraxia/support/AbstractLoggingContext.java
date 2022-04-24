@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractLoggingContext implements LoggingContext {
+  private static final String EXCEPTION_PATH = "$." + Field.Builder.EXCEPTION;
 
   private static final JsonProvider jsonProvider = new EchopraxiaJsonProvider();
   private static final MappingProvider javaMappingProvider = new EchopraxiaMappingProvider();
@@ -31,97 +32,82 @@ public abstract class AbstractLoggingContext implements LoggingContext {
   private final Supplier<DocumentContext> supplier =
       new Utilities.MemoizingSupplier<>(() -> JsonPath.parse(this, configuration));
 
-  @Override
-  public @NotNull <T extends Field.Value<?>> Optional<T> findValue(
-      @NotNull String jsonPath, @NotNull Class<T> valueClass, Predicate... predicates) {
-    final Field.Value<?> s = getDocumentContext().read(jsonPath, Field.Value.class, predicates);
-    if (valueClass.isInstance(s)) {
-      return Optional.of(valueClass.cast(s));
-    } else {
-      return Optional.empty();
-    }
-  }
+  private @NotNull <T> Optional<T> optionalFind(
+      @NotNull String jsonPath, @NotNull Class<T> desiredClass) {
+    final Object o = getDocumentContext().read(jsonPath);
 
-  @Override
-  public @NotNull <T extends Field.Value<?>> Optional<T> findValue(
-      @NotNull String jsonPath, @NotNull Class<T> valueClass) {
-    final Field.Value<?> s = getDocumentContext().read(jsonPath, Field.Value.class);
-    if (valueClass.isInstance(s)) {
-      return Optional.of(valueClass.cast(s));
-    } else {
-      return Optional.empty();
+    // We asked for Foo, and it was Foo.  Return Foo.
+    if (desiredClass.isInstance(o)) {
+      return Optional.of(desiredClass.cast(o));
     }
+
+    // Well, it's not that value.  Let's try mapping it.
+    final T convertedObject = javaMappingProvider.map(o, desiredClass, configuration);
+    if (desiredClass.isInstance(convertedObject)) {
+      return Optional.of(convertedObject);
+    }
+
+    // Still nope.
+    return Optional.empty();
   }
 
   @Override
   @NotNull
   public Optional<String> findString(@NotNull String jsonPath) {
-    return findValue(jsonPath, StringValue.class).map(StringValue::raw);
+    // Not all strings are mapped string values.
+    // $.exception.message is a string but was never a string value,
+    return optionalFind(jsonPath, String.class);
   }
 
   @Override
   @NotNull
   public Optional<Boolean> findBoolean(@NotNull String jsonPath) {
-    return findValue(jsonPath, BooleanValue.class).map(BooleanValue::raw);
+    return optionalFind(jsonPath, Boolean.class);
   }
 
   @Override
   @NotNull
   public Optional<Number> findNumber(@NotNull String jsonPath) {
-    return findValue(jsonPath, NumberValue.class).map(NumberValue::raw);
+    return optionalFind(jsonPath, Number.class);
   }
 
   public boolean findNull(@NotNull String jsonPath) {
+    // $.exception.message where message == null is also a null
+    // but was never a null value.
     Object o = getDocumentContext().read(jsonPath);
-    return o instanceof Field.Value.NullValue;
+    return o == null || o instanceof Field.Value.NullValue;
   }
 
   @Override
   @NotNull
   public Optional<Throwable> findThrowable(@NotNull String jsonPath) {
-    return findValue(jsonPath, ExceptionValue.class).map(ExceptionValue::raw);
+    // Pretty sure exceptions are always exception values.
+    return optionalFind(jsonPath, ExceptionValue.class).map(ExceptionValue::raw);
   }
 
   @Override
   @NotNull
   public Optional<Throwable> findThrowable() {
-    String jsonPath = "$." + Field.Builder.EXCEPTION;
-    return findThrowable(jsonPath);
+    return findThrowable(EXCEPTION_PATH);
   }
 
   @SuppressWarnings("unchecked")
   @Override
   @NotNull
-  public <T> Optional<Map<String, T>> findObject(@NotNull String jsonPath) {
-    Optional<ObjectValue> objectValue = findValue(jsonPath, ObjectValue.class);
-    return objectValue.map(obj -> javaMappingProvider.map(obj, Map.class, configuration));
+  public Optional<Map<String, ?>> findObject(@NotNull String jsonPath) {
+    return optionalFind(jsonPath, Map.class).map(f -> (Map<String, ?>) f);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T> @NotNull Optional<Map<String, T>> findObject(
-      @NotNull String jsonPath, Predicate... predicates) {
-    // XXX fix this
-    return Optional.ofNullable(getDocumentContext().read(jsonPath, Map.class, predicates));
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> @NotNull List<T> findList(@NotNull String jsonPath) {
-    Optional<ArrayValue> arrayValue = findValue(jsonPath, Field.Value.ArrayValue.class);
-    if (arrayValue.isPresent()) {
-      @NotNull List<Field.Value<?>> list = arrayValue.get().raw();
-      return javaMappingProvider.map(list, List.class, configuration);
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public <T> @NotNull List<T> findList(@NotNull String jsonPath, Predicate... predicates) {
-    // XXX fix this
-    return (List<T>) getDocumentContext().read(jsonPath, List.class, predicates);
+  public @NotNull List<?> findList(@NotNull String jsonPath) {
+    // finding a list has two different meanings in JSONPath
+    // The first one is that you asked for a JSON array and it gives you
+    // a json array.  Simple.
+    // The second is when JSONPath does a deep scan or some kind of query
+    // of the JSON document and returns matches.  This could have pretty
+    // much anything in it.
+    return (List<?>) optionalFind(jsonPath, List.class).orElse(Collections.emptyList());
   }
 
   private DocumentContext getDocumentContext() {

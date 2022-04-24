@@ -563,34 +563,6 @@ class FindException {
 }
 ```
 
-And you can also use [filter predicates](https://github.com/json-path/JsonPath#filter-predicates) using the `?` placeholder:
-
-```java
-import static com.jayway.jsonpath.Criteria.where;
-import static com.jayway.jsonpath.Filter.*;
-
-class FindWithFilterPredicates {
-  void logWithPredicate() {
-    Condition cheapBookCondition =
-      (level, context) -> {
-        Filter cheapFictionFilter = filter(where("category").is("fiction").and("price").lte(10D));
-        List<Map<String, ?>> books = context.findList("$.store.book[?]", cheapFictionFilter);
-        return books.size() > 0;
-      };
-
-    logger.info(
-      cheapBookCondition,
-      "found cheap books",
-      fb -> {
-        Field category = fb.string("category", "fiction");
-        Field price = fb.number("price", 5);
-        Field book = fb.object("book", category, price);
-        return fb.onlyObject("store", book);
-      });
-  }
-}
-```
-
 There are many more options available using JSONPath.  You can try out the [online evaluator](https://jsonpath.herokuapp.com/) to test out expressions.
 
 ### Logger

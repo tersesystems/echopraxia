@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia;
 
-import com.jayway.jsonpath.Predicate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -8,14 +7,6 @@ import org.jetbrains.annotations.NotNull;
 
 /** Methods for finding values and fields using JSON path syntax. */
 public interface FindPathMethods {
-
-  @NotNull
-  <T extends Field.Value<?>> Optional<T> findValue(
-      @NotNull String jsonPath, @NotNull Class<T> valueClass, Predicate... predicates);
-
-  @NotNull
-  <T extends Field.Value<?>> Optional<T> findValue(
-      @NotNull String jsonPath, @NotNull Class<T> valueClass);
 
   /**
    * Finds a string value from the JSON path.
@@ -74,40 +65,16 @@ public interface FindPathMethods {
    *
    * @param jsonPath a JSON path to evaluate.
    * @return optional map if found, empty() otherwise.
-   * @param <T> the type of value in the map.
    */
   @NotNull
-  <T> Optional<Map<String, T>> findObject(@NotNull String jsonPath);
-
-  /**
-   * Finds an object value using a json path.
-   *
-   * @param jsonPath a JSON path to evaluate.
-   * @param predicates the predicates to use.
-   * @return optional map if found, empty() otherwise.
-   * @param <T> the type of value in the map.
-   */
-  @NotNull
-  <T> Optional<Map<String, T>> findObject(@NotNull String jsonPath, Predicate... predicates);
+  Optional<Map<String, ?>> findObject(@NotNull String jsonPath);
 
   /**
    * Finds a list using a json path.
    *
    * @param jsonPath a JSON path to evaluate.
    * @return list containing elements, may be empty if nothing found.
-   * @param <T> the type of value in the list.
    */
   @NotNull
-  <T> List<T> findList(@NotNull String jsonPath);
-
-  /**
-   * Finds a list using a json path.
-   *
-   * @param jsonPath a JSON path to evaluate.
-   * @param predicates the predicates to use.
-   * @return optional map if found, empty() otherwise.
-   * @param <T> the type of value in the list.
-   */
-  @NotNull
-  <T> List<T> findList(@NotNull String jsonPath, Predicate... predicates);
+  List<?> findList(@NotNull String jsonPath);
 }
