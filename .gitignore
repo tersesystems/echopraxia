@@ -6,6 +6,9 @@ build
 
 .idea/
 .bsp/
+.bloop/
+.metals/
+.vscode/
 
 bin/
 
@@ -13,3 +16,6 @@ project/
 target/
 
 *.log
+
+target/
+.bsp/
