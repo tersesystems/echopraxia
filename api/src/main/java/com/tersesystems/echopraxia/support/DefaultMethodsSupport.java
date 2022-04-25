@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <FB> the field builder type.
  */
-public interface DefaultMethodsSupport<FB extends Field.Builder> {
+public interface DefaultMethodsSupport<FB> {
   @NotNull
   String getName();
 

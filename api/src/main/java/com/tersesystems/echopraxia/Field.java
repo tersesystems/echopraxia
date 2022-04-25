@@ -15,6 +15,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface Field {
 
+  String EXCEPTION = "exception";
+
   /**
    * The field name.
    *
@@ -32,24 +34,13 @@ public interface Field {
   Value<?> value();
 
   /**
-   * The field builder interface.
-   *
-   * <p>This is provided in a function for creating fields in context and arguments. You are
-   * encourage to extend this interface to create your own custom field builders to create your own
-   * domain specific logic for creating fields.
-   */
-  interface Builder {
-    String EXCEPTION = "exception";
-  }
-
-  /**
    * The BuilderFunction interface. This is used when logging arguments, so that a field builder can
    * return a list of fields.
    *
    * @param <FB> the field builder type.
    */
   @FunctionalInterface
-  interface BuilderFunction<FB extends Builder> extends Function<FB, List<Field>> {}
+  interface BuilderFunction<FB> extends Function<FB, List<Field>> {}
 
   /**
    * The Value class. This consists of the basic JSON infoset values, and the throwable exception.

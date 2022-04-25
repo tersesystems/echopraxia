@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
@@ -67,13 +68,13 @@ public interface SemanticLogger<DataType> {
   SemanticLogger<DataType> withCondition(@NotNull Condition c);
 
   @NotNull
-  SemanticLogger<DataType> withFields(@NotNull Field.BuilderFunction<Field.Builder> f);
+  SemanticLogger<DataType> withFields(@NotNull Field.BuilderFunction<FieldBuilder> f);
 
   @NotNull
   SemanticLogger<DataType> withThreadContext();
 
   @NotNull
-  <FB extends Field.Builder> SemanticLogger<DataType> withFields(
+  <FB> SemanticLogger<DataType> withFields(
       @NotNull Field.BuilderFunction<FB> f, @NotNull FB builder);
 
   @NotNull

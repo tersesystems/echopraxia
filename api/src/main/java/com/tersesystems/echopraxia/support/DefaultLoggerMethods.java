@@ -1,11 +1,14 @@
 package com.tersesystems.echopraxia.support;
 
+import static com.tersesystems.echopraxia.Field.EXCEPTION;
+import static com.tersesystems.echopraxia.Field.Value.exception;
 import static com.tersesystems.echopraxia.Level.*;
 import static com.tersesystems.echopraxia.Level.ERROR;
+import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
+import com.tersesystems.echopraxia.KeyValueField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public interface DefaultLoggerMethods<FB extends FieldBuilder>
+public interface DefaultLoggerMethods<FB>
     extends LoggerMethods<FB>, DefaultMethodsSupport<FB> {
 
   // ------------------------------------------------------------------------
@@ -59,7 +62,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void trace(@Nullable String message, @NotNull Throwable e) {
-    core().log(TRACE, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(TRACE, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   /**
@@ -94,7 +97,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void trace(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(TRACE, condition, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(TRACE, condition, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -139,7 +142,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void debug(@Nullable String message, @NotNull Throwable e) {
-    core().log(DEBUG, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(DEBUG, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   /**
@@ -160,7 +163,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(DEBUG, condition, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(DEBUG, condition, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   /**
@@ -219,7 +222,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void info(@Nullable String message, @NotNull Throwable e) {
-    core().log(INFO, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(INFO, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   /**
@@ -254,7 +257,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(INFO, condition, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(INFO, condition, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -299,7 +302,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void warn(@Nullable String message, @NotNull Throwable e) {
-    core().log(WARN, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(WARN, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   /**
@@ -320,7 +323,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(WARN, condition, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(WARN, condition, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   /**
@@ -379,7 +382,7 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void error(@Nullable String message, @NotNull Throwable e) {
-    core().log(ERROR, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(ERROR, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 
   /**
@@ -414,6 +417,6 @@ public interface DefaultLoggerMethods<FB extends FieldBuilder>
    * @param e the given exception.
    */
   default void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
-    core().log(ERROR, condition, message, fb -> fb.onlyException(e), fieldBuilder());
+    core().log(ERROR, condition, message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))), fieldBuilder());
   }
 }

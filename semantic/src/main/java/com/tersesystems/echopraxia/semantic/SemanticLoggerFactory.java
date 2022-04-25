@@ -346,7 +346,7 @@ public class SemanticLoggerFactory {
 
     @Override
     public @NotNull SemanticLogger<DataType> withFields(
-        Field.@NotNull BuilderFunction<Field.Builder> f) {
+        Field.@NotNull BuilderFunction<FieldBuilder> f) {
       return withFields(f, builder);
     }
 
@@ -368,7 +368,7 @@ public class SemanticLoggerFactory {
     }
 
     @Override
-    public <CFB extends Field.Builder> @NotNull SemanticLogger<DataType> withFields(
+    public <CFB> @NotNull SemanticLogger<DataType> withFields(
         Field.@NotNull BuilderFunction<CFB> ctxBuilderF, @NotNull CFB ctxBuilder) {
       final CoreLogger coreLogger = core.withFields(ctxBuilderF, ctxBuilder);
       return new SemanticLoggerFactory.Impl<>(
