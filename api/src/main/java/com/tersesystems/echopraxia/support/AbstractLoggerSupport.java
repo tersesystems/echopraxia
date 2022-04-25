@@ -18,7 +18,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <FB> the field builder.
  */
 public abstract class AbstractLoggerSupport<
-        SELF extends AbstractLoggerSupport<SELF, FB>, FB extends FieldBuilder>
+        SELF extends AbstractLoggerSupport<SELF, FB>, FB>
     implements DefaultMethodsSupport<FB> {
   private static final Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
       threadContextFunction = buildThreadContextFunction();

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <FB> the field builder type.
  */
-public interface AsyncLoggerMethods<FB extends Field.Builder> extends BaseLoggerMethods<FB> {
+public interface AsyncLoggerMethods<FB> extends BaseLoggerMethods<FB> {
 
   void trace(@NotNull Consumer<LoggerHandle<FB>> consumer);
 

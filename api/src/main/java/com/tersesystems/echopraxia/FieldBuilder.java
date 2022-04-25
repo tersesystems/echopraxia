@@ -8,7 +8,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public interface FieldBuilder extends Field.Builder {
+public interface FieldBuilder {
 
   static @NotNull FieldBuilder instance() {
     return FieldBuilderInstance.getInstance();
@@ -437,7 +437,7 @@ public interface FieldBuilder extends Field.Builder {
    */
   @NotNull
   default Field exception(@NotNull Throwable t) {
-    return keyValue(EXCEPTION, Field.Value.exception(t));
+    return keyValue(Field.EXCEPTION, Field.Value.exception(t));
   }
 
   /**
@@ -448,7 +448,7 @@ public interface FieldBuilder extends Field.Builder {
    */
   @NotNull
   default Field exception(@NotNull Field.Value.ExceptionValue value) {
-    return keyValue(EXCEPTION, value);
+    return keyValue(Field.EXCEPTION, value);
   }
 
   /**

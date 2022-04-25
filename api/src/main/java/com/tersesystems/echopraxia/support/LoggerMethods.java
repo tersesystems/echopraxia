@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @param <FB> the field builder type.
  */
-public interface LoggerMethods<FB extends Field.Builder> extends BaseLoggerMethods<FB> {
+public interface LoggerMethods<FB> extends BaseLoggerMethods<FB> {
 
   /** @return true if the logger level is TRACE or higher. */
   boolean isTraceEnabled();

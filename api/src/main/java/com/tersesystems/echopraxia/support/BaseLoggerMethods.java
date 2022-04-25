@@ -10,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public interface BaseLoggerMethods<FB extends Field.Builder> {
+public interface BaseLoggerMethods<FB> {
 
   // ------------------------------------------------------------------------
   // TRACE

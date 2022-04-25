@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public final class Utilities {
 
   @NotNull
-  public static <T extends Field.Builder> T getNewInstance(@NotNull Class<T> newBuilderClass) {
+  public static <T> T getNewInstance(@NotNull Class<T> newBuilderClass) {
     try {
       return newBuilderClass.getDeclaredConstructor().newInstance();
     } catch (NoSuchMethodException
