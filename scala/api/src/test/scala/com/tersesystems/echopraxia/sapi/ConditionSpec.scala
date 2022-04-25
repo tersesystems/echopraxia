@@ -47,6 +47,32 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
       matchThis("found a foo == bar")
     }
 
+    it("should match on a complex object") {
+      val condition: Condition = (_, ctx) => {
+        val bar0 = ctx.findString("$.store.book[0].title")
+        bar0.get == "Sayings of the Century"
+      }
+      logger.info(
+        condition,
+        "{}",
+        fb => {
+          fb.onlyObj(
+            "store" ->
+              fb.array(
+                "book" -> Seq(
+                  Field.Value.`object`(
+                    fb.string("category", "reference"),
+                    fb.string("author", "Nigel Rees"),
+                    fb.string("title", "Sayings of the Century"),
+                    fb.number("price", 8.95)
+                  )
+                )
+              )
+          )
+        }
+      )
+    }
+
     it("should none on no match") {
       val condition: Condition = (_, ctx) => ctx.findString("$.foo").contains("bar")
       logger.debug(condition, "found a foo == bar")
@@ -144,9 +170,9 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("object") {
     it("should match on simple object") {
-      logger.withCondition((_, ctx) =>
-        ctx.findObject("$.foo").get("key").equals("value")
-      ).debug("simple map", fb => fb.onlyObj("foo", fb.keyValue("key" -> "value")))
+      logger
+        .withCondition((_, ctx) => ctx.findObject("$.foo").get("key").equals("value"))
+        .debug("simple map", fb => fb.onlyObj("foo", fb.keyValue("key" -> "value")))
 
       matchThis("simple map")
     }

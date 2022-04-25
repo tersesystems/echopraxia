@@ -148,7 +148,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
           import fb._
           fb.list(
             fb.keyValue("person1" -> Person("Eloise", 1)),
-            fb.obj("person2" -> Person("Eloise", 1))
+            fb.obj("person2"      -> Person("Eloise", 1))
           )
         }
       )

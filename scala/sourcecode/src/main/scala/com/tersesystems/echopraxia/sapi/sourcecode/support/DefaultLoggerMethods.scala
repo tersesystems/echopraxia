@@ -27,7 +27,8 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
       enc: sourcecode.Enclosing
   ): util.List[Field] = {
     fb.onlyObj(
-      "sourcecode", Seq(
+      "sourcecode",
+      Seq(
         fb.string("file", file.value),
         fb.number("line", line.value),
         fb.string("enclosing", enc.value)

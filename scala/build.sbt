@@ -29,6 +29,7 @@ lazy val api = (project in file("api"))
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % version.value,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
     libraryDependencies += "org.scala-lang.modules"     %% "scala-collection-compat" % "2.7.0",
+    libraryDependencies += "com.daodecode"              %% "scalaj-collection" % "0.3.1",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % version.value % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.11"      % Test

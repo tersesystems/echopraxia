@@ -22,7 +22,8 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       "sourcecode" -> Seq(
         fb.string("file", file.value),
         fb.number("line", line.value),
-        fb.string("enclosing", enc.value))
+        fb.string("enclosing", enc.value)
+      )
     )
   }
 

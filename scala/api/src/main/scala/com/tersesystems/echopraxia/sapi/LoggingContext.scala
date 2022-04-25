@@ -1,13 +1,9 @@
 package com.tersesystems.echopraxia.sapi
 
-import com.jayway.jsonpath.Predicate
-import com.tersesystems.echopraxia.Field.Value
-import com.tersesystems.echopraxia.Field.Value.{ArrayValue, ObjectValue}
-import com.tersesystems.echopraxia.Field.Value.ValueType._
+import com.daodecode.scalaj.collection.immutable._
 import com.tersesystems.echopraxia.{Field, LoggingContext => JLoggingContext}
 
 import scala.compat.java8.OptionConverters._
-import scala.jdk.CollectionConverters._
 
 object LoggingContext {
 
@@ -49,46 +45,11 @@ class LoggingContext private (context: JLoggingContext) {
   }
 
   def findObject(jsonPath: String): Option[Map[String, Any]] = {
-    context.findValue(jsonPath, classOf[Value.ObjectValue]).asScala.map(convertObject)
-  }
-
-  def findObject(jsonPath: String, predicates: Predicate*): Option[Map[String, Any]] = {
-    context.findValue(jsonPath, classOf[Value.ObjectValue], predicates:_*).asScala.map(convertObject)
+    context.findObject(jsonPath).asScala.map(_.deepAsScalaImmutable)
   }
 
   def findList(jsonPath: String): Seq[Any] = {
-    context.findValue(jsonPath, classOf[Value.ArrayValue]).asScala.map(convertArray).getOrElse(Seq.empty)
-  }
-
-  def findList(jsonPath: String, predicates: Predicate*): Seq[Any] = {
-    context.findValue(jsonPath, classOf[Value.ArrayValue], predicates:_*).asScala.map(convertArray).getOrElse(Seq.empty)
-  }
-
-  private def deepConvert(value: Field.Value[_]): Any = {
-    value.`type` match {
-      case STRING =>
-        value.raw.asInstanceOf[String]
-      case EXCEPTION =>
-        value.raw().asInstanceOf[Throwable]
-      case BOOLEAN =>
-        value.raw.asInstanceOf[Boolean]
-      case NUMBER =>
-        value.raw.asInstanceOf[Number]
-      case OBJECT =>
-        convertObject(value.asInstanceOf[ObjectValue])
-      case ARRAY =>
-        convertArray(value.asInstanceOf[ArrayValue])
-      case NULL =>
-        null
-    }
-  }
-
-  private def convertObject(objectValue: ObjectValue): Map[String, Any] = {
-    objectValue.raw().asScala.map(f => f.name() -> deepConvert(f.value())).toMap
-  }
-
-  private def convertArray(arrayValue: ArrayValue): Seq[Any] = {
-    arrayValue.raw().asScala.toSeq.map(deepConvert) // toSeq for 2.13 compat
+    context.findList(jsonPath).deepAsScalaImmutable
   }
 
 }

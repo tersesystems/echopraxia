@@ -2,7 +2,12 @@ package com.tersesystems.echopraxia.sapi
 
 import com.tersesystems.echopraxia.Field
 import com.tersesystems.echopraxia.core.CoreLogger
-import com.tersesystems.echopraxia.sapi.support.{DefaultLoggerMethods, DefaultMethodsSupport, LoggerSupport, Utilities}
+import com.tersesystems.echopraxia.sapi.support.{
+  DefaultLoggerMethods,
+  DefaultMethodsSupport,
+  LoggerSupport,
+  Utilities
+}
 
 import scala.compat.java8.FunctionConverters._
 

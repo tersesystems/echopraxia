@@ -71,9 +71,15 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
 
 ## Field Builder
 
+<<<<<<< Updated upstream
 The Scala field builder has additional methods that take `ToValue`, `ToObjectValue`, and `ToArrayValue` type classes.
 
 The field builder can imported with `import fb._` to provide a custom DSL that relies on tuples.  The built in type classes are already provided, and there are also type classes for `Option[V: ToValue]` and `Try[V: ToValue]` types.
+=======
+A field is defined as a `name` and a `value`, where the value can one of the types defined in `Field.Value`.  Defining a value like `StringValue` or `BooleanValue` can be tedious, and so the Scala field builder has methods that take `ToValue`, `ToObjectValue`, and `ToArrayValue` type classes.
+
+The field builder can be imported with `import fb._` to provide a custom DSL that relies on tuples.  The built-in type classes are already provided, and there are also type classes for `Option[V: ToValue]` and `Try[V: ToValue]` types.
+>>>>>>> Stashed changes
 
 ```scala
 import com.tersesystems.echopraxia.sapi._
@@ -85,7 +91,11 @@ class Example {
     logger.info("{} {} {} {}", fb => {
       import fb._
       list(
+<<<<<<< Updated upstream
         `object`("person" -> 
+=======
+        obj("person" -> 
+>>>>>>> Stashed changes
           Seq(
             value("number" -> 1),
             value("bool" -> true),
@@ -99,6 +109,26 @@ class Example {
 }
 ```
 
+<<<<<<< Updated upstream
+=======
+Arrays will take a `Seq` of values, including object values.  Object values take a sequence of fields as arguments, and are best defined using the `Field.Value.object`. For example, the first element in the [path example from Json-Path](https://github.com/json-path/JsonPath#path-examples) can be represented as:
+
+```scala
+logger.info("{}", fb => {
+  fb.onlyObj("store" ->
+    fb.array("book" -> Seq(
+      Field.Value.`object`(
+        fb.string("category", "reference"),
+        fb.string("author", "Nigel Rees"),
+        fb.string("title", "Sayings of the Century"),
+        fb.number("price", 8.95)
+      ),
+    ))
+  )
+})
+```
+
+>>>>>>> Stashed changes
 ## Custom Field Builder
 
 You can create your own field builder and define type class instances.  For example, to map an `java.time.Instant` to a string, you would add
@@ -163,7 +193,11 @@ import com.tersesystems.echopraxia.sapi.support._
 
 import java.time.Instant
 import scala.compat.java8.FunctionConverters._
+<<<<<<< Updated upstream
 import scala.collection.JavaConverters._
+=======
+import scala.jdk.JavaConverters._
+>>>>>>> Stashed changes
 
 object CustomLoggerFactory {
   private val FQCN: String = classOf[DefaultLoggerMethods[_]].getName
