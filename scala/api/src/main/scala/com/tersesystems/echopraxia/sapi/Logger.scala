@@ -19,35 +19,33 @@ final class Logger[FB <: FieldBuilder](val core: CoreLogger, val fieldBuilder: F
     with LoggerSupport[FB]
     with DefaultMethodsSupport[FB] {
 
-  type SELF[T <: FieldBuilder] = Logger[T]
-
   @inline
   override def name: String = core.getName
 
   @inline
-  override def withCondition(condition: Condition): SELF[FB] = {
+  override def withCondition(condition: Condition): Logger[FB] = {
     newLogger(newCoreLogger = core.withCondition(condition.asJava))
   }
 
   @inline
-  override def withFields(f: FB => java.util.List[Field]): SELF[FB] = {
+  override def withFields(f: FB => java.util.List[Field]): Logger[FB] = {
     newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
   }
 
   @inline
-  override def withThreadContext: SELF[FB] = {
+  override def withThreadContext: Logger[FB] = {
     newLogger(
       newCoreLogger = core.withThreadContext(Utilities.getThreadContextFunction)
     )
   }
 
   @inline
-  override def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): SELF[NEWFB] = {
+  override def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): Logger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): SELF[T] = {
+  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): Logger[T] = {
     newLogger[T](newFieldBuilder = Utilities.getNewInstance(newBuilderClass))
   }
 
@@ -55,7 +53,7 @@ final class Logger[FB <: FieldBuilder](val core: CoreLogger, val fieldBuilder: F
   private def newLogger[T <: FieldBuilder](
       newCoreLogger: CoreLogger = core,
       newFieldBuilder: T = fieldBuilder
-  ): SELF[T] =
+  ): Logger[T] =
     new Logger[T](newCoreLogger, newFieldBuilder)
 
 }

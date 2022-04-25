@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.sapi.sourcecode.support
 
-import com.tersesystems.echopraxia.Field
+import com.tersesystems.echopraxia.{Field, KeyValueField}
 import com.tersesystems.echopraxia.Level._
-import com.tersesystems.echopraxia.sapi.{Condition, FieldBuilder}
+import com.tersesystems.echopraxia.sapi.Condition
 
 import scala.compat.java8.FunctionConverters._
-
 import java.util
 
 /**
@@ -18,23 +17,14 @@ import java.util
  * You can subclass this method and override `sourceInfoFields` to provide
  * your own implementation.
  */
-trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
+trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   this: DefaultMethodsSupport[FB] =>
 
   protected def sourceInfoFields(fb: FB)(implicit
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): util.List[Field] = {
-    fb.onlyObj(
-      "sourcecode",
-      Seq(
-        fb.string("file", file.value),
-        fb.number("line", line.value),
-        fb.string("enclosing", enc.value)
-      )
-    )
-  }
+  ): util.List[Field]
 
   /** @return true if the logger level is TRACE or higher. */
   def isTraceEnabled: Boolean = core.isEnabled(TRACE)
@@ -87,7 +77,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(TRACE, message, (fb: FB) => fb.onlyException(e), fieldBuilder)
+      .log(TRACE, message, (fb: FB) => onlyException(e), fieldBuilder)
   }
 
   /**
@@ -137,7 +127,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(TRACE, condition.asJava, message, (fb: FB) => fb.onlyException(e), fieldBuilder)
+      .log(TRACE, condition.asJava, message, (fb: FB) => onlyException(e), fieldBuilder)
   }
 
   /** @return true if the logger level is DEBUG or higher. */
@@ -189,7 +179,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(DEBUG, message, (fb: FB) => fb.onlyException(e), fieldBuilder)
+      .log(DEBUG, message, (fb: FB) => onlyException(e), fieldBuilder)
   }
 
   /**
@@ -222,7 +212,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(DEBUG, condition.asJava, message, (fb: FB) => fb.onlyException(e), fieldBuilder)
+      .log(DEBUG, condition.asJava, message, (fb: FB) => onlyException(e), fieldBuilder)
   }
 
   /**
@@ -291,7 +281,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(INFO, message, ((fb: FB) => fb.onlyException(e)), fieldBuilder)
+      .log(INFO, message, ((fb: FB) => onlyException(e)), fieldBuilder)
   }
 
   /**
@@ -341,7 +331,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(INFO, condition.asJava, message, ((fb: FB) => fb.onlyException(e)), fieldBuilder)
+      .log(INFO, condition.asJava, message, ((fb: FB) => onlyException(e)), fieldBuilder)
   }
 
   /** @return true if the logger level is WARN or higher. */
@@ -393,7 +383,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(WARN, message, ((fb: FB) => fb.onlyException(e)), fieldBuilder)
+      .log(WARN, message, ((fb: FB) => onlyException(e)), fieldBuilder)
   }
 
   def warn(condition: Condition, message: String)(implicit
@@ -413,7 +403,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(WARN, condition.asJava, message, ((fb: FB) => fb.onlyException(e)), fieldBuilder)
+      .log(WARN, condition.asJava, message, ((fb: FB) => onlyException(e)), fieldBuilder)
   }
 
   def warn(condition: Condition, message: String, f: FB => java.util.List[Field])(implicit
@@ -456,7 +446,7 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(ERROR, message, ((fb: FB) => fb.onlyException(e)), fieldBuilder)
+      .log(ERROR, message, ((fb: FB) => onlyException(e)), fieldBuilder)
   }
 
   def error(condition: Condition, message: String)(implicit
@@ -486,6 +476,11 @@ trait DefaultLoggerMethods[FB <: FieldBuilder] extends LoggerMethods[FB] {
   ): Unit = {
     core
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
-      .log(ERROR, condition.asJava, message, ((fb: FB) => fb.onlyException(e)), fieldBuilder)
+      .log(ERROR, condition.asJava, message, ((fb: FB) => onlyException(e)), fieldBuilder)
   }
+
+  private def onlyException(e: Throwable): java.util.List[Field] = {
+    util.Arrays.asList(KeyValueField.create(Field.Builder.EXCEPTION, Field.Value.exception(e)))
+  }
+
 }

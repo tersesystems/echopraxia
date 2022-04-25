@@ -5,18 +5,18 @@ import com.tersesystems.echopraxia.Field
 import com.tersesystems.echopraxia.core.CoreLogger
 import com.tersesystems.echopraxia.sapi.support.Utilities
 import com.tersesystems.echopraxia.sapi.{Condition, FieldBuilder}
+import sourcecode.{Enclosing, File, Line}
 
+import java.util
 import scala.compat.java8.FunctionConverters._
 
 /**
  * Async Logger with source code enabled.
  */
-final class AsyncLogger[FB <: FieldBuilder](val core: CoreLogger, val fieldBuilder: FB)
-    extends DefaultMethodsSupport[FB]
+final class AsyncLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
+    extends AbstractLoggerSupport[FB](core, fieldBuilder)
     with LoggerSupport[FB]
     with DefaultAsyncLoggerMethods[FB] {
-
-  override type SELF[T <: FieldBuilder] = AsyncLogger[T]
 
   @inline
   override def name: String = core.getName
@@ -48,7 +48,15 @@ final class AsyncLogger[FB <: FieldBuilder](val core: CoreLogger, val fieldBuild
   private def newLogger[T <: FieldBuilder](
       newCoreLogger: CoreLogger = core,
       newFieldBuilder: T = fieldBuilder
-  ): SELF[T] =
+  ): AsyncLogger[T] =
     new AsyncLogger[T](newCoreLogger, newFieldBuilder)
 
+  override protected def sourceInfoFields(fb: FB)(implicit line: Line, file: File, enc: Enclosing): util.List[Field] = {
+    fb.onlyObj(
+      "sourcecode" -> Seq(
+        fb.string("file", file.value),
+        fb.number("line", line.value),
+        fb.string("enclosing", enc.value)
+      ))
+  }
 }

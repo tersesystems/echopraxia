@@ -1,31 +1,24 @@
 package com.tersesystems.echopraxia.sapi.sourcecode.support
 
 import com.tersesystems.echopraxia.Level._
-import com.tersesystems.echopraxia.sapi.{Condition, FieldBuilder}
-import com.tersesystems.echopraxia.{Field, LoggerHandle}
+import com.tersesystems.echopraxia.sapi.Condition
+import com.tersesystems.echopraxia.{Field, KeyValueField, LoggerHandle}
 
+import java.util
 import java.util.function.Consumer
 import scala.compat.java8.FunctionConverters._
 
 /**
  * Default Async Logger Methods with source code implicits.
  */
-trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[FB] {
+trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   self: DefaultMethodsSupport[FB] =>
 
   protected def sourceInfoFields(fb: FB)(implicit
       line: sourcecode.Line,
       file: sourcecode.File,
       enc: sourcecode.Enclosing
-  ): java.util.List[Field] = {
-    fb.onlyObj(
-      "sourcecode" -> Seq(
-        fb.string("file", file.value),
-        fb.number("line", line.value),
-        fb.string("enclosing", enc.value)
-      )
-    )
-  }
+  ): java.util.List[Field]
 
   /**
    * Logs using a logger handle at TRACE level.
@@ -106,7 +99,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
       .asyncLog(
         TRACE,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -161,7 +154,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .asyncLog(
         TRACE,
         condition.asJava,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -244,7 +237,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
       .asyncLog(
         DEBUG,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -299,7 +292,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .asyncLog(
         DEBUG,
         condition.asJava,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -382,7 +375,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
       .asyncLog(
         INFO,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -437,7 +430,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .asyncLog(
         INFO,
         condition.asJava,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -520,7 +513,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
       .asyncLog(
         WARN,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -555,7 +548,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .asyncLog(
         WARN,
         condition.asJava,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -621,7 +614,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .withFields((f => sourceInfoFields(f)).asJava, fieldBuilder)
       .asyncLog(
         ERROR,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -656,7 +649,7 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       .asyncLog(
         ERROR,
         condition.asJava,
-        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => fb.onlyException(e)),
+        (h: LoggerHandle[FB]) => h.log(message, (fb: FB) => onlyException(e)),
         fieldBuilder
       )
   }
@@ -666,5 +659,10 @@ trait DefaultAsyncLoggerMethods[FB <: FieldBuilder] extends AsyncLoggerMethods[F
       message: String,
       f: FB => java.util.List[Field]
   ): Consumer[LoggerHandle[FB]] = h => h.log(message, f.asJava)
+
+  private def onlyException(e: Throwable): java.util.List[Field] = {
+    util.Arrays.asList(KeyValueField.create(Field.Builder.EXCEPTION, Field.Value.exception(e)))
+  }
+
 
 }
