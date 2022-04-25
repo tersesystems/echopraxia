@@ -9,7 +9,7 @@ import scala.compat.java8.FunctionConverters._
 /**
  * An asynchronous logger that can use scala tuples and types.
  */
-final class AsyncLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
+final class AsyncLogger[FB](core: CoreLogger, fieldBuilder: FB)
     extends AbstractLoggerSupport[FB](core, fieldBuilder)
     with LoggerSupport[FB]
     with DefaultAsyncLoggerMethods[FB] {
@@ -33,15 +33,15 @@ final class AsyncLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
   )
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): AsyncLogger[T] =
+  override def withFieldBuilder[T](newBuilderClass: Class[T]): AsyncLogger[T] =
     newLogger[T](Utilities.getNewInstance(newBuilderClass))
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilder: T): AsyncLogger[T] =
+  override def withFieldBuilder[T](newBuilder: T): AsyncLogger[T] =
     new AsyncLogger(core, newBuilder)
 
   @inline
-  private def newLogger[T <: FieldBuilder](fieldBuilder: T): AsyncLogger[T] =
+  private def newLogger[T](fieldBuilder: T): AsyncLogger[T] =
     new AsyncLogger(core, fieldBuilder)
 
   @inline

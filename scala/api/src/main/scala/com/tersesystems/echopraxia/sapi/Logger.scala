@@ -14,7 +14,7 @@ import scala.compat.java8.FunctionConverters._
 /**
  * A logger with support for scala values and tuples.
  */
-final class Logger[FB <: FieldBuilder](val core: CoreLogger, val fieldBuilder: FB)
+final class Logger[FB](val core: CoreLogger, val fieldBuilder: FB)
     extends DefaultLoggerMethods[FB]
     with LoggerSupport[FB]
     with DefaultMethodsSupport[FB] {
@@ -40,17 +40,17 @@ final class Logger[FB <: FieldBuilder](val core: CoreLogger, val fieldBuilder: F
   }
 
   @inline
-  override def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): Logger[NEWFB] = {
+  override def withFieldBuilder[NEWFB](newFieldBuilder: NEWFB): Logger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): Logger[T] = {
+  override def withFieldBuilder[T](newBuilderClass: Class[T]): Logger[T] = {
     newLogger[T](newFieldBuilder = Utilities.getNewInstance(newBuilderClass))
   }
 
   @inline
-  private def newLogger[T <: FieldBuilder](
+  private def newLogger[T](
       newCoreLogger: CoreLogger = core,
       newFieldBuilder: T = fieldBuilder
   ): Logger[T] =

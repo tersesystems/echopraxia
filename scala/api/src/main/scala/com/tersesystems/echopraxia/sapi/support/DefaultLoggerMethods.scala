@@ -325,5 +325,4 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
     util.Arrays.asList(KeyValueField.create(Field.Builder.EXCEPTION, Field.Value.exception(e)))
   }
 
-
 }
