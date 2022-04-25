@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.support;
 
-import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import org.jetbrains.annotations.NotNull;
 

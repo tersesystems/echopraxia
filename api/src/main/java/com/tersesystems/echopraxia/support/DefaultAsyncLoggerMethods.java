@@ -1,18 +1,17 @@
 package com.tersesystems.echopraxia.support;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.KeyValueField;
-import com.tersesystems.echopraxia.LoggerHandle;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.function.Consumer;
-
 import static com.tersesystems.echopraxia.Field.EXCEPTION;
 import static com.tersesystems.echopraxia.Field.Value.exception;
 import static com.tersesystems.echopraxia.Level.*;
 import static java.util.Collections.singletonList;
+
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.KeyValueField;
+import com.tersesystems.echopraxia.LoggerHandle;
+import java.util.function.Consumer;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Async logger methods that implement the default `core.asyncLog` delegation.
@@ -70,7 +69,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param e the given exception.
    */
   default void trace(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(TRACE, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+    core()
+        .asyncLog(
+            TRACE,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   /**
@@ -106,7 +109,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    */
   default void trace(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core()
-        .asyncLog(TRACE, condition, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+        .asyncLog(
+            TRACE,
+            condition,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -157,7 +164,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param e the given exception.
    */
   default void debug(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(DEBUG, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+    core()
+        .asyncLog(
+            DEBUG,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   /**
@@ -193,7 +204,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    */
   default void debug(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core()
-        .asyncLog(DEBUG, condition, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+        .asyncLog(
+            DEBUG,
+            condition,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -244,7 +259,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param e the given exception.
    */
   default void info(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(INFO, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+    core()
+        .asyncLog(
+            INFO,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   /**
@@ -280,7 +299,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    */
   default void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core()
-        .asyncLog(INFO, condition, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+        .asyncLog(
+            INFO,
+            condition,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -331,7 +354,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param e the given exception.
    */
   default void warn(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(WARN, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+    core()
+        .asyncLog(
+            WARN,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   /**
@@ -367,7 +394,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    */
   default void warn(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core()
-        .asyncLog(WARN, condition, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+        .asyncLog(
+            WARN,
+            condition,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   // ------------------------------------------------------------------------
@@ -418,7 +449,11 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param e the given exception.
    */
   default void error(@Nullable String message, @NotNull Throwable e) {
-    core().asyncLog(ERROR, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+    core()
+        .asyncLog(
+            ERROR,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 
   /**
@@ -454,6 +489,10 @@ public interface DefaultAsyncLoggerMethods<FB>
    */
   default void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e) {
     core()
-        .asyncLog(ERROR, condition, h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))), fieldBuilder());
+        .asyncLog(
+            ERROR,
+            condition,
+            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            fieldBuilder());
   }
 }

@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.support;
 
 import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.LoggerHandle;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
