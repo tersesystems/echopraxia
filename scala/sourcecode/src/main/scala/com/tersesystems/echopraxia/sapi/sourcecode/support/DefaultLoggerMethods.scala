@@ -3,9 +3,11 @@ package com.tersesystems.echopraxia.sapi.sourcecode.support
 import com.tersesystems.echopraxia.{Field, KeyValueField}
 import com.tersesystems.echopraxia.Level._
 import com.tersesystems.echopraxia.sapi.Condition
+import sourcecode.{Enclosing, File, Line}
 
 import scala.compat.java8.FunctionConverters._
 import java.util
+import java.util.Arrays.asList
 
 /**
  * Default Logger methods with source code implicits.
@@ -20,11 +22,20 @@ import java.util
 trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   this: DefaultMethodsSupport[FB] =>
 
-  protected def sourceInfoFields(fb: FB)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): util.List[Field]
+  protected def sourceInfoFields(
+      fb: FB
+  )(implicit line: Line, file: File, enc: Enclosing): util.List[Field] = {
+    asList(
+      KeyValueField.create(
+        "sourcecode",
+        Field.Value.`object`(
+          KeyValueField.create("file", Field.Value.string(file.value)),
+          KeyValueField.create("line", Field.Value.number(line.value)),
+          KeyValueField.create("enclosing", Field.Value.string(enc.value))
+        )
+      )
+    )
+  }
 
   /** @return true if the logger level is TRACE or higher. */
   def isTraceEnabled: Boolean = core.isEnabled(TRACE)

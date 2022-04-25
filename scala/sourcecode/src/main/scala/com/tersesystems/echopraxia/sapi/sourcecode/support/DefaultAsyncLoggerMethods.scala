@@ -3,8 +3,10 @@ package com.tersesystems.echopraxia.sapi.sourcecode.support
 import com.tersesystems.echopraxia.Level._
 import com.tersesystems.echopraxia.sapi.Condition
 import com.tersesystems.echopraxia.{Field, KeyValueField, LoggerHandle}
+import sourcecode.{Enclosing, File, Line}
 
 import java.util
+import java.util.Arrays.asList
 import java.util.function.Consumer
 import scala.compat.java8.FunctionConverters._
 
@@ -14,11 +16,20 @@ import scala.compat.java8.FunctionConverters._
 trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   self: DefaultMethodsSupport[FB] =>
 
-  protected def sourceInfoFields(fb: FB)(implicit
-      line: sourcecode.Line,
-      file: sourcecode.File,
-      enc: sourcecode.Enclosing
-  ): java.util.List[Field]
+  protected def sourceInfoFields(
+      fb: FB
+  )(implicit line: Line, file: File, enc: Enclosing): util.List[Field] = {
+    asList(
+      KeyValueField.create(
+        "sourcecode",
+        Field.Value.`object`(
+          KeyValueField.create("file", Field.Value.string(file.value)),
+          KeyValueField.create("line", Field.Value.number(line.value)),
+          KeyValueField.create("enclosing", Field.Value.string(enc.value))
+        )
+      )
+    )
+  }
 
   /**
    * Logs using a logger handle at TRACE level.
@@ -663,6 +674,5 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   private def onlyException(e: Throwable): java.util.List[Field] = {
     util.Arrays.asList(KeyValueField.create(Field.Builder.EXCEPTION, Field.Value.exception(e)))
   }
-
 
 }
