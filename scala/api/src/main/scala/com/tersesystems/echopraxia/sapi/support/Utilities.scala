@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.sapi.support
 
-import com.tersesystems.echopraxia.Field
-import com.tersesystems.echopraxia.sapi.FieldBuilder
+import com.tersesystems.echopraxia.{Field, KeyValueField}
 
 import java.util
 import java.util.function.{Function, Supplier}
@@ -10,7 +9,7 @@ import scala.util.control.NonFatal
 
 object Utilities {
 
-  def getNewInstance[T <: Field.Builder](newBuilderClass: Class[T]): T = {
+  def getNewInstance[T](newBuilderClass: Class[T]): T = {
     try {
       newBuilderClass.getDeclaredConstructor().newInstance()
     } catch {
@@ -29,7 +28,7 @@ object Utilities {
           def buildFields(contextMap: util.Map[String, String]): util.List[Field] = {
             val list = new util.ArrayList[Field]();
             for (entry <- contextMap.entrySet().iterator.asScala) {
-              list.add(FieldBuilder.keyValue(entry.getKey -> entry.getValue))
+              list.add(KeyValueField.create(entry.getKey, Field.Value.string(entry.getValue)))
             }
             list
           }

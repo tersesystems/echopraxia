@@ -14,40 +14,38 @@ final class AsyncLogger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
     with LoggerSupport[FB]
     with DefaultAsyncLoggerMethods[FB] {
 
-  type SELF[T <: FieldBuilder] = AsyncLogger[T]
-
   @inline
   override def name: String = core.getName
 
   @inline
-  override def withCondition(scalaCondition: Condition): SELF[FB] = newLogger(
+  override def withCondition(scalaCondition: Condition): AsyncLogger[FB] = newLogger(
     core.withCondition(scalaCondition.asJava)
   )
 
   @inline
-  override def withFields(f: FB => java.util.List[Field]): SELF[FB] = {
+  override def withFields(f: FB => java.util.List[Field]): AsyncLogger[FB] = {
     newLogger(core.withFields[FB](f.asJava, fieldBuilder))
   }
 
   @inline
-  override def withThreadContext: SELF[FB] = newLogger(
+  override def withThreadContext: AsyncLogger[FB] = newLogger(
     core.withThreadContext(Utilities.getThreadContextFunction)
   )
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): SELF[T] =
+  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): AsyncLogger[T] =
     newLogger[T](Utilities.getNewInstance(newBuilderClass))
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilder: T): SELF[T] =
+  override def withFieldBuilder[T <: FieldBuilder](newBuilder: T): AsyncLogger[T] =
     new AsyncLogger(core, newBuilder)
 
   @inline
-  private def newLogger[T <: FieldBuilder](fieldBuilder: T): SELF[T] =
+  private def newLogger[T <: FieldBuilder](fieldBuilder: T): AsyncLogger[T] =
     new AsyncLogger(core, fieldBuilder)
 
   @inline
-  private def newLogger(coreLogger: CoreLogger): SELF[FB] =
+  private def newLogger(coreLogger: CoreLogger): AsyncLogger[FB] =
     new AsyncLogger(coreLogger, fieldBuilder)
 
 }

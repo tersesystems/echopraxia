@@ -6,6 +6,7 @@ import com.tersesystems.echopraxia.sapi.support.Utilities
 import com.tersesystems.echopraxia.sapi.{Condition, FieldBuilder}
 import support._
 
+import java.util
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
 /** 
@@ -16,35 +17,33 @@ final class Logger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
     with LoggerSupport[FB]
     with DefaultLoggerMethods[FB] {
 
-  override type SELF[F <: FieldBuilder] = Logger[F]
-
   @inline
   override def name: String = core.getName
 
   @inline
-  override def withCondition(condition: Condition): SELF[FB] = {
+  override def withCondition(condition: Condition): Logger[FB] = {
     newLogger(newCoreLogger = core.withCondition(condition.asJava))
   }
 
   @inline
-  override def withFields(f: FB => java.util.List[Field]): SELF[FB] = {
+  override def withFields(f: FB => java.util.List[Field]): Logger[FB] = {
     newLogger(newCoreLogger = core.withFields(f.asJava, fieldBuilder))
   }
 
   @inline
-  override def withThreadContext: SELF[FB] = {
+  override def withThreadContext: Logger[FB] = {
     newLogger(
       newCoreLogger = core.withThreadContext(Utilities.getThreadContextFunction)
     )
   }
 
   @inline
-  override def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): SELF[NEWFB] = {
+  override def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): Logger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): SELF[T] = {
+  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): Logger[T] = {
     newLogger[T](newFieldBuilder = Utilities.getNewInstance(newBuilderClass))
   }
 
@@ -52,7 +51,22 @@ final class Logger[FB <: FieldBuilder](core: CoreLogger, fieldBuilder: FB)
   private def newLogger[T <: FieldBuilder](
       newCoreLogger: CoreLogger = core,
       newFieldBuilder: T = fieldBuilder
-  ): SELF[T] =
+  ): Logger[T] =
     new Logger[T](newCoreLogger, newFieldBuilder)
+
+  protected def sourceInfoFields(fb: FB)(implicit
+                                         line: sourcecode.Line,
+                                         file: sourcecode.File,
+                                         enc: sourcecode.Enclosing
+  ): util.List[Field] = {
+    fb.onlyObj(
+      "sourcecode",
+      Seq(
+        fb.string("file", file.value),
+        fb.number("line", line.value),
+        fb.string("enclosing", enc.value)
+      )
+    )
+  }
 
 }

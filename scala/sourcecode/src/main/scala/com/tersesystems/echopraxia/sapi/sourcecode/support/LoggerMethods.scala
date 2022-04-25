@@ -1,12 +1,12 @@
 package com.tersesystems.echopraxia.sapi.sourcecode.support
 
 import com.tersesystems.echopraxia.Field
-import com.tersesystems.echopraxia.sapi.{Condition, FieldBuilder}
+import com.tersesystems.echopraxia.sapi.Condition
 
 /**
  * Logger methods with source code implicits
  */
-trait LoggerMethods[FB <: FieldBuilder] {
+trait LoggerMethods[FB] {
 
   /** @return true if the logger level is TRACE or higher. */
   def isTraceEnabled: Boolean
