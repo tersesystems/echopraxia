@@ -106,8 +106,15 @@ public abstract class AbstractLoggingContext implements LoggingContext {
     // a json array.  Simple.
     // The second is when JSONPath does a deep scan or some kind of query
     // of the JSON document and returns matches.  This could have pretty
-    // much anything in it.
-    return (List<?>) optionalFind(jsonPath, List.class).orElse(Collections.emptyList());
+    // much anything in it, but may contain a List<ArrayValue>.
+    //
+    // So we have to do some special case logic here beyond just optionalFind.
+    final Object o = getDocumentContext().read(jsonPath);
+    if (o instanceof ArrayValue || o instanceof List) {
+      return javaMappingProvider.map(o, List.class, configuration);
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   private DocumentContext getDocumentContext() {
