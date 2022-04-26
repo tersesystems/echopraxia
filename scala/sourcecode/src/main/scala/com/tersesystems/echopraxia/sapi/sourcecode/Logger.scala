@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.sapi.sourcecode
 
-import com.tersesystems.echopraxia.{Field, KeyValueField}
+import com.tersesystems.echopraxia.Field
 import com.tersesystems.echopraxia.core.CoreLogger
+import com.tersesystems.echopraxia.sapi.Condition
+import com.tersesystems.echopraxia.sapi.sourcecode.support._
 import com.tersesystems.echopraxia.sapi.support.Utilities
-import com.tersesystems.echopraxia.sapi.{Condition, FieldBuilder}
-import sourcecode.{Enclosing, File, Line}
-import support._
 
 import scala.compat.java8.FunctionConverters.enrichAsJavaFunction
 
@@ -38,17 +37,17 @@ final class Logger[FB](core: CoreLogger, fieldBuilder: FB)
   }
 
   @inline
-  override def withFieldBuilder[NEWFB <: FieldBuilder](newFieldBuilder: NEWFB): Logger[NEWFB] = {
+  override def withFieldBuilder[NEWFB](newFieldBuilder: NEWFB): Logger[NEWFB] = {
     newLogger(newFieldBuilder = newFieldBuilder)
   }
 
   @inline
-  override def withFieldBuilder[T <: FieldBuilder](newBuilderClass: Class[T]): Logger[T] = {
+  override def withFieldBuilder[T](newBuilderClass: Class[T]): Logger[T] = {
     newLogger[T](newFieldBuilder = Utilities.getNewInstance(newBuilderClass))
   }
 
   @inline
-  private def newLogger[T <: FieldBuilder](
+  private def newLogger[T](
       newCoreLogger: CoreLogger = core,
       newFieldBuilder: T = fieldBuilder
   ): Logger[T] =

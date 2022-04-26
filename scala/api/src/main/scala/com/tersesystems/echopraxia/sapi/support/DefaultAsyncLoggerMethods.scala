@@ -421,7 +421,7 @@ trait DefaultAsyncLoggerMethods[FB] extends AsyncLoggerMethods[FB] {
   ): Consumer[LoggerHandle[FB]] = h => h.log(message, f.asJava)
 
   private def onlyException(e: Throwable): java.util.List[Field] = {
-    util.Arrays.asList(KeyValueField.create(Field.Builder.EXCEPTION, Field.Value.exception(e)))
+    util.Arrays.asList(KeyValueField.create(Field.EXCEPTION, Field.Value.exception(e)))
   }
 
 }

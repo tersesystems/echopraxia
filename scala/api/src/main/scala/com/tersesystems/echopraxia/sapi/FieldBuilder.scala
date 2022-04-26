@@ -8,7 +8,7 @@ import scala.jdk.CollectionConverters._
 /**
  * A field builder that is enhanced with ToValue, ToObjectValue, and ToArrayValue.
  */
-trait FieldBuilder extends Field.Builder {
+trait FieldBuilder {
 
   // ------------------------------------------------------------------
   // keyValue
@@ -92,7 +92,7 @@ trait FieldBuilder extends Field.Builder {
   // ------------------------------------------------------------------
   // exception
 
-  def exception(ex: Throwable): Field                        = value(Field.Builder.EXCEPTION, ex)
+  def exception(ex: Throwable): Field                        = value(Field.EXCEPTION, ex)
   def exception(name: String, ex: Throwable): Field          = keyValue(name, ex)
   def onlyException(value: Throwable): java.util.List[Field] = only(exception(value))
   def onlyException(name: String, value: Throwable): java.util.List[Field] = only(

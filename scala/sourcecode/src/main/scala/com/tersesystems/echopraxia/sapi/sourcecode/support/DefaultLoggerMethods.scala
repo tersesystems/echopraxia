@@ -491,7 +491,7 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   private def onlyException(e: Throwable): java.util.List[Field] = {
-    util.Arrays.asList(KeyValueField.create(Field.Builder.EXCEPTION, Field.Value.exception(e)))
+    util.Arrays.asList(KeyValueField.create(Field.EXCEPTION, Field.Value.exception(e)))
   }
 
 }
