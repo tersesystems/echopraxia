@@ -2,13 +2,7 @@ package com.tersesystems.echopraxia.support;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.core.CoreLogger;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -19,8 +13,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<SELF, FB>, FB>
     implements DefaultMethodsSupport<FB> {
-  private static final Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
-      threadContextFunction = buildThreadContextFunction();
 
   protected final CoreLogger core;
   protected final FB fieldBuilder;
@@ -69,21 +61,7 @@ public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<S
 
   @NotNull
   public SELF withThreadContext() {
-    return newLogger(core().withThreadContext(threadContextFunction));
-  }
-
-  @NotNull
-  private static Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
-      buildThreadContextFunction() {
-    return Utilities.getThreadContextFunction(
-        contextMap -> {
-          List<Field> list = new ArrayList<>();
-          for (Map.Entry<String, String> e : contextMap.entrySet()) {
-            Field field = FieldBuilder.instance().string(e.getKey(), e.getValue());
-            list.add(field);
-          }
-          return list;
-        });
+    return newLogger(core().withThreadContext(Utilities.threadContext()));
   }
 
   /**

@@ -7,11 +7,8 @@ import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.Caller;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.core.CoreLoggerFactory;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.tersesystems.echopraxia.support.Utilities;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -352,17 +349,7 @@ public class SemanticLoggerFactory {
 
     @Override
     public @NotNull SemanticLogger<DataType> withThreadContext() {
-      Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
-          mapSupplier ->
-              () -> {
-                List<Field> list = new ArrayList<>();
-                for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
-                  Field string = builder.string(e.getKey(), e.getValue());
-                  list.add(string);
-                }
-                return list;
-              };
-      final CoreLogger coreLogger = core.withThreadContext(mapTransform);
+      final CoreLogger coreLogger = core.withThreadContext(Utilities.threadContext());
       return new SemanticLoggerFactory.Impl<>(
           coreLogger, builder, messageFunction, builderFunction);
     }
