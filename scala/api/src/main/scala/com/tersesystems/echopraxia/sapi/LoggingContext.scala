@@ -8,7 +8,7 @@ import scala.compat.java8.OptionConverters._
 object LoggingContext {
 
   // This repeats stuff in AbstractLoggingContext
-  private val ExceptionPath = "$." + Field.Builder.EXCEPTION
+  private val ExceptionPath = "$." + Field.EXCEPTION
 
   def apply(context: JLoggingContext): LoggingContext = {
     new LoggingContext(context)
