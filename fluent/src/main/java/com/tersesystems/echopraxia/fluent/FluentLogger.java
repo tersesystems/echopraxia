@@ -5,12 +5,11 @@ import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.core.CoreLogger;
+import com.tersesystems.echopraxia.support.Utilities;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -78,17 +77,7 @@ public class FluentLogger<FB extends FieldBuilder> {
 
   @NotNull
   public FluentLogger<FB> withThreadContext() {
-    Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform =
-        mapSupplier ->
-            () -> {
-              List<Field> list = new ArrayList<>();
-              for (Map.Entry<String, String> e : mapSupplier.get().entrySet()) {
-                Field string = builder.string(e.getKey(), e.getValue());
-                list.add(string);
-              }
-              return list;
-            };
-    CoreLogger coreLogger = core.withThreadContext(mapTransform);
+    CoreLogger coreLogger = core.withThreadContext(Utilities.threadContext());
     return new FluentLogger<>(coreLogger, builder);
   }
 

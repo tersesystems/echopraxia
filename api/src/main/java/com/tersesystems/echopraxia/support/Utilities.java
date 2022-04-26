@@ -1,7 +1,9 @@
 package com.tersesystems.echopraxia.support;
 
 import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.KeyValueField;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -32,6 +34,19 @@ public final class Utilities {
 
   public static <T> Supplier<T> memoize(Supplier<T> supplier) {
     return new MemoizingSupplier<>(supplier);
+  }
+
+  public static List<Field> buildThreadContext(Map<String, String> contextMap) {
+    List<Field> list = new ArrayList<>();
+    for (Map.Entry<String, String> e : contextMap.entrySet()) {
+      Field field = KeyValueField.create(e.getKey(), Field.Value.string(e.getValue()));
+      list.add(field);
+    }
+    return list;
+  }
+
+  public static Function<Supplier<Map<String, String>>, Supplier<List<Field>>> threadContext() {
+    return getThreadContextFunction(Utilities::buildThreadContext);
   }
 
   @NotNull
