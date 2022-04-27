@@ -10,6 +10,8 @@ import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
 import java.util.List;
 import java.util.Optional;
+
+import org.assertj.core.condition.VerboseCondition;
 import org.junit.jupiter.api.Test;
 
 public class JsonPathTests {
@@ -80,8 +82,11 @@ public class JsonPathTests {
 
     LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
-    List mother = documentContext.read("$..mother", List.class);
-    assertThat(mother).size().isEqualTo(4);
+    List<?> interests = documentContext.read("$..interests", List.class);
+    assertThat(interests).size().isEqualTo(4);
+    assertThat(interests.stream().anyMatch(i ->
+      i instanceof List && ((List<?>) i).get(0).equals("iceskating"))
+    ).isTrue();
   }
 
   @Test
