@@ -512,13 +512,20 @@ This also applies to `Throwable` which are usually passed in as arguments:
 Optional<Throwable> optThrowable = context.findThrowable();
 ```
 
-You can also treat a `Throwable` as a JSON object, i.e. the following will all work:
+You can treat a `Throwable` as a JSON object, i.e. the following will all work with the default `$.exception` path:
 
 ```java
-Optional<String> methodName = ctx.findString("$.exception.stackTrace[0].methodName");
 Optional<String> className = ctx.findString("$.exception.className");
 Optional<String> message = ctx.findString("$.exception.message");
 Optional<Throwable> cause = ctx.findThrowable("$.exception.cause");
+```
+
+And you can also query stack trace elements:
+
+```java
+Optional<Map<String, ?>> stacktraceElement = ctx.findObject("$.exception.stackTrace[0]")
+Optional<String> methodName = ctx.findString("$.exception.stackTrace[0].methodName");
+Optional<List<?>> listOfElements = ctx.findObject("$.exception.stackTrace[5..10]")
 ```
 
 Finding an explicitly null value returns a `boolean`:
