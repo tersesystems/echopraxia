@@ -118,6 +118,22 @@ public class EchopraxiaMappingProvider implements MappingProvider {
       return mapped;
     } else if (source instanceof Field.Value) {
       return ((Field.Value<?>) source).raw();
+    } else if (source instanceof StackTraceElement[]) {
+      List<Object> mapped = new ArrayList<>();
+      StackTraceElement[] array = (StackTraceElement[]) source;
+      for (StackTraceElement value : array) {
+        mapped.add(mapToObject(value));
+      }
+      return mapped;
+    } else if (source instanceof StackTraceElement) {
+      StackTraceElement element = (StackTraceElement) source;
+
+      Map<String, Object> elementMap = new HashMap<>();
+      elementMap.put("methodName", element.getMethodName());
+      elementMap.put("className", element.getClassName());
+      elementMap.put("fileName", element.getFileName());
+      elementMap.put("lineNumber", element.getLineNumber());
+      return elementMap;
     } else {
       throw new JsonPathException("Could not determine value type for " + source.getClass());
     }

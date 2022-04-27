@@ -107,10 +107,12 @@ public abstract class AbstractLoggingContext implements LoggingContext {
     // The second is when JSONPath does a deep scan or some kind of query
     // of the JSON document and returns matches.  This could have pretty
     // much anything in it, but may contain a List<ArrayValue>.
+    // The third is when the exception is queried: $.exception.stackTrace
+    // in particular.
     //
     // So we have to do some special case logic here beyond just optionalFind.
     final Object o = getDocumentContext().read(jsonPath);
-    if (o instanceof ArrayValue || o instanceof List) {
+    if (o instanceof ArrayValue || o instanceof List || o instanceof Object[]) {
       return javaMappingProvider.map(o, List.class, configuration);
     } else {
       return Collections.emptyList();

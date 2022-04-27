@@ -16,6 +16,7 @@ import com.tersesystems.echopraxia.core.CoreLogger;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -330,6 +331,39 @@ public class ContextTest extends TestBase {
             ctx.findThrowable("$.exception")
                 .filter(e -> "test message".equals(e.getMessage()))
                 .isPresent();
+    RuntimeException e = new RuntimeException("test message");
+    logger.info(c, "Matches on exception", e);
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on exception");
+  }
+
+  @Test
+  void testFindExceptionStacktrace() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) -> {
+          List<?> trace = ctx.findList("$.exception.stackTrace");
+          return trace.size() > 0;
+        };
+    RuntimeException e = new RuntimeException("test message");
+    logger.info(c, "Matches on exception", e);
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("Matches on exception");
+  }
+
+  void testFindExceptionStackTraceElement() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) -> {
+          Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
+          return element.get("fileName").toString().endsWith("ContextTest.java");
+        };
     RuntimeException e = new RuntimeException("test message");
     logger.info(c, "Matches on exception", e);
 
