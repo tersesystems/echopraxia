@@ -1,9 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.List;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An abstract class that implements the support methods and safe self-typed return methods.

@@ -8,7 +8,6 @@ import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.Utilities;
-
 import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
@@ -358,7 +357,7 @@ public class SemanticLoggerFactory {
 
     @Override
     public <CFB> @NotNull SemanticLogger<DataType> withFields(
-      @NotNull Function<CFB, List<Field>> ctxBuilderF, @NotNull CFB ctxBuilder) {
+        @NotNull Function<CFB, List<Field>> ctxBuilderF, @NotNull CFB ctxBuilder) {
       final CoreLogger coreLogger = core.withFields(ctxBuilderF, ctxBuilder);
       return new SemanticLoggerFactory.Impl<>(
           coreLogger, builder, messageFunction, builderFunction);

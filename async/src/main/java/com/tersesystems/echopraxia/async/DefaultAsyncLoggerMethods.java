@@ -9,11 +9,9 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggerHandle;
-
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

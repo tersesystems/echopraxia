@@ -2,11 +2,10 @@ package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Logging methods specific to the synchronous Logger (isEnabled checks + base).

@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.*;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.function.Function;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * An echopraxia logger built around a field builder.
