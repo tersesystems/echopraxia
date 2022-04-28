@@ -23,7 +23,7 @@ public final class Utilities {
   public static List<Field> buildThreadContext(Map<String, String> contextMap) {
     List<Field> list = new ArrayList<>();
     for (Map.Entry<String, String> e : contextMap.entrySet()) {
-      Field field = KeyValueField.create(e.getKey(), Value.string(e.getValue()));
+      Field field = Field.keyValue(e.getKey(), Value.string(e.getValue()));
       list.add(field);
     }
     return list;

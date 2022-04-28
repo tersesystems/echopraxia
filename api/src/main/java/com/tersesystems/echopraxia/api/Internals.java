@@ -24,7 +24,7 @@ class Internals {
   }
 
   /** This is a field that prints out value to a message template if possible. */
-  static final class DefaultValueField implements ValueField, FormatToBuffer {
+  static final class DefaultValueField implements Field.ValueField, FormatToBuffer {
     private final String name;
     private final Value<?> value;
 
@@ -56,7 +56,7 @@ class Internals {
   }
 
   /** This is a field that prints out key=value to a message template if possible. */
-  static final class DefaultKeyValueField implements KeyValueField, FormatToBuffer {
+  static final class DefaultKeyValueField implements Field.KeyValueField, FormatToBuffer {
     private final String name;
     private final Value<?> value;
 

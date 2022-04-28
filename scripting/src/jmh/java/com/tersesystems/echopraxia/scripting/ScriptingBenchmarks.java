@@ -44,7 +44,7 @@ public class ScriptingBenchmarks {
   private static final Condition watchedCondition = ScriptCondition.create(false, watchedScript);
 
   private static final LoggingContext passContext =
-      LogstashLoggingContext.create(ValueField.create("some_field", Value.number(1)));
+      LogstashLoggingContext.create(Field.value("some_field", Value.number(1)));
 
   private static final LoggingContext failContext = LogstashLoggingContext.empty();
 

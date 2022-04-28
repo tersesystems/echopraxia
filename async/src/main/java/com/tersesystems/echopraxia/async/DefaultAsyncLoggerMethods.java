@@ -8,7 +8,6 @@ import static java.util.Collections.singletonList;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.KeyValueField;
 import com.tersesystems.echopraxia.api.LoggerHandle;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
@@ -73,7 +72,7 @@ public interface DefaultAsyncLoggerMethods<FB>
     core()
         .asyncLog(
             TRACE,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -113,7 +112,7 @@ public interface DefaultAsyncLoggerMethods<FB>
         .asyncLog(
             TRACE,
             condition,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -168,7 +167,7 @@ public interface DefaultAsyncLoggerMethods<FB>
     core()
         .asyncLog(
             DEBUG,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -208,7 +207,7 @@ public interface DefaultAsyncLoggerMethods<FB>
         .asyncLog(
             DEBUG,
             condition,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -263,7 +262,7 @@ public interface DefaultAsyncLoggerMethods<FB>
     core()
         .asyncLog(
             INFO,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -303,7 +302,7 @@ public interface DefaultAsyncLoggerMethods<FB>
         .asyncLog(
             INFO,
             condition,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -358,7 +357,7 @@ public interface DefaultAsyncLoggerMethods<FB>
     core()
         .asyncLog(
             WARN,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -398,7 +397,7 @@ public interface DefaultAsyncLoggerMethods<FB>
         .asyncLog(
             WARN,
             condition,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -453,7 +452,7 @@ public interface DefaultAsyncLoggerMethods<FB>
     core()
         .asyncLog(
             ERROR,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -493,7 +492,7 @@ public interface DefaultAsyncLoggerMethods<FB>
         .asyncLog(
             ERROR,
             condition,
-            h -> h.log(message, fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 }
