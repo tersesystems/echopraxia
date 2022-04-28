@@ -7,7 +7,7 @@ The Scala API for Echopraxia is a layer over the Java API that works smoothly wi
 Add the following to your `build.sbt` file:
 
 ```scala
-libraryDependencies += "com.tersesystems.echopraxia" %% "scala-api" % "1.5.0-SNAPSHOT"
+libraryDependencies += "com.tersesystems.echopraxia" %% "scala-logger" % "2.0.0-SNAPSHOT"
 ```
 
 To import the Scala API, add the following:
