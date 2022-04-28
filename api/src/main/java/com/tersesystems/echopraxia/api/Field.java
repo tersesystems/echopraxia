@@ -43,15 +43,6 @@ public interface Field {
   }
 
   /**
-   * The BuilderFunction interface. This is used when logging arguments, so that a field builder can
-   * return a list of fields.
-   *
-   * @param <FB> the field builder type.
-   */
-  @FunctionalInterface
-  interface BuilderFunction<FB> extends Function<FB, List<Field>> {}
-
-  /**
    * Marker interface for key values.
    *
    * <p>Indicates that the plain value should be rendered in message template.

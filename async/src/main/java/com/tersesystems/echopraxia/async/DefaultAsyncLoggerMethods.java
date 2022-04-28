@@ -9,7 +9,11 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggerHandle;
+
+import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +62,7 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void trace(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+  default void trace(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(TRACE, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -96,7 +100,7 @@ public interface DefaultAsyncLoggerMethods<FB>
   default void trace(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(TRACE, condition, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -153,7 +157,7 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void debug(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void debug(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(DEBUG, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -191,7 +195,7 @@ public interface DefaultAsyncLoggerMethods<FB>
   default void debug(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(DEBUG, condition, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -248,7 +252,7 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void info(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void info(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(INFO, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -286,7 +290,7 @@ public interface DefaultAsyncLoggerMethods<FB>
   default void info(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(INFO, condition, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -343,7 +347,7 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void warn(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void warn(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(WARN, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -381,7 +385,7 @@ public interface DefaultAsyncLoggerMethods<FB>
   default void warn(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(WARN, condition, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -438,7 +442,7 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void error(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void error(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(ERROR, h -> h.log(message, f), fieldBuilder());
   }
 
@@ -476,7 +480,7 @@ public interface DefaultAsyncLoggerMethods<FB>
   default void error(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().asyncLog(ERROR, condition, h -> h.log(message, f), fieldBuilder());
   }
 

@@ -2,6 +2,9 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * An abstract class that implements the support methods and safe self-typed return methods.
  *
@@ -52,7 +55,7 @@ public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<S
   }
 
   @NotNull
-  public SELF withFields(@NotNull Field.BuilderFunction<FB> f) {
+  public SELF withFields(@NotNull Function<FB, List<Field>> f) {
     return newLogger(core().withFields(f, fieldBuilder));
   }
 

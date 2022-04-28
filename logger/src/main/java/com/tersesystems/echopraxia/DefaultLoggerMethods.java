@@ -12,6 +12,9 @@ import com.tersesystems.echopraxia.api.Field;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * Logger methods that delegate to `core.log` by default.
  *
@@ -50,7 +53,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * @param message the message.
    * @param f the field builder function.
    */
-  default void trace(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+  default void trace(@Nullable String message, Function<FB, List<Field>> f) {
     core().log(TRACE, message, f, fieldBuilder());
   }
 
@@ -89,7 +92,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   default void trace(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().log(TRACE, condition, message, f, fieldBuilder());
   }
 
@@ -141,7 +144,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * @param message the message.
    * @param f the field builder function.
    */
-  default void debug(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void debug(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().log(DEBUG, message, f, fieldBuilder());
   }
 
@@ -197,7 +200,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   default void debug(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().log(DEBUG, condition, message, f, fieldBuilder());
   }
 
@@ -232,7 +235,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * @param message the message.
    * @param f the field builder function.
    */
-  default void info(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void info(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().log(INFO, message, f, fieldBuilder());
   }
 
@@ -271,7 +274,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   default void info(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().log(INFO, condition, message, f, fieldBuilder());
   }
 
@@ -323,7 +326,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * @param message the message.
    * @param f the field builder function.
    */
-  default void warn(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void warn(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().log(WARN, message, f, fieldBuilder());
   }
 
@@ -379,7 +382,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   default void warn(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().log(WARN, condition, message, f, fieldBuilder());
   }
 
@@ -414,7 +417,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * @param message the message.
    * @param f the field builder function.
    */
-  default void error(@Nullable String message, @NotNull Field.BuilderFunction<FB> f) {
+  default void error(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
     core().log(ERROR, message, f, fieldBuilder());
   }
 
@@ -453,7 +456,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   default void error(
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Field.BuilderFunction<FB> f) {
+      @NotNull Function<FB, List<Field>> f) {
     core().log(ERROR, condition, message, f, fieldBuilder());
   }
 

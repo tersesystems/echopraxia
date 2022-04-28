@@ -4,6 +4,9 @@ import com.tersesystems.echopraxia.api.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.function.Function;
+
 /**
  * An echopraxia logger built around a field builder.
  *
@@ -77,7 +80,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     }
 
     @Override
-    public @NotNull Logger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
+    public @NotNull Logger<FB> withFields(@NotNull Function<FB, List<Field>> f) {
       return this;
     }
 
@@ -105,7 +108,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     }
 
     @Override
-    public void trace(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+    public void trace(@Nullable String message, Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -123,7 +126,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     public void trace(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {
+        @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -152,7 +155,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     }
 
     @Override
-    public void debug(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+    public void debug(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -170,7 +173,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     public void debug(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {
+        @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -199,7 +202,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     }
 
     @Override
-    public void info(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+    public void info(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -217,7 +220,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     public void info(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {
+        @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -240,7 +243,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     }
 
     @Override
-    public void warn(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+    public void warn(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -258,7 +261,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     public void warn(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {
+        @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -286,7 +289,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     }
 
     @Override
-    public void error(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {
+    public void error(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
@@ -304,7 +307,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     public void error(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {
+        @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 
