@@ -12,19 +12,6 @@ import org.jetbrains.annotations.NotNull;
 public final class Utilities {
 
   @NotNull
-  public static <T> T getNewInstance(@NotNull Class<T> newBuilderClass) {
-    try {
-      return newBuilderClass.getDeclaredConstructor().newInstance();
-    } catch (NoSuchMethodException
-        | SecurityException
-        | InstantiationException
-        | IllegalAccessException
-        | InvocationTargetException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  @NotNull
   public static Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
       getThreadContextFunction(@NotNull Function<Map<String, String>, List<Field>> f) {
     return mapSupplier -> () -> f.apply(mapSupplier.get());

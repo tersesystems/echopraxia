@@ -260,7 +260,7 @@ class LogstashLoggerTest extends TestBase {
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating"));
 
-    final Logger<MyFieldBuilder> logger = getLogger().withFieldBuilder(MyFieldBuilder.class);
+    final Logger<MyFieldBuilder> logger = getLogger().withFieldBuilder(new MyFieldBuilder());
     logger.info("hi there {}", fb -> fb.only(fb.person("person", abe)));
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
