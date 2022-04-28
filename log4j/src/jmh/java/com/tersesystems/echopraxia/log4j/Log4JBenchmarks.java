@@ -1,11 +1,11 @@
 package com.tersesystems.echopraxia.log4j;
 
-import static com.tersesystems.echopraxia.Field.Value;
+import static com.tersesystems.echopraxia.api.Field.Value;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.KeyValueField;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.KeyValueField;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Arrays;
 import java.util.List;

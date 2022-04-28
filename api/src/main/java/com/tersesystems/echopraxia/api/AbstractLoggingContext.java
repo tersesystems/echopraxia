@@ -1,13 +1,9 @@
-package com.tersesystems.echopraxia.support;
+package com.tersesystems.echopraxia.api;
 
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import com.tersesystems.echopraxia.EchopraxiaJsonProvider;
-import com.tersesystems.echopraxia.EchopraxiaMappingProvider;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Field.Value.*;
-import com.tersesystems.echopraxia.LoggingContext;
+import com.tersesystems.echopraxia.api.Field.Value.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

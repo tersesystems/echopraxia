@@ -1,7 +1,9 @@
 package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.*;
-import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.Level;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;

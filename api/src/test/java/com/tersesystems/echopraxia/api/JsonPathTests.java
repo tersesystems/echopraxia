@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
 import static com.jayway.jsonpath.Criteria.where;
 import static com.jayway.jsonpath.Filter.filter;

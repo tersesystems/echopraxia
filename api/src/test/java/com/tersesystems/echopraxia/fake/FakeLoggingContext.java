@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.fake;
 
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.support.AbstractLoggingContext;
+import com.tersesystems.echopraxia.api.AbstractLoggingContext;
+import com.tersesystems.echopraxia.api.Field;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

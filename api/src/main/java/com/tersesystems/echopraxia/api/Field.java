@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
 import java.util.*;
 import java.util.function.Function;

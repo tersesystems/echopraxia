@@ -1,11 +1,11 @@
 package com.tersesystems.echopraxia.fluent;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
-import com.tersesystems.echopraxia.Level;
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.support.Utilities;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.api.Utilities;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;

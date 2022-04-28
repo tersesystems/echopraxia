@@ -1,9 +1,7 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;

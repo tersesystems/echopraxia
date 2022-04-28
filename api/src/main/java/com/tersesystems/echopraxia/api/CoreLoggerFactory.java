@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.core;
+package com.tersesystems.echopraxia.api;
 
 import java.io.IOException;
 import java.io.InputStream;

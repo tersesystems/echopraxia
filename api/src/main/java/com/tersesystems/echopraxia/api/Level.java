@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
 /**
  * An enumeration of the logging levels.

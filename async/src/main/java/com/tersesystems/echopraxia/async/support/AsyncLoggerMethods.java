@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.async.support;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.LoggerHandle;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.LoggerHandle;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

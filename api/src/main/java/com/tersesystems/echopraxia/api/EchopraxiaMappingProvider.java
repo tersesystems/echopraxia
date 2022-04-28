@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPathException;

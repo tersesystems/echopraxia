@@ -3,11 +3,11 @@ package com.tersesystems.echopraxia.log4j;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
-import com.tersesystems.echopraxia.core.CoreLoggerFactory;
+import com.tersesystems.echopraxia.api.CoreLoggerFactory;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldBuilder;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import org.apache.logging.log4j.Marker;

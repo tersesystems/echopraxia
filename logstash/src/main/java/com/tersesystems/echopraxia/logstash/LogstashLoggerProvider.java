@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.logstash;
 
 import ch.qos.logback.classic.LoggerContext;
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.core.CoreLoggerProvider;
+import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.CoreLoggerProvider;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;
 

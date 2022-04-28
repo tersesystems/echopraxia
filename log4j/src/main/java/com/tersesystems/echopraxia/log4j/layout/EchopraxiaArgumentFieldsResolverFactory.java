@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
-import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.api.Field;
 import java.util.List;
 import org.apache.logging.log4j.core.config.plugins.Plugin;
 import org.apache.logging.log4j.core.config.plugins.PluginFactory;

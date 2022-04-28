@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
-import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.api.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

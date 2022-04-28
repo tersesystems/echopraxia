@@ -2,11 +2,11 @@ package com.tersesystems.echopraxia.log4j;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.Option;
-import com.tersesystems.echopraxia.EchopraxiaJsonProvider;
-import com.tersesystems.echopraxia.EchopraxiaMappingProvider;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.support.AbstractLoggingContext;
-import com.tersesystems.echopraxia.support.Utilities;
+import com.tersesystems.echopraxia.api.AbstractLoggingContext;
+import com.tersesystems.echopraxia.api.EchopraxiaJsonProvider;
+import com.tersesystems.echopraxia.api.EchopraxiaMappingProvider;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Utilities;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;

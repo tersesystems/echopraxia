@@ -1,9 +1,12 @@
 package com.tersesystems.echopraxia;
 
-import static com.tersesystems.echopraxia.support.Utilities.getNewInstance;
+import static com.tersesystems.echopraxia.api.Utilities.getNewInstance;
 
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.support.AbstractLoggerSupport;
+import com.tersesystems.echopraxia.api.AbstractLoggerSupport;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.support.DefaultLoggerMethods;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

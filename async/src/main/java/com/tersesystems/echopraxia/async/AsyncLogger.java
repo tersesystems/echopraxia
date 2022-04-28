@@ -1,14 +1,14 @@
 package com.tersesystems.echopraxia.async;
 
-import static com.tersesystems.echopraxia.support.Utilities.getNewInstance;
+import static com.tersesystems.echopraxia.api.Utilities.getNewInstance;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
-import com.tersesystems.echopraxia.LoggerHandle;
+import com.tersesystems.echopraxia.api.AbstractLoggerSupport;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.LoggerHandle;
 import com.tersesystems.echopraxia.async.support.DefaultAsyncLoggerMethods;
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.support.AbstractLoggerSupport;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;

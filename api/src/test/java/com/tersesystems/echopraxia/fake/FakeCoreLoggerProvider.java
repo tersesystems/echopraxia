@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.fake;
 
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.core.CoreLoggerProvider;
+import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.CoreLoggerProvider;
 import org.jetbrains.annotations.NotNull;
 
 public class FakeCoreLoggerProvider implements CoreLoggerProvider {

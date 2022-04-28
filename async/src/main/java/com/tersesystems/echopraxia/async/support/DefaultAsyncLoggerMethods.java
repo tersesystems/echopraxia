@@ -1,15 +1,15 @@
 package com.tersesystems.echopraxia.async.support;
 
-import static com.tersesystems.echopraxia.Field.EXCEPTION;
-import static com.tersesystems.echopraxia.Field.Value.exception;
-import static com.tersesystems.echopraxia.Level.*;
+import static com.tersesystems.echopraxia.api.Field.EXCEPTION;
+import static com.tersesystems.echopraxia.api.Field.Value.exception;
+import static com.tersesystems.echopraxia.api.Level.*;
 import static java.util.Collections.singletonList;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.KeyValueField;
-import com.tersesystems.echopraxia.LoggerHandle;
-import com.tersesystems.echopraxia.support.DefaultMethodsSupport;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.KeyValueField;
+import com.tersesystems.echopraxia.api.LoggerHandle;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

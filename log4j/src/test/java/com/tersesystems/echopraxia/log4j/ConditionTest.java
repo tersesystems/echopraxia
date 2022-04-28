@@ -6,9 +6,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
 import java.util.List;

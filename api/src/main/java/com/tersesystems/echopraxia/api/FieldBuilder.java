@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;

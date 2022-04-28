@@ -1,9 +1,10 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.LoggingContext;
-import com.tersesystems.echopraxia.ValueField;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.ValueField;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -20,7 +21,7 @@ public class JsonPathBenchmarks {
   private static final Condition pathCondition =
       new Condition() {
         @Override
-        public boolean test(com.tersesystems.echopraxia.Level level, LoggingContext context) {
+        public boolean test(Level level, LoggingContext context) {
           return context.findString("$.some_field").filter(f -> f.equals("testing")).isPresent();
         }
       };
@@ -32,21 +33,21 @@ public class JsonPathBenchmarks {
 
   @Benchmark
   public void testStreamConditionPass(Blackhole blackhole) {
-    blackhole.consume(streamCondition.test(com.tersesystems.echopraxia.Level.INFO, passContext));
+    blackhole.consume(streamCondition.test(Level.INFO, passContext));
   }
 
   @Benchmark
   public void testStreamConditionFail(Blackhole blackhole) {
-    blackhole.consume(streamCondition.test(com.tersesystems.echopraxia.Level.INFO, failContext));
+    blackhole.consume(streamCondition.test(Level.INFO, failContext));
   }
 
   @Benchmark
   public void testPathConditionPass(Blackhole blackhole) {
-    blackhole.consume(pathCondition.test(com.tersesystems.echopraxia.Level.INFO, passContext));
+    blackhole.consume(pathCondition.test(Level.INFO, passContext));
   }
 
   @Benchmark
   public void testPathConditionFail(Blackhole blackhole) {
-    blackhole.consume(pathCondition.test(com.tersesystems.echopraxia.Level.INFO, failContext));
+    blackhole.consume(pathCondition.test(Level.INFO, failContext));
   }
 }
