@@ -1,8 +1,10 @@
 package com.tersesystems.echopraxia.async;
 
 import com.tersesystems.echopraxia.api.*;
+import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -131,7 +133,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void trace(@Nullable String message) {}
 
     @Override
-    public void trace(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {}
+    public void trace(@Nullable String message, @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void trace(@Nullable String message, @NotNull Throwable e) {}
@@ -143,7 +145,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void trace(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {}
+        @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void trace(
@@ -168,7 +170,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void debug(@Nullable String message) {}
 
     @Override
-    public void debug(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {}
+    public void debug(@Nullable String message, @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void debug(@Nullable String message, @NotNull Throwable e) {}
@@ -180,7 +182,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void debug(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {}
+        @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void debug(
@@ -205,7 +207,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void info(@Nullable String message) {}
 
     @Override
-    public void info(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {}
+    public void info(@Nullable String message, @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void info(@Nullable String message, @NotNull Throwable e) {}
@@ -217,7 +219,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void info(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {}
+        @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void info(
@@ -239,7 +241,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     @Override
-    public void warn(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {}
+    public void warn(@Nullable String message, @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void warn(@Nullable String message, @NotNull Throwable e) {}
@@ -251,7 +253,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void warn(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {}
+        @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void warn(
@@ -278,7 +280,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void error(@Nullable String message) {}
 
     @Override
-    public void error(@Nullable String message, Field.@NotNull BuilderFunction<FB> f) {}
+    public void error(@Nullable String message, @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void error(@Nullable String message, @NotNull Throwable e) {}
@@ -290,7 +292,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     public void error(
         @NotNull Condition condition,
         @Nullable String message,
-        Field.@NotNull BuilderFunction<FB> f) {}
+        @NotNull Function<FB, List<Field>> f) {}
 
     @Override
     public void error(

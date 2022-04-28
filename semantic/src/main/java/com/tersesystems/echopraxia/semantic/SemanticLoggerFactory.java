@@ -8,6 +8,7 @@ import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.Utilities;
+import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 
@@ -44,7 +45,7 @@ public class SemanticLoggerFactory {
       Class<?> clazz,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<FB>> f,
+      Function<DataType, Function<FB, List<Field>>> f,
       FB builder) {
     CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, clazz);
     return getLogger(coreLogger, dataTypeClass, messageFunction, f, builder);
@@ -66,7 +67,7 @@ public class SemanticLoggerFactory {
       String name,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<FB>> f,
+      Function<DataType, Function<FB, List<Field>>> f,
       FB builder) {
     CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, name);
     return getLogger(coreLogger, dataTypeClass, messageFunction, f, builder);
@@ -86,7 +87,7 @@ public class SemanticLoggerFactory {
       String name,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<FieldBuilder>> f) {
+      Function<DataType, Function<FieldBuilder, List<Field>>> f) {
     return getLogger(name, dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
@@ -104,7 +105,7 @@ public class SemanticLoggerFactory {
       Class<?> clazz,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<FieldBuilder>> f) {
+      Function<DataType, Function<FieldBuilder, List<Field>>> f) {
     return getLogger(clazz, dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
@@ -120,7 +121,7 @@ public class SemanticLoggerFactory {
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<FieldBuilder>> f) {
+      Function<DataType, Function<FieldBuilder, List<Field>>> f) {
     return getLogger(
         Caller.resolveClassName(), dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
@@ -139,7 +140,7 @@ public class SemanticLoggerFactory {
   public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<FB>> f,
+      Function<DataType, Function<FB, List<Field>>> f,
       FB builder) {
     return getLogger(Caller.resolveClassName(), dataTypeClass, messageFunction, f, builder);
   }
@@ -162,7 +163,7 @@ public class SemanticLoggerFactory {
       CoreLogger coreLogger,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Field.BuilderFunction<FB>> f,
+      Function<DataType, Function<FB, List<Field>>> f,
       FB builder) {
     return new Impl<>(coreLogger, builder, messageFunction, f);
   }
@@ -173,7 +174,7 @@ public class SemanticLoggerFactory {
   public static class Impl<DataType, FB extends FieldBuilder> implements SemanticLogger<DataType> {
 
     private final CoreLogger core;
-    private final Function<DataType, Field.BuilderFunction<FB>> builderFunction;
+    private final Function<DataType, Function<FB, List<Field>>> builderFunction;
     private final FB builder;
     private final Function<DataType, String> messageFunction;
 
@@ -181,7 +182,7 @@ public class SemanticLoggerFactory {
         CoreLogger core,
         FB builder,
         Function<DataType, String> messageFunction,
-        Function<DataType, Field.BuilderFunction<FB>> builderFunction) {
+        Function<DataType, Function<FB, List<Field>>> builderFunction) {
       this.core = core;
       this.builderFunction = builderFunction;
       this.messageFunction = messageFunction;
@@ -206,7 +207,7 @@ public class SemanticLoggerFactory {
       return messageFunction;
     }
 
-    public Function<DataType, Field.BuilderFunction<FB>> builderFunction() {
+    public Function<DataType, Function<FB, List<Field>>> builderFunction() {
       return builderFunction;
     }
 
@@ -343,7 +344,7 @@ public class SemanticLoggerFactory {
 
     @Override
     public @NotNull SemanticLogger<DataType> withFields(
-        Field.@NotNull BuilderFunction<FieldBuilder> f) {
+        @NotNull Function<FieldBuilder, List<Field>> f) {
       return withFields(f, builder);
     }
 
@@ -356,7 +357,7 @@ public class SemanticLoggerFactory {
 
     @Override
     public <CFB> @NotNull SemanticLogger<DataType> withFields(
-        Field.@NotNull BuilderFunction<CFB> ctxBuilderF, @NotNull CFB ctxBuilder) {
+        @NotNull Function<CFB, List<Field>> ctxBuilderF, @NotNull CFB ctxBuilder) {
       final CoreLogger coreLogger = core.withFields(ctxBuilderF, ctxBuilder);
       return new SemanticLoggerFactory.Impl<>(
           coreLogger, builder, messageFunction, builderFunction);

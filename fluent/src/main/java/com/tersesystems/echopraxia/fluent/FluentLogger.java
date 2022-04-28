@@ -50,7 +50,7 @@ public class FluentLogger<FB extends FieldBuilder> {
   }
 
   @NotNull
-  public FluentLogger<FB> withFields(@NotNull Field.BuilderFunction<FB> f) {
+  public FluentLogger<FB> withFields(@NotNull Function<FB, List<Field>> f) {
     CoreLogger coreLogger = core.withFields(f, builder);
     return new FluentLogger<>(coreLogger, builder);
   }

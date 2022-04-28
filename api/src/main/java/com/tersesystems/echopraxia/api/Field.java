@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
 import java.util.*;
-import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -41,15 +40,6 @@ public interface Field {
   static Field.KeyValueField keyValue(@NotNull String name, @NotNull Value<?> value) {
     return new Internals.DefaultKeyValueField(name, value);
   }
-
-  /**
-   * The BuilderFunction interface. This is used when logging arguments, so that a field builder can
-   * return a list of fields.
-   *
-   * @param <FB> the field builder type.
-   */
-  @FunctionalInterface
-  interface BuilderFunction<FB> extends Function<FB, List<Field>> {}
 
   /**
    * Marker interface for key values.
