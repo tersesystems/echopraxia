@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
-import com.tersesystems.echopraxia.api.Value;
-
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Value;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;

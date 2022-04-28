@@ -1,10 +1,8 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.*;
-
-import java.util.concurrent.TimeUnit;
-
 import com.tersesystems.echopraxia.api.Level;
+import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -26,7 +24,7 @@ public class JsonPathBenchmarks {
       };
 
   private static final LoggingContext passContext =
-      LogstashLoggingContext.create(ValueField.create("some_field", Value.string("testing")));
+      LogstashLoggingContext.create(Field.value("some_field", Value.string("testing")));
 
   private static final LoggingContext failContext = LogstashLoggingContext.empty();
 

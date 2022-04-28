@@ -1,12 +1,11 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.api.Value;
-
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggerHandle;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Collections;
 import java.util.List;

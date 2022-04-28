@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.api.Value;
 import static com.tersesystems.echopraxia.api.Value.*;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -15,6 +14,7 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.Value;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;

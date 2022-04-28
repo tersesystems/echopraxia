@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Value;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;

@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.api.Value;
 import static org.slf4j.event.EventConstants.*;
 
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.Value;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -343,7 +343,7 @@ public class LogstashCoreLogger implements CoreLogger {
       } else {
         final String name = field.name();
         StructuredArgument array =
-            field instanceof ValueField
+            field instanceof Field.ValueField
                 ? StructuredArguments.value(name, value)
                 : StructuredArguments.keyValue(name, value);
         arguments.add(array);

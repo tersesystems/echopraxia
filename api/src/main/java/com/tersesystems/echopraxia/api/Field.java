@@ -32,6 +32,16 @@ public interface Field {
   @NotNull
   Value<?> value();
 
+  @NotNull
+  static Field.ValueField value(@NotNull String name, @NotNull Value<?> value) {
+    return new Internals.DefaultValueField(name, value);
+  }
+
+  @NotNull
+  static Field.KeyValueField keyValue(@NotNull String name, @NotNull Value<?> value) {
+    return new Internals.DefaultKeyValueField(name, value);
+  }
+
   /**
    * The BuilderFunction interface. This is used when logging arguments, so that a field builder can
    * return a list of fields.
@@ -40,4 +50,23 @@ public interface Field {
    */
   @FunctionalInterface
   interface BuilderFunction<FB> extends Function<FB, List<Field>> {}
+
+  /**
+   * Marker interface for key values.
+   *
+   * <p>Indicates that the plain value should be rendered in message template.
+   *
+   * <p>This marker interface is used internally.
+   */
+  interface ValueField extends Field {}
+
+  /**
+   * Marker interface for key values.
+   *
+   * <p>Indicates that we want `key=value` in the message template.
+   *
+   * <p>This marker interface is used internally, but you typically won't need to use it directly.
+   * You can call `Field.Builder.keyValue` to get a instance of a field with this.
+   */
+  interface KeyValueField extends Field {}
 }

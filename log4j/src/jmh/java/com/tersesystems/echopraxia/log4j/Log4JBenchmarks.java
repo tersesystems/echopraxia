@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.api.Value;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.KeyValueField;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.Arrays;
 import java.util.List;
@@ -65,7 +64,7 @@ public class Log4JBenchmarks {
     logger.info(message, exception);
   }
 
-  static class MyKeyValueField implements KeyValueField {
+  static class MyKeyValueField implements Field.KeyValueField {
     private final String name;
     private final Value<?> value;
 

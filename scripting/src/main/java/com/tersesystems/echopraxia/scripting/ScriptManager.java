@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.scripting;
 
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.Value;
 import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
@@ -47,7 +47,8 @@ public class ScriptManager {
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
       com.twineworks.tweakflow.lang.values.Value levelV = Values.make(level.name());
-      com.twineworks.tweakflow.lang.values.Value functionMapValue = Values.make(createFunctionMap(context));
+      com.twineworks.tweakflow.lang.values.Value functionMapValue =
+          Values.make(createFunctionMap(context));
       com.twineworks.tweakflow.lang.values.Value retValue = call(levelV, functionMapValue);
       if (!retValue.isBoolean()) {
         throw new ScriptException(
@@ -75,7 +76,9 @@ public class ScriptManager {
     return new DictValue(functionMap);
   }
 
-  private com.twineworks.tweakflow.lang.values.Value call(com.twineworks.tweakflow.lang.values.Value level, com.twineworks.tweakflow.lang.values.Value fields) {
+  private com.twineworks.tweakflow.lang.values.Value call(
+      com.twineworks.tweakflow.lang.values.Value level,
+      com.twineworks.tweakflow.lang.values.Value fields) {
     synchronized (lock) {
       // if there's no callsite or the handle is bad, we need to eval the script
       // probably safest to do this in a single thread in synchronized block?
@@ -109,7 +112,8 @@ public class ScriptManager {
   }
 
   @NotNull
-  private com.twineworks.tweakflow.lang.values.Value userFunctionValue(Arity1UserFunction userFunction) {
+  private com.twineworks.tweakflow.lang.values.Value userFunctionValue(
+      Arity1UserFunction userFunction) {
     return Values.make(
         new UserFunctionValue(
             new FunctionSignature(
@@ -119,7 +123,8 @@ public class ScriptManager {
             userFunction));
   }
 
-  private com.twineworks.tweakflow.lang.values.Value arity0FunctionValue(Arity0UserFunction userFunction) {
+  private com.twineworks.tweakflow.lang.values.Value arity0FunctionValue(
+      Arity0UserFunction userFunction) {
     return Values.make(
         new UserFunctionValue(
             new FunctionSignature(Collections.emptyList(), Types.ANY), userFunction));

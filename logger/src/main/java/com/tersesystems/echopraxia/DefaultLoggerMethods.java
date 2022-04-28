@@ -9,7 +9,6 @@ import static java.util.Collections.singletonList;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.KeyValueField;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,7 +65,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
         .log(
             TRACE,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -107,7 +106,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
             TRACE,
             condition,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -157,7 +156,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
         .log(
             DEBUG,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -184,7 +183,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
             DEBUG,
             condition,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -248,7 +247,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
         .log(
             INFO,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -289,7 +288,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
             INFO,
             condition,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -339,7 +338,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
         .log(
             WARN,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -366,7 +365,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
             WARN,
             condition,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -430,7 +429,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
         .log(
             ERROR,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -471,7 +470,7 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
             ERROR,
             condition,
             message,
-            fb -> singletonList(KeyValueField.create(EXCEPTION, exception(e))),
+            fb -> singletonList(Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 }

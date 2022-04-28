@@ -50,8 +50,8 @@ public interface FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default ValueField value(@NotNull String name, @NotNull Value<?> value) {
-    return ValueField.create(name, value);
+  default Field.ValueField value(@NotNull String name, @NotNull Value<?> value) {
+    return Field.value(name, value);
   }
 
   /**
@@ -64,8 +64,8 @@ public interface FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default KeyValueField keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return KeyValueField.create(name, value);
+  default Field.KeyValueField keyValue(@NotNull String name, @NotNull Value<?> value) {
+    return Field.keyValue(name, value);
   }
 
   // ---------------------------------------------------------
