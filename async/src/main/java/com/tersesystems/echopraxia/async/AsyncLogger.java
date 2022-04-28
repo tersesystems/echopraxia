@@ -4,7 +4,6 @@ import static com.tersesystems.echopraxia.support.Utilities.getNewInstance;
 
 import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.LoggerHandle;
 import com.tersesystems.echopraxia.async.support.DefaultAsyncLoggerMethods;
 import com.tersesystems.echopraxia.core.CoreLogger;
@@ -26,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<AsyncLogger<FB>, FB>
+public class AsyncLogger<FB> extends AbstractLoggerSupport<AsyncLogger<FB>, FB>
     implements DefaultAsyncLoggerMethods<FB> {
 
   protected AsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
@@ -41,7 +40,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
    * @return a new logger using the given field builder.
    */
   @NotNull
-  public <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
+  public <T> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     return newLogger(newBuilder);
   }
 
@@ -53,8 +52,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
    * @return a new logger using the given field builder.
    */
   @NotNull
-  public <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(
-      @NotNull Class<T> newBuilderClass) {
+  public <T> AsyncLogger<T> withFieldBuilder(@NotNull Class<T> newBuilderClass) {
     return newLogger(getNewInstance(newBuilderClass));
   }
 
@@ -97,7 +95,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
   }
 
   @NotNull
-  protected <T extends FieldBuilder> AsyncLogger<T> newLogger(@NotNull T fieldBuilder) {
+  protected <T> AsyncLogger<T> newLogger(@NotNull T fieldBuilder) {
     if (this.fieldBuilder == fieldBuilder) {
       //noinspection unchecked
       return (AsyncLogger<T>) this;
@@ -112,7 +110,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
   }
 
   // This must extend AsyncLogger so the return type is the same
-  private static class NeverAsyncLogger<FB extends FieldBuilder> extends AsyncLogger<FB> {
+  private static class NeverAsyncLogger<FB> extends AsyncLogger<FB> {
 
     protected NeverAsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
       super(core, fieldBuilder);
@@ -128,8 +126,7 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
     }
 
     @Override
-    public @NotNull <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(
-        @NotNull T newBuilder) {
+    public @NotNull <T> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
       return new NeverAsyncLogger<T>(core, newBuilder);
     }
 

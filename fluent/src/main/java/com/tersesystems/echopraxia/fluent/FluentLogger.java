@@ -1,9 +1,6 @@
 package com.tersesystems.echopraxia.fluent;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.FieldBuilder;
-import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.support.Utilities;
 import java.lang.reflect.InvocationTargetException;
@@ -18,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public class FluentLogger<FB extends FieldBuilder> {
+public class FluentLogger<FB> {
 
   private final CoreLogger core;
   private final FB builder;
@@ -56,13 +53,12 @@ public class FluentLogger<FB extends FieldBuilder> {
   }
 
   @NotNull
-  public <T extends FieldBuilder> FluentLogger<T> withFieldBuilder(@NotNull T newBuilder) {
+  public <T> FluentLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     return new FluentLogger<>(core, newBuilder);
   }
 
   @NotNull
-  public <T extends FieldBuilder> FluentLogger<T> withFieldBuilder(
-      @NotNull Class<T> newBuilderClass) {
+  public <T> FluentLogger<T> withFieldBuilder(@NotNull Class<T> newBuilderClass) {
     try {
       final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();
       return new FluentLogger<>(core, newInstance);
@@ -189,7 +185,7 @@ public class FluentLogger<FB extends FieldBuilder> {
 
     @NotNull
     public EntryBuilder exception(@NotNull Throwable t) {
-      return argument(b -> b.exception(t));
+      return argument(b -> KeyValueField.create(Field.EXCEPTION, Field.Value.exception(t)));
     }
 
     public void log() {

@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.log4j;
 
 import static com.tersesystems.echopraxia.log4j.appender.ListAppender.getListAppender;
 
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.async.AsyncLogger;
@@ -22,11 +23,11 @@ public class TestBase {
     listAppender.clear();
   }
 
-  Logger<?> getLogger() {
+  Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger();
   }
 
-  AsyncLogger<?> getAsyncLogger() {
+  AsyncLogger<FieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger();
   }
 

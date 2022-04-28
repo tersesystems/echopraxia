@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.FieldBuilder;
 import com.tersesystems.echopraxia.Level;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.async.AsyncLogger;
@@ -126,7 +127,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testFailedLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger();
+    AsyncLogger<FieldBuilder> loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
         handle -> {
           handle.log(

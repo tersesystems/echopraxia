@@ -44,11 +44,11 @@ public class TestBase {
     return new LogstashCoreLogger(Logger.FQCN, loggerContext().getLogger(getClass().getName()));
   }
 
-  Logger<?> getLogger() {
+  Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 
-  AsyncLogger<?> getAsyncLogger() {
+  AsyncLogger<FieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 

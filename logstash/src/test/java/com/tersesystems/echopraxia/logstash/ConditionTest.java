@@ -108,7 +108,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testFailedLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger();
+    AsyncLogger<FieldBuilder> loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
         handle -> {
           handle.log(

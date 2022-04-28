@@ -1,6 +1,9 @@
 package com.tersesystems.echopraxia.fluent;
 
 import java.util.concurrent.TimeUnit;
+
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
 import org.openjdk.jmh.annotations.*;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -9,7 +12,7 @@ import org.openjdk.jmh.annotations.*;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class FluentBenchmarks {
-  private static final FluentLogger<?> logger = FluentLoggerFactory.getLogger();
+  private static final FluentLogger<FieldBuilder> logger = FluentLoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
 
   @Benchmark

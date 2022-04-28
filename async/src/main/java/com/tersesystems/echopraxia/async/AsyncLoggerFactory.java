@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The AsyncLoggerFactory class. This is used to create the appropriate `Logger`.
  *
- * <p>{@code private static final AsyncLogger<?> logger = AsyncLoggerFactory.getLogger(); }
+ * <p>{@code private static final AsyncLogger<FieldBuilder> logger = AsyncLoggerFactory.getLogger();
+ * }
  */
 public class AsyncLoggerFactory {
 
@@ -37,8 +38,7 @@ public class AsyncLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(
-      @NotNull Class<?> clazz, @NotNull FB builder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull Class<?> clazz, @NotNull FB builder) {
     CoreLogger coreLogger = AsyncLoggerFactory.getLogger(clazz).core();
     return new AsyncLogger<>(coreLogger, builder);
   }
@@ -64,8 +64,7 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(
-      @NotNull String name, @NotNull FB builder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull String name, @NotNull FB builder) {
     CoreLogger coreLogger = AsyncLoggerFactory.getLogger(name).core();
     return new AsyncLogger<>(coreLogger, builder);
   }
@@ -89,7 +88,7 @@ public class AsyncLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(@NotNull FB fieldBuilder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull FB fieldBuilder) {
     CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
     return new AsyncLogger<>(core, fieldBuilder);
   }
@@ -103,8 +102,7 @@ public class AsyncLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(
-      @NotNull CoreLogger core, @NotNull FB fieldBuilder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     return new AsyncLogger<>(core.withFQCN(FQCN), fieldBuilder);
   }
 }
