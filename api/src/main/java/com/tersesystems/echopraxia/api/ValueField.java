@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 public interface ValueField extends Field {
 
   @NotNull
-  static ValueField create(@NotNull String name, @NotNull Field.Value<?> value) {
+  static ValueField create(@NotNull String name, @NotNull Value<?> value) {
     return new Internals.DefaultValueField(name, value);
   }
 }

@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import java.util.Arrays;
@@ -84,8 +85,7 @@ public class Log4JLoggerTest extends TestBase {
   @Test
   void testNullObject() {
     Logger<?> logger = getLogger();
-    logger.debug(
-        "object is {}", fb -> fb.only(fb.object("name", Field.Value.object((Field) null))));
+    logger.debug("object is {}", fb -> fb.only(fb.object("name", Value.object((Field) null))));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");

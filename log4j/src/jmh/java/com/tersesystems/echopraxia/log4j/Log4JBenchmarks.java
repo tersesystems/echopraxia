@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
-import static com.tersesystems.echopraxia.api.Field.Value;
+import com.tersesystems.echopraxia.api.Value;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 

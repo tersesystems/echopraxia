@@ -50,7 +50,7 @@ public interface FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default ValueField value(@NotNull String name, @NotNull Field.Value<?> value) {
+  default ValueField value(@NotNull String name, @NotNull Value<?> value) {
     return ValueField.create(name, value);
   }
 
@@ -64,7 +64,7 @@ public interface FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default KeyValueField keyValue(@NotNull String name, @NotNull Field.Value<?> value) {
+  default KeyValueField keyValue(@NotNull String name, @NotNull Value<?> value) {
     return KeyValueField.create(name, value);
   }
 
@@ -80,7 +80,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field string(@NotNull String name, @NotNull String value) {
-    return value(name, Field.Value.string(value));
+    return value(name, Value.string(value));
   }
 
   /**
@@ -91,7 +91,7 @@ public interface FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default Field string(@NotNull String name, @NotNull Field.Value.StringValue value) {
+  default Field string(@NotNull String name, @NotNull Value.StringValue value) {
     return value(name, value);
   }
 
@@ -115,7 +115,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyString(@NotNull String name, @NotNull Field.Value.StringValue value) {
+  default List<Field> onlyString(@NotNull String name, @NotNull Value.StringValue value) {
     return only(string(name, value));
   }
 
@@ -131,7 +131,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field number(@NotNull String name, @NotNull Number value) {
-    return value(name, Field.Value.number(value));
+    return value(name, Value.number(value));
   }
 
   /**
@@ -142,7 +142,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default Field number(@NotNull String name, @NotNull Field.Value.NumberValue value) {
+  default Field number(@NotNull String name, @NotNull Value.NumberValue value) {
     return value(name, value);
   }
 
@@ -166,7 +166,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyNumber(@NotNull String name, @NotNull Field.Value.NumberValue value) {
+  default List<Field> onlyNumber(@NotNull String name, @NotNull Value.NumberValue value) {
     return only(number(name, value));
   }
 
@@ -182,7 +182,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field bool(@NotNull String name, @NotNull Boolean value) {
-    return value(name, Field.Value.bool(value));
+    return value(name, Value.bool(value));
   }
 
   /**
@@ -193,7 +193,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default Field bool(@NotNull String name, @NotNull Field.Value.BooleanValue value) {
+  default Field bool(@NotNull String name, @NotNull Value.BooleanValue value) {
     return value(name, value);
   }
 
@@ -217,7 +217,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyBool(@NotNull String name, @NotNull Field.Value.BooleanValue value) {
+  default List<Field> onlyBool(@NotNull String name, @NotNull Value.BooleanValue value) {
     return only(bool(name, value));
   }
 
@@ -232,8 +232,8 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default Field array(@NotNull String name, @NotNull Field.Value.ObjectValue... values) {
-    return keyValue(name, Field.Value.array(values));
+  default Field array(@NotNull String name, @NotNull Value.ObjectValue... values) {
+    return keyValue(name, Value.array(values));
   }
 
   /**
@@ -245,7 +245,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field array(@NotNull String name, String... values) {
-    return keyValue(name, Field.Value.array(values));
+    return keyValue(name, Value.array(values));
   }
 
   /**
@@ -257,7 +257,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field array(@NotNull String name, Number... values) {
-    return keyValue(name, Field.Value.array(values));
+    return keyValue(name, Value.array(values));
   }
 
   /**
@@ -269,7 +269,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field array(@NotNull String name, Boolean... values) {
-    return keyValue(name, Field.Value.array(values));
+    return keyValue(name, Value.array(values));
   }
 
   /**
@@ -282,7 +282,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default Field array(@NotNull String name, @NotNull Field.Value.ArrayValue value) {
+  default Field array(@NotNull String name, @NotNull Value.ArrayValue value) {
     // Don't allow Value.ArrayValue... it's far too easy to double nest an array.
     return keyValue(name, value);
   }
@@ -295,7 +295,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyArray(@NotNull String name, @NotNull Field.Value.ObjectValue... values) {
+  default List<Field> onlyArray(@NotNull String name, @NotNull Value.ObjectValue... values) {
     return only(array(name, values));
   }
 
@@ -345,7 +345,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyArray(@NotNull String name, @NotNull Field.Value.ArrayValue value) {
+  default List<Field> onlyArray(@NotNull String name, @NotNull Value.ArrayValue value) {
     return only(array(name, value));
   }
 
@@ -361,7 +361,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field object(@NotNull String name, Field... values) {
-    return keyValue(name, Field.Value.object(values));
+    return keyValue(name, Value.object(values));
   }
 
   /**
@@ -373,7 +373,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field object(@NotNull String name, @NotNull List<Field> values) {
-    return keyValue(name, Field.Value.object(values));
+    return keyValue(name, Value.object(values));
   }
 
   /**
@@ -384,7 +384,7 @@ public interface FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default Field object(@NotNull String name, @NotNull Field.Value.ObjectValue value) {
+  default Field object(@NotNull String name, @NotNull Value.ObjectValue value) {
     // limited to object specifically -- if you want object or null,
     // use `value` or `keyValue`
     return keyValue(name, value);
@@ -422,7 +422,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyObject(@NotNull String name, @NotNull Field.Value.ObjectValue value) {
+  default List<Field> onlyObject(@NotNull String name, @NotNull Value.ObjectValue value) {
     return only(object(name, value));
   }
 
@@ -437,7 +437,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field exception(@NotNull Throwable t) {
-    return keyValue(Field.EXCEPTION, Field.Value.exception(t));
+    return keyValue(Field.EXCEPTION, Value.exception(t));
   }
 
   /**
@@ -447,7 +447,7 @@ public interface FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default Field exception(@NotNull Field.Value.ExceptionValue value) {
+  default Field exception(@NotNull Value.ExceptionValue value) {
     return keyValue(Field.EXCEPTION, value);
   }
 
@@ -460,7 +460,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field exception(@NotNull String name, @NotNull Throwable t) {
-    return keyValue(name, Field.Value.exception(t));
+    return keyValue(name, Value.exception(t));
   }
 
   /**
@@ -471,7 +471,7 @@ public interface FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default Field exception(@NotNull String name, @NotNull Field.Value.ExceptionValue value) {
+  default Field exception(@NotNull String name, @NotNull Value.ExceptionValue value) {
     return keyValue(name, value);
   }
 
@@ -496,7 +496,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyException(@NotNull Field.Value.ExceptionValue t) {
+  default List<Field> onlyException(@NotNull Value.ExceptionValue t) {
     return only(exception(t));
   }
 
@@ -508,8 +508,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default List<Field> onlyException(
-      @NotNull String name, @NotNull Field.Value.ExceptionValue value) {
+  default List<Field> onlyException(@NotNull String name, @NotNull Value.ExceptionValue value) {
     return only(exception(name, value));
   }
 
@@ -524,7 +523,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field nullField(@NotNull String name) {
-    return value(name, Field.Value.nullValue());
+    return value(name, Value.nullValue());
   }
 
   /**

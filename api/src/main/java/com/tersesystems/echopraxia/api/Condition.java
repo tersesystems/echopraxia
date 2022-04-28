@@ -121,7 +121,7 @@ public interface Condition {
    * @param predicate a predicate
    * @return true if no elements match the predicate, false otherwise.
    */
-  static Condition valueMatch(String fieldName, Predicate<Field.Value<?>> predicate) {
+  static Condition valueMatch(String fieldName, Predicate<Value<?>> predicate) {
     return (level, ctx) ->
         ctx.getFields().stream()
             .filter(f -> f.name().equals(fieldName))

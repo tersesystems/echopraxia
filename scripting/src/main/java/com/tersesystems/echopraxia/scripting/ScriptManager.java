@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.scripting;
 
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import com.twineworks.tweakflow.lang.TweakFlow;
@@ -45,9 +46,9 @@ public class ScriptManager {
   */
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
-      Value levelV = Values.make(level.name());
-      Value functionMapValue = Values.make(createFunctionMap(context));
-      Value retValue = call(levelV, functionMapValue);
+      com.twineworks.tweakflow.lang.values.Value levelV = Values.make(level.name());
+      com.twineworks.tweakflow.lang.values.Value functionMapValue = Values.make(createFunctionMap(context));
+      com.twineworks.tweakflow.lang.values.Value retValue = call(levelV, functionMapValue);
       if (!retValue.isBoolean()) {
         throw new ScriptException(
             "Your function needs to return a boolean value!  Invalid return type: "
@@ -62,7 +63,7 @@ public class ScriptManager {
 
   protected DictValue createFunctionMap(LoggingContext ctx) {
     // protected because users should be able to override this given a custom logging context
-    Map<String, Value> functionMap = new HashMap<>();
+    Map<String, com.twineworks.tweakflow.lang.values.Value> functionMap = new HashMap<>();
     functionMap.put("fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields())));
     functionMap.put("find_number", userFunctionValue(optionalFunction(ctx::findNumber)));
     functionMap.put("find_string", userFunctionValue(optionalFunction(ctx::findString)));
@@ -74,7 +75,7 @@ public class ScriptManager {
     return new DictValue(functionMap);
   }
 
-  private Value call(Value level, Value fields) {
+  private com.twineworks.tweakflow.lang.values.Value call(com.twineworks.tweakflow.lang.values.Value level, com.twineworks.tweakflow.lang.values.Value fields) {
     synchronized (lock) {
       // if there's no callsite or the handle is bad, we need to eval the script
       // probably safest to do this in a single thread in synchronized block?
@@ -108,7 +109,7 @@ public class ScriptManager {
   }
 
   @NotNull
-  private Value userFunctionValue(Arity1UserFunction userFunction) {
+  private com.twineworks.tweakflow.lang.values.Value userFunctionValue(Arity1UserFunction userFunction) {
     return Values.make(
         new UserFunctionValue(
             new FunctionSignature(
@@ -118,7 +119,7 @@ public class ScriptManager {
             userFunction));
   }
 
-  private Value arity0FunctionValue(Arity0UserFunction userFunction) {
+  private com.twineworks.tweakflow.lang.values.Value arity0FunctionValue(Arity0UserFunction userFunction) {
     return Values.make(
         new UserFunctionValue(
             new FunctionSignature(Collections.emptyList(), Types.ANY), userFunction));
@@ -152,7 +153,7 @@ public class ScriptManager {
   }
 
   private com.twineworks.tweakflow.lang.values.Value convertFields(List<Field> fields) {
-    Map<String, Value> objectMap = new HashMap<>();
+    Map<String, com.twineworks.tweakflow.lang.values.Value> objectMap = new HashMap<>();
     for (Field field : fields) {
       com.twineworks.tweakflow.lang.values.Value fieldValue = convertValue(field.value());
       objectMap.put(field.name(), fieldValue);
@@ -160,13 +161,13 @@ public class ScriptManager {
     return Values.make(objectMap);
   }
 
-  private com.twineworks.tweakflow.lang.values.Value convertValue(Field.Value<?> value) {
+  private com.twineworks.tweakflow.lang.values.Value convertValue(Value<?> value) {
     switch (value.type()) {
       case ARRAY:
         //noinspection unchecked
-        List<Field.Value<?>> values = (List<Field.Value<?>>) value.raw();
+        List<Value<?>> values = (List<Value<?>>) value.raw();
         List<com.twineworks.tweakflow.lang.values.Value> rawList = new ArrayList<>();
-        for (Field.Value<?> v : values) {
+        for (Value<?> v : values) {
           com.twineworks.tweakflow.lang.values.Value v2 = convertValue(v);
           rawList.add(v2);
         }

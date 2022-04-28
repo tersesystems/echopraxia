@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
-import static com.tersesystems.echopraxia.api.Field.Value;
+import com.tersesystems.echopraxia.api.Value;
 
 import com.tersesystems.echopraxia.api.Field;
 import java.math.BigDecimal;
@@ -18,7 +18,7 @@ class EchopraxiaFieldSerializer {
     final Value<?> v = f.value();
 
     // if raw() is null and it's not NullValue, then chalk up an error and keep going.
-    if (v.type() == Value.ValueType.NULL || v.raw() == null) {
+    if (v.type() == Value.Type.NULL || v.raw() == null) {
       builder.addNull(name);
       return;
     }

@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia;
 
 import static com.tersesystems.echopraxia.api.Field.EXCEPTION;
-import static com.tersesystems.echopraxia.api.Field.Value.exception;
 import static com.tersesystems.echopraxia.api.Level.*;
 import static com.tersesystems.echopraxia.api.Level.ERROR;
+import static com.tersesystems.echopraxia.api.Value.exception;
 import static java.util.Collections.singletonList;
 
 import com.tersesystems.echopraxia.api.Condition;

@@ -97,11 +97,11 @@ class Internals {
     return ECHOPRAXIA_UNKNOWN + unknownFieldAdder.longValue();
   }
 
-  private static Field.Value<?> requireValue(Field.Value<?> value) {
+  private static Value<?> requireValue(Value<?> value) {
     if (value != null) {
       return value;
     }
-    return Field.Value.nullValue();
+    return Value.nullValue();
   }
 
   private static StringBuilder getThreadLocalStringBuilder() {
@@ -116,13 +116,13 @@ class Internals {
 
   static class ValueFormatter {
 
-    static void formatToBuffer(StringBuilder b, Field.Value<?> v) {
+    static void formatToBuffer(StringBuilder b, Value<?> v) {
       final Object raw = v.raw();
       if (raw == null) { // if null value or a raw value was set to null, keep going.
         b.append("null");
-      } else if (v.type() == Field.Value.ValueType.OBJECT) {
+      } else if (v.type() == Value.Type.OBJECT) {
         // render an object with curly braces to distinguish from array.
-        final List<Field> fieldList = ((Field.Value.ObjectValue) v).raw();
+        final List<Field> fieldList = ((Value.ObjectValue) v).raw();
         b.append("{");
         for (int i = 0; i < fieldList.size(); i++) {
           Field field = fieldList.get(i);

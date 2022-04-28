@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.async;
 
 import com.tersesystems.echopraxia.api.*;
-
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
-import static com.tersesystems.echopraxia.api.Field.Value;
+import com.tersesystems.echopraxia.api.Value;
 
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.CoreLogger;

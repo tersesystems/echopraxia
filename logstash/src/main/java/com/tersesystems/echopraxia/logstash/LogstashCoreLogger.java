@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static com.tersesystems.echopraxia.api.Field.Value;
+import com.tersesystems.echopraxia.api.Value;
 import static org.slf4j.event.EventConstants.*;
 
 import com.tersesystems.echopraxia.api.*;
@@ -338,7 +338,7 @@ public class LogstashCoreLogger implements CoreLogger {
     List<Object> arguments = new ArrayList<>(args.size() + 1);
     for (Field field : args) {
       final Value<?> value = field.value();
-      if (value.type() == Value.ValueType.EXCEPTION) {
+      if (value.type() == Value.Type.EXCEPTION) {
         throwable = (Value.ExceptionValue) value;
       } else {
         final String name = field.name();
