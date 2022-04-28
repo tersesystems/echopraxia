@@ -1,28 +1,61 @@
-package com.tersesystems.echopraxia.async.support;
+package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.LoggerHandle;
-import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Logging method API used by the AsyncLogger.
+ * Logging methods specific to the synchronous Logger (isEnabled checks + base).
  *
  * @param <FB> the field builder type.
  */
-public interface AsyncLoggerMethods<FB> {
+public interface LoggerMethods<FB> {
 
-  void trace(@NotNull Consumer<LoggerHandle<FB>> consumer);
+  /** @return true if the logger level is TRACE or higher. */
+  boolean isTraceEnabled();
 
   /**
-   * Logs using a condition and a logger handle at TRACE level.
-   *
-   * @param c the condition
-   * @param consumer the consumer of the logger handle.
+   * @param condition the given condition.
+   * @return true if the logger level is TRACE or higher and the condition is met.
    */
-  void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
+  boolean isTraceEnabled(@NotNull Condition condition);
+
+  /** @return true if the logger level is DEBUG or higher. */
+  boolean isDebugEnabled();
+
+  /**
+   * @param condition the given condition.
+   * @return true if the logger level is DEBUG or higher and the condition is met.
+   */
+  boolean isDebugEnabled(@NotNull Condition condition);
+
+  /** @return true if the logger level is INFO or higher. */
+  boolean isInfoEnabled();
+
+  /**
+   * @param condition the given condition.
+   * @return true if the logger level is INFO or higher and the condition is met.
+   */
+  boolean isInfoEnabled(@NotNull Condition condition);
+
+  /** @return true if the logger level is WARN or higher. */
+  boolean isWarnEnabled();
+
+  /**
+   * @param condition the given condition.
+   * @return true if the logger level is WARN or higher and the condition is met.
+   */
+  boolean isWarnEnabled(@NotNull Condition condition);
+
+  /** @return true if the logger level is ERROR or higher. */
+  boolean isErrorEnabled();
+
+  /**
+   * @param condition the given condition.
+   * @return true if the logger level is ERROR or higher and the condition is met.
+   */
+  boolean isErrorEnabled(@NotNull Condition condition);
 
   /**
    * Logs statement at TRACE level.
@@ -125,21 +158,6 @@ public interface AsyncLoggerMethods<FB> {
       @NotNull Condition condition, @Nullable String message, @NotNull Field.BuilderFunction<FB> f);
 
   /**
-   * Logs using a logger handle at DEBUG level.
-   *
-   * @param consumer the consumer of the logger handle.
-   */
-  void debug(@NotNull Consumer<LoggerHandle<FB>> consumer);
-
-  /**
-   * Logs using a condition and a logger handle at DEBUG level.
-   *
-   * @param c the condition
-   * @param consumer the consumer of the logger handle.
-   */
-  void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
-
-  /**
    * Logs statement at INFO level.
    *
    * @param message the given message.
@@ -190,14 +208,6 @@ public interface AsyncLoggerMethods<FB> {
   void info(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e);
 
   /**
-   * Logs using a condition and a logger handle at INFO level.
-   *
-   * @param c the condition
-   * @param consumer the consumer of the logger handle.
-   */
-  void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
-
-  /**
    * Logs statement at WARN level.
    *
    * @param message the given message.
@@ -246,20 +256,6 @@ public interface AsyncLoggerMethods<FB> {
    */
   void warn(
       @NotNull Condition condition, @Nullable String message, @NotNull Field.BuilderFunction<FB> f);
-  /**
-   * Logs using a logger handle at WARN level.
-   *
-   * @param consumer the consumer of the logger handle.
-   */
-  void warn(@NotNull Consumer<LoggerHandle<FB>> consumer);
-
-  /**
-   * Logs using a condition and a logger handle at WARN level.
-   *
-   * @param c the condition
-   * @param consumer the consumer of the logger handle.
-   */
-  void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs statement at INFO level.
@@ -310,19 +306,4 @@ public interface AsyncLoggerMethods<FB> {
    * @param e the given exception.
    */
   void error(@NotNull Condition condition, @Nullable String message, @NotNull Throwable e);
-
-  /**
-   * Logs using a logger handle at ERROR level.
-   *
-   * @param consumer the consumer of the logger handle.
-   */
-  void error(@NotNull Consumer<LoggerHandle<FB>> consumer);
-
-  /**
-   * Logs using a condition and a logger handle at ERROR level.
-   *
-   * @param c the condition
-   * @param consumer the consumer of the logger handle.
-   */
-  void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
 }
