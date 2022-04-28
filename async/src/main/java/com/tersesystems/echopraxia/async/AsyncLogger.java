@@ -1,7 +1,5 @@
 package com.tersesystems.echopraxia.async;
 
-import static com.tersesystems.echopraxia.api.Utilities.getNewInstance;
-
 import com.tersesystems.echopraxia.api.AbstractLoggerSupport;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.CoreLogger;
@@ -43,19 +41,6 @@ public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<
   @NotNull
   public <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     return newLogger(newBuilder);
-  }
-
-  /**
-   * Creates a new logger with the given field builder, using reflection.
-   *
-   * @param newBuilderClass the class of given field builder.
-   * @param <T> the type of the field builder.
-   * @return a new logger using the given field builder.
-   */
-  @NotNull
-  public <T extends FieldBuilder> AsyncLogger<T> withFieldBuilder(
-      @NotNull Class<T> newBuilderClass) {
-    return newLogger(getNewInstance(newBuilderClass));
   }
 
   /**
