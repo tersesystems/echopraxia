@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.api;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import com.tersesystems.echopraxia.api.Field.Value.*;
+import com.tersesystems.echopraxia.api.Value.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -71,7 +71,7 @@ public abstract class AbstractLoggingContext implements LoggingContext {
     // $.exception.message where message == null is also a null
     // but was never a null value.
     Object o = getDocumentContext().read(jsonPath);
-    return o == null || o instanceof Field.Value.NullValue;
+    return o == null || o instanceof Value.NullValue;
   }
 
   @Override

@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +23,7 @@ public final class Utilities {
   public static List<Field> buildThreadContext(Map<String, String> contextMap) {
     List<Field> list = new ArrayList<>();
     for (Map.Entry<String, String> e : contextMap.entrySet()) {
-      Field field = KeyValueField.create(e.getKey(), Field.Value.string(e.getValue()));
+      Field field = KeyValueField.create(e.getKey(), Value.string(e.getValue()));
       list.add(field);
     }
     return list;

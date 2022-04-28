@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.api.Field.Value.*;
+import static com.tersesystems.echopraxia.api.Value.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
@@ -60,7 +60,7 @@ public class FormatTests {
   @Test
   public void testArrayOfNull() {
     final FieldBuilder fb = FieldBuilder.instance();
-    final Field f = fb.array("foo", Field.Value.array(nullValue(), nullValue(), nullValue()));
+    final Field f = fb.array("foo", Value.array(nullValue(), nullValue(), nullValue()));
     assertThat(f.toString()).isEqualTo("foo=[null, null, null]");
   }
 
@@ -74,7 +74,7 @@ public class FormatTests {
                 fb.string("stringName", "value"),
                 fb.number("numName", 43),
                 fb.bool("boolName", true),
-                fb.array("arrayName", array(Field.Value.string("a"), Field.Value.nullValue())),
+                fb.array("arrayName", array(Value.string("a"), Value.nullValue())),
                 fb.nullField("nullName")));
     assertThat(f.toString()).isEqualTo("foo={value, 43, true, arrayName=[a, null], null}");
   }

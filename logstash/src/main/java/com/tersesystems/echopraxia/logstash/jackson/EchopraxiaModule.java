@@ -1,12 +1,11 @@
 package com.tersesystems.echopraxia.logstash.jackson;
 
-import static com.tersesystems.echopraxia.api.Field.Value;
-
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Value;
 
 /** A Jackson module that is loaded in automatically by logstash-logback-encoder. */
 public class EchopraxiaModule extends Module {

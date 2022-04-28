@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static com.tersesystems.echopraxia.api.Field.Value;
-import static com.tersesystems.echopraxia.api.Field.Value.*;
+import com.tersesystems.echopraxia.api.Value;
+import static com.tersesystems.echopraxia.api.Value.*;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 

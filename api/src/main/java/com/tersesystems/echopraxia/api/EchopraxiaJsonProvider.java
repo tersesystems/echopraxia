@@ -33,8 +33,8 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   @Override
   public boolean isMap(Object obj) {
     return obj instanceof LoggingContext
-        || obj instanceof Field.Value.ObjectValue
-        || obj instanceof Field.Value.ExceptionValue
+        || obj instanceof Value.ObjectValue
+        || obj instanceof Value.ExceptionValue
         || obj instanceof Throwable
         || obj instanceof StackTraceElement
         || obj instanceof Map;
@@ -42,14 +42,14 @@ public class EchopraxiaJsonProvider implements JsonProvider {
 
   @Override
   public Object unwrap(Object obj) {
-    if (obj instanceof Field.Value) {
-      return ((Field.Value<?>) obj).raw();
+    if (obj instanceof Value) {
+      return ((Value<?>) obj).raw();
     }
     return obj;
   }
 
   public boolean isArray(Object obj) {
-    return (obj instanceof Field.Value.ArrayValue
+    return (obj instanceof Value.ArrayValue
         || obj instanceof java.util.List
         || obj.getClass().isArray());
   }
@@ -72,8 +72,8 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     if (obj instanceof java.util.List) {
       return ((Iterable) obj);
     }
-    if (obj instanceof Field.Value.ArrayValue) {
-      return ((Field.Value.ArrayValue) obj).raw();
+    if (obj instanceof Value.ArrayValue) {
+      return ((Value.ArrayValue) obj).raw();
     } else
       throw new JsonPathException(
           "Cannot iterate over " + obj != null ? obj.getClass().getName() : "null");
@@ -90,9 +90,8 @@ public class EchopraxiaJsonProvider implements JsonProvider {
       return ((Map<String, ?>) obj).keySet();
     }
 
-    if (obj instanceof Field.Value.ObjectValue) {
-      return ((Field.Value.ObjectValue) obj)
-          .raw().stream().map(Field::name).collect(Collectors.toList());
+    if (obj instanceof Value.ObjectValue) {
+      return ((Value.ObjectValue) obj).raw().stream().map(Field::name).collect(Collectors.toList());
     }
 
     if (obj instanceof LoggingContext) {
@@ -113,8 +112,8 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   }
 
   private int arraySize(Object obj) {
-    if (obj instanceof Field.Value.ArrayValue) {
-      return ((Field.Value.ArrayValue) obj).raw().size();
+    if (obj instanceof Value.ArrayValue) {
+      return ((Value.ArrayValue) obj).raw().size();
     }
     if (obj instanceof List) {
       return ((List<?>) obj).size();
@@ -154,8 +153,8 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   }
 
   public Object getArrayIndex(Object obj, int idx) {
-    if (obj instanceof Field.Value.ArrayValue) {
-      final List<Field.Value<?>> raw = ((Field.Value.ArrayValue) obj).raw();
+    if (obj instanceof Value.ArrayValue) {
+      final List<Value<?>> raw = ((Value.ArrayValue) obj).raw();
       return raw.get(idx);
     }
     if (obj instanceof List) {
@@ -194,11 +193,11 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     if (obj instanceof LoggingContext) {
       return findValue(key, ((LoggingContext) obj).getFields());
     }
-    if (obj instanceof Field.Value.ObjectValue) {
-      return findValue(key, ((Field.Value.ObjectValue) obj).raw());
+    if (obj instanceof Value.ObjectValue) {
+      return findValue(key, ((Value.ObjectValue) obj).raw());
     }
-    if (obj instanceof Field.Value.ExceptionValue) {
-      return findExceptionValue(key, ((Field.Value.ExceptionValue) obj).raw());
+    if (obj instanceof Value.ExceptionValue) {
+      return findExceptionValue(key, ((Value.ExceptionValue) obj).raw());
     }
     if (obj instanceof Throwable) {
       return findExceptionValue(key, (Throwable) obj);
@@ -245,7 +244,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   @NotNull
   private Object findValue(String key, List<Field> fields) {
     // This is O(N), so it will be slower when there are large lists.
-    final Optional<? extends Field.Value<?>> first =
+    final Optional<? extends Value<?>> first =
         fields.stream().filter(f -> f.name().equals(key)).map(Field::value).findFirst();
     return first.isPresent() ? first.get() : JsonProvider.UNDEFINED;
   }

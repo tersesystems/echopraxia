@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.*;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

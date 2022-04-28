@@ -97,8 +97,8 @@ public class JsonPathTests {
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
     LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
-    List<Field.Value<?>> results = documentContext.read("$.person.mother[?(@.age <= 30)]");
-    assertThat(results.get(0)).isExactlyInstanceOf(Field.Value.ObjectValue.class);
+    List<Value<?>> results = documentContext.read("$.person.mother[?(@.age <= 30)]");
+    assertThat(results.get(0)).isExactlyInstanceOf(Value.ObjectValue.class);
   }
 
   @Test
@@ -111,7 +111,7 @@ public class JsonPathTests {
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
     LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
-    List<Field.Value<?>> results = documentContext.read("$.person.father[?(@.age <= 30)]");
+    List<Value<?>> results = documentContext.read("$.person.father[?(@.age <= 30)]");
     assertThat(results).isEmpty();
   }
 
@@ -127,7 +127,7 @@ public class JsonPathTests {
 
     Filter iceskatingFilter = filter(where("interests").contains("iceskating"));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
-    List<Field.Value<?>> results = documentContext.read("$.person.mother[?]", iceskatingFilter);
+    List<Value<?>> results = documentContext.read("$.person.mother[?]", iceskatingFilter);
     assertThat(results).isNotEmpty();
   }
 

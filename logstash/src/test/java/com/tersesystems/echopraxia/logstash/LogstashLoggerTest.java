@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.io.IOException;
 import java.io.StringWriter;
@@ -172,8 +173,7 @@ class LogstashLoggerTest extends TestBase {
   @Test
   void testNullObject() {
     Logger<?> logger = getLogger();
-    logger.debug(
-        "object is {}", fb -> fb.only(fb.object("name", Field.Value.object((Field) null))));
+    logger.debug("object is {}", fb -> fb.only(fb.object("name", Value.object((Field) null))));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);

@@ -42,8 +42,8 @@ public class EchopraxiaMappingProvider implements MappingProvider {
       return null;
     }
 
-    if (source instanceof Field.Value) {
-      Field.Value<?> value = (Field.Value<?>) source;
+    if (source instanceof Value) {
+      Value<?> value = (Value<?>) source;
       switch (value.type()) {
         case STRING:
         case EXCEPTION:
@@ -79,7 +79,7 @@ public class EchopraxiaMappingProvider implements MappingProvider {
     if (source == null) {
       return null;
     }
-    if (source == Field.Value.NullValue.instance) {
+    if (source == Value.NullValue.instance) {
       return null;
     }
 
@@ -98,26 +98,26 @@ public class EchopraxiaMappingProvider implements MappingProvider {
         mapped.put(key, mapToObject(mapValue));
       }
       return mapped;
-    } else if (source instanceof Field.Value.ArrayValue) {
+    } else if (source instanceof Value.ArrayValue) {
       List<Object> mapped = new ArrayList<>();
-      Field.Value.ArrayValue arrayValue = (Field.Value.ArrayValue) source;
-      final List<Field.Value<?>> array = arrayValue.raw();
+      Value.ArrayValue arrayValue = (Value.ArrayValue) source;
+      final List<Value<?>> array = arrayValue.raw();
 
-      for (Field.Value<?> value : array) {
+      for (Value<?> value : array) {
         mapped.add(mapToObject(value));
       }
       return mapped;
-    } else if (source instanceof Field.Value.ObjectValue) {
+    } else if (source instanceof Value.ObjectValue) {
       Map<String, Object> mapped = new HashMap<>();
-      Field.Value.ObjectValue objValue = (Field.Value.ObjectValue) source;
+      Value.ObjectValue objValue = (Value.ObjectValue) source;
       final List<Field> raw = objValue.raw();
 
       for (Field f : raw) {
         mapped.put(f.name(), mapToObject(f.value()));
       }
       return mapped;
-    } else if (source instanceof Field.Value) {
-      return ((Field.Value<?>) source).raw();
+    } else if (source instanceof Value) {
+      return ((Value<?>) source).raw();
     } else if (source instanceof StackTraceElement[]) {
       List<Object> mapped = new ArrayList<>();
       StackTraceElement[] array = (StackTraceElement[]) source;
