@@ -14,7 +14,7 @@ public class FilterTests {
   public void testFilter() {
     AtomicReference<List<Field>> myFields = new AtomicReference<>();
 
-    CoreLogger logger = CoreLoggerFactory.getLogger(Logger.class.getName(), "example.Logger");
+    CoreLogger logger = CoreLoggerFactory.getLogger(FilterTests.class.getName(), "example.Logger");
     Condition condition =
         new Condition() {
           @Override

@@ -1,10 +1,14 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.async;
 
 import static com.tersesystems.echopraxia.support.Utilities.getNewInstance;
 
+import com.tersesystems.echopraxia.Condition;
+import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.FieldBuilder;
+import com.tersesystems.echopraxia.LoggerHandle;
+import com.tersesystems.echopraxia.async.support.DefaultAsyncLoggerMethods;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.support.AbstractLoggerSupport;
-import com.tersesystems.echopraxia.support.DefaultAsyncLoggerMethods;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -25,10 +29,8 @@ import org.jetbrains.annotations.Nullable;
 public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<AsyncLogger<FB>, FB>
     implements DefaultAsyncLoggerMethods<FB> {
 
-  public static final String FQCN = DefaultAsyncLoggerMethods.class.getName();
-
   protected AsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
-    super(core.withFQCN(FQCN), fieldBuilder, AsyncLogger.class);
+    super(core, fieldBuilder, AsyncLogger.class);
   }
 
   /**

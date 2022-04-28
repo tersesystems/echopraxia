@@ -5,7 +5,6 @@ import static com.tersesystems.echopraxia.support.Utilities.getNewInstance;
 import com.tersesystems.echopraxia.core.CoreLogger;
 import com.tersesystems.echopraxia.support.AbstractLoggerSupport;
 import com.tersesystems.echopraxia.support.DefaultLoggerMethods;
-import java.util.concurrent.Executor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,19 +46,6 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
   @NotNull
   public <T extends FieldBuilder> Logger<T> withFieldBuilder(@NotNull Class<T> newBuilderClass) {
     return newLogger(getNewInstance(newBuilderClass));
-  }
-
-  /**
-   * Creates a new async logger using this field builder.
-   *
-   * @deprecated since 1.3, use {@code AsyncLoggerFactory.getLogger(logger.core(),
-   *     logger.fieldBuilder())}
-   * @param executor the executor
-   * @return an async logger.
-   */
-  @Deprecated()
-  public AsyncLogger<FB> withExecutor(Executor executor) {
-    return new AsyncLogger<>(core().withExecutor(executor), fieldBuilder);
   }
 
   // This is not part of the AbstractLoggerSupport

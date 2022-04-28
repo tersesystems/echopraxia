@@ -5,6 +5,10 @@ plugins {
 dependencies {
     api project(":api")
 
+    testImplementation project(":logger")
+    testImplementation project(":async")
+    jmhImplementation project(":logger")
+
     implementation "org.slf4j:slf4j-api:1.7.36"
     implementation 'ch.qos.logback:logback-classic:1.2.10'
     implementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'

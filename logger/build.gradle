@@ -5,16 +5,9 @@ plugins {
 dependencies {
     api project(":api")
 
-    implementation project(":filewatch")
-    implementation "com.twineworks:tweakflow:1.4.1"
-
-    // https://github.com/playframework/play-file-watch
-
     jmhImplementation project(":logstash")
 
     testImplementation project(":logstash")
-    testImplementation project(":logger")
-
     testImplementation 'ch.qos.logback:logback-classic:1.2.10'
     testImplementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
 }

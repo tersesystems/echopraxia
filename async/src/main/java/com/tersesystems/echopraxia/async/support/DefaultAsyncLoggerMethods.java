@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.support;
+package com.tersesystems.echopraxia.async.support;
 
 import static com.tersesystems.echopraxia.Field.EXCEPTION;
 import static com.tersesystems.echopraxia.Field.Value.exception;
@@ -9,6 +9,7 @@ import com.tersesystems.echopraxia.Condition;
 import com.tersesystems.echopraxia.Field;
 import com.tersesystems.echopraxia.KeyValueField;
 import com.tersesystems.echopraxia.LoggerHandle;
+import com.tersesystems.echopraxia.support.DefaultMethodsSupport;
 import java.util.function.Consumer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

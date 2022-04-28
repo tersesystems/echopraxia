@@ -2,8 +2,6 @@ package com.tersesystems.echopraxia.scripting;
 
 import static java.util.Collections.singletonList;
 
-import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.filewatch.FileWatchEvent;
 import com.tersesystems.echopraxia.filewatch.FileWatchService;
 import com.tersesystems.echopraxia.filewatch.FileWatchServiceFactory;
@@ -25,7 +23,6 @@ import java.util.function.Consumer;
  * file has been touched.
  */
 public class ScriptWatchService implements AutoCloseable {
-  private static final Logger<?> logger = LoggerFactory.getLogger();
 
   private static final FileWatchService watchService = FileWatchServiceFactory.fileWatchService();
 
@@ -65,7 +62,6 @@ public class ScriptWatchService implements AutoCloseable {
           switch (event.eventType()) {
             case CREATE:
               // Creation is an automatic touch, and a full eval is needed after a file is deleted.
-              logger.debug("CREATE: {}", fb -> fb.onlyString("path", event.path().toString()));
               final AtomicBoolean t = touchedMap.get(event.path());
               if (t != null) {
                 t.set(true);
@@ -73,7 +69,6 @@ public class ScriptWatchService implements AutoCloseable {
               break;
             case MODIFY:
               // This is the normal use case.
-              logger.debug("MODIFY: {}", fb -> fb.onlyString("path", event.path().toString()));
               final AtomicBoolean touched = touchedMap.get(event.path());
               if (touched != null) {
                 touched.set(true);
@@ -81,18 +76,13 @@ public class ScriptWatchService implements AutoCloseable {
 
               break;
             case DELETE:
-              logger.debug("DELETE: {}", fb -> fb.onlyString("path", event.path().toString()));
               final AtomicBoolean t3 = touchedMap.get(event.path());
               if (t3 != null) {
-                logger.warn(
-                    "Watched script {} was deleted!  Disabling touched flag until found again.",
-                    fb -> fb.onlyString("path", event.path().toString()));
                 t3.set(false);
               }
               break;
             case OVERFLOW:
               // Honestly not much we can do about this?
-              logger.debug("OVERFLOW: {}", fb -> fb.onlyString("path", event.path().toString()));
               break;
           }
         };
