@@ -2,10 +2,10 @@ package com.tersesystems.echopraxia.log4j;
 
 import static com.tersesystems.echopraxia.log4j.appender.ListAppender.getListAppender;
 
-import com.tersesystems.echopraxia.AsyncLogger;
-import com.tersesystems.echopraxia.AsyncLoggerFactory;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.async.AsyncLogger;
+import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
 import java.io.StringReader;
 import java.util.List;

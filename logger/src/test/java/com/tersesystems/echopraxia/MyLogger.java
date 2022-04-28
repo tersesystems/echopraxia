@@ -35,8 +35,7 @@ class MyLoggerFactory {
   private static final MyFieldBuilder fieldBuilder = new MyFieldBuilder();
 
   public static MyLogger getLogger(Class<?> clazz) {
-    final CoreLogger core =
-        CoreLoggerFactory.getLogger(DefaultLoggerMethods.class.getName(), clazz);
+    final CoreLogger core = CoreLoggerFactory.getLogger(LoggerMethods.class.getName(), clazz);
     return new MyLogger(core, fieldBuilder);
   }
 }

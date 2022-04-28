@@ -8,7 +8,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.*;
-import java.util.concurrent.ForkJoinPool;
+import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;
 
@@ -59,8 +59,7 @@ public class ConditionTest extends TestBase {
         };
 
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition =
-        getLogger().withExecutor(ForkJoinPool.commonPool()).withCondition(c);
+    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -71,7 +70,6 @@ public class ConditionTest extends TestBase {
     assertThat(listAppender.list).isEmpty();
 
     await().atMost(1, SECONDS).until(logged::get);
-    assertThat(listAppender.list).isNotEmpty();
 
     final ILoggingEvent event = listAppender.list.get(0);
     String message = event.getFormattedMessage();
@@ -89,8 +87,7 @@ public class ConditionTest extends TestBase {
           }
           return true;
         };
-    AsyncLogger<?> loggerWithCondition =
-        getLogger().withExecutor(ForkJoinPool.commonPool()).withCondition(c);
+    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -111,7 +108,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testFailedLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getLogger().withExecutor(ForkJoinPool.commonPool());
+    AsyncLogger<?> loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
         handle -> {
           handle.log(
