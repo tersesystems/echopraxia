@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.scripting;
 
-import com.tersesystems.echopraxia.*;
-import com.tersesystems.echopraxia.Level;
+import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
 import java.nio.file.Path;
 import java.nio.file.Paths;

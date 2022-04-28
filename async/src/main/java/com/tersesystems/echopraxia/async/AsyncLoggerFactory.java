@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.async;
 
-import com.tersesystems.echopraxia.FieldBuilder;
+import com.tersesystems.echopraxia.api.Caller;
+import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.CoreLoggerFactory;
+import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.async.support.DefaultAsyncLoggerMethods;
-import com.tersesystems.echopraxia.core.Caller;
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.core.CoreLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 /**

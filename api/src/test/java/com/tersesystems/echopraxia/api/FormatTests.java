@@ -1,6 +1,6 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.Field.Value.*;
+import static com.tersesystems.echopraxia.api.Field.Value.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;

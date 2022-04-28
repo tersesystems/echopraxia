@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia;
 
-import com.tersesystems.echopraxia.core.*;
+import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.support.*;
 import org.jetbrains.annotations.NotNull;
 

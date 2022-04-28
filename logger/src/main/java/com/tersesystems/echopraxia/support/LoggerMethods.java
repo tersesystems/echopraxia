@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.support;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Field;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

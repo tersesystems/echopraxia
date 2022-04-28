@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia;
+package com.tersesystems.echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

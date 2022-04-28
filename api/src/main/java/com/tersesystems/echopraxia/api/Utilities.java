@@ -1,7 +1,5 @@
-package com.tersesystems.echopraxia.support;
+package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.KeyValueField;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;

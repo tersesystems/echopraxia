@@ -8,6 +8,8 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.junit.jupiter.api.Test;

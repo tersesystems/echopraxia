@@ -3,6 +3,8 @@ package com.tersesystems.echopraxia.log4j;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import java.util.Arrays;

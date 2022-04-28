@@ -1,8 +1,9 @@
 package com.tersesystems.echopraxia;
 
-import com.tersesystems.echopraxia.core.Caller;
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.core.CoreLoggerFactory;
+import com.tersesystems.echopraxia.api.Caller;
+import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.api.CoreLoggerFactory;
+import com.tersesystems.echopraxia.api.FieldBuilder;
 import org.jetbrains.annotations.NotNull;
 
 /**

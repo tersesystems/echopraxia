@@ -1,9 +1,5 @@
-package com.tersesystems.echopraxia.core;
+package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.Field;
-import com.tersesystems.echopraxia.Level;
-import com.tersesystems.echopraxia.LoggerHandle;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;

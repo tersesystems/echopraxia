@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static com.tersesystems.echopraxia.Field.Value;
+import static com.tersesystems.echopraxia.api.Field.Value;
 import static org.slf4j.event.EventConstants.*;
 
-import com.tersesystems.echopraxia.*;
-import com.tersesystems.echopraxia.core.CoreLogger;
+import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.api.CoreLogger;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;

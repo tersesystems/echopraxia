@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.scripting;
 
-import static com.tersesystems.echopraxia.Level.INFO;
+import static com.tersesystems.echopraxia.api.Level.INFO;
 
-import com.tersesystems.echopraxia.Condition;
-import com.tersesystems.echopraxia.LoggingContext;
+import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.LoggingContext;
 import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
 import java.io.IOException;
 import java.nio.file.Files;

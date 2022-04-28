@@ -1,6 +1,5 @@
-package com.tersesystems.echopraxia.support;
+package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.core.CoreLogger;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -1,7 +1,4 @@
-package com.tersesystems.echopraxia;
-
-import com.tersesystems.echopraxia.core.CoreLogger;
-import com.tersesystems.echopraxia.core.CoreLoggerFilter;
+package com.tersesystems.echopraxia.api;
 
 public class TestFilter implements CoreLoggerFilter {
   @Override

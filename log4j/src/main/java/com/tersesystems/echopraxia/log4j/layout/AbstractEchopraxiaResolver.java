@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
-import com.tersesystems.echopraxia.Field;
+import com.tersesystems.echopraxia.api.Field;
 import java.io.StringWriter;
 import java.util.List;
 import javax.json.Json;
