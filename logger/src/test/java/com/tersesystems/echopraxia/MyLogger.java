@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.support.*;
 import org.jetbrains.annotations.NotNull;
 
 public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>
