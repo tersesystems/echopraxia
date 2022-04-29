@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <FB> the field builder type.
  */
 public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logger<FB>, FB>
-    implements DefaultLoggerMethods<FB> {
+    implements DefaultLoggerMethods<FB, List<Field>> {
 
   // This is where the logging methods are called, so the stacktrace element shows
   // DefaultLoggerMethods as the caller.
@@ -107,7 +107,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
     }
 
     @Override
-    public void trace(@Nullable String message, Function<FB, List<Field>> f) {
+    public void trace(@Nullable String message, @NotNull Function<FB, List<Field>> f) {
       // do nothing
     }
 

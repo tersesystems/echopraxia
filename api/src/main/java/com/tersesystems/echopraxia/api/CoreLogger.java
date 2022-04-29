@@ -149,10 +149,10 @@ public interface CoreLogger {
    * @param builder the field builder
    * @param <FB> the type of field builder.
    */
-  <FB> void log(
+  <FB, RET> void log(
       @NotNull Level level,
       @Nullable String message,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder);
 
   /**
@@ -174,11 +174,11 @@ public interface CoreLogger {
    * @param builder the field builder
    * @param <FB> the type of field builder.
    */
-  <FB> void log(
+  <FB, RET> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder);
 
   /**

@@ -175,16 +175,16 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void log(
+  public <FB, RET> void log(
       @NotNull Level level,
       @Nullable String messageTemplate,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder) {
     // because the isEnabled check looks for message and throwable, we have to
     // calculate them right up front.
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final List<Field> argumentFields = f.apply(builder);
+    final List<Field> argumentFields = (List<Field>) f.apply(builder);
     final Throwable e = findThrowable(argumentFields);
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
@@ -208,15 +208,15 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void log(
+  public <FB, RET> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String messageTemplate,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final List<Field> argumentFields = f.apply(builder);
+    final List<Field> argumentFields = (List<Field>) f.apply(builder);
     final Throwable e = findThrowable(argumentFields);
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
