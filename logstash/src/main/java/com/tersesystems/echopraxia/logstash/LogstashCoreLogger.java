@@ -25,6 +25,8 @@ public class LogstashCoreLogger implements CoreLogger {
   // The logger context property used to set up caller info for async logging.
   public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
 
+  private static final Function<Object, List<Field>> conversionFunction = new FieldConversion();
+
   private final ch.qos.logback.classic.Logger logger;
   private final LogstashLoggingContext context;
   private final Condition condition;
@@ -103,9 +105,13 @@ public class LogstashCoreLogger implements CoreLogger {
   public <FB, RET> @NotNull CoreLogger withFields(
       @NotNull Function<FB, RET> f, @NotNull FB builder) {
     LogstashLoggingContext newContext =
-        new LogstashLoggingContext(() -> (List<Field>) f.apply(builder), Collections::emptyList);
+        new LogstashLoggingContext(() -> convertToFields(f.apply(builder)), Collections::emptyList);
     return new LogstashCoreLogger(
         fqcn, logger, this.context.and(newContext), condition, executor, mdcContext());
+  }
+
+  private <RET> List<Field> convertToFields(RET input) {
+    return conversionFunction.apply(input);
   }
 
   @Override
@@ -204,7 +210,7 @@ public class LogstashCoreLogger implements CoreLogger {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
     // XXX find the right object for this
-    final List<Field> args = (List<Field>) f.apply(builder);
+    final List<Field> args = convertToFields(f.apply(builder));
     final Marker m = context.getMarker();
     final LogstashLoggingContext argContext =
         new LogstashLoggingContext(() -> args, Collections::emptyList);
@@ -234,7 +240,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final Marker m = context.getMarker();
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
-    final List<Field> args = (List<Field>) f.apply(builder);
+    final List<Field> args = convertToFields(f.apply(builder));
     LogstashLoggingContext argContext =
         new LogstashLoggingContext(() -> args, Collections::emptyList);
     if (logger.isEnabledFor(m, convertLogbackLevel(level))

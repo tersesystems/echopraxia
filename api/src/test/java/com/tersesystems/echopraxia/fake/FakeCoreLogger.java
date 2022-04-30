@@ -1,10 +1,6 @@
 package com.tersesystems.echopraxia.fake;
 
-import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.CoreLogger;
-import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.api.LoggerHandle;
+import com.tersesystems.echopraxia.api.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -73,9 +69,13 @@ public class FakeCoreLogger implements CoreLogger {
   @Override
   public @NotNull <FB, RET> CoreLogger withFields(
       @NotNull Function<FB, RET> f, @NotNull FB builder) {
-    FakeLoggingContext newContext = new FakeLoggingContext(() -> (List<Field>) f.apply(builder));
+    FakeLoggingContext newContext = new FakeLoggingContext(() -> convert(f.apply(builder)));
     return new FakeCoreLogger(
         fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
+  }
+
+  private <RET> List<Field> convert(RET input) {
+    return new FieldConversion().apply(input);
   }
 
   @Override
@@ -120,8 +120,8 @@ public class FakeCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, RET> f,
       @NotNull FB builder) {
-    Object args = f.apply(builder);
-    FakeLoggingContext argContext = new FakeLoggingContext(() -> (List<Field>) args);
+    List<Field> args = convert(f.apply(builder));
+    FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
     if (isEnabledFor(level) && this.condition.test(level, context.and(argContext))) {
       List<Field> fields = context.getFields();
       System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);
@@ -146,7 +146,7 @@ public class FakeCoreLogger implements CoreLogger {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
     List<Field> fields = context.getFields();
-    List<Field> args = (List<Field>) f.apply(builder);
+    List<Field> args = convert(f.apply(builder));
     FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
     if (isEnabledFor(level) && this.condition.and(condition).test(level, context.and(argContext))) {
       System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);

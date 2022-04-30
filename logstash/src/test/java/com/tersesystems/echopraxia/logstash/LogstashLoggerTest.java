@@ -15,7 +15,6 @@ import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.UUID;
 import net.logstash.logback.argument.StructuredArgument;
@@ -103,7 +102,7 @@ class LogstashLoggerTest extends TestBase {
   @Test
   void testNullArgument() {
     Logger<?> logger = getLogger();
-    logger.debug("hello {}", fb -> fb.only(fb.nullField("nothing")));
+    logger.debug("hello {}", fb -> fb.nullField("nothing"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -162,7 +161,7 @@ class LogstashLoggerTest extends TestBase {
   void testNullArrayElement() {
     Logger<?> logger = getLogger();
     String[] values = {"1", null, "3"};
-    logger.debug("array field is {}", fb -> fb.only(fb.array("arrayName", values)));
+    logger.debug("array field is {}", fb -> fb.array("arrayName", values));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -173,7 +172,7 @@ class LogstashLoggerTest extends TestBase {
   @Test
   void testNullObject() {
     Logger<?> logger = getLogger();
-    logger.debug("object is {}", fb -> fb.only(fb.object("name", Value.object((Field) null))));
+    logger.debug("object is {}", fb -> (fb.object("name", Value.object((Field) null))));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -191,8 +190,7 @@ class LogstashLoggerTest extends TestBase {
           Field name = fb.string("name", "will");
           Field age = fb.number("age", 13);
           Field toys = fb.array("toys", "binkie", "dotty");
-          Field person = fb.object("person", name, age, toys);
-          return fb.list(person);
+          return fb.object("person", name, age, toys);
         });
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -220,7 +218,7 @@ class LogstashLoggerTest extends TestBase {
     logger.error(
         "Error {}",
         fb ->
-            Arrays.asList(
+            fb.list(
                 fb.string("operation", "MyOperation"),
                 fb.exception(new IllegalStateException("oh noes"))));
 
@@ -243,7 +241,7 @@ class LogstashLoggerTest extends TestBase {
     Logger<UUIDFieldBuilder> logger = getLogger().withFieldBuilder(new UUIDFieldBuilder() {});
 
     UUID uuid = UUID.randomUUID();
-    logger.error("user id {}", fb -> fb.only(fb.uuid("user_id", uuid)));
+    logger.error("user id {}", fb -> fb.uuid("user_id", uuid));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
