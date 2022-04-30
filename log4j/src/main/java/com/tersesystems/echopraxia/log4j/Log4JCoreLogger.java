@@ -1,15 +1,8 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.CoreLogger;
-import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.api.LoggerHandle;
-import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
@@ -28,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
+
+  private static final Function<Object, List<Field>> conversionFunction = new FieldConversion();
 
   private final ExtendedLogger logger;
   private final Log4JLoggingContext context;
@@ -82,10 +77,13 @@ public class Log4JCoreLogger implements CoreLogger {
     return fqcn;
   }
 
+  // attempt to cover all permutations of output.
+  @SuppressWarnings("unchecked")
   @Override
-  public <FB> @NotNull Log4JCoreLogger withFields(
-      @NotNull Function<FB, List<Field>> f, @NotNull FB builder) {
-    Log4JLoggingContext newContext = new Log4JLoggingContext(() -> f.apply(builder), null);
+  public <FB, RET> @NotNull Log4JCoreLogger withFields(
+      @NotNull Function<FB, RET> f, @NotNull FB builder) {
+    Log4JLoggingContext newContext =
+        new Log4JLoggingContext(() -> convertToFields(f.apply(builder)), null);
     return new Log4JCoreLogger(
         fqcn, logger, context.and(newContext), condition, executor, threadContextFunction);
   }
@@ -175,16 +173,16 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void log(
+  public <FB, RET> void log(
       @NotNull Level level,
       @Nullable String messageTemplate,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder) {
     // because the isEnabled check looks for message and throwable, we have to
     // calculate them right up front.
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final List<Field> argumentFields = f.apply(builder);
+    final List<Field> argumentFields = convertToFields(f.apply(builder));
     final Throwable e = findThrowable(argumentFields);
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
@@ -194,6 +192,10 @@ public class Log4JCoreLogger implements CoreLogger {
         && condition.test(level, context.and(argContext))) {
       logger.logMessage(fqcn, log4jLevel, marker, message, e);
     }
+  }
+
+  private <RET> List<Field> convertToFields(RET object) {
+    return conversionFunction.apply(object);
   }
 
   @Override
@@ -208,15 +210,15 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void log(
+  public <FB, RET> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String messageTemplate,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final List<Field> argumentFields = f.apply(builder);
+    final List<Field> argumentFields = convertToFields(f.apply(builder));
     final Throwable e = findThrowable(argumentFields);
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
@@ -229,15 +231,17 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+  public <FB, RET> void asyncLog(
+      @NotNull Level level,
+      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
+      @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
           threadLocalRunnable.run();
           consumer.accept(
-              new LoggerHandle<FB>() {
+              new LoggerHandle<FB, RET>() {
                 @Override
                 public void log(@Nullable String messageTemplate) {
                   final Marker marker = context.getMarker();
@@ -250,13 +254,12 @@ public class Log4JCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(
-                    @Nullable String messageTemplate, @NotNull Function<FB, List<Field>> f) {
+                public void log(@Nullable String messageTemplate, @NotNull Function<FB, RET> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
                   final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  final List<Field> argumentFields = f.apply(builder);
+                  final List<Field> argumentFields = convertToFields(f.apply(builder));
                   final Throwable e = findThrowable(argumentFields);
                   // When passing a condition through with explicit arguments, we pull the args
                   // and make them available through context.
@@ -273,10 +276,10 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void asyncLog(
+  public <FB, RET> void asyncLog(
       @NotNull Level level,
       @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
       @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
@@ -285,7 +288,7 @@ public class Log4JCoreLogger implements CoreLogger {
         () -> {
           threadLocalRunnable.run();
           consumer.accept(
-              new LoggerHandle<FB>() {
+              new LoggerHandle<FB, RET>() {
                 @Override
                 public void log(@Nullable String messageTemplate) {
                   final Marker marker = context.getMarker();
@@ -298,13 +301,12 @@ public class Log4JCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(
-                    @Nullable String messageTemplate, @NotNull Function<FB, List<Field>> f) {
+                public void log(@Nullable String messageTemplate, @NotNull Function<FB, RET> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
                   final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  final List<Field> argumentFields = f.apply(builder);
+                  final List<Field> argumentFields = convertToFields(f.apply(builder));
                   final Throwable e = findThrowable(argumentFields);
                   // When passing a condition through with explicit arguments, we pull the args and
                   // make

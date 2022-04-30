@@ -61,7 +61,7 @@ public interface CoreLogger {
    * @return the core logger with given context fields applied.
    */
   @NotNull
-  <B> CoreLogger withFields(@NotNull Function<B, List<Field>> f, @NotNull B builder);
+  <B, RET> CoreLogger withFields(@NotNull Function<B, RET> f, @NotNull B builder);
 
   /**
    * Pulls fields from thread context into logger context, if any exist and the implementation
@@ -149,10 +149,10 @@ public interface CoreLogger {
    * @param builder the field builder
    * @param <FB> the type of field builder.
    */
-  <FB> void log(
+  <FB, RET> void log(
       @NotNull Level level,
       @Nullable String message,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder);
 
   /**
@@ -174,11 +174,11 @@ public interface CoreLogger {
    * @param builder the field builder
    * @param <FB> the type of field builder.
    */
-  <FB> void log(
+  <FB, RET> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder);
 
   /**
@@ -189,8 +189,8 @@ public interface CoreLogger {
    * @param consumer the consumer of the logger handle
    * @param builder the field builder.
    */
-  <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder);
+  <FB, RET> void asyncLog(
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB, RET>> consumer, @NotNull FB builder);
 
   /**
    * Logs a statement asynchronously using an executor and the given condition.
@@ -201,9 +201,9 @@ public interface CoreLogger {
    * @param consumer the consumer of the logger handle
    * @param builder the field builder.
    */
-  <FB> void asyncLog(
+  <FB, RET> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
       @NotNull FB builder);
 }

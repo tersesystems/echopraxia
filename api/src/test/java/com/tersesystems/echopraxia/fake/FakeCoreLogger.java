@@ -1,10 +1,6 @@
 package com.tersesystems.echopraxia.fake;
 
-import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.CoreLogger;
-import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.api.LoggerHandle;
+import com.tersesystems.echopraxia.api.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -71,11 +67,15 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull <FB> CoreLogger withFields(
-      @NotNull Function<FB, List<Field>> f, @NotNull FB builder) {
-    FakeLoggingContext newContext = new FakeLoggingContext(() -> f.apply(builder));
+  public @NotNull <FB, RET> CoreLogger withFields(
+      @NotNull Function<FB, RET> f, @NotNull FB builder) {
+    FakeLoggingContext newContext = new FakeLoggingContext(() -> convert(f.apply(builder)));
     return new FakeCoreLogger(
         fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
+  }
+
+  private <RET> List<Field> convert(RET input) {
+    return new FieldConversion().apply(input);
   }
 
   @Override
@@ -115,12 +115,12 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void log(
+  public <FB, RET> void log(
       @NotNull Level level,
       @Nullable String message,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder) {
-    List<Field> args = f.apply(builder);
+    List<Field> args = convert(f.apply(builder));
     FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
     if (isEnabledFor(level) && this.condition.test(level, context.and(argContext))) {
       List<Field> fields = context.getFields();
@@ -137,16 +137,16 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB> void log(
+  public <FB, RET> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Function<FB, List<Field>> f,
+      @NotNull Function<FB, RET> f,
       @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
     List<Field> fields = context.getFields();
-    List<Field> args = f.apply(builder);
+    List<Field> args = convert(f.apply(builder));
     FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
     if (isEnabledFor(level) && this.condition.and(condition).test(level, context.and(argContext))) {
       System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);
@@ -160,13 +160,15 @@ public class FakeCoreLogger implements CoreLogger {
   // -----------------------------------------------------------------------
 
   @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
+  public <FB, RET> void asyncLog(
+      @NotNull Level level,
+      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
+      @NotNull FB builder) {}
 
   @Override
-  public <FB> void asyncLog(
+  public <FB, RET> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
       @NotNull FB builder) {}
 }
