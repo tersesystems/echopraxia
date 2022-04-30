@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public interface LoggerMethods<FB, RET> {
+public interface LoggerMethods<FB> {
 
   /** @return true if the logger level is TRACE or higher. */
   boolean isTraceEnabled();
@@ -70,7 +71,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void trace(@Nullable String message, @NotNull Function<FB, RET> f);
+  void trace(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at TRACE level with exception.
@@ -95,7 +96,10 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void trace(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void trace(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at TRACE level with exception.
@@ -119,7 +123,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void debug(@Nullable String message, @NotNull Function<FB, RET> f);
+  void debug(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at DEBUG level with exception.
@@ -153,7 +157,10 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void debug(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void debug(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at INFO level.
@@ -168,7 +175,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void info(@Nullable String message, @NotNull Function<FB, RET> f);
+  void info(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at INFO level with exception.
@@ -193,7 +200,10 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void info(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void info(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.
@@ -217,7 +227,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void warn(@Nullable String message, @NotNull Function<FB, RET> f);
+  void warn(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at WARN level with exception.
@@ -251,7 +261,10 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void warn(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void warn(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at INFO level.
@@ -266,7 +279,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void error(@Nullable String message, @NotNull Function<FB, RET> f);
+  void error(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at INFO level with exception.
@@ -291,7 +304,10 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void error(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void error(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.

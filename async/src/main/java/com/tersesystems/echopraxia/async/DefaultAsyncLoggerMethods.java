@@ -3,12 +3,8 @@ package com.tersesystems.echopraxia.async;
 import static com.tersesystems.echopraxia.api.Field.EXCEPTION;
 import static com.tersesystems.echopraxia.api.Level.*;
 import static com.tersesystems.echopraxia.api.Value.exception;
-import static java.util.Collections.singletonList;
 
-import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
-import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.LoggerHandle;
+import com.tersesystems.echopraxia.api.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
@@ -19,8 +15,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder.
  */
-public interface DefaultAsyncLoggerMethods<FB, RET>
-    extends AsyncLoggerMethods<FB, RET>, DefaultMethodsSupport<FB> {
+public interface DefaultAsyncLoggerMethods<FB>
+    extends AsyncLoggerMethods<FB>, DefaultMethodsSupport<FB> {
 
   // ------------------------------------------------------------------------
   // TRACE
@@ -30,7 +26,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    *
    * @param consumer the consumer of the logger handle.
    */
-  default void trace(@NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void trace(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(TRACE, consumer, fieldBuilder());
   }
 
@@ -40,7 +36,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  default void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(TRACE, c, consumer, fieldBuilder());
   }
 
@@ -59,8 +55,8 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void trace(@Nullable String message, @NotNull Function<FB, RET> f) {
-    core().asyncLog(TRACE, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+  default void trace(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(TRACE, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -73,7 +69,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
     core()
         .asyncLog(
             TRACE,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -95,9 +91,10 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param f the field builder function.
    */
   default void trace(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
-    core()
-        .asyncLog(TRACE, condition, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(TRACE, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -112,7 +109,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
         .asyncLog(
             TRACE,
             condition,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> Field.keyValue(EXCEPTION, exception(e))),
             fieldBuilder());
   }
 
@@ -124,7 +121,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    *
    * @param consumer the consumer of the logger handle.
    */
-  default void debug(@NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void debug(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(DEBUG, consumer, fieldBuilder());
   }
 
@@ -134,7 +131,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  default void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(DEBUG, c, consumer, fieldBuilder());
   }
 
@@ -153,8 +150,8 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void debug(@Nullable String message, @NotNull Function<FB, RET> f) {
-    core().asyncLog(DEBUG, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+  default void debug(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(DEBUG, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -167,7 +164,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
     core()
         .asyncLog(
             DEBUG,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -189,9 +186,10 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param f the field builder function.
    */
   default void debug(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
-    core()
-        .asyncLog(DEBUG, condition, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(DEBUG, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -206,7 +204,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
         .asyncLog(
             DEBUG,
             condition,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -218,7 +216,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    *
    * @param consumer the consumer of the logger handle.
    */
-  default void info(@NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void info(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(INFO, consumer, fieldBuilder());
   }
 
@@ -228,7 +226,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  default void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(INFO, c, consumer, fieldBuilder());
   }
 
@@ -247,8 +245,8 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void info(@Nullable String message, @NotNull Function<FB, RET> f) {
-    core().asyncLog(INFO, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+  default void info(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(INFO, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -261,7 +259,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
     core()
         .asyncLog(
             INFO,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -283,9 +281,10 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param f the field builder function.
    */
   default void info(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
-    core()
-        .asyncLog(INFO, condition, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(INFO, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -300,7 +299,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
         .asyncLog(
             INFO,
             condition,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -312,7 +311,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    *
    * @param consumer the consumer of the logger handle.
    */
-  default void warn(@NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void warn(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(WARN, consumer, fieldBuilder());
   }
 
@@ -322,7 +321,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  default void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(WARN, c, consumer, fieldBuilder());
   }
 
@@ -341,8 +340,8 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void warn(@Nullable String message, @NotNull Function<FB, RET> f) {
-    core().asyncLog(WARN, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+  default void warn(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(WARN, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -355,7 +354,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
     core()
         .asyncLog(
             WARN,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -377,9 +376,10 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param f the field builder function.
    */
   default void warn(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
-    core()
-        .asyncLog(WARN, condition, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(WARN, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -394,7 +394,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
         .asyncLog(
             WARN,
             condition,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -406,7 +406,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    *
    * @param consumer the consumer of the logger handle.
    */
-  default void error(@NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void error(@NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(ERROR, consumer, fieldBuilder());
   }
 
@@ -416,7 +416,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  default void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer) {
+  default void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {
     core().asyncLog(ERROR, c, consumer, fieldBuilder());
   }
 
@@ -435,8 +435,8 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param message the message.
    * @param f the field builder function.
    */
-  default void error(@Nullable String message, @NotNull Function<FB, RET> f) {
-    core().asyncLog(ERROR, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+  default void error(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(ERROR, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -449,7 +449,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
     core()
         .asyncLog(
             ERROR,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 
@@ -471,9 +471,10 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
    * @param f the field builder function.
    */
   default void error(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
-    core()
-        .asyncLog(ERROR, condition, (LoggerHandle<FB, RET> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(ERROR, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -488,7 +489,7 @@ public interface DefaultAsyncLoggerMethods<FB, RET>
         .asyncLog(
             ERROR,
             condition,
-            h -> h.log(message, fb -> singletonList(Field.keyValue(EXCEPTION, exception(e)))),
+            h -> h.log(message, fb -> (Field.keyValue(EXCEPTION, exception(e)))),
             fieldBuilder());
   }
 }

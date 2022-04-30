@@ -34,7 +34,7 @@ public class ConditionTest extends TestBase {
 
     Logger<?> logger = getLogger();
     Logger<?> loggerWithCondition =
-        logger.withCondition(hasInfoLevel).withFields(f -> f.onlyString("herp", "derp"));
+        logger.withCondition(hasInfoLevel).withFields(f -> f.string("herp", "derp"));
 
     Condition hasFieldNamedHerp =
         (level, c) -> c.getFields().stream().anyMatch(f -> f.name().equals("herp"));
@@ -120,7 +120,7 @@ public class ConditionTest extends TestBase {
                   logged.set(true);
                   throw new RuntimeException("oh noes!");
                 }
-                return fb.onlyString("foo", "bar");
+                return fb.string("foo", "bar");
               });
         });
 

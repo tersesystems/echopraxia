@@ -91,7 +91,7 @@ class LogstashLoggerTest extends TestBase {
   @Test
   void testArrayOfStringsArgument() {
     Logger<?> logger = getLogger();
-    logger.debug("hello {}", fb -> fb.onlyArray("toys", "binkie"));
+    logger.debug("hello {}", fb -> fb.array("toys", "binkie"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -114,7 +114,7 @@ class LogstashLoggerTest extends TestBase {
   void testNullStringArgument() {
     Logger<?> logger = getLogger();
     String value = null;
-    logger.debug("hello {}", fb -> fb.only(fb.string("name", value)));
+    logger.debug("hello {}", fb -> (fb.string("name", value)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -126,7 +126,7 @@ class LogstashLoggerTest extends TestBase {
   void testNullFieldName() {
     Logger<?> logger = getLogger();
     String value = "value";
-    logger.debug("hello {}", fb -> fb.only(fb.string(null, value)));
+    logger.debug("hello {}", fb -> (fb.string(null, value)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -138,7 +138,7 @@ class LogstashLoggerTest extends TestBase {
   void testNullNumber() {
     Logger<?> logger = getLogger();
     Number value = null;
-    logger.debug("hello {}", fb -> fb.only(fb.number("name", value)));
+    logger.debug("hello {}", fb -> (fb.number("name", value)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -149,7 +149,7 @@ class LogstashLoggerTest extends TestBase {
   @Test
   void testNullBoolean() {
     Logger<?> logger = getLogger();
-    logger.debug("boolean is {}", fb -> fb.only(fb.bool("name", (Boolean) null)));
+    logger.debug("boolean is {}", fb -> (fb.bool("name", (Boolean) null)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -259,7 +259,7 @@ class LogstashLoggerTest extends TestBase {
     abe.setMother(new Person("Candace", 30, "iceskating"));
 
     final Logger<MyFieldBuilder> logger = getLogger().withFieldBuilder(new MyFieldBuilder());
-    logger.info("hi there {}", fb -> fb.only(fb.person("person", abe)));
+    logger.info("hi there {}", fb -> (fb.person("person", abe)));
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String message = event.getFormattedMessage();

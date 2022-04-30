@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.scripting;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
@@ -30,7 +29,7 @@ public class ScriptConditionTest {
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger.info("data of interest found", fb -> fb.only(fb.string("correlation_id", "match")));
+    logger.info("data of interest found", fb -> (fb.string("correlation_id", "match")));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -49,7 +48,7 @@ public class ScriptConditionTest {
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger.info("data of interest found", fb -> fb.onlyNumber("correlation_id", 123));
+    logger.info("data of interest found", fb -> fb.number("correlation_id", 123));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -68,7 +67,7 @@ public class ScriptConditionTest {
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger.info("data of interest found", fb -> fb.onlyBool("bool_value", true));
+    logger.info("data of interest found", fb -> fb.bool("bool_value", true));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -87,7 +86,7 @@ public class ScriptConditionTest {
                 + "}",
             Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger.info("data of interest found", fb -> fb.onlyNullField("null_value"));
+    logger.info("data of interest found", fb -> fb.nullField("null_value"));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -112,7 +111,7 @@ public class ScriptConditionTest {
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info(
         "data of interest found",
-        fb -> fb.onlyObject("obj", fb.list(fb.number("foo", 1337), fb.number("bar", 0xDEADBEEF))));
+        fb -> fb.object("obj", fb.number("foo", 1337), fb.number("bar", 0xDEADBEEF)));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -137,7 +136,7 @@ public class ScriptConditionTest {
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info(
         "data of interest found",
-        fb -> fb.onlyObject("obj", fb.list(fb.array("interests", "food", "drink", "sleep"))));
+        fb -> fb.object("obj", (fb.array("interests", "food", "drink", "sleep"))));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -161,7 +160,7 @@ public class ScriptConditionTest {
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info(
         "data of interest found",
-        fb -> fb.onlyObject("obj", fb.list(fb.array("interests", "food", "drink", "sleep"))));
+        fb -> fb.object("obj", (fb.array("interests", "food", "drink", "sleep"))));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -176,7 +175,7 @@ public class ScriptConditionTest {
 
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger
-        .withFields(fb -> fb.only(fb.exception(new RuntimeException("testing"))))
+        .withFields(fb -> (fb.exception(new RuntimeException("testing"))))
         .info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -191,9 +190,7 @@ public class ScriptConditionTest {
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger
-        .withFields(bf -> bf.only(bf.string("correlation_id", "match")))
-        .info("data of interest found");
+    logger.withFields(fb -> (fb.string("correlation_id", "match"))).info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
@@ -237,7 +234,7 @@ public class ScriptConditionTest {
               Field age = fb.number("age", 13);
               Field toys = fb.array("toys", "binkie");
               Field person = fb.object("person", name, age, toys);
-              return singletonList(person);
+              return (person);
             })
         .info("data of interest found");
 

@@ -13,7 +13,7 @@ public class SemanticLoggerBenchmarks {
 
   private static final SemanticLogger<String> logger =
       SemanticLoggerFactory.getLogger(
-          String.class, s -> "Message {}", s -> b -> b.onlyString("name", s));
+          String.class, s -> "Message {}", s -> b -> b.string("name", s));
 
   @Benchmark
   public void info() {

@@ -3,8 +3,8 @@ package com.tersesystems.echopraxia;
 import com.tersesystems.echopraxia.api.*;
 import org.jetbrains.annotations.NotNull;
 
-public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder, Object>
-    implements DefaultLoggerMethods<MyFieldBuilder, Object> {
+public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>
+    implements DefaultLoggerMethods<MyFieldBuilder> {
 
   public MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) {
     super(core, fieldBuilder, MyLogger.class);
@@ -14,7 +14,7 @@ public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder, Ob
     // the caller is MyLogger specifically, so we need to let the logging framework know how to
     // address it.
     core.withFQCN(getClass().getName())
-        .log(Level.INFO, message, fb -> fb.onlyBool("notice", true), fieldBuilder());
+        .log(Level.INFO, message, fb -> fb.bool("notice", true), fieldBuilder());
   }
 
   @Override

@@ -19,9 +19,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public class AsyncLogger<FB extends FieldBuilder>
-    extends AbstractLoggerSupport<AsyncLogger<FB>, FB, Object>
-    implements DefaultAsyncLoggerMethods<FB, Object> {
+public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<AsyncLogger<FB>, FB>
+    implements DefaultAsyncLoggerMethods<FB> {
 
   protected AsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     super(core, fieldBuilder, AsyncLogger.class);
@@ -119,7 +118,7 @@ public class AsyncLogger<FB extends FieldBuilder>
       return this;
     }
 
-    public void trace(@NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void trace(@NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     /**
      * Logs using a condition and a logger handle at TRACE level.
@@ -127,13 +126,13 @@ public class AsyncLogger<FB extends FieldBuilder>
      * @param c the condition
      * @param consumer the consumer of the logger handle.
      */
-    public void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     @Override
     public void trace(@Nullable String message) {}
 
     @Override
-    public void trace(@Nullable String message, @NotNull Function<FB, Object> f) {}
+    public void trace(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void trace(@Nullable String message, @NotNull Throwable e) {}
@@ -143,7 +142,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void trace(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, Object> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void trace(
@@ -154,7 +155,7 @@ public class AsyncLogger<FB extends FieldBuilder>
      *
      * @param consumer the consumer of the logger handle.
      */
-    public void debug(@NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void debug(@NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     /**
      * Logs using a condition and a logger handle at DEBUG level.
@@ -162,13 +163,13 @@ public class AsyncLogger<FB extends FieldBuilder>
      * @param c the condition
      * @param consumer the consumer of the logger handle.
      */
-    public void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     @Override
     public void debug(@Nullable String message) {}
 
     @Override
-    public void debug(@Nullable String message, @NotNull Function<FB, Object> f) {}
+    public void debug(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void debug(@Nullable String message, @NotNull Throwable e) {}
@@ -178,7 +179,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void debug(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, Object> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void debug(
@@ -189,7 +192,7 @@ public class AsyncLogger<FB extends FieldBuilder>
      *
      * @param consumer the consumer of the logger handle.
      */
-    public void info(@NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void info(@NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     /**
      * Logs using a condition and a logger handle at INFO level.
@@ -197,13 +200,13 @@ public class AsyncLogger<FB extends FieldBuilder>
      * @param c the condition
      * @param consumer the consumer of the logger handle.
      */
-    public void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     @Override
     public void info(@Nullable String message) {}
 
     @Override
-    public void info(@Nullable String message, @NotNull Function<FB, Object> f) {}
+    public void info(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void info(@Nullable String message, @NotNull Throwable e) {}
@@ -213,7 +216,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void info(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, Object> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void info(
@@ -224,7 +229,7 @@ public class AsyncLogger<FB extends FieldBuilder>
      *
      * @param consumer the consumer of the logger handle.
      */
-    public void warn(@NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void warn(@NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     /**
      * Logs using a condition and a logger handle at WARN level.
@@ -232,10 +237,10 @@ public class AsyncLogger<FB extends FieldBuilder>
      * @param c the condition
      * @param consumer the consumer of the logger handle.
      */
-    public void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     @Override
-    public void warn(@Nullable String message, @NotNull Function<FB, Object> f) {}
+    public void warn(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void warn(@Nullable String message, @NotNull Throwable e) {}
@@ -245,7 +250,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void warn(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, Object> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void warn(
@@ -257,7 +264,7 @@ public class AsyncLogger<FB extends FieldBuilder>
      * @param consumer the consumer of the logger handle.
      */
     @Override
-    public void error(@NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void error(@NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     /**
      * Logs using a condition and a logger handle at ERROR level.
@@ -266,13 +273,13 @@ public class AsyncLogger<FB extends FieldBuilder>
      * @param consumer the consumer of the logger handle.
      */
     @Override
-    public void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, Object>> consumer) {}
+    public void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer) {}
 
     @Override
     public void error(@Nullable String message) {}
 
     @Override
-    public void error(@Nullable String message, @NotNull Function<FB, Object> f) {}
+    public void error(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void error(@Nullable String message, @NotNull Throwable e) {}
@@ -282,7 +289,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void error(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, Object> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void error(

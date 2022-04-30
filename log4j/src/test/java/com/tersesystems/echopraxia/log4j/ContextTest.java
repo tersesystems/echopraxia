@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.log4j;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.Logger;
@@ -24,7 +23,7 @@ public class ContextTest extends TestBase {
         (Log4JCoreLogger) CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
     Logger<?> logger =
         LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
-    logger.error("Message {}", fb -> fb.onlyString("field_name", "field_value"));
+    logger.error("Message {}", fb -> fb.string("field_name", "field_value"));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -66,7 +65,7 @@ public class ContextTest extends TestBase {
               Field age = fb.number("age", 13);
               Field toys = fb.array("toys", "binkie");
               Field person = fb.object("person", name, age, toys);
-              return singletonList(person);
+              return person;
             })
         .error("this is a message with complex fields");
 

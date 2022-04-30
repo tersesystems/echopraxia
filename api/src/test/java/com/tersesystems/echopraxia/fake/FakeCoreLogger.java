@@ -67,15 +67,15 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull <FB, RET> CoreLogger withFields(
-      @NotNull Function<FB, RET> f, @NotNull FB builder) {
+  public @NotNull <FB> CoreLogger withFields(
+      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     FakeLoggingContext newContext = new FakeLoggingContext(() -> convert(f.apply(builder)));
     return new FakeCoreLogger(
         fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
   }
 
-  private <RET> List<Field> convert(RET input) {
-    return new FieldConversion().apply(input);
+  private List<Field> convert(FieldBuilderResult input) {
+    return input.fields();
   }
 
   @Override
@@ -118,7 +118,7 @@ public class FakeCoreLogger implements CoreLogger {
   public <FB, RET> void log(
       @NotNull Level level,
       @Nullable String message,
-      @NotNull Function<FB, RET> f,
+      @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
     List<Field> args = convert(f.apply(builder));
     FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
@@ -141,7 +141,7 @@ public class FakeCoreLogger implements CoreLogger {
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Function<FB, RET> f,
+      @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
@@ -161,14 +161,12 @@ public class FakeCoreLogger implements CoreLogger {
 
   @Override
   public <FB, RET> void asyncLog(
-      @NotNull Level level,
-      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
-      @NotNull FB builder) {}
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
 
   @Override
   public <FB, RET> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {}
 }
