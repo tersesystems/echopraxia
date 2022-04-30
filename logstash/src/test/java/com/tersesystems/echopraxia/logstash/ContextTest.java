@@ -41,7 +41,7 @@ public class ContextTest extends TestBase {
         new LogstashCoreLogger(Logger.FQCN, loggerContext.getLogger(getClass().getName()));
     Logger<?> logger =
         LoggerFactory.getLogger(core.withMarkers(securityMarker), FieldBuilder.instance());
-    logger.withFields(f -> f.onlyString("key", "value")).error("This has a marker");
+    logger.withFields(f -> f.string("key", "value")).error("This has a marker");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -87,7 +87,7 @@ public class ContextTest extends TestBase {
               Field age = fb.number("age", 13);
               Field toys = fb.array("toys", "binkie");
               Field person = fb.object("person", name, age, toys);
-              return singletonList(person);
+              return (person);
             })
         .error("This has a marker");
 
@@ -121,7 +121,7 @@ public class ContextTest extends TestBase {
               Value.ArrayValue a3 = array("1", "2", "3");
               Value.ArrayValue a2 = array(1, 2, 3);
               Field field = fb.array("a1", array(a2, a3, a4));
-              return singletonList(field);
+              return (field);
             })
         .error("This has a marker");
 
@@ -147,9 +147,9 @@ public class ContextTest extends TestBase {
   @Test
   void testCombinedContext() {
     Logger<?> logger = getLogger();
-    Logger<?> loggerWithContext = logger.withFields(f -> f.onlyString("key", "value"));
+    Logger<?> loggerWithContext = logger.withFields(f -> f.string("key", "value"));
     loggerWithContext
-        .withFields(f -> f.onlyString("key2", "value2"))
+        .withFields(f -> f.string("key2", "value2"))
         .info("This should have two contexts.");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -185,7 +185,7 @@ public class ContextTest extends TestBase {
     Logger<?> logger = getLogger();
     Condition c =
         (level, ctx) -> ctx.findString("$.arg1").filter(v -> v.equals("value1")).isPresent();
-    logger.info(c, "Matches on arg1", fb -> fb.onlyString("arg1", "value1"));
+    logger.info(c, "Matches on arg1", fb -> fb.string("arg1", "value1"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -198,7 +198,7 @@ public class ContextTest extends TestBase {
     Logger<?> logger = getLogger();
     Condition c =
         (level, ctx) -> ctx.findNumber("$.arg1").filter(v -> v.intValue() == 1).isPresent();
-    logger.info(c, "Matches on arg1", fb -> fb.onlyNumber("arg1", 1));
+    logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -210,7 +210,7 @@ public class ContextTest extends TestBase {
   void testFindBoolean() {
     Logger<?> logger = getLogger();
     Condition c = (level, ctx) -> ctx.findBoolean("$.arg1").orElse(false);
-    logger.info(c, "Matches on arg1", fb -> fb.onlyBool("arg1", true));
+    logger.info(c, "Matches on arg1", fb -> fb.bool("arg1", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -223,7 +223,7 @@ public class ContextTest extends TestBase {
     Logger<?> logger = getLogger();
     Condition c =
         (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
-    logger.info(c, "Matches on arg1", fb -> fb.onlyNumber("arg1", 1.5));
+    logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1.5));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -244,7 +244,7 @@ public class ContextTest extends TestBase {
           Field category = fb.string("category", "fiction");
           Field price = fb.number("price", 5);
           Field book = fb.object("book", category, price);
-          return fb.onlyObject("store", book);
+          return fb.object("store", book);
         });
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -258,7 +258,7 @@ public class ContextTest extends TestBase {
     Logger<?> logger = getLogger();
     final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
 
-    logger.info(nullCondition, "found null", fb -> fb.onlyNullField("myNullField"));
+    logger.info(nullCondition, "found null", fb -> fb.nullField("myNullField"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -271,7 +271,7 @@ public class ContextTest extends TestBase {
     Logger<?> logger = getLogger();
     final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
 
-    logger.info(nullCondition, "found null", fb -> fb.onlyString("myNullField", "notnull"));
+    logger.info(nullCondition, "found null", fb -> fb.string("myNullField", "notnull"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
@@ -295,7 +295,7 @@ public class ContextTest extends TestBase {
     final Condition noFindException = (level, ctx) -> ctx.findString("$.notastring").isPresent();
 
     // property is present but is boolean, not a string
-    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notastring", true));
+    logger.info(noFindException, "this should not log", fb -> fb.bool("notastring", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
@@ -307,7 +307,7 @@ public class ContextTest extends TestBase {
     final Condition noFindException = (level, ctx) -> ctx.findObject("$.notanobject").isPresent();
 
     // property is present but is boolean, not a string
-    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notanobject", true));
+    logger.info(noFindException, "this should not log", fb -> fb.bool("notanobject", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
@@ -319,7 +319,7 @@ public class ContextTest extends TestBase {
     final Condition noFindException = (level, ctx) -> ctx.findList("$.notalist").size() > 0;
 
     // property is present but is boolean, not a string
-    logger.info(noFindException, "this should not log", fb -> fb.onlyBool("notalist", true));
+    logger.info(noFindException, "this should not log", fb -> fb.bool("notalist", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
@@ -395,7 +395,7 @@ public class ContextTest extends TestBase {
     logger.info(
         c,
         "Can manage null in array",
-        fb -> fb.onlyObject("foo", fb.onlyArray("interests", "foo", null, null)));
+        fb -> fb.object("foo", fb.array("interests", "foo", null, null)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
@@ -415,7 +415,7 @@ public class ContextTest extends TestBase {
               object(fb.bool("one", true), fb.string("two", "t"), fb.number("three", 3));
           final Value.ArrayValue arrayValue =
               array(string("interests"), string("foo"), objectValue);
-          return fb.onlyObject("foo", fb.onlyArray("array", arrayValue));
+          return fb.object("foo", fb.array("array", arrayValue));
         });
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();

@@ -26,7 +26,7 @@ public class LoggerBenchmarks {
   private static final com.tersesystems.echopraxia.Logger<?> fieldBuilderLogger =
       logger.withFieldBuilder(FieldBuilder.instance());
   private static final Logger<?> contextLogger =
-      logger.withFields(fb -> fb.onlyString("foo", "bar"));
+      logger.withFields(fb -> fb.string("foo", "bar"));
 
   @Benchmark
   public void info() {
@@ -61,7 +61,7 @@ public class LoggerBenchmarks {
   @Benchmark
   public void infoWithStringArg() {
     // No {} in the message template
-    logger.info("Message", fb -> fb.onlyString("foo", "bar"));
+    logger.info("Message", fb -> fb.string("foo", "bar"));
   }
 
   @Benchmark
@@ -72,7 +72,7 @@ public class LoggerBenchmarks {
   @Benchmark
   public void infoWithParameterizedString() {
     // {} in message template
-    logger.info("Message {}", fb -> fb.onlyString("foo", "bar"));
+    logger.info("Message {}", fb -> fb.string("foo", "bar"));
   }
 
   @Benchmark
@@ -83,6 +83,6 @@ public class LoggerBenchmarks {
   @Benchmark
   public void traceWithParameterizedString() {
     // should never log
-    logger.trace("Message {}", fb -> fb.onlyString("foo", "bar"));
+    logger.trace("Message {}", fb -> fb.string("foo", "bar"));
   }
 }

@@ -32,7 +32,7 @@ public class Log4JLoggerTest extends TestBase {
   void testNullStringArgument() {
     Logger<?> logger = getLogger();
     String value = null;
-    logger.info("hello {}", fb -> fb.only(fb.string("name", value)));
+    logger.info("hello {}", fb -> (fb.string("name", value)));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -43,7 +43,7 @@ public class Log4JLoggerTest extends TestBase {
   void testNullFieldName() {
     Logger<?> logger = getLogger();
     String value = "value";
-    logger.debug("array field is {}", fb -> fb.only(fb.array(null, value)));
+    logger.debug("array field is {}", fb -> (fb.array(null, value)));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -54,7 +54,7 @@ public class Log4JLoggerTest extends TestBase {
   void testNullNumber() {
     Logger<?> logger = getLogger();
     Number value = null;
-    logger.debug("number is {}", fb -> fb.only(fb.number("name", value)));
+    logger.debug("number is {}", fb -> (fb.number("name", value)));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -64,7 +64,7 @@ public class Log4JLoggerTest extends TestBase {
   @Test
   void testNullBoolean() {
     Logger<?> logger = getLogger();
-    logger.debug("boolean is {}", fb -> fb.only(fb.bool("name", (Boolean) null)));
+    logger.debug("boolean is {}", fb -> (fb.bool("name", (Boolean) null)));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -75,7 +75,7 @@ public class Log4JLoggerTest extends TestBase {
   void testNullArrayElement() {
     Logger<?> logger = getLogger();
     String[] values = {"1", null, "3"};
-    logger.debug("array field is {}", fb -> fb.only(fb.array("arrayName", values)));
+    logger.debug("array field is {}", fb -> (fb.array("arrayName", values)));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -85,7 +85,7 @@ public class Log4JLoggerTest extends TestBase {
   @Test
   void testNullObject() {
     Logger<?> logger = getLogger();
-    logger.debug("object is {}", fb -> fb.only(fb.object("name", Value.object((Field) null))));
+    logger.debug("object is {}", fb -> (fb.object("name", Value.object((Field) null))));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -96,7 +96,7 @@ public class Log4JLoggerTest extends TestBase {
   @Test
   public void testLoggerWithStringField() {
     Logger<?> logger = LoggerFactory.getLogger(getClass());
-    logger.info("my argument is {}", fb -> fb.onlyString("random_key", "random_value"));
+    logger.info("my argument is {}", fb -> fb.string("random_key", "random_value"));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -148,7 +148,7 @@ public class Log4JLoggerTest extends TestBase {
         fb -> {
           final Field field1 = fb.string("key1", "value1");
           final Field field2 = fb.string("key2", "value2");
-          return fb.onlyObject("random_object", field1, field2);
+          return fb.object("random_object", field1, field2);
         });
 
     JsonObject entry = getEntry();
@@ -199,7 +199,7 @@ public class Log4JLoggerTest extends TestBase {
         "my argument is {}",
         fb -> {
           Number[] intArray = {1, 2, 3};
-          return fb.onlyArray("random_key", intArray);
+          return fb.array("random_key", intArray);
         });
 
     JsonObject entry = getEntry();
@@ -230,7 +230,7 @@ public class Log4JLoggerTest extends TestBase {
   public void testLoggerWithThrowableField() {
     Logger<?> logger = LoggerFactory.getLogger(getClass());
     Exception exception = new RuntimeException("Some exception");
-    logger.error("Message {}", fb -> fb.onlyException(exception));
+    logger.error("Message {}", fb -> fb.exception(exception));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
@@ -244,7 +244,7 @@ public class Log4JLoggerTest extends TestBase {
   public void testLoggerWithContextField() {
     Logger<?> logger =
         LoggerFactory.getLogger(getClass())
-            .withFields(fb -> fb.onlyString("context_name", "context_field"));
+            .withFields(fb -> fb.string("context_name", "context_field"));
     logger.error("Message");
 
     JsonObject entry = getEntry();
@@ -259,8 +259,8 @@ public class Log4JLoggerTest extends TestBase {
   public void testLoggerWithContextAndArgumentField() {
     Logger<?> logger =
         LoggerFactory.getLogger(getClass())
-            .withFields(fb -> fb.onlyString("context_name", "context_field"));
-    logger.error("Message {}", fb -> fb.onlyString("arg_name", "arg_field"));
+            .withFields(fb -> fb.string("context_name", "context_field"));
+    logger.error("Message {}", fb -> fb.string("arg_name", "arg_field"));
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");

@@ -80,8 +80,8 @@ public class Log4JCoreLogger implements CoreLogger {
   // attempt to cover all permutations of output.
   @SuppressWarnings("unchecked")
   @Override
-  public <FB, RET> @NotNull Log4JCoreLogger withFields(
-      @NotNull Function<FB, RET> f, @NotNull FB builder) {
+  public <FB> @NotNull Log4JCoreLogger withFields(
+      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     Log4JLoggingContext newContext =
         new Log4JLoggingContext(() -> convertToFields(f.apply(builder)), null);
     return new Log4JCoreLogger(
@@ -176,7 +176,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public <FB, RET> void log(
       @NotNull Level level,
       @Nullable String messageTemplate,
-      @NotNull Function<FB, RET> f,
+      @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
     // because the isEnabled check looks for message and throwable, we have to
     // calculate them right up front.
@@ -214,7 +214,7 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String messageTemplate,
-      @NotNull Function<FB, RET> f,
+      @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
@@ -233,7 +233,7 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB, RET> void asyncLog(
       @NotNull Level level,
-      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
@@ -241,7 +241,7 @@ public class Log4JCoreLogger implements CoreLogger {
         () -> {
           threadLocalRunnable.run();
           consumer.accept(
-              new LoggerHandle<FB, RET>() {
+              new LoggerHandle<FB>() {
                 @Override
                 public void log(@Nullable String messageTemplate) {
                   final Marker marker = context.getMarker();
@@ -254,7 +254,7 @@ public class Log4JCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String messageTemplate, @NotNull Function<FB, RET> f) {
+                public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
@@ -279,7 +279,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public <FB, RET> void asyncLog(
       @NotNull Level level,
       @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
@@ -288,7 +288,7 @@ public class Log4JCoreLogger implements CoreLogger {
         () -> {
           threadLocalRunnable.run();
           consumer.accept(
-              new LoggerHandle<FB, RET>() {
+              new LoggerHandle<FB>() {
                 @Override
                 public void log(@Nullable String messageTemplate) {
                   final Marker marker = context.getMarker();
@@ -301,7 +301,7 @@ public class Log4JCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String messageTemplate, @NotNull Function<FB, RET> f) {
+                public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();

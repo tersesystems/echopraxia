@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <FB> the field builder.
  */
 public abstract class AbstractLoggerSupport<
-        SELF extends AbstractLoggerSupport<SELF, FB, RET>, FB, RET>
+        SELF extends AbstractLoggerSupport<SELF, FB>, FB>
     implements DefaultMethodsSupport<FB> {
 
   protected final CoreLogger core;
@@ -54,7 +54,7 @@ public abstract class AbstractLoggerSupport<
   }
 
   @NotNull
-  public SELF withFields(@NotNull Function<FB, RET> f) {
+  public SELF withFields(@NotNull Function<FB, FieldBuilderResult> f) {
     return newLogger(core().withFields(f, fieldBuilder));
   }
 

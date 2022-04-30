@@ -26,7 +26,7 @@ public class Log4JBenchmarks {
 
   private static final Exception exception = new RuntimeException();
 
-  private static final Field field = new MyKeyValueField("name", Value.string("value"));
+  private static final Field field = Field.keyValue("name", Value.string("value"));
 
   private static final List<Field> fields = Arrays.asList(field, field, field, field);
 
@@ -64,23 +64,4 @@ public class Log4JBenchmarks {
     logger.info(message, exception);
   }
 
-  static class MyKeyValueField implements Field.KeyValueField {
-    private final String name;
-    private final Value<?> value;
-
-    MyKeyValueField(String name, Value<?> value) {
-      this.name = name;
-      this.value = value;
-    }
-
-    @Override
-    public @NotNull String name() {
-      return name;
-    }
-
-    @Override
-    public @NotNull Value<?> value() {
-      return value;
-    }
-  }
 }

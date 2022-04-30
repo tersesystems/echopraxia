@@ -20,7 +20,7 @@ public class CoreLoggerBenchmarks {
   private static final FieldBuilder builder = FieldBuilder.instance();
 
   private static final CoreLogger contextLogger =
-      logger.withFields(fb -> fb.onlyString("foo", "bar"), builder);
+      logger.withFields(fb -> fb.string("foo", "bar"), builder);
 
   @Benchmark
   public void info() {
@@ -34,7 +34,7 @@ public class CoreLoggerBenchmarks {
 
   @Benchmark
   public void infoWithParameterizedString() {
-    logger.log(Level.INFO, "Message {}", fb -> fb.onlyString("foo", "bar"), builder);
+    logger.log(Level.INFO, "Message {}", fb -> fb.string("foo", "bar"), builder);
   }
 
   @Benchmark
@@ -44,6 +44,6 @@ public class CoreLoggerBenchmarks {
 
   @Benchmark
   public void infoWithException() {
-    logger.log(Level.INFO, "Message", fb -> fb.onlyException(exception), builder);
+    logger.log(Level.INFO, "Message", fb -> fb.exception(exception), builder);
   }
 }

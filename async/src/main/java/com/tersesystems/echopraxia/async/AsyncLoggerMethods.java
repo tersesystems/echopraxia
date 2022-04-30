@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.async;
 
 import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import com.tersesystems.echopraxia.api.LoggerHandle;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -12,9 +13,9 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public interface AsyncLoggerMethods<FB, RET> {
+public interface AsyncLoggerMethods<FB> {
 
-  void trace(@NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void trace(@NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs using a condition and a logger handle at TRACE level.
@@ -22,7 +23,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void trace(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs statement at TRACE level.
@@ -37,7 +38,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void trace(@Nullable String message, @NotNull Function<FB, RET> f);
+  void trace(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at TRACE level with exception.
@@ -62,7 +63,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void trace(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void trace(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at TRACE level with exception.
@@ -86,7 +87,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void debug(@Nullable String message, @NotNull Function<FB, RET> f);
+  void debug(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at DEBUG level with exception.
@@ -120,14 +121,14 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void debug(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void debug(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs using a logger handle at DEBUG level.
    *
    * @param consumer the consumer of the logger handle.
    */
-  void debug(@NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void debug(@NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs using a condition and a logger handle at DEBUG level.
@@ -135,7 +136,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void debug(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs statement at INFO level.
@@ -150,7 +151,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void info(@Nullable String message, @NotNull Function<FB, RET> f);
+  void info(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at INFO level with exception.
@@ -175,7 +176,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void info(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void info(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.
@@ -192,7 +193,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void info(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs statement at WARN level.
@@ -207,7 +208,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void warn(@Nullable String message, @NotNull Function<FB, RET> f);
+  void warn(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at WARN level with exception.
@@ -241,13 +242,13 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void warn(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void warn(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
   /**
    * Logs using a logger handle at WARN level.
    *
    * @param consumer the consumer of the logger handle.
    */
-  void warn(@NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void warn(@NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs using a condition and a logger handle at WARN level.
@@ -255,7 +256,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void warn(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs statement at INFO level.
@@ -270,7 +271,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void error(@Nullable String message, @NotNull Function<FB, RET> f);
+  void error(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs statement at INFO level with exception.
@@ -295,7 +296,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void error(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void error(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.
@@ -311,7 +312,7 @@ public interface AsyncLoggerMethods<FB, RET> {
    *
    * @param consumer the consumer of the logger handle.
    */
-  void error(@NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void error(@NotNull Consumer<LoggerHandle<FB>> consumer);
 
   /**
    * Logs using a condition and a logger handle at ERROR level.
@@ -319,5 +320,5 @@ public interface AsyncLoggerMethods<FB, RET> {
    * @param c the condition
    * @param consumer the consumer of the logger handle.
    */
-  void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB, RET>> consumer);
+  void error(@NotNull Condition c, @NotNull Consumer<LoggerHandle<FB>> consumer);
 }

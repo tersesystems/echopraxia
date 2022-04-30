@@ -57,11 +57,11 @@ public interface CoreLogger {
    *
    * @param f the field builder function
    * @param builder the field builder
-   * @param <B> the type of field builder.
+   * @param <FB> the type of field builder.
    * @return the core logger with given context fields applied.
    */
   @NotNull
-  <B, RET> CoreLogger withFields(@NotNull Function<B, RET> f, @NotNull B builder);
+  <FB> CoreLogger withFields(@NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder);
 
   /**
    * Pulls fields from thread context into logger context, if any exist and the implementation
@@ -152,7 +152,7 @@ public interface CoreLogger {
   <FB, RET> void log(
       @NotNull Level level,
       @Nullable String message,
-      @NotNull Function<FB, RET> f,
+      @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder);
 
   /**
@@ -178,7 +178,7 @@ public interface CoreLogger {
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
-      @NotNull Function<FB, RET> f,
+      @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder);
 
   /**
@@ -190,7 +190,7 @@ public interface CoreLogger {
    * @param builder the field builder.
    */
   <FB, RET> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB, RET>> consumer, @NotNull FB builder);
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder);
 
   /**
    * Logs a statement asynchronously using an executor and the given condition.
@@ -204,6 +204,6 @@ public interface CoreLogger {
   <FB, RET> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder);
 }

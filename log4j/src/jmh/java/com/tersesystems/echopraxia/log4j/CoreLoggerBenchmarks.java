@@ -32,11 +32,11 @@ public class CoreLoggerBenchmarks {
 
   @Benchmark
   public void infoWithParameterizedString() {
-    logger.log(Level.INFO, "Message {}", fb -> fb.onlyString("foo", "bar"), builder);
+    logger.log(Level.INFO, "Message {}", fb -> fb.string("foo", "bar"), builder);
   }
 
   @Benchmark
   public void infoWithException() {
-    logger.log(Level.INFO, "Message", fb -> fb.onlyException(exception), builder);
+    logger.log(Level.INFO, "Message", fb -> fb.exception(exception), builder);
   }
 }

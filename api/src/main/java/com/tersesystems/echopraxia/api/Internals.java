@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +54,11 @@ class Internals {
       // Render value only here
       ValueFormatter.formatToBuffer(b, value);
     }
+
+    @Override
+    public List<Field> fields() {
+      return Collections.singletonList(this);
+    }
   }
 
   /** This is a field that prints out key=value to a message template if possible. */
@@ -85,6 +91,11 @@ class Internals {
     public void formatToBuffer(StringBuilder b) {
       b.append(name).append("=");
       ValueFormatter.formatToBuffer(b, value);
+    }
+
+    @Override
+    public List<Field> fields() {
+      return Collections.singletonList(this);
     }
   }
 

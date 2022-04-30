@@ -1,11 +1,7 @@
 package com.tersesystems.echopraxia.fluent;
 
-import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.CoreLogger;
-import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.FieldBuilder;
-import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.api.Utilities;
+import com.tersesystems.echopraxia.api.*;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +46,7 @@ public class FluentLogger<FB extends FieldBuilder> {
   }
 
   @NotNull
-  public FluentLogger<FB> withFields(@NotNull Function<FB, List<Field>> f) {
+  public FluentLogger<FB> withFields(@NotNull Function<FB, FieldBuilderResult> f) {
     CoreLogger coreLogger = core.withFields(f, builder);
     return new FluentLogger<>(coreLogger, builder);
   }
@@ -163,7 +159,7 @@ public class FluentLogger<FB extends FieldBuilder> {
     private final Level level;
     private String message;
     private Condition condition = Condition.always();
-    private final List<Function<FB, Field>> argumentFnList = new ArrayList<>();
+    private final List<Function<FB, FieldBuilderResult>> argumentFnList = new ArrayList<>();
 
     EntryBuilder(Level level) {
       this.level = level;
@@ -182,7 +178,7 @@ public class FluentLogger<FB extends FieldBuilder> {
     }
 
     @NotNull
-    public EntryBuilder argument(@NotNull Function<FB, Field> f) {
+    public EntryBuilder argument(@NotNull Function<FB, FieldBuilderResult> f) {
       this.argumentFnList.add(f);
       return this;
     }
@@ -199,11 +195,11 @@ public class FluentLogger<FB extends FieldBuilder> {
           message,
           b -> {
             List<Field> list = new ArrayList<>();
-            for (Function<FB, Field> f : argumentFnList) {
-              Field apply = f.apply(b);
-              list.add(apply);
+            for (Function<FB, FieldBuilderResult> f : argumentFnList) {
+              FieldBuilderResult result = f.apply(b);
+              list.addAll(result.fields());
             }
-            return list;
+            return FieldBuilderResult.list(list);
           },
           builder);
     }

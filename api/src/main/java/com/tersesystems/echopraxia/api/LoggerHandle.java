@@ -5,7 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** The LoggerHandle class is used as a handle to a logger at a specific level. */
-public interface LoggerHandle<FB, RET> {
+public interface LoggerHandle<FB> {
 
   /**
    * Logs using a message.
@@ -20,5 +20,5 @@ public interface LoggerHandle<FB, RET> {
    * @param message the message template.
    * @param f the field builder function.
    */
-  void log(@Nullable String message, @NotNull Function<FB, RET> f);
+  void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
 }
