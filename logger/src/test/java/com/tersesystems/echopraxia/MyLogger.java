@@ -3,10 +3,8 @@ package com.tersesystems.echopraxia;
 import com.tersesystems.echopraxia.api.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
-public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>
-    implements DefaultLoggerMethods<MyFieldBuilder, List<Field>> {
+public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder, Object>
+    implements DefaultLoggerMethods<MyFieldBuilder, Object> {
 
   public MyLogger(CoreLogger core, MyFieldBuilder fieldBuilder) {
     super(core, fieldBuilder, MyLogger.class);

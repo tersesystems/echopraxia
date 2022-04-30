@@ -1,8 +1,6 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.Field;
-import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -97,8 +95,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void trace(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void trace(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
 
   /**
    * Conditionally logs statement at TRACE level with exception.
@@ -156,8 +153,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void debug(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void debug(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
 
   /**
    * Logs statement at INFO level.
@@ -197,8 +193,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void info(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void info(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.
@@ -256,8 +251,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void warn(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void warn(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
 
   /**
    * Logs statement at INFO level.
@@ -297,8 +291,7 @@ public interface LoggerMethods<FB, RET> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void error(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
+  void error(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.

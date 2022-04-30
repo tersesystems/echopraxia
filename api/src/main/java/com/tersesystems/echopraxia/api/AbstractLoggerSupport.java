@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 
@@ -10,7 +9,8 @@ import org.jetbrains.annotations.NotNull;
  * @param <SELF> the actual type of the logger.
  * @param <FB> the field builder.
  */
-public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<SELF, FB>, FB>
+public abstract class AbstractLoggerSupport<
+        SELF extends AbstractLoggerSupport<SELF, FB, RET>, FB, RET>
     implements DefaultMethodsSupport<FB> {
 
   protected final CoreLogger core;
@@ -54,7 +54,7 @@ public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<S
   }
 
   @NotNull
-  public SELF withFields(@NotNull Function<FB, List<Field>> f) {
+  public SELF withFields(@NotNull Function<FB, RET> f) {
     return newLogger(core().withFields(f, fieldBuilder));
   }
 

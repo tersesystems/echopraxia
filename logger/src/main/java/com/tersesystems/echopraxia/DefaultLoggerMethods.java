@@ -9,7 +9,6 @@ import static java.util.Collections.singletonList;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
 import com.tersesystems.echopraxia.api.Field;
-import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +18,8 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public interface DefaultLoggerMethods<FB, RET> extends LoggerMethods<FB, RET>, DefaultMethodsSupport<FB> {
+public interface DefaultLoggerMethods<FB, RET>
+    extends LoggerMethods<FB, RET>, DefaultMethodsSupport<FB> {
 
   // ------------------------------------------------------------------------
   // TRACE
@@ -89,9 +89,7 @@ public interface DefaultLoggerMethods<FB, RET> extends LoggerMethods<FB, RET>, D
    * @param f the field builder function.
    */
   default void trace(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Function<FB, RET> f) {
+      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
     core().log(TRACE, condition, message, f, fieldBuilder());
   }
 
@@ -197,9 +195,7 @@ public interface DefaultLoggerMethods<FB, RET> extends LoggerMethods<FB, RET>, D
    * @param f the field builder function.
    */
   default void debug(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Function<FB, RET> f) {
+      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
     core().log(DEBUG, condition, message, f, fieldBuilder());
   }
 
@@ -271,9 +267,7 @@ public interface DefaultLoggerMethods<FB, RET> extends LoggerMethods<FB, RET>, D
    * @param f the field builder function.
    */
   default void info(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Function<FB, RET> f) {
+      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
     core().log(INFO, condition, message, f, fieldBuilder());
   }
 
@@ -379,9 +373,7 @@ public interface DefaultLoggerMethods<FB, RET> extends LoggerMethods<FB, RET>, D
    * @param f the field builder function.
    */
   default void warn(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Function<FB, RET> f) {
+      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
     core().log(WARN, condition, message, f, fieldBuilder());
   }
 
@@ -453,9 +445,7 @@ public interface DefaultLoggerMethods<FB, RET> extends LoggerMethods<FB, RET>, D
    * @param f the field builder function.
    */
   default void error(
-      @NotNull Condition condition,
-      @Nullable String message,
-      @NotNull Function<FB, RET> f) {
+      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, RET> f) {
     core().log(ERROR, condition, message, f, fieldBuilder());
   }
 

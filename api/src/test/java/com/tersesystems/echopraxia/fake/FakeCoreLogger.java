@@ -71,9 +71,9 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull <FB> CoreLogger withFields(
-      @NotNull Function<FB, List<Field>> f, @NotNull FB builder) {
-    FakeLoggingContext newContext = new FakeLoggingContext(() -> f.apply(builder));
+  public @NotNull <FB, RET> CoreLogger withFields(
+      @NotNull Function<FB, RET> f, @NotNull FB builder) {
+    FakeLoggingContext newContext = new FakeLoggingContext(() -> (List<Field>) f.apply(builder));
     return new FakeCoreLogger(
         fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
   }
@@ -160,13 +160,15 @@ public class FakeCoreLogger implements CoreLogger {
   // -----------------------------------------------------------------------
 
   @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
+  public <FB, RET> void asyncLog(
+      @NotNull Level level,
+      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
+      @NotNull FB builder) {}
 
   @Override
-  public <FB> void asyncLog(
+  public <FB, RET> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull Consumer<LoggerHandle<FB, RET>> consumer,
       @NotNull FB builder) {}
 }
