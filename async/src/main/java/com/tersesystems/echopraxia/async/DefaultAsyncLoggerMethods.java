@@ -5,7 +5,6 @@ import static com.tersesystems.echopraxia.api.Level.*;
 import static com.tersesystems.echopraxia.api.Value.exception;
 
 import com.tersesystems.echopraxia.api.*;
-
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
@@ -92,9 +91,10 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param f the field builder function.
    */
   default void trace(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
-    core()
-        .asyncLog(TRACE, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(TRACE, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -186,9 +186,10 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param f the field builder function.
    */
   default void debug(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
-    core()
-        .asyncLog(DEBUG, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(DEBUG, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -280,9 +281,10 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param f the field builder function.
    */
   default void info(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
-    core()
-        .asyncLog(INFO, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(INFO, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -374,9 +376,10 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param f the field builder function.
    */
   default void warn(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
-    core()
-        .asyncLog(WARN, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(WARN, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**
@@ -468,9 +471,10 @@ public interface DefaultAsyncLoggerMethods<FB>
    * @param f the field builder function.
    */
   default void error(
-      @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
-    core()
-        .asyncLog(ERROR, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f) {
+    core().asyncLog(ERROR, condition, (LoggerHandle<FB> h) -> h.log(message, f), fieldBuilder());
   }
 
   /**

@@ -23,8 +23,7 @@ public class LoggerBenchmarks {
       logger.withCondition((level, context) -> level.equals(Level.ERROR));
   private static final Logger<?> fieldBuilderLogger =
       logger.withFieldBuilder(FieldBuilder.instance());
-  private static final Logger<?> contextLogger =
-      logger.withFields(fb -> fb.string("foo", "bar"));
+  private static final Logger<?> contextLogger = logger.withFields(fb -> fb.string("foo", "bar"));
 
   @Benchmark
   public void info() {

@@ -25,8 +25,6 @@ public class LogstashCoreLogger implements CoreLogger {
   // The logger context property used to set up caller info for async logging.
   public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
 
-  private static final Function<Object, List<Field>> conversionFunction = new FieldConversion();
-
   private final ch.qos.logback.classic.Logger logger;
   private final LogstashLoggingContext context;
   private final Condition condition;
@@ -110,8 +108,12 @@ public class LogstashCoreLogger implements CoreLogger {
         fqcn, logger, this.context.and(newContext), condition, executor, mdcContext());
   }
 
-  private <RET> List<Field> convertToFields(RET input) {
-    return conversionFunction.apply(input);
+  private List<Field> convertToFields(FieldBuilderResult result) {
+    if (result == null) {
+      // XXX log an error
+      return Collections.emptyList();
+    }
+    return result.fields();
   }
 
   @Override
@@ -206,7 +208,10 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public <FB, RET> void log(
-      @NotNull Level level, String message, @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+      @NotNull Level level,
+      String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
     // XXX find the right object for this
@@ -252,9 +257,7 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public <FB, RET> void asyncLog(
-      @NotNull Level level,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     final LogstashCoreLogger callerLogger = asyncCallerLogger();
     Runnable threadLocalRunnable = threadContextFunction.get();
     Runnable runnable =
@@ -268,7 +271,8 @@ public class LogstashCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+                public void log(
+                    @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
                   callerLogger.log(level, message, f, builder);
                 }
               });
@@ -295,7 +299,8 @@ public class LogstashCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+                public void log(
+                    @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
                   callerLogger.log(level, c, message, f, builder);
                 }
               });

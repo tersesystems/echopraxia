@@ -74,8 +74,8 @@ public class FakeCoreLogger implements CoreLogger {
         fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
   }
 
-  private <RET> List<Field> convert(RET input) {
-    return new FieldConversion().apply(input);
+  private List<Field> convert(FieldBuilderResult input) {
+    return input.fields();
   }
 
   @Override
@@ -161,9 +161,7 @@ public class FakeCoreLogger implements CoreLogger {
 
   @Override
   public <FB, RET> void asyncLog(
-      @NotNull Level level,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {}
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
 
   @Override
   public <FB, RET> void asyncLog(

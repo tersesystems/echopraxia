@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -301,7 +300,6 @@ public interface FieldBuilder {
   default Field nullField(@NotNull String name) {
     return value(name, Value.nullValue());
   }
-
 }
 
 // internal class so interface doesn't have to expose it

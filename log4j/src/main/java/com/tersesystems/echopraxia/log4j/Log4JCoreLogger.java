@@ -22,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 /** A core logger using the Log4J API. */
 public class Log4JCoreLogger implements CoreLogger {
 
-  private static final Function<Object, List<Field>> conversionFunction = new FieldConversion();
-
   private final ExtendedLogger logger;
   private final Log4JLoggingContext context;
   private final Condition condition;
@@ -194,8 +192,12 @@ public class Log4JCoreLogger implements CoreLogger {
     }
   }
 
-  private <RET> List<Field> convertToFields(RET object) {
-    return conversionFunction.apply(object);
+  private List<Field> convertToFields(FieldBuilderResult result) {
+    if (result == null) {
+      // XXX log an error
+      return Collections.emptyList();
+    }
+    return result.fields();
   }
 
   @Override
@@ -232,9 +234,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public <FB, RET> void asyncLog(
-      @NotNull Level level,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
@@ -254,7 +254,8 @@ public class Log4JCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+                public void log(
+                    @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
@@ -301,7 +302,8 @@ public class Log4JCoreLogger implements CoreLogger {
                 }
 
                 @Override
-                public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+                public void log(
+                    @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
                   // because the isEnabled check looks for message and throwable, we have to
                   // calculate them right up front.
                   final Marker marker = context.getMarker();

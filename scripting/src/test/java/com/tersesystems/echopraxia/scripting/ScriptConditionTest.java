@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.scripting;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
@@ -191,9 +190,7 @@ public class ScriptConditionTest {
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-    logger
-        .withFields(fb -> (fb.string("correlation_id", "match")))
-        .info("data of interest found");
+    logger.withFields(fb -> (fb.string("correlation_id", "match"))).info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;

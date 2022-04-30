@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
 import static com.tersesystems.echopraxia.api.Value.*;
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;

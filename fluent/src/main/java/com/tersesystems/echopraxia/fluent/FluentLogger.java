@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.api.*;
-
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;

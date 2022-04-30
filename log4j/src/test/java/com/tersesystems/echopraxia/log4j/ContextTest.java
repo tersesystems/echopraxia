@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.log4j;
 
-import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.Logger;

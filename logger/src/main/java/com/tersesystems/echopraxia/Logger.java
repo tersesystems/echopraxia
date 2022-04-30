@@ -122,7 +122,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
 
     @Override
     public void trace(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {
       // do nothing
     }
 
@@ -167,7 +169,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
 
     @Override
     public void debug(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {
       // do nothing
     }
 
@@ -212,7 +216,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
 
     @Override
     public void info(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {
       // do nothing
     }
 
@@ -251,7 +257,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
 
     @Override
     public void warn(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {
       // do nothing
     }
 
@@ -295,7 +303,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
 
     @Override
     public void error(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {
       // do nothing
     }
 

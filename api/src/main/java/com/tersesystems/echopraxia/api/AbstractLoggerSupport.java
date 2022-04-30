@@ -9,8 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <SELF> the actual type of the logger.
  * @param <FB> the field builder.
  */
-public abstract class AbstractLoggerSupport<
-        SELF extends AbstractLoggerSupport<SELF, FB>, FB>
+public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<SELF, FB>, FB>
     implements DefaultMethodsSupport<FB> {
 
   protected final CoreLogger core;

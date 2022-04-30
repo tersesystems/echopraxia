@@ -19,8 +19,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type
  */
-public class AsyncLogger<FB extends FieldBuilder>
-    extends AbstractLoggerSupport<AsyncLogger<FB>, FB>
+public class AsyncLogger<FB extends FieldBuilder> extends AbstractLoggerSupport<AsyncLogger<FB>, FB>
     implements DefaultAsyncLoggerMethods<FB> {
 
   protected AsyncLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
@@ -143,7 +142,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void trace(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void trace(
@@ -178,7 +179,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void debug(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void debug(
@@ -213,7 +216,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void info(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void info(
@@ -245,7 +250,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void warn(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void warn(
@@ -282,7 +289,9 @@ public class AsyncLogger<FB extends FieldBuilder>
 
     @Override
     public void error(
-        @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {}
+        @NotNull Condition condition,
+        @Nullable String message,
+        @NotNull Function<FB, FieldBuilderResult> f) {}
 
     @Override
     public void error(

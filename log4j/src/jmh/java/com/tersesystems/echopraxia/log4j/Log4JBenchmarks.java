@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.message.Message;
-import org.jetbrains.annotations.NotNull;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 
@@ -63,5 +62,4 @@ public class Log4JBenchmarks {
   public void infoWithException() {
     logger.info(message, exception);
   }
-
 }

@@ -1,9 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
 
 public interface FieldBuilderWithOnly extends FieldBuilder {
 
@@ -220,7 +219,8 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default FieldBuilderResult onlyException(@NotNull String name, @NotNull Value.ExceptionValue value) {
+  default FieldBuilderResult onlyException(
+      @NotNull String name, @NotNull Value.ExceptionValue value) {
     return only(exception(name, value));
   }
 

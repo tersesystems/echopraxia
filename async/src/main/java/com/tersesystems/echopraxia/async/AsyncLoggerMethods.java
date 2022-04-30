@@ -63,7 +63,10 @@ public interface AsyncLoggerMethods<FB> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void trace(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
+  void trace(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at TRACE level with exception.
@@ -121,7 +124,10 @@ public interface AsyncLoggerMethods<FB> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void debug(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
+  void debug(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Logs using a logger handle at DEBUG level.
@@ -176,7 +182,10 @@ public interface AsyncLoggerMethods<FB> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void info(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
+  void info(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.
@@ -242,7 +251,10 @@ public interface AsyncLoggerMethods<FB> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void warn(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
+  void warn(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
   /**
    * Logs using a logger handle at WARN level.
    *
@@ -296,7 +308,10 @@ public interface AsyncLoggerMethods<FB> {
    * @param message the message.
    * @param f the field builder function.
    */
-  void error(@NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f);
+  void error(
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f);
 
   /**
    * Conditionally logs statement at INFO level with exception.

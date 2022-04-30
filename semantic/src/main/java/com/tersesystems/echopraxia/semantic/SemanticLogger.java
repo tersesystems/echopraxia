@@ -1,8 +1,6 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.api.*;
-
-import java.util.List;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 

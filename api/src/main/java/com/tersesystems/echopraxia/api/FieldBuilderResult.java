@@ -1,8 +1,11 @@
 package com.tersesystems.echopraxia.api;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public interface FieldBuilderResult {
   List<Field> fields();
@@ -42,4 +45,22 @@ public interface FieldBuilderResult {
       }
     };
   }
+
+  static FieldBuilderResult list(Iterable<Field> iterable) {
+      return list(iterable.spliterator());
+  }
+
+  static FieldBuilderResult list(Spliterator<Field> fieldSpliterator) {
+    return list(StreamSupport.stream(fieldSpliterator, false));
+  }
+
+  static FieldBuilderResult list(Iterator<Field> iterator) {
+    final Spliterator<Field> fieldSpliterator = Spliterators.spliteratorUnknownSize(iterator, 0);
+    return list(fieldSpliterator);
+  }
+
+  static FieldBuilderResult list(Stream<Field> stream) {
+    return list(stream.collect(Collectors.toList()));
+  }
+
 }
