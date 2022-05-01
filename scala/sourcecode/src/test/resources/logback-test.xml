@@ -2,7 +2,7 @@
     <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
     </appender>
 
-    <logger name="com.tersesystems.echopraxia.sapi" level="TRACE"/>
+    <logger name="com.tersesystems.echopraxia.scala" level="TRACE"/>
 
     <root level="INFO">
         <appender-ref ref="LIST"/>

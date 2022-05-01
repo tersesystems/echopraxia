@@ -7,6 +7,9 @@ import com.tersesystems.echopraxia.api._
  */
 trait FieldBuilder {
 
+  def list(fields: Field*): FieldBuilderResult = list(fields)
+  def list[T: ToFieldBuilderResult](input: T): FieldBuilderResult = ToFieldBuilderResult[T](input)
+
   // ------------------------------------------------------------------
   // keyValue
 
@@ -67,7 +70,6 @@ trait FieldBuilder {
   // ------------------------------------------------------------------
   // object
 
-  def list(fields: Field*): FieldBuilderResult = FieldBuilderResult.list(fields.toArray)
 }
 
 object FieldBuilder extends FieldBuilder

@@ -2,7 +2,7 @@ import sbt.Keys._
 
 val scala213      = "2.13.8"
 val scala212      = "2.12.14"
-val scalaVersions = Seq(scala213, scala212)
+val scalaVersions = Seq(scala212, scala213)
 
 initialize := {
   val _        = initialize.value // run the previous initialization
@@ -32,6 +32,7 @@ ThisBuild / crossScalaVersions := scalaVersions
 ThisBuild / scalacOptions      := scalacOptionsVersion(scalaVersion.value)
 
 ThisBuild / Test / parallelExecution := false
+Global / concurrentRestrictions += Tags.limit(Tags.Test, 1)
 
 lazy val api = (project in file("api"))
   .settings(
