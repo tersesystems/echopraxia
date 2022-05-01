@@ -65,9 +65,6 @@ public interface SemanticLogger<DataType> {
   SemanticLogger<DataType> withCondition(@NotNull Condition c);
 
   @NotNull
-  SemanticLogger<DataType> withFields(@NotNull Function<FieldBuilder, FieldBuilderResult> f);
-
-  @NotNull
   SemanticLogger<DataType> withThreadContext();
 
   @NotNull
