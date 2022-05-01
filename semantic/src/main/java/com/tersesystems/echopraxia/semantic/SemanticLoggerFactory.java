@@ -171,10 +171,10 @@ public class SemanticLoggerFactory {
     private final Function<DataType, String> messageFunction;
 
     protected Impl(
-        CoreLogger core,
-        FB builder,
-        Function<DataType, String> messageFunction,
-        Function<DataType, Function<FB, FieldBuilderResult>> builderFunction) {
+        @NotNull CoreLogger core,
+        @NotNull FB builder,
+        @NotNull Function<DataType, String> messageFunction,
+        @NotNull Function<DataType, Function<FB, FieldBuilderResult>> builderFunction) {
       this.core = core;
       this.builderFunction = builderFunction;
       this.messageFunction = messageFunction;
@@ -191,15 +191,15 @@ public class SemanticLoggerFactory {
       return core;
     }
 
-    public FB fieldBuilder() {
+    public @NotNull FB fieldBuilder() {
       return builder;
     }
 
-    public Function<DataType, String> messageFunction() {
+    public @NotNull  Function<DataType, String> messageFunction() {
       return messageFunction;
     }
 
-    public Function<DataType, Function<FB, FieldBuilderResult>> builderFunction() {
+    public @NotNull Function<DataType, Function<FB, FieldBuilderResult>> builderFunction() {
       return builderFunction;
     }
 
@@ -332,12 +332,6 @@ public class SemanticLoggerFactory {
       final CoreLogger coreLogger = core.withCondition(c);
       return new SemanticLoggerFactory.Impl<>(
           coreLogger, builder, messageFunction, builderFunction);
-    }
-
-    @Override
-    public @NotNull SemanticLogger<DataType> withFields(
-        @NotNull Function<FieldBuilder, FieldBuilderResult> f) {
-      return withFields(f, builder);
     }
 
     @Override

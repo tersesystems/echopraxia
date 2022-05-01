@@ -4,9 +4,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * Extended field builder with "only" interfaces for backwards compatibility.
- */
+/** Extended field builder with "only" interfaces for backwards compatibility. */
 public interface FieldBuilderWithOnly extends FieldBuilder {
 
   /**
