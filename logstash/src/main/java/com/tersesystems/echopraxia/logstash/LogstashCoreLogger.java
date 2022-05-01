@@ -105,7 +105,7 @@ public class LogstashCoreLogger implements CoreLogger {
     LogstashLoggingContext newContext =
         new LogstashLoggingContext(() -> f.apply(builder), Collections::emptyList);
     return new LogstashCoreLogger(
-        fqcn, logger, this.context.and(newContext), condition, executor, mdcContext());
+        fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
   }
 
   @Override
