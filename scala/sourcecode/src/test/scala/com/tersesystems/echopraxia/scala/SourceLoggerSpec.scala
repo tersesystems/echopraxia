@@ -10,7 +10,7 @@ import org.scalatest.matchers.must.Matchers
 
 import java.util
 
-class LoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
+class SourceLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   private val logger = LoggerFactory.getLogger
 
@@ -38,6 +38,10 @@ class LoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   private def loggerContext: LoggerContext = {
     org.slf4j.LoggerFactory.getILoggerFactory.asInstanceOf[LoggerContext]
+  }
+
+  override def beforeEach(): Unit = {
+    getListAppender.list.clear()
   }
 
   private def getListAppender: ListAppender[ILoggingEvent] = {

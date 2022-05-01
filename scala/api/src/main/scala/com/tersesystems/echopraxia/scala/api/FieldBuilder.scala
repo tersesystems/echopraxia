@@ -7,6 +7,9 @@ import com.tersesystems.echopraxia.api._
  */
 trait FieldBuilder {
 
+  def list(fields: Field*): FieldBuilderResult                    = list(fields)
+  def list[T: ToFieldBuilderResult](input: T): FieldBuilderResult = ToFieldBuilderResult[T](input)
+
   // ------------------------------------------------------------------
   // keyValue
 
@@ -38,36 +41,35 @@ trait FieldBuilder {
   // ------------------------------------------------------------------
   // string
 
-  def string(name: String, string: String): Field               = value(name, string)
-  def string(tuple: (String, String)): Field                    = value(tuple._1, tuple._2)
+  def string(name: String, string: String): Field = value(name, string)
+  def string(tuple: (String, String)): Field      = value(tuple._1, tuple._2)
 
   // ------------------------------------------------------------------
   // number
 
-  def number(name: String, number: Number): Field               = value(name, number)
-  def number(tuple: (String, Number)): Field                    = value(tuple._1, tuple._2)
+  def number(name: String, number: Number): Field = value(name, number)
+  def number(tuple: (String, Number)): Field      = value(tuple._1, tuple._2)
 
   // ------------------------------------------------------------------
   // boolean
 
-  def bool(name: String, boolean: Boolean): Field             = value(name, boolean)
-  def bool(tuple: (String, Boolean)): Field                   = value(tuple._1, tuple._2)
+  def bool(name: String, boolean: Boolean): Field = value(name, boolean)
+  def bool(tuple: (String, Boolean)): Field       = value(tuple._1, tuple._2)
 
   // ------------------------------------------------------------------
   // null
 
-  def nullField(name: String): Field                = keyValue(name, Value.NullValue.instance)
+  def nullField(name: String): Field = keyValue(name, Value.NullValue.instance)
 
   // ------------------------------------------------------------------
   // exception
 
-  def exception(ex: Throwable): Field                        = value(Field.EXCEPTION, ex)
-  def exception(name: String, ex: Throwable): Field          = keyValue(name, ex)
+  def exception(ex: Throwable): Field               = value(Field.EXCEPTION, ex)
+  def exception(name: String, ex: Throwable): Field = keyValue(name, ex)
 
   // ------------------------------------------------------------------
   // object
 
-  def list(fields: Field*): FieldBuilderResult = FieldBuilderResult.list(fields.toArray)
 }
 
 object FieldBuilder extends FieldBuilder

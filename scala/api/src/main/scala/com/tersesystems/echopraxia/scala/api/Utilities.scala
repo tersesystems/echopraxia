@@ -19,11 +19,11 @@ object Utilities {
   }
 
   val getThreadContextFunction
-  : Function[Supplier[util.Map[String, String]], Supplier[util.List[Field]]] =
+      : Function[Supplier[util.Map[String, String]], Supplier[util.List[Field]]] =
     new Function[Supplier[util.Map[String, String]], Supplier[util.List[Field]]] {
       override def apply(
-                          mapSupplier: Supplier[util.Map[String, String]]
-                        ): Supplier[util.List[Field]] = {
+          mapSupplier: Supplier[util.Map[String, String]]
+      ): Supplier[util.List[Field]] = {
         new Supplier[util.List[Field]]() {
           def buildFields(contextMap: util.Map[String, String]): util.List[Field] = {
             val list = new util.ArrayList[Field]();
