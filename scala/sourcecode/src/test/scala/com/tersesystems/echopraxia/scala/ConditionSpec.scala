@@ -210,7 +210,7 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
   }
 
   it("should match on level") {
-    val condition: Condition = (level, _) => level.isGreater(Level.DEBUG)
+    val condition: Condition = (level, _) => level > Level.DEBUG
 
     logger.info(condition, "matches on level")
     matchThis("matches on level")
