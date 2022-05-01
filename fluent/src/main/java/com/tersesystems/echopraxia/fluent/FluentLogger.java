@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.api.*;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -13,41 +12,23 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public class FluentLogger<FB extends FieldBuilder> {
+public class FluentLogger<FB extends FieldBuilder>
+    extends AbstractLoggerSupport<FluentLogger<FB>, FB> {
 
-  private final CoreLogger core;
-  private final FB builder;
-
-  protected FluentLogger(CoreLogger core, FB builder) {
-    this.core = core;
-    this.builder = builder;
-  }
-
-  @NotNull
-  String getName() {
-    return core.getName();
-  }
-
-  @NotNull
-  public CoreLogger core() {
-    return core;
-  }
-
-  @NotNull
-  public FB fieldBuilder() {
-    return builder;
+  protected FluentLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
+    super(core, fieldBuilder, FluentLogger.class);
   }
 
   @NotNull
   public FluentLogger<FB> withCondition(@NotNull Condition c) {
     CoreLogger coreLogger = core.withCondition(c);
-    return new FluentLogger<>(coreLogger, builder);
+    return new FluentLogger<>(coreLogger, fieldBuilder);
   }
 
   @NotNull
   public FluentLogger<FB> withFields(@NotNull Function<FB, FieldBuilderResult> f) {
-    CoreLogger coreLogger = core.withFields(f, builder);
-    return new FluentLogger<>(coreLogger, builder);
+    CoreLogger coreLogger = core.withFields(f, fieldBuilder);
+    return new FluentLogger<>(coreLogger, fieldBuilder);
   }
 
   @NotNull
@@ -56,24 +37,19 @@ public class FluentLogger<FB extends FieldBuilder> {
   }
 
   @NotNull
-  public <T extends FieldBuilder> FluentLogger<T> withFieldBuilder(
-      @NotNull Class<T> newBuilderClass) {
-    try {
-      final T newInstance = newBuilderClass.getDeclaredConstructor().newInstance();
-      return new FluentLogger<>(core, newInstance);
-    } catch (NoSuchMethodException
-        | SecurityException
-        | InstantiationException
-        | IllegalAccessException
-        | InvocationTargetException e) {
-      throw new IllegalStateException(e);
-    }
-  }
-
-  @NotNull
   public FluentLogger<FB> withThreadContext() {
     CoreLogger coreLogger = core.withThreadContext(Utilities.threadContext());
-    return new FluentLogger<>(coreLogger, builder);
+    return new FluentLogger<>(coreLogger, fieldBuilder);
+  }
+
+  @Override
+  protected @NotNull FluentLogger<FB> newLogger(CoreLogger core) {
+    return new FluentLogger<>(core, fieldBuilder);
+  }
+
+  @Override
+  protected @NotNull FluentLogger<FB> neverLogger() {
+    return new FluentLogger<>(core.withCondition(Condition.never()), fieldBuilder);
   }
 
   public boolean isErrorEnabled() {
@@ -200,7 +176,7 @@ public class FluentLogger<FB extends FieldBuilder> {
             }
             return FieldBuilderResult.list(list);
           },
-          builder);
+          fieldBuilder);
     }
   }
 }

@@ -195,7 +195,7 @@ public class SemanticLoggerFactory {
       return builder;
     }
 
-    public @NotNull  Function<DataType, String> messageFunction() {
+    public @NotNull Function<DataType, String> messageFunction() {
       return messageFunction;
     }
 
