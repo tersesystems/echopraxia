@@ -35,7 +35,10 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
     it("should log a seq automatically") {
       val seq = Array("one", "two", "three")
-      logger.debug("single tuple {}", fb => fb.list(seq.zipWithIndex.map{ case (value, i) => fb.string(i.toString, value) }))
+      logger.debug(
+        "single tuple {}",
+        fb => fb.list(seq.zipWithIndex.map { case (value, i) => fb.string(i.toString, value) })
+      )
       matchThis("single tuple {}")
     }
 
@@ -159,7 +162,7 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
           import fb._
           fb.list(
             fb.keyValue("person1" -> Person("Eloise", 1)),
-            fb.obj("person2" -> Person("Eloise", 1))
+            fb.obj("person2"      -> Person("Eloise", 1))
           )
         }
       )
@@ -250,13 +253,13 @@ class ScalaLoggerSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
     // Instant type
     implicit val instantToStringValue: ToValue[Instant] = ToValue(instantValue)
     def instant(name: String, i: Instant): Field        = keyValue(name, instantValue(i))
-    private def instantValue(i: Instant) = Value.string(i.toString)
+    private def instantValue(i: Instant)                = Value.string(i.toString)
 
     // Person type
     implicit val personToValue: ToValue[Person]             = ToValue(personValue)
     implicit val personToObjectValue: ToObjectValue[Person] = ToObjectValue(personValue(_))
 
-    def person(name: String, person: Person): Field           = keyValue(name, personValue(person))
+    def person(name: String, person: Person): Field = keyValue(name, personValue(person))
     private def personValue(p: Person): Value.ObjectValue = Value.`object`(
       string("name", p.name),
       number("age", p.age)

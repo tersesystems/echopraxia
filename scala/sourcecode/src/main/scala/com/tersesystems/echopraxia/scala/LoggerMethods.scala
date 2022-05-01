@@ -23,8 +23,8 @@ trait LoggerMethods[FB] {
    * @param message the given message.
    */
   def trace(
-             message: String
-           )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at TRACE level using a field builder function.
@@ -33,9 +33,9 @@ trait LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def trace(message: String, f: FB => FieldBuilderResult)(implicit
-                                                             line: sourcecode.Line,
-                                                             file: sourcecode.File,
-                                                             enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -45,9 +45,9 @@ trait LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def trace(message: String, e: Throwable)(implicit
-                                           line: sourcecode.Line,
-                                           file: sourcecode.File,
-                                           enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -57,9 +57,9 @@ trait LoggerMethods[FB] {
    * @param message   the message.
    */
   def trace(condition: Condition, message: String)(implicit
-                                                   line: sourcecode.Line,
-                                                   file: sourcecode.File,
-                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -70,9 +70,9 @@ trait LoggerMethods[FB] {
    * @param f         the field builder function.
    */
   def trace(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                   line: sourcecode.Line,
-                                                                                   file: sourcecode.File,
-                                                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -83,9 +83,9 @@ trait LoggerMethods[FB] {
    * @param e         the given exception.
    */
   def trace(condition: Condition, message: String, e: Throwable)(implicit
-                                                                 line: sourcecode.Line,
-                                                                 file: sourcecode.File,
-                                                                 enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /** @return true if the logger level is DEBUG or higher. */
@@ -103,8 +103,8 @@ trait LoggerMethods[FB] {
    * @param message the given message.
    */
   def debug(
-             message: String
-           )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at DEBUG level using a field builder function.
@@ -113,9 +113,9 @@ trait LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def debug(message: String, f: FB => FieldBuilderResult)(implicit
-                                                             line: sourcecode.Line,
-                                                             file: sourcecode.File,
-                                                             enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -125,9 +125,9 @@ trait LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def debug(message: String, e: Throwable)(implicit
-                                           line: sourcecode.Line,
-                                           file: sourcecode.File,
-                                           enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -137,9 +137,9 @@ trait LoggerMethods[FB] {
    * @param message   the message.
    */
   def debug(condition: Condition, message: String)(implicit
-                                                   line: sourcecode.Line,
-                                                   file: sourcecode.File,
-                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -150,9 +150,9 @@ trait LoggerMethods[FB] {
    * @param e         the given exception.
    */
   def debug(condition: Condition, message: String, e: Throwable)(implicit
-                                                                 line: sourcecode.Line,
-                                                                 file: sourcecode.File,
-                                                                 enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -163,9 +163,9 @@ trait LoggerMethods[FB] {
    * @param f         the field builder function.
    */
   def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                   line: sourcecode.Line,
-                                                                                   file: sourcecode.File,
-                                                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /** @return true if the logger level is INFO or higher. */
@@ -183,8 +183,8 @@ trait LoggerMethods[FB] {
    * @param message the given message.
    */
   def info(
-            message: String
-          )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at INFO level using a field builder function.
@@ -193,9 +193,9 @@ trait LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def info(message: String, f: FB => FieldBuilderResult)(implicit
-                                                            line: sourcecode.Line,
-                                                            file: sourcecode.File,
-                                                            enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -205,9 +205,9 @@ trait LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def info(message: String, e: Throwable)(implicit
-                                          line: sourcecode.Line,
-                                          file: sourcecode.File,
-                                          enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -217,9 +217,9 @@ trait LoggerMethods[FB] {
    * @param message   the message.
    */
   def info(condition: Condition, message: String)(implicit
-                                                  line: sourcecode.Line,
-                                                  file: sourcecode.File,
-                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -230,9 +230,9 @@ trait LoggerMethods[FB] {
    * @param f         the field builder function.
    */
   def info(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                  line: sourcecode.Line,
-                                                                                  file: sourcecode.File,
-                                                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -243,9 +243,9 @@ trait LoggerMethods[FB] {
    * @param e         the given exception.
    */
   def info(condition: Condition, message: String, e: Throwable)(implicit
-                                                                line: sourcecode.Line,
-                                                                file: sourcecode.File,
-                                                                enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /** @return true if the logger level is WARN or higher. */
@@ -263,8 +263,8 @@ trait LoggerMethods[FB] {
    * @param message the given message.
    */
   def warn(
-            message: String
-          )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   /**
    * Logs statement at WARN level using a field builder function.
@@ -273,9 +273,9 @@ trait LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def warn(message: String, f: FB => FieldBuilderResult)(implicit
-                                                            line: sourcecode.Line,
-                                                            file: sourcecode.File,
-                                                            enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /**
@@ -285,27 +285,27 @@ trait LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def warn(message: String, e: Throwable)(implicit
-                                          line: sourcecode.Line,
-                                          file: sourcecode.File,
-                                          enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   def warn(condition: Condition, message: String)(implicit
-                                                  line: sourcecode.Line,
-                                                  file: sourcecode.File,
-                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   def warn(condition: Condition, message: String, e: Throwable)(implicit
-                                                                line: sourcecode.Line,
-                                                                file: sourcecode.File,
-                                                                enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                  line: sourcecode.Line,
-                                                                                  file: sourcecode.File,
-                                                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   /** @return true if the logger level is ERROR or higher. */
@@ -318,36 +318,36 @@ trait LoggerMethods[FB] {
   def isErrorEnabled(condition: Condition): Boolean
 
   def error(
-             message: String
-           )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit
 
   def error(message: String, f: FB => FieldBuilderResult)(implicit
-                                                             line: sourcecode.Line,
-                                                             file: sourcecode.File,
-                                                             enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   def error(message: String, e: Throwable)(implicit
-                                           line: sourcecode.Line,
-                                           file: sourcecode.File,
-                                           enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   def error(condition: Condition, message: String)(implicit
-                                                   line: sourcecode.Line,
-                                                   file: sourcecode.File,
-                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   def error(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                   line: sourcecode.Line,
-                                                                                   file: sourcecode.File,
-                                                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 
   def error(condition: Condition, message: String, e: Throwable)(implicit
-                                                                 line: sourcecode.Line,
-                                                                 file: sourcecode.File,
-                                                                 enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit
 }

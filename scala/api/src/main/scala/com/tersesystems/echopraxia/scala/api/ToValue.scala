@@ -73,7 +73,7 @@ object ToValue {
   implicit val bigIntToValue: ToValue[BigInt]         = ToValue.convert(Value.number(_))
   implicit val bigDecimalToValue: ToValue[BigDecimal] = ToValue.convert(Value.number(_))
 
-  implicit val booleanToBoolValue: ToValue[Boolean] = ToValue.convert(Value.bool(_))
+  implicit val booleanToBoolValue: ToValue[Boolean]            = ToValue.convert(Value.bool(_))
   implicit val javaBoolToBoolValue: ToValue[java.lang.Boolean] = ToValue.convert(Value.bool)
 
   implicit def throwableToValue[T <: Throwable]: ToValue[T] = ToValue.convert(Value.exception)

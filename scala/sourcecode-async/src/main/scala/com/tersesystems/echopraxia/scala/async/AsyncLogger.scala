@@ -1,7 +1,12 @@
 package com.tersesystems.echopraxia.scala.async
 
 import com.tersesystems.echopraxia.api.{CoreLogger, FieldBuilderResult}
-import com.tersesystems.echopraxia.scala.api.{AbstractLoggerSupport, Condition, LoggerSupport, Utilities}
+import com.tersesystems.echopraxia.scala.api.{
+  AbstractLoggerSupport,
+  Condition,
+  LoggerSupport,
+  Utilities
+}
 
 import scala.compat.java8.FunctionConverters._
 

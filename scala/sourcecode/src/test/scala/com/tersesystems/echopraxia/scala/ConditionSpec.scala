@@ -142,9 +142,9 @@ class ConditionSpec extends AnyFunSpec with BeforeAndAfterEach with Matchers {
 
   describe("object") {
     it("should match on simple object") {
-      logger.withCondition((_, ctx) =>
-        ctx.findObject("$.foo").get("key").equals("value")
-      ).debug("simple map", fb => fb.obj("foo", fb.keyValue("key" -> "value")))
+      logger
+        .withCondition((_, ctx) => ctx.findObject("$.foo").get("key").equals("value"))
+        .debug("simple map", fb => fb.obj("foo", fb.keyValue("key" -> "value")))
 
       matchThis("simple map")
     }

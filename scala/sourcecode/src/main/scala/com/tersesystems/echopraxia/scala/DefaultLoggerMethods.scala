@@ -21,8 +21,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   this: DefaultMethodsSupport[FB] =>
 
   protected def sourceInfoFields(
-                                  fb: FB
-                                )(implicit line: Line, file: File, enc: Enclosing): FieldBuilderResult = {
+      fb: FB
+  )(implicit line: Line, file: File, enc: Enclosing): FieldBuilderResult = {
     Field.keyValue(
       "sourcecode", // XXX make this configurable
       Value.`object`(
@@ -50,8 +50,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param message the given message.
    */
   def trace(
-             message: String
-           )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
     core.withFields(sourceInfoFields, fieldBuilder).log(TRACE, message)
   }
 
@@ -62,9 +62,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def trace(message: String, f: FB => FieldBuilderResult)(implicit
-                                                             line: sourcecode.Line,
-                                                             file: sourcecode.File,
-                                                             enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -78,9 +78,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def trace(message: String, e: Throwable)(implicit
-                                           line: sourcecode.Line,
-                                           file: sourcecode.File,
-                                           enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -94,9 +94,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param message   the message.
    */
   def trace(condition: Condition, message: String)(implicit
-                                                   line: sourcecode.Line,
-                                                   file: sourcecode.File,
-                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -111,9 +111,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param f         the field builder function.
    */
   def trace(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                   line: sourcecode.Line,
-                                                                                   file: sourcecode.File,
-                                                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -128,9 +128,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param e         the given exception.
    */
   def trace(condition: Condition, message: String, e: Throwable)(implicit
-                                                                 line: sourcecode.Line,
-                                                                 file: sourcecode.File,
-                                                                 enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -152,8 +152,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param message the given message.
    */
   def debug(
-             message: String
-           )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
     core.log(DEBUG, message)
   }
 
@@ -164,9 +164,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def debug(message: String, f: FB => FieldBuilderResult)(implicit
-                                                             line: sourcecode.Line,
-                                                             file: sourcecode.File,
-                                                             enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -180,9 +180,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def debug(message: String, e: Throwable)(implicit
-                                           line: sourcecode.Line,
-                                           file: sourcecode.File,
-                                           enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -196,9 +196,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param message   the message.
    */
   def debug(condition: Condition, message: String)(implicit
-                                                   line: sourcecode.Line,
-                                                   file: sourcecode.File,
-                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -213,9 +213,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param e         the given exception.
    */
   def debug(condition: Condition, message: String, e: Throwable)(implicit
-                                                                 line: sourcecode.Line,
-                                                                 file: sourcecode.File,
-                                                                 enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -230,9 +230,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param f         the field builder function.
    */
   def debug(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                   line: sourcecode.Line,
-                                                                                   file: sourcecode.File,
-                                                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -254,8 +254,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param message the given message.
    */
   def info(
-            message: String
-          )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
     core.withFields(sourceInfoFields, fieldBuilder).log(INFO, message)
   }
 
@@ -266,9 +266,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def info(message: String, f: FB => FieldBuilderResult)(implicit
-                                                            line: sourcecode.Line,
-                                                            file: sourcecode.File,
-                                                            enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -282,9 +282,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def info(message: String, e: Throwable)(implicit
-                                          line: sourcecode.Line,
-                                          file: sourcecode.File,
-                                          enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -298,9 +298,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param message   the message.
    */
   def info(condition: Condition, message: String)(implicit
-                                                  line: sourcecode.Line,
-                                                  file: sourcecode.File,
-                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -315,9 +315,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param f         the field builder function.
    */
   def info(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                  line: sourcecode.Line,
-                                                                                  file: sourcecode.File,
-                                                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -332,9 +332,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param e         the given exception.
    */
   def info(condition: Condition, message: String, e: Throwable)(implicit
-                                                                line: sourcecode.Line,
-                                                                file: sourcecode.File,
-                                                                enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -356,8 +356,8 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param message the given message.
    */
   def warn(
-            message: String
-          )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
     core.withFields(sourceInfoFields, fieldBuilder).log(WARN, message)
   }
 
@@ -368,9 +368,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param f       the field builder function.
    */
   def warn(message: String, f: FB => FieldBuilderResult)(implicit
-                                                            line: sourcecode.Line,
-                                                            file: sourcecode.File,
-                                                            enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -384,9 +384,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
    * @param e       the given exception.
    */
   def warn(message: String, e: Throwable)(implicit
-                                          line: sourcecode.Line,
-                                          file: sourcecode.File,
-                                          enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -394,9 +394,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   def warn(condition: Condition, message: String)(implicit
-                                                  line: sourcecode.Line,
-                                                  file: sourcecode.File,
-                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -404,9 +404,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   def warn(condition: Condition, message: String, e: Throwable)(implicit
-                                                                line: sourcecode.Line,
-                                                                file: sourcecode.File,
-                                                                enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -414,9 +414,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   def warn(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                  line: sourcecode.Line,
-                                                                                  file: sourcecode.File,
-                                                                                  enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core.log(WARN, condition.asJava, message, f.asJava, fieldBuilder)
   }
@@ -431,15 +431,15 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   def isErrorEnabled(condition: Condition): Boolean = core.isEnabled(ERROR, condition.asJava)
 
   def error(
-             message: String
-           )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
+      message: String
+  )(implicit line: sourcecode.Line, file: sourcecode.File, enc: sourcecode.Enclosing): Unit = {
     core.withFields(sourceInfoFields, fieldBuilder).log(ERROR, message)
   }
 
   def error(message: String, f: FB => FieldBuilderResult)(implicit
-                                                             line: sourcecode.Line,
-                                                             file: sourcecode.File,
-                                                             enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -447,9 +447,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   def error(message: String, e: Throwable)(implicit
-                                           line: sourcecode.Line,
-                                           file: sourcecode.File,
-                                           enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -457,9 +457,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   def error(condition: Condition, message: String)(implicit
-                                                   line: sourcecode.Line,
-                                                   file: sourcecode.File,
-                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -467,9 +467,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   def error(condition: Condition, message: String, f: FB => FieldBuilderResult)(implicit
-                                                                                   line: sourcecode.Line,
-                                                                                   file: sourcecode.File,
-                                                                                   enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
@@ -477,9 +477,9 @@ trait DefaultLoggerMethods[FB] extends LoggerMethods[FB] {
   }
 
   def error(condition: Condition, message: String, e: Throwable)(implicit
-                                                                 line: sourcecode.Line,
-                                                                 file: sourcecode.File,
-                                                                 enc: sourcecode.Enclosing
+      line: sourcecode.Line,
+      file: sourcecode.File,
+      enc: sourcecode.Enclosing
   ): Unit = {
     core
       .withFields(sourceInfoFields, fieldBuilder)
