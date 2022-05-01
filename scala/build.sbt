@@ -12,6 +12,17 @@ initialize := {
 }
 
 ThisBuild / organization := "com.tersesystems.echopraxia"
+ThisBuild / homepage     := Some(url("https://tersesystems.github.io/blindsight"))
+
+ThisBuild / startYear := Some(2021)
+ThisBuild / licenses += ("Apache-2.0", new URL("https://www.apache.org/licenses/LICENSE-2.0.txt"))
+
+ThisBuild / scmInfo := Some(
+  ScmInfo(
+    url("https://github.com/tersesystems/echopraxia"),
+    "scm:git@github.com:tersesystems/echopraxia.git"
+  )
+)
 
 ThisBuild / versionScheme := Some("early-semver")
 
@@ -28,16 +39,24 @@ lazy val api = (project in file("api"))
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "api"                % version.value,
     libraryDependencies += "org.scala-lang.modules"     %% "scala-java8-compat" % "1.0.2",
-    libraryDependencies += "org.scala-lang.modules"     %% "scala-collection-compat" % "2.7.0",
-    libraryDependencies += "com.daodecode"              %% "scalaj-collection" % "0.3.1",
+    libraryDependencies += "org.scala-lang.modules" %% "scala-collection-compat" % "2.7.0",
+    libraryDependencies += "com.daodecode"          %% "scalaj-collection"       % "0.3.1"
+  )
+
+lazy val logger = (project in file("sourcecode"))
+  .settings(
+    name := "scala-logger",
+    //
+    libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
     libraryDependencies += "com.tersesystems.echopraxia" % "logstash"  % version.value % Test,
     libraryDependencies += "org.scalatest"              %% "scalatest" % "3.2.11"      % Test
   )
+  .dependsOn(api % "compile->compile;test->compile")
 
-lazy val sourcecode = (project in file("sourcecode"))
+lazy val asyncLogger = (project in file("sourcecode-async"))
   .settings(
-    name := "scala-sourcecode",
+    name := "scala-async-logger",
     //
     libraryDependencies += "com.lihaoyi" %% "sourcecode" % "0.2.8",
     //
@@ -47,7 +66,13 @@ lazy val sourcecode = (project in file("sourcecode"))
   .dependsOn(api % "compile->compile;test->compile")
 
 lazy val root = (project in file("."))
-  .aggregate(api, sourcecode)
+  .settings(
+    Compile / doc / sources                := Seq.empty,
+    Compile / packageDoc / publishArtifact := false,
+    publishArtifact                        := false,
+    publish / skip                         := true
+  )
+  .aggregate(api, logger, asyncLogger)
 
 def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
   CrossVersion.partialVersion(scalaVersion) match {
@@ -94,6 +119,6 @@ def scalacOptionsVersion(scalaVersion: String): Seq[String] = {
 
 val optimizeInline = Seq(
   "-opt:l:inline",
-  "-opt-inline-from:com.tersesystems.echopraxia.**",  
+  "-opt-inline-from:com.tersesystems.echopraxia.**",
   "-opt-warnings:any-inline-failed"
 )
