@@ -55,6 +55,7 @@ public class SemanticLoggerFactory {
    * @param <FB> the field builder type.
    * @return an implementation of semantic logger.
    */
+  @NotNull
   public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
@@ -75,6 +76,7 @@ public class SemanticLoggerFactory {
    * @param <DataType> the type of data to render as an argument.
    * @return an implementation of semantic logger.
    */
+  @NotNull
   public static <DataType> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
@@ -93,6 +95,7 @@ public class SemanticLoggerFactory {
    * @param <DataType> the type of data to render as an argument.
    * @return an implementation of semantic logger.
    */
+  @NotNull
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<?> clazz,
       Class<DataType> dataTypeClass,
@@ -110,6 +113,7 @@ public class SemanticLoggerFactory {
    * @param <DataType> the type of data to render as an argument.
    * @return an implementation of semantic logger.
    */
+  @NotNull
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -129,6 +133,7 @@ public class SemanticLoggerFactory {
    * @return an implementation of semantic logger.
    * @param <FB> the field builder type.
    */
+  @NotNull
   public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -151,6 +156,7 @@ public class SemanticLoggerFactory {
    * @return an implementation of semantic logger.
    * @param <FB> the field builder type.
    */
+  @NotNull
   public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
       CoreLogger coreLogger,
       Class<DataType> dataTypeClass,

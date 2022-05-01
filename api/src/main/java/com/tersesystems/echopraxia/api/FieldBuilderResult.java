@@ -4,39 +4,42 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.jetbrains.annotations.NotNull;
 
 public interface FieldBuilderResult {
+
+  @NotNull
   List<Field> fields();
 
-  static FieldBuilderResult empty() {
+  static @NotNull FieldBuilderResult empty() {
     return Collections::emptyList;
   }
 
-  static FieldBuilderResult only(Field field) {
+  static @NotNull FieldBuilderResult only(@NotNull Field field) {
     return () -> Collections.singletonList(field);
   }
 
-  static FieldBuilderResult list(List<Field> list) {
+  static @NotNull FieldBuilderResult list(@NotNull List<Field> list) {
     return () -> list;
   }
 
-  static FieldBuilderResult list(Field[] array) {
+  static @NotNull FieldBuilderResult list(@NotNull Field[] array) {
     return () -> Arrays.asList(array);
   }
 
-  static FieldBuilderResult list(Iterable<Field> iterable) {
+  static @NotNull FieldBuilderResult list(@NotNull Iterable<Field> iterable) {
     return list(iterable.spliterator());
   }
 
-  static FieldBuilderResult list(Spliterator<Field> fieldSpliterator) {
+  static @NotNull FieldBuilderResult list(@NotNull Spliterator<Field> fieldSpliterator) {
     return list(StreamSupport.stream(fieldSpliterator, false));
   }
 
-  static FieldBuilderResult list(Iterator<Field> iterator) {
+  static @NotNull FieldBuilderResult list(@NotNull Iterator<Field> iterator) {
     return list(Spliterators.spliteratorUnknownSize(iterator, 0));
   }
 
-  static FieldBuilderResult list(Stream<Field> stream) {
+  static @NotNull FieldBuilderResult list(@NotNull Stream<Field> stream) {
     return list(stream.collect(Collectors.toList()));
   }
 }
