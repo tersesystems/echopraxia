@@ -4,6 +4,7 @@ import com.tersesystems.echopraxia.api.Caller;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.CoreLoggerFactory;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import org.jetbrains.annotations.NotNull;
 
 /** The factory for FluentLogger. */
 public class FluentLoggerFactory {
@@ -15,6 +16,7 @@ public class FluentLoggerFactory {
    * @param clazz the logger class to use
    * @return the logger.
    */
+  @NotNull
   public static FluentLogger<FieldBuilder> getLogger(Class<?> clazz) {
     return getLogger(clazz, FieldBuilder.instance());
   }
@@ -27,6 +29,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    * @param <FB> the type of field builder.
    */
+  @NotNull
   public static <FB extends FieldBuilder> FluentLogger<FB> getLogger(Class<?> clazz, FB builder) {
     CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, clazz);
     return getLogger(coreLogger, builder);
@@ -38,6 +41,7 @@ public class FluentLoggerFactory {
    * @param name the logger name to use
    * @return the logger.
    */
+  @NotNull
   public static FluentLogger<FieldBuilder> getLogger(String name) {
     return getLogger(name, FieldBuilder.instance());
   }
@@ -50,6 +54,7 @@ public class FluentLoggerFactory {
    * @param <FB> the type of field builder.
    * @return the logger.
    */
+  @NotNull
   public static <FB extends FieldBuilder> FluentLogger<FB> getLogger(String name, FB builder) {
     CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, name);
     return getLogger(coreLogger, builder);
@@ -60,6 +65,7 @@ public class FluentLoggerFactory {
    *
    * @return the logger.
    */
+  @NotNull
   public static FluentLogger<FieldBuilder> getLogger() {
     return getLogger(Caller.resolveClassName());
   }
@@ -71,6 +77,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    * @param <FB> the type of field builder.
    */
+  @NotNull
   public static <FB extends FieldBuilder> FluentLogger<FieldBuilder> getLogger(FB builder) {
     return getLogger(Caller.resolveClassName(), builder);
   }
@@ -83,6 +90,7 @@ public class FluentLoggerFactory {
    * @param <FB> the type of field builder.
    * @return the logger.
    */
+  @NotNull
   public static <FB extends FieldBuilder> FluentLogger<FB> getLogger(
       CoreLogger coreLogger, FB builder) {
     return new FluentLogger<>(coreLogger, builder);

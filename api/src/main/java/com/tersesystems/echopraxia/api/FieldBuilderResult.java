@@ -1,7 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -41,5 +39,4 @@ public interface FieldBuilderResult {
   static FieldBuilderResult list(Stream<Field> stream) {
     return list(stream.collect(Collectors.toList()));
   }
-
 }
