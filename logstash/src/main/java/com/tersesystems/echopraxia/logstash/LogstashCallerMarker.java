@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 public class LogstashCallerMarker extends LogstashBaseMarker {
   private final String fqcn;
   private final Throwable callsite;
-  private StackTraceElement[] callerData;
 
   public LogstashCallerMarker(@NotNull String fqcn, @NotNull Throwable callsite) {
     super("caller");
