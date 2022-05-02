@@ -51,6 +51,7 @@ subprojects { subproj ->
         // To enable the built-in stacktrace sampling profiler
         //args = ['-prof', 'stack']
         // args = ['-prof', 'gc']
+        // args = ['-prof', 'jfr' ]
     }
 
     // to make sure benchmarks always get compiled
