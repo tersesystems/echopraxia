@@ -25,6 +25,9 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ScriptManager {
 
+  private static final FunctionSignature JSON_TYPE_FUNCTION_SIGNATURE = new FunctionSignature(Collections.singletonList(
+    new FunctionParameter(0, "jsonType", Types.STRING, Values.NIL)), Types.ANY);
+
   private final ScriptHandle handle;
   private Arity2CallSite callSite;
 
@@ -62,7 +65,7 @@ public class ScriptManager {
     }
   }
 
-  protected DictValue createFunctionMap(LoggingContext ctx) {
+  private DictValue createFunctionMap(LoggingContext ctx) {
     // protected because users should be able to override this given a custom logging context
     Map<String, com.twineworks.tweakflow.lang.values.Value> functionMap = new HashMap<>();
     functionMap.put("fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields())));
@@ -115,12 +118,7 @@ public class ScriptManager {
   private com.twineworks.tweakflow.lang.values.Value userFunctionValue(
       Arity1UserFunction userFunction) {
     return Values.make(
-        new UserFunctionValue(
-            new FunctionSignature(
-                Collections.singletonList(
-                    new FunctionParameter(0, "jsonType", Types.STRING, Values.NIL)),
-                Types.ANY),
-            userFunction));
+        new UserFunctionValue(JSON_TYPE_FUNCTION_SIGNATURE, userFunction));
   }
 
   private com.twineworks.tweakflow.lang.values.Value arity0FunctionValue(

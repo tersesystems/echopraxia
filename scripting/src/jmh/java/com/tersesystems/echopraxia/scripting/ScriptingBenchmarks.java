@@ -29,11 +29,32 @@ public class ScriptingBenchmarks {
         + "}\n";
   }
 
+  public static String buildBoolean() {
+    return "library echopraxia {\n"
+      + "  function evaluate: (string level, dict ctx) ->\n"
+      + "    true;\n"
+      + "}\n";
+  }
+
+  public static String buildInfo() {
+    return "library echopraxia {\n"
+      + "  function evaluate: (string level, dict ctx) ->\n"
+      + "    level == 'INFO';\n"
+      + "}\n";
+  }
+
+
   private static final Condition fileCondition =
       ScriptCondition.create(false, path, Throwable::printStackTrace);
 
   private static final Condition stringCondition =
       ScriptCondition.create(false, buildScript(), Throwable::printStackTrace);
+
+  private static final Condition booleanCondition =
+    ScriptCondition.create(false, buildBoolean(), Throwable::printStackTrace);
+
+  private static final Condition infoCondition =
+    ScriptCondition.create(false, buildInfo(), Throwable::printStackTrace);
 
   private static final ScriptWatchService scriptWatchService = new ScriptWatchService(watchedDir);
 
@@ -56,6 +77,16 @@ public class ScriptingBenchmarks {
   @Benchmark
   public void testStringConditionMatch(Blackhole blackhole) {
     blackhole.consume(stringCondition.test(Level.INFO, passContext));
+  }
+
+  @Benchmark
+  public void testBooleanConditionMatch(Blackhole blackhole) {
+    blackhole.consume(booleanCondition.test(Level.INFO, passContext));
+  }
+
+  @Benchmark
+  public void testInfoConditionMatch(Blackhole blackhole) {
+    blackhole.consume(infoCondition.test(Level.INFO, passContext));
   }
 
   @Benchmark

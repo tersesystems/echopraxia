@@ -16,17 +16,32 @@ Uses logback 1.2.10 and logstash-logback-encoder 7.0.1.
 
 ```
 Benchmark                                         Mode  Cnt    Score    Error  Units
-LoggerBenchmarks.info                             avgt    5   54.470 ±  4.644  ns/op
-LoggerBenchmarks.infoWithAlways                   avgt    5   53.655 ±  3.365  ns/op
-LoggerBenchmarks.infoWithContextString            avgt    5  150.495 ±  1.702  ns/op
-LoggerBenchmarks.infoWithErrorCondition           avgt    5    4.880 ±  0.020  ns/op
-LoggerBenchmarks.infoWithException                avgt    5  174.080 ± 14.744  ns/op
-LoggerBenchmarks.infoWithFieldBuilder             avgt    5   53.058 ±  3.091  ns/op
-LoggerBenchmarks.infoWithNever                    avgt    5    0.500 ±  0.004  ns/op
-LoggerBenchmarks.infoWithParameterizedString      avgt    5   76.599 ±  0.670  ns/op
-LoggerBenchmarks.infoWithStringArg                avgt    5   76.026 ±  2.674  ns/op
-LoggerBenchmarks.isInfoEnabled                    avgt    5    5.329 ±  0.033  ns/op
-LoggerBenchmarks.traceWithParameterizedString     avgt    5    3.505 ±  0.037  ns/op
+CoreLoggerBenchmarks.info                         avgt    5   56.128 ±  0.980  ns/op
+CoreLoggerBenchmarks.infoWithContext              avgt    5  155.291 ±  6.272  ns/op
+CoreLoggerBenchmarks.infoWithException            avgt    5  280.680 ±  7.445  ns/op
+CoreLoggerBenchmarks.infoWithParameterizedString  avgt    5  137.542 ±  1.517  ns/op
+CoreLoggerBenchmarks.isEnabled                    avgt    5    8.436 ±  0.070  ns/op
+JsonPathBenchmarks.testPathConditionFail          avgt    5  456.893 ± 12.185  ns/op
+JsonPathBenchmarks.testPathConditionPass          avgt    5  524.633 ± 78.791  ns/op
+JsonPathBenchmarks.testStreamConditionFail        avgt    5   64.805 ± 11.530  ns/op
+JsonPathBenchmarks.testStreamConditionPass        avgt    5   71.453 ±  0.832  ns/op
+LoggerBenchmarks.info                             avgt    5   66.369 ±  7.402  ns/op
+LoggerBenchmarks.infoWithAlways                   avgt    5   64.321 ±  0.629  ns/op
+LoggerBenchmarks.infoWithContextString            avgt    5  173.154 ± 33.208  ns/op
+LoggerBenchmarks.infoWithErrorCondition           avgt    5    7.473 ±  0.278  ns/op
+LoggerBenchmarks.infoWithException                avgt    5  275.581 ±  3.196  ns/op
+LoggerBenchmarks.infoWithFieldBuilder             avgt    5   66.661 ±  3.907  ns/op
+LoggerBenchmarks.infoWithNever                    avgt    5    0.717 ±  0.017  ns/op
+LoggerBenchmarks.infoWithParameterizedString      avgt    5  138.944 ± 13.325  ns/op
+LoggerBenchmarks.infoWithStringArg                avgt    5  139.971 ±  9.339  ns/op
+LoggerBenchmarks.isInfoEnabled                    avgt    5    8.381 ±  0.048  ns/op
+LoggerBenchmarks.traceWithParameterizedString     avgt    5   33.058 ±  4.906  ns/op
+SLF4JLoggerBenchmarks.info                        avgt    5   57.610 ±  0.855  ns/op
+SLF4JLoggerBenchmarks.infoWithArgument            avgt    5   69.459 ±  0.836  ns/op
+SLF4JLoggerBenchmarks.infoWithArrayArgs           avgt    5   89.485 ±  0.856  ns/op
+SLF4JLoggerBenchmarks.infoWithException           avgt    5  210.398 ±  3.741  ns/op
+SLF4JLoggerBenchmarks.isInfoEnabled               avgt    5    4.173 ±  0.125  ns/op
+
 ```
 
 `CoreLoggerBenchmarks` shows the CoreLogger SPI.  
