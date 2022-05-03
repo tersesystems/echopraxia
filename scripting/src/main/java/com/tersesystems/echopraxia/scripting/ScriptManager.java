@@ -10,15 +10,13 @@ import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
-
-import java.io.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
-
 import org.jetbrains.annotations.NotNull;
-
 
 /**
  * ScriptManager class.
@@ -27,14 +25,22 @@ import org.jetbrains.annotations.NotNull;
  */
 public class ScriptManager {
 
-  private static final FunctionSignature JSON_TYPE_FUNCTION_SIGNATURE = new FunctionSignature(Collections.singletonList(
-    new FunctionParameter(0, "jsonType", Types.STRING, Values.NIL)), Types.ANY);
-  private static final FunctionSignature ANY_FUNCTION_SIGNATURE = new FunctionSignature(Collections.emptyList(), Types.ANY);
-  private static final com.twineworks.tweakflow.lang.values.Value TRACE_VALUE = Values.make(Level.TRACE.name());
-  private static final com.twineworks.tweakflow.lang.values.Value DEBUG_VALUE = Values.make(Level.DEBUG.name());
-  private static final com.twineworks.tweakflow.lang.values.Value INFO_VALUE = Values.make(Level.INFO.name());
-  private static final com.twineworks.tweakflow.lang.values.Value WARN_VALUE = Values.make(Level.WARN.name());
-  private static final com.twineworks.tweakflow.lang.values.Value ERROR_VALUE = Values.make(Level.ERROR.name());
+  private static final FunctionSignature JSON_TYPE_FUNCTION_SIGNATURE =
+      new FunctionSignature(
+          Collections.singletonList(new FunctionParameter(0, "jsonType", Types.STRING, Values.NIL)),
+          Types.ANY);
+  private static final FunctionSignature ANY_FUNCTION_SIGNATURE =
+      new FunctionSignature(Collections.emptyList(), Types.ANY);
+  private static final com.twineworks.tweakflow.lang.values.Value TRACE_VALUE =
+      Values.make(Level.TRACE.name());
+  private static final com.twineworks.tweakflow.lang.values.Value DEBUG_VALUE =
+      Values.make(Level.DEBUG.name());
+  private static final com.twineworks.tweakflow.lang.values.Value INFO_VALUE =
+      Values.make(Level.INFO.name());
+  private static final com.twineworks.tweakflow.lang.values.Value WARN_VALUE =
+      Values.make(Level.WARN.name());
+  private static final com.twineworks.tweakflow.lang.values.Value ERROR_VALUE =
+      Values.make(Level.ERROR.name());
 
   private final ScriptHandle handle;
   private Arity2CallSite callSite;
@@ -58,8 +64,7 @@ public class ScriptManager {
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
       com.twineworks.tweakflow.lang.values.Value levelV = getLevelV(level);
-      com.twineworks.tweakflow.lang.values.Value functionMapValue =
-          Values.makeDict(createFunctionMap(context));
+      com.twineworks.tweakflow.lang.values.Value functionMapValue = createFunctionMap(context);
       com.twineworks.tweakflow.lang.values.Value retValue = call(levelV, functionMapValue);
       if (!retValue.isBoolean()) {
         throw new ScriptException(
@@ -90,21 +95,18 @@ public class ScriptManager {
     }
   }
 
-  private Map<String, com.twineworks.tweakflow.lang.values.Value> createFunctionMap(LoggingContext ctx) {
-    // It'd be great if we could just expose a map interface but not actually have to create a hashmap
-    // directly -- we could hardcode the lookups directly with less overhead and object allocation...
+  private com.twineworks.tweakflow.lang.values.Value createFunctionMap(LoggingContext ctx) {
+    ValueMapEntry[] array = {
+      new ValueMapEntry("fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields()))),
+      new ValueMapEntry("find_number", userFunctionValue(optionalFunction(ctx::findNumber))),
+      new ValueMapEntry("find_string", userFunctionValue(optionalFunction(ctx::findString))),
+      new ValueMapEntry("find_boolean", userFunctionValue(optionalFunction(ctx::findBoolean))),
+      new ValueMapEntry("find_object", userFunctionValue(optionalFunction(ctx::findObject))),
+      new ValueMapEntry("find_list", userFunctionValue(listFunction(ctx::findList))),
+      new ValueMapEntry("find_null", userFunctionValue(nullFunction(ctx::findNull))),
+    };
 
-    // using power of 2 and specifying 16 means the load factor doesn't trigger a resize
-    Map<String, com.twineworks.tweakflow.lang.values.Value> functionMap = new HashMap<>(16);
-    functionMap.put("fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields())));
-    functionMap.put("find_number", userFunctionValue(optionalFunction(ctx::findNumber)));
-    functionMap.put("find_string", userFunctionValue(optionalFunction(ctx::findString)));
-    functionMap.put("find_boolean", userFunctionValue(optionalFunction(ctx::findBoolean)));
-    functionMap.put("find_object", userFunctionValue(optionalFunction(ctx::findObject)));
-    functionMap.put("find_list", userFunctionValue(listFunction(ctx::findList)));
-    functionMap.put("find_null", userFunctionValue(nullFunction(ctx::findNull)));
-
-    return functionMap;
+    return Values.make(new DictValue(array));
   }
 
   private com.twineworks.tweakflow.lang.values.Value call(
@@ -145,14 +147,12 @@ public class ScriptManager {
   @NotNull
   private com.twineworks.tweakflow.lang.values.Value userFunctionValue(
       Arity1UserFunction userFunction) {
-    return Values.make(
-        new UserFunctionValue(JSON_TYPE_FUNCTION_SIGNATURE, userFunction));
+    return Values.make(new UserFunctionValue(JSON_TYPE_FUNCTION_SIGNATURE, userFunction));
   }
 
   private com.twineworks.tweakflow.lang.values.Value arity0FunctionValue(
       Arity0UserFunction userFunction) {
-    return Values.make(
-      new UserFunctionValue(ANY_FUNCTION_SIGNATURE, userFunction));
+    return Values.make(new UserFunctionValue(ANY_FUNCTION_SIGNATURE, userFunction));
   }
 
   private Arity1UserFunction optionalFunction(Function<String, Optional<?>> contextFunction) {
@@ -183,12 +183,13 @@ public class ScriptManager {
   }
 
   private com.twineworks.tweakflow.lang.values.Value convertFields(List<Field> fields) {
-    Map<String, com.twineworks.tweakflow.lang.values.Value> objectMap = new HashMap<>(fields.size());
-    for (Field field : fields) {
+    ValueMapEntry[] array = new ValueMapEntry[fields.size()];
+    for (int i = 0; i < fields.size(); i++) {
+      Field field = fields.get(i);
       com.twineworks.tweakflow.lang.values.Value fieldValue = convertValue(field.value());
-      objectMap.put(field.name(), fieldValue);
+      array[i] = new ValueMapEntry(field.name(), fieldValue);
     }
-    return Values.makeDict(objectMap);
+    return Values.make(new DictValue(array));
   }
 
   private com.twineworks.tweakflow.lang.values.Value convertValue(Value<?> value) {
@@ -245,19 +246,20 @@ public class ScriptManager {
   }
 
   private com.twineworks.tweakflow.lang.values.Value createThrowable(Throwable t) {
-    final String message = t.getMessage();
+    String message = t.getMessage();
     String stackTrace = getStackTrace(t);
 
-    // Avoid a resize
-    Map<String, com.twineworks.tweakflow.lang.values.Value> throwMap = new HashMap<>(8);
-    throwMap.put("message", Values.make(message));
-    throwMap.put("stackTrace", Values.make(stackTrace));
-
+    ValueMapEntry messageValue = new ValueMapEntry("message", Values.make(message));
+    ValueMapEntry stacktraceValue = new ValueMapEntry("stackTrace", Values.make(stackTrace));
     if (t.getCause() != null) {
       com.twineworks.tweakflow.lang.values.Value cause = createThrowable(t.getCause());
-      throwMap.put("cause", cause);
+      ValueMapEntry causeValue = new ValueMapEntry("cause", cause);
+      ValueMapEntry[] array = {messageValue, stacktraceValue, causeValue};
+      return Values.make(new DictValue(array));
+    } else {
+      ValueMapEntry[] array = {messageValue, stacktraceValue};
+      return Values.make(new DictValue(array));
     }
-    return Values.makeDict(throwMap);
   }
 
   private String getStackTrace(Throwable t) {
@@ -266,4 +268,47 @@ public class ScriptManager {
     return stringWriter.toString();
   }
 
+  static final class ValueMapEntry
+      implements Map.Entry<String, com.twineworks.tweakflow.lang.values.Value> {
+    final String key;
+    final com.twineworks.tweakflow.lang.values.Value value;
+
+    ValueMapEntry(String k, com.twineworks.tweakflow.lang.values.Value v) {
+      key = Objects.requireNonNull(k);
+      value = Objects.requireNonNull(v);
+    }
+
+    @Override
+    public String getKey() {
+      return key;
+    }
+
+    @Override
+    public com.twineworks.tweakflow.lang.values.Value getValue() {
+      return value;
+    }
+
+    @Override
+    public com.twineworks.tweakflow.lang.values.Value setValue(
+        com.twineworks.tweakflow.lang.values.Value value) {
+      throw new UnsupportedOperationException("not supported");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (!(o instanceof Map.Entry)) return false;
+      Map.Entry<?, ?> e = (Map.Entry<?, ?>) o;
+      return key.equals(e.getKey()) && value.equals(e.getValue());
+    }
+
+    @Override
+    public int hashCode() {
+      return key.hashCode() ^ value.hashCode();
+    }
+
+    @Override
+    public String toString() {
+      return key + "=" + value;
+    }
+  }
 }
