@@ -10,13 +10,15 @@ import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
-import java.io.PrintWriter;
-import java.io.StringWriter;
+
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
+
 import org.jetbrains.annotations.NotNull;
+
 
 /**
  * ScriptManager class.
@@ -27,6 +29,12 @@ public class ScriptManager {
 
   private static final FunctionSignature JSON_TYPE_FUNCTION_SIGNATURE = new FunctionSignature(Collections.singletonList(
     new FunctionParameter(0, "jsonType", Types.STRING, Values.NIL)), Types.ANY);
+  private static final FunctionSignature ANY_FUNCTION_SIGNATURE = new FunctionSignature(Collections.emptyList(), Types.ANY);
+  private static final com.twineworks.tweakflow.lang.values.Value TRACE_VALUE = Values.make(Level.TRACE.name());
+  private static final com.twineworks.tweakflow.lang.values.Value DEBUG_VALUE = Values.make(Level.DEBUG.name());
+  private static final com.twineworks.tweakflow.lang.values.Value INFO_VALUE = Values.make(Level.INFO.name());
+  private static final com.twineworks.tweakflow.lang.values.Value WARN_VALUE = Values.make(Level.WARN.name());
+  private static final com.twineworks.tweakflow.lang.values.Value ERROR_VALUE = Values.make(Level.ERROR.name());
 
   private final ScriptHandle handle;
   private Arity2CallSite callSite;
@@ -49,9 +57,9 @@ public class ScriptManager {
   */
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
-      com.twineworks.tweakflow.lang.values.Value levelV = Values.make(level.name());
+      com.twineworks.tweakflow.lang.values.Value levelV = getLevelV(level);
       com.twineworks.tweakflow.lang.values.Value functionMapValue =
-          Values.make(createFunctionMap(context));
+          Values.makeDict(createFunctionMap(context));
       com.twineworks.tweakflow.lang.values.Value retValue = call(levelV, functionMapValue);
       if (!retValue.isBoolean()) {
         throw new ScriptException(
@@ -65,9 +73,29 @@ public class ScriptManager {
     }
   }
 
-  private DictValue createFunctionMap(LoggingContext ctx) {
-    // protected because users should be able to override this given a custom logging context
-    Map<String, com.twineworks.tweakflow.lang.values.Value> functionMap = new HashMap<>();
+  private com.twineworks.tweakflow.lang.values.Value getLevelV(Level level) {
+    switch (level) {
+      case TRACE:
+        return TRACE_VALUE;
+      case DEBUG:
+        return DEBUG_VALUE;
+      case INFO:
+        return INFO_VALUE;
+      case WARN:
+        return WARN_VALUE;
+      case ERROR:
+        return ERROR_VALUE;
+      default:
+        throw new IllegalStateException("Unknown level " + level);
+    }
+  }
+
+  private Map<String, com.twineworks.tweakflow.lang.values.Value> createFunctionMap(LoggingContext ctx) {
+    // It'd be great if we could just expose a map interface but not actually have to create a hashmap
+    // directly -- we could hardcode the lookups directly with less overhead and object allocation...
+
+    // using power of 2 and specifying 16 means the load factor doesn't trigger a resize
+    Map<String, com.twineworks.tweakflow.lang.values.Value> functionMap = new HashMap<>(16);
     functionMap.put("fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields())));
     functionMap.put("find_number", userFunctionValue(optionalFunction(ctx::findNumber)));
     functionMap.put("find_string", userFunctionValue(optionalFunction(ctx::findString)));
@@ -76,7 +104,7 @@ public class ScriptManager {
     functionMap.put("find_list", userFunctionValue(listFunction(ctx::findList)));
     functionMap.put("find_null", userFunctionValue(nullFunction(ctx::findNull)));
 
-    return new DictValue(functionMap);
+    return functionMap;
   }
 
   private com.twineworks.tweakflow.lang.values.Value call(
@@ -124,11 +152,10 @@ public class ScriptManager {
   private com.twineworks.tweakflow.lang.values.Value arity0FunctionValue(
       Arity0UserFunction userFunction) {
     return Values.make(
-        new UserFunctionValue(
-            new FunctionSignature(Collections.emptyList(), Types.ANY), userFunction));
+      new UserFunctionValue(ANY_FUNCTION_SIGNATURE, userFunction));
   }
 
-  Arity1UserFunction optionalFunction(Function<String, Optional<?>> contextFunction) {
+  private Arity1UserFunction optionalFunction(Function<String, Optional<?>> contextFunction) {
     return (context, pathValue) -> {
       final String path = pathValue.string();
       final Optional<?> opt = contextFunction.apply(path);
@@ -143,7 +170,7 @@ public class ScriptManager {
     return (context, pathValue) -> {
       final String path = pathValue.string();
       final List<?> list = listFunction.apply(path);
-      return Values.make(list);
+      return Values.makeList(list);
     };
   }
 
@@ -156,25 +183,18 @@ public class ScriptManager {
   }
 
   private com.twineworks.tweakflow.lang.values.Value convertFields(List<Field> fields) {
-    Map<String, com.twineworks.tweakflow.lang.values.Value> objectMap = new HashMap<>();
+    Map<String, com.twineworks.tweakflow.lang.values.Value> objectMap = new HashMap<>(fields.size());
     for (Field field : fields) {
       com.twineworks.tweakflow.lang.values.Value fieldValue = convertValue(field.value());
       objectMap.put(field.name(), fieldValue);
     }
-    return Values.make(objectMap);
+    return Values.makeDict(objectMap);
   }
 
   private com.twineworks.tweakflow.lang.values.Value convertValue(Value<?> value) {
     switch (value.type()) {
       case ARRAY:
-        //noinspection unchecked
-        List<Value<?>> values = (List<Value<?>>) value.raw();
-        List<com.twineworks.tweakflow.lang.values.Value> rawList = new ArrayList<>();
-        for (Value<?> v : values) {
-          com.twineworks.tweakflow.lang.values.Value v2 = convertValue(v);
-          rawList.add(v2);
-        }
-        return Values.make(rawList);
+        return convertArray(value);
       case OBJECT:
         //noinspection unchecked
         List<Field> fields = (List<Field>) value.raw();
@@ -183,20 +203,7 @@ public class ScriptManager {
         String s = (String) value.raw();
         return Values.make(s);
       case NUMBER:
-        // Speed up conversion by using overloaded value directly
-        Number o = (Number) value.raw();
-        if (o instanceof Byte) return Values.make(o.longValue());
-        if (o instanceof Short) return Values.make(o.longValue());
-        if (o instanceof Long) return Values.make(o.longValue());
-        if (o instanceof Integer) return Values.make(o.longValue());
-        if (o instanceof Float) return Values.make((Float) o);
-        if (o instanceof Double) return Values.make((Double) o);
-        if (o instanceof BigDecimal) return Values.make((BigDecimal) o);
-        // Tweakflow doesn't have a BigInteger representation, we must hack it for now
-        // this is fixed in
-        // https://github.com/twineworks/tweakflow/commit/cd0d2412d9826028ccd9ce412a35e2d17086e985
-        if (o instanceof BigInteger) return Values.make(new BigDecimal((BigInteger) o));
-        throw new IllegalStateException("Unknown number type " + o.getClass().getName());
+        return convertNumber(value);
       case BOOLEAN:
         Boolean b = (Boolean) value.raw();
         return Values.make(b);
@@ -209,13 +216,40 @@ public class ScriptManager {
     }
   }
 
+  private com.twineworks.tweakflow.lang.values.Value convertNumber(Value<?> value) {
+    // Speed up conversion by using overloaded value directly
+    Number o = (Number) value.raw();
+    if (o instanceof Byte) return Values.make(o.longValue());
+    if (o instanceof Short) return Values.make(o.longValue());
+    if (o instanceof Long) return Values.make(o.longValue());
+    if (o instanceof Integer) return Values.make(o.longValue());
+    if (o instanceof Float) return Values.make((Float) o);
+    if (o instanceof Double) return Values.make((Double) o);
+    if (o instanceof BigDecimal) return Values.make((BigDecimal) o);
+    // Tweakflow doesn't have a BigInteger representation, we must hack it for now
+    // this is fixed in
+    // https://github.com/twineworks/tweakflow/commit/cd0d2412d9826028ccd9ce412a35e2d17086e985
+    if (o instanceof BigInteger) return Values.make(new BigDecimal((BigInteger) o));
+    throw new IllegalStateException("Unknown number type " + o.getClass().getName());
+  }
+
+  private com.twineworks.tweakflow.lang.values.Value convertArray(Value<?> value) {
+    //noinspection unchecked
+    List<Value<?>> values = (List<Value<?>>) value.raw();
+    List<com.twineworks.tweakflow.lang.values.Value> rawList = new ArrayList<>(values.size());
+    for (Value<?> v : values) {
+      com.twineworks.tweakflow.lang.values.Value v2 = convertValue(v);
+      rawList.add(v2);
+    }
+    return Values.make(new ListValue(rawList));
+  }
+
   private com.twineworks.tweakflow.lang.values.Value createThrowable(Throwable t) {
     final String message = t.getMessage();
-    StringWriter stringWriter = new StringWriter();
-    t.printStackTrace(new PrintWriter(stringWriter));
-    String stackTrace = stringWriter.toString();
+    String stackTrace = getStackTrace(t);
 
-    Map<String, com.twineworks.tweakflow.lang.values.Value> throwMap = new HashMap<>();
+    // Avoid a resize
+    Map<String, com.twineworks.tweakflow.lang.values.Value> throwMap = new HashMap<>(8);
     throwMap.put("message", Values.make(message));
     throwMap.put("stackTrace", Values.make(stackTrace));
 
@@ -225,4 +259,11 @@ public class ScriptManager {
     }
     return Values.makeDict(throwMap);
   }
+
+  private String getStackTrace(Throwable t) {
+    StringWriter stringWriter = new StringWriter();
+    t.printStackTrace(new PrintWriter(stringWriter));
+    return stringWriter.toString();
+  }
+
 }
