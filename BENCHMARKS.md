@@ -8,6 +8,8 @@ OpenJDK 64-Bit Server VM Corretto-11.0.9.11.1 (build 11.0.9+11-LTS, mixed mode)
 
 Implementations are set up with a null / no-op appender, so only the time going through the API and the implementation. 
 
+**NOTE**: when running benchmarks, please ensure you are dealing with an appropriately cooled system!  Benchmarks become surprisingly inaccurate when your computer is hot enough, as the CPU will turn on thermal throttling to manage excess temperatures.
+
 ## Logstash Implementation
 
 Uses logback 1.2.10 and logstash-logback-encoder 7.0.1.
@@ -169,80 +171,29 @@ public class SemanticLoggerBenchmarks {
 
 ## Scripting
 
-Scripts can be read from file system or directly from memory.
+The scripting implementation uses Tweakflow, and is turned into an abstract syntax tree when compiled.  
 
-```java
-public class ScriptingBenchmarks {
-    private static final Path path = Paths.get("src/jmh/tweakflow/condition.tf");
-
-    private static final Path watchedDir = Paths.get("src/jmh/tweakflow");
-
-    public static String buildScript() {
-        StringBuilder b = new StringBuilder("");
-        b.append("library echopraxia {");
-        b.append("  function evaluate: (string level, dict fields) ->");
-        b.append("    level == \"INFO\";");
-        b.append("}");
-        return b.toString();
-    }
-
-    private static final Condition fileCondition =
-            ScriptCondition.create(false, path, Throwable::printStackTrace);
-
-    private static final Condition stringCondition =
-            ScriptCondition.create(false, buildScript(), Throwable::printStackTrace);
-
-    private static final ScriptWatchService scriptWatchService = new ScriptWatchService(watchedDir);
-
-    private static final ScriptHandle watchedScript =
-            scriptWatchService.watchScript(
-                    watchedDir.resolve("condition.tf"), Throwable::printStackTrace);
-
-    private static final Condition watchedCondition = ScriptCondition.create(false, watchedScript);
-
-    @Benchmark
-    public void testFileConditionMatch(Blackhole blackhole) {
-        // ScriptingBenchmarks.testFileConditionMatch     avgt    5  127.251 ± 0.816  ns/op
-        blackhole.consume(fileCondition.test(Level.INFO, LogstashLoggingContext.empty()));
-    }
-
-    @Benchmark
-    public void testStringConditionMatch(Blackhole blackhole) {
-        // ScriptingBenchmarks.testStringConditionMatch   avgt    5  122.905 ± 3.440  ns/op
-        blackhole.consume(stringCondition.test(Level.INFO, LogstashLoggingContext.empty()));
-    }
-
-    @Benchmark
-    public void testFileConditionFail(Blackhole blackhole) {
-        // ScriptingBenchmarks.testFileConditionFail      avgt    5  112.629 ± 2.951  ns/op
-        blackhole.consume(fileCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
-    }
-
-    @Benchmark
-    public void testStringConditionFail(Blackhole blackhole) {
-        // ScriptingBenchmarks.testStringConditionFail    avgt    5  118.323 ± 4.296  ns/op
-        blackhole.consume(stringCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
-    }
-
-    @Benchmark
-    public void testWatchedConditionMatch(Blackhole blackhole) {
-        // ScriptingBenchmarks.testWatchedConditionMatch  avgt    5  134.601 ± 2.325  ns/op
-        blackhole.consume(watchedCondition.test(Level.INFO, LogstashLoggingContext.empty()));
-    }
-
-    @Benchmark
-    public void testWatchedConditionFail(Blackhole blackhole) {
-        // ScriptingBenchmarks.testWatchedConditionFail   avgt    5  125.652 ± 5.286  ns/op
-        blackhole.consume(watchedCondition.test(Level.DEBUG, LogstashLoggingContext.empty()));
-    }
-}
-```
-
-where the `condition.tf` script is 
+Here's the simplest boolean condition:
 
 ```
 library echopraxia {
-  function evaluate: (string level, dict fields) ->
-     level == "INFO";
+  function evaluate: (string level, dict ctx) ->
+     true;
 }
+```
+
+The runtime cost for evaluating the simplest "boolean condition" is around 670 +/- 109 nanoseconds, which comes mainly from setting up a function map to `findBoolean`, `findString` etc.
+
+Here's the full benchmarks:
+
+```
+Benchmark                                      Mode  Cnt     Score     Error  Units
+ScriptingBenchmarks.testBooleanConditionMatch  avgt    5   670.523 ± 109.664  ns/op
+ScriptingBenchmarks.testFileConditionFail      avgt    5  1467.818 ± 155.201  ns/op
+ScriptingBenchmarks.testFileConditionMatch     avgt    5  1390.808 ± 126.744  ns/op
+ScriptingBenchmarks.testInfoConditionMatch     avgt    5   808.190 ±  83.414  ns/op
+ScriptingBenchmarks.testStringConditionFail    avgt    5  1590.013 ± 152.896  ns/op
+ScriptingBenchmarks.testStringConditionMatch   avgt    5  1581.162 ±  46.193  ns/op
+ScriptingBenchmarks.testWatchedConditionFail   avgt    5  1657.719 ± 177.949  ns/op
+ScriptingBenchmarks.testWatchedConditionMatch  avgt    5  1836.656 ± 205.378  ns/op
 ```
