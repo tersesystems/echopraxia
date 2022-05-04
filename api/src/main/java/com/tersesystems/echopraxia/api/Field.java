@@ -12,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface Field extends FieldBuilderResult {
 
-  String EXCEPTION = "exception";
-
   /**
    * The field name.
    *

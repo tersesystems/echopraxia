@@ -56,6 +56,7 @@ class Internals {
     }
 
     @Override
+    @NotNull
     public List<Field> fields() {
       return Collections.singletonList(this);
     }
@@ -94,6 +95,7 @@ class Internals {
     }
 
     @Override
+    @NotNull
     public List<Field> fields() {
       return Collections.singletonList(this);
     }

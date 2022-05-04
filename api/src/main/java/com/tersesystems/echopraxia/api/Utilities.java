@@ -16,11 +16,11 @@ public final class Utilities {
     return mapSupplier -> () -> f.apply(mapSupplier.get());
   }
 
-  public static <T> Supplier<T> memoize(Supplier<T> supplier) {
+  public static <T> @NotNull Supplier<T> memoize(@NotNull Supplier<T> supplier) {
     return new MemoizingSupplier<>(supplier);
   }
 
-  public static List<Field> buildThreadContext(Map<String, String> contextMap) {
+  public @NotNull static List<Field> buildThreadContext(Map<String, String> contextMap) {
     List<Field> list = new ArrayList<>();
     for (Map.Entry<String, String> e : contextMap.entrySet()) {
       Field field = Field.keyValue(e.getKey(), Value.string(e.getValue()));
@@ -29,7 +29,8 @@ public final class Utilities {
     return list;
   }
 
-  public static Function<Supplier<Map<String, String>>, Supplier<List<Field>>> threadContext() {
+  public @NotNull static Function<Supplier<Map<String, String>>, Supplier<List<Field>>>
+      threadContext() {
     return getThreadContextFunction(Utilities::buildThreadContext);
   }
 

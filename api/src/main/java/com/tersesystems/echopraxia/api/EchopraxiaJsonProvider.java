@@ -11,9 +11,17 @@ import org.jetbrains.annotations.NotNull;
 public class EchopraxiaJsonProvider implements JsonProvider {
 
   private static final List<String> THROWABLE_KEYS =
-      Arrays.asList("message", "cause", "stackTrace", "className");
+      Arrays.asList(
+          FieldConstants.THROWABLE_MESSAGE,
+          FieldConstants.THROWABLE_CAUSE,
+          FieldConstants.THROWABLE_STACK_TRACE,
+          FieldConstants.CLASS_NAME);
   private static final List<String> STACK_TRACE_ELEMENT_KEYS =
-      Arrays.asList("methodName", "lineNumber", "fileName", "className");
+      Arrays.asList(
+          FieldConstants.STACK_TRACE_EL_METHOD_NAME,
+          FieldConstants.STACK_TRACE_EL_LINE_NUMBER,
+          FieldConstants.STACK_TRACE_EL_FILE_NAME,
+          FieldConstants.CLASS_NAME);
 
   @Override
   public Object parse(String json) throws InvalidJsonException {
@@ -164,7 +172,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
       return ((Object[]) obj)[idx];
     }
 
-    throw new IllegalArgumentException("Object is not valid: " + obj.toString());
+    throw new IllegalArgumentException("Object is not valid: " + obj);
   }
 
   @Override
@@ -209,16 +217,16 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   }
 
   private Object findStackTraceValue(String key, StackTraceElement obj) {
-    if (key.equals("fileName")) {
+    if (key.equals(FieldConstants.STACK_TRACE_EL_FILE_NAME)) {
       return obj.getFileName();
     }
-    if (key.equals("lineNumber")) {
+    if (key.equals(FieldConstants.STACK_TRACE_EL_LINE_NUMBER)) {
       return obj.getLineNumber();
     }
-    if (key.equals("className")) {
+    if (key.equals(FieldConstants.CLASS_NAME)) {
       return obj.getClassName();
     }
-    if (key.equals("methodName")) {
+    if (key.equals(FieldConstants.STACK_TRACE_EL_METHOD_NAME)) {
       return obj.getMethodName();
     }
     return JsonProvider.UNDEFINED;
@@ -226,16 +234,16 @@ public class EchopraxiaJsonProvider implements JsonProvider {
 
   private Object findExceptionValue(String key, Throwable throwable) {
     // XXX Might be nice to do reflection based property introspection here
-    if (key.equals("message")) {
+    if (key.equals(FieldConstants.THROWABLE_MESSAGE)) {
       return throwable.getMessage();
     }
-    if (key.equals("cause")) {
+    if (key.equals(FieldConstants.THROWABLE_CAUSE)) {
       return throwable.getCause();
     }
-    if (key.equals("stackTrace")) {
+    if (key.equals(FieldConstants.THROWABLE_STACK_TRACE)) {
       return throwable.getStackTrace();
     }
-    if (key.equals("className")) {
+    if (key.equals(FieldConstants.CLASS_NAME)) {
       return throwable.getClass().getName();
     }
     return JsonProvider.UNDEFINED;

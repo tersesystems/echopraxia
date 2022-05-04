@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
+import static com.tersesystems.echopraxia.api.FieldConstants.EXCEPTION;
+
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -249,7 +251,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field exception(@NotNull Throwable t) {
-    return keyValue(Field.EXCEPTION, Value.exception(t));
+    return keyValue(EXCEPTION, Value.exception(t));
   }
 
   /**
@@ -260,7 +262,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field exception(@NotNull Value.ExceptionValue value) {
-    return keyValue(Field.EXCEPTION, value);
+    return keyValue(EXCEPTION, value);
   }
 
   /**
