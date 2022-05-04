@@ -171,7 +171,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void log(
+  public <FB> void log(
       @NotNull Level level,
       @Nullable String messageTemplate,
       @NotNull Function<FB, FieldBuilderResult> f,
@@ -212,7 +212,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void log(
+  public <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String messageTemplate,
@@ -233,7 +233,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
@@ -277,7 +277,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level,
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,

@@ -149,7 +149,7 @@ public interface CoreLogger {
    * @param builder the field builder
    * @param <FB> the type of field builder.
    */
-  <FB, RET> void log(
+  <FB> void log(
       @NotNull Level level,
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
@@ -174,7 +174,7 @@ public interface CoreLogger {
    * @param builder the field builder
    * @param <FB> the type of field builder.
    */
-  <FB, RET> void log(
+  <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
@@ -189,7 +189,7 @@ public interface CoreLogger {
    * @param consumer the consumer of the logger handle
    * @param builder the field builder.
    */
-  <FB, RET> void asyncLog(
+  <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder);
 
   /**
@@ -201,7 +201,7 @@ public interface CoreLogger {
    * @param consumer the consumer of the logger handle
    * @param builder the field builder.
    */
-  <FB, RET> void asyncLog(
+  <FB> void asyncLog(
       @NotNull Level level,
       @NotNull Condition condition,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
