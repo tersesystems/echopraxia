@@ -59,10 +59,6 @@ public class EchopraxiaMappingProvider implements MappingProvider {
     return (T) source;
   }
 
-  private Map<String, ?> mapThrowable(Throwable t) {
-    return null;
-  }
-
   @Override
   public <T> T map(Object source, TypeRef<T> targetType, Configuration configuration) {
     try {
@@ -84,58 +80,82 @@ public class EchopraxiaMappingProvider implements MappingProvider {
     }
 
     if (source instanceof List) {
-      List<Object> mapped = new ArrayList<>();
-      List<?> array = (List<?>) source;
-      for (Object value : array) {
-        mapped.add(mapToObject(value));
-      }
-      return mapped;
+      return getList((List<?>) source);
     } else if (source instanceof Map) {
-      Map<String, Object> mapped = new HashMap<>();
-      Map<String, ?> sourceMap = (Map<String, ?>) source;
-      for (String key : sourceMap.keySet()) {
-        final Object mapValue = sourceMap.get(key);
-        mapped.put(key, mapToObject(mapValue));
-      }
-      return mapped;
+      return getMap((Map<String, ?>) source);
     } else if (source instanceof Value.ArrayValue) {
-      List<Object> mapped = new ArrayList<>();
-      Value.ArrayValue arrayValue = (Value.ArrayValue) source;
-      final List<Value<?>> array = arrayValue.raw();
-
-      for (Value<?> value : array) {
-        mapped.add(mapToObject(value));
-      }
-      return mapped;
+      return getArrayValue((Value.ArrayValue) source);
     } else if (source instanceof Value.ObjectValue) {
-      Map<String, Object> mapped = new HashMap<>();
-      Value.ObjectValue objValue = (Value.ObjectValue) source;
-      final List<Field> raw = objValue.raw();
-
-      for (Field f : raw) {
-        mapped.put(f.name(), mapToObject(f.value()));
-      }
-      return mapped;
+      return getObjectValue((Value.ObjectValue) source);
     } else if (source instanceof Value) {
       return ((Value<?>) source).raw();
     } else if (source instanceof StackTraceElement[]) {
-      List<Object> mapped = new ArrayList<>();
-      StackTraceElement[] array = (StackTraceElement[]) source;
-      for (StackTraceElement value : array) {
-        mapped.add(mapToObject(value));
-      }
-      return mapped;
+      return getStackTraceElements((StackTraceElement[]) source);
     } else if (source instanceof StackTraceElement) {
-      StackTraceElement element = (StackTraceElement) source;
-
-      Map<String, Object> elementMap = new HashMap<>();
-      elementMap.put("methodName", element.getMethodName());
-      elementMap.put("className", element.getClassName());
-      elementMap.put("fileName", element.getFileName());
-      elementMap.put("lineNumber", element.getLineNumber());
-      return elementMap;
+      return getStackTraceElement((StackTraceElement) source);
     } else {
       throw new JsonPathException("Could not determine value type for " + source.getClass());
     }
+  }
+
+  @NotNull
+  private Map<String, Object> getStackTraceElement(StackTraceElement source) {
+    StackTraceElement element = source;
+
+    Map<String, Object> elementMap = new HashMap<>();
+    elementMap.put(FieldConstants.STACK_TRACE_EL_METHOD_NAME, element.getMethodName());
+    elementMap.put(FieldConstants.CLASS_NAME, element.getClassName());
+    elementMap.put(FieldConstants.STACK_TRACE_EL_FILE_NAME, element.getFileName());
+    elementMap.put(FieldConstants.STACK_TRACE_EL_LINE_NUMBER, element.getLineNumber());
+    return elementMap;
+  }
+
+  @NotNull
+  private List<Object> getStackTraceElements(StackTraceElement[] source) {
+    List<Object> mapped = new ArrayList<>();
+    for (StackTraceElement value : source) {
+      mapped.add(mapToObject(value));
+    }
+    return mapped;
+  }
+
+  @NotNull
+  private Map<String, Object> getObjectValue(Value.ObjectValue source) {
+    Map<String, Object> mapped = new HashMap<>();
+    final List<Field> raw = source.raw();
+    for (Field f : raw) {
+      mapped.put(f.name(), mapToObject(f.value()));
+    }
+    return mapped;
+  }
+
+  @NotNull
+  private List<Object> getArrayValue(Value.ArrayValue source) {
+    List<Object> mapped = new ArrayList<>();
+    final List<Value<?>> array = source.raw();
+
+    for (Value<?> value : array) {
+      mapped.add(mapToObject(value));
+    }
+    return mapped;
+  }
+
+  @NotNull
+  private Map<String, Object> getMap(Map<String, ?> source) {
+    Map<String, Object> mapped = new HashMap<>();
+    for (String key : source.keySet()) {
+      final Object mapValue = source.get(key);
+      mapped.put(key, mapToObject(mapValue));
+    }
+    return mapped;
+  }
+
+  @NotNull
+  private List<Object> getList(List<?> source) {
+    List<Object> mapped = new ArrayList<>();
+    for (Object value : source) {
+      mapped.add(mapToObject(value));
+    }
+    return mapped;
   }
 }

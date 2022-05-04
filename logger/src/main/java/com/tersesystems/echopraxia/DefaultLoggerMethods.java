@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia;
 
-import static com.tersesystems.echopraxia.api.Field.EXCEPTION;
+import static com.tersesystems.echopraxia.api.FieldConstants.EXCEPTION;
 import static com.tersesystems.echopraxia.api.Level.*;
 import static com.tersesystems.echopraxia.api.Level.ERROR;
 import static com.tersesystems.echopraxia.api.Value.exception;

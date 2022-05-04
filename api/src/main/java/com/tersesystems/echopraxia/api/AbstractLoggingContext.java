@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
+import static com.tersesystems.echopraxia.api.FieldConstants.*;
+
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
@@ -12,7 +14,7 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractLoggingContext implements LoggingContext {
-  private static final String EXCEPTION_PATH = "$." + Field.EXCEPTION;
+  private static final String EXCEPTION_PATH = "$." + EXCEPTION;
 
   private static final JsonProvider jsonProvider = new EchopraxiaJsonProvider();
   private static final MappingProvider javaMappingProvider = new EchopraxiaMappingProvider();
