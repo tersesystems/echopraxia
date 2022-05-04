@@ -207,7 +207,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void log(
+  public <FB> void log(
       @NotNull Level level,
       String message,
       @NotNull Function<FB, FieldBuilderResult> f,
@@ -236,7 +236,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void log(
+  public <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
       @Nullable String message,
@@ -256,7 +256,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     final LogstashCoreLogger callerLogger = asyncCallerLogger();
     Runnable threadLocalRunnable = threadContextFunction.get();
@@ -281,7 +281,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public <FB, RET> void asyncLog(
+  public <FB> void asyncLog(
       @NotNull Level level,
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
