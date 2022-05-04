@@ -1,11 +1,18 @@
 package com.tersesystems.echopraxia.api;
-final class FieldConstants {
-  public static final String EXCEPTION = "exception";
-  static final String CLASS_NAME = "className";
-  static final String THROWABLE_MESSAGE = "message";
-  static final String THROWABLE_CAUSE = "cause";
-  static final String THROWABLE_STACK_TRACE = "stackTrace";
-  static final String STACK_TRACE_EL_FILE_NAME = "fileName";
-  static final String STACK_TRACE_EL_LINE_NUMBER = "lineNumber";
-  static final String STACK_TRACE_EL_METHOD_NAME = "methodName";
+
+import java.util.ResourceBundle;
+
+public final class FieldConstants {
+
+  private static final ResourceBundle bundle =
+      ResourceBundle.getBundle(  "echopraxia/fields");
+
+  public static final String EXCEPTION = bundle.getString("exception");
+  public static final String CLASS_NAME = bundle.getString("className");
+  public static final String MESSAGE = bundle.getString("message");
+  public static final String CAUSE = bundle.getString("cause");
+  public static final String STACK_TRACE = bundle.getString("stackTrace");
+  public static final String FILE_NAME = bundle.getString("fileName");
+  public static final String LINE_NUMBER = bundle.getString("lineNumber");
+  public static final String METHOD_NAME = bundle.getString("methodName");
 }

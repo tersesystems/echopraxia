@@ -100,19 +100,17 @@ public class EchopraxiaMappingProvider implements MappingProvider {
 
   @NotNull
   private Map<String, Object> getStackTraceElement(StackTraceElement source) {
-    StackTraceElement element = source;
-
-    Map<String, Object> elementMap = new HashMap<>();
-    elementMap.put(FieldConstants.STACK_TRACE_EL_METHOD_NAME, element.getMethodName());
-    elementMap.put(FieldConstants.CLASS_NAME, element.getClassName());
-    elementMap.put(FieldConstants.STACK_TRACE_EL_FILE_NAME, element.getFileName());
-    elementMap.put(FieldConstants.STACK_TRACE_EL_LINE_NUMBER, element.getLineNumber());
+    Map<String, Object> elementMap = new HashMap<>(8);
+    elementMap.put(FieldConstants.METHOD_NAME, source.getMethodName());
+    elementMap.put(FieldConstants.CLASS_NAME, source.getClassName());
+    elementMap.put(FieldConstants.FILE_NAME, source.getFileName());
+    elementMap.put(FieldConstants.LINE_NUMBER, source.getLineNumber());
     return elementMap;
   }
 
   @NotNull
   private List<Object> getStackTraceElements(StackTraceElement[] source) {
-    List<Object> mapped = new ArrayList<>();
+    List<Object> mapped = new ArrayList<>(source.length);
     for (StackTraceElement value : source) {
       mapped.add(mapToObject(value));
     }
@@ -131,8 +129,8 @@ public class EchopraxiaMappingProvider implements MappingProvider {
 
   @NotNull
   private List<Object> getArrayValue(Value.ArrayValue source) {
-    List<Object> mapped = new ArrayList<>();
     final List<Value<?>> array = source.raw();
+    List<Object> mapped = new ArrayList<>(array.size());
 
     for (Value<?> value : array) {
       mapped.add(mapToObject(value));
@@ -152,7 +150,7 @@ public class EchopraxiaMappingProvider implements MappingProvider {
 
   @NotNull
   private List<Object> getList(List<?> source) {
-    List<Object> mapped = new ArrayList<>();
+    List<Object> mapped = new ArrayList<>(source.size());
     for (Object value : source) {
       mapped.add(mapToObject(value));
     }
