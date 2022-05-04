@@ -12,15 +12,15 @@ public class EchopraxiaJsonProvider implements JsonProvider {
 
   private static final List<String> THROWABLE_KEYS =
       Arrays.asList(
-          FieldConstants.THROWABLE_MESSAGE,
-          FieldConstants.THROWABLE_CAUSE,
-          FieldConstants.THROWABLE_STACK_TRACE,
+          FieldConstants.MESSAGE,
+          FieldConstants.CAUSE,
+          FieldConstants.STACK_TRACE,
           FieldConstants.CLASS_NAME);
   private static final List<String> STACK_TRACE_ELEMENT_KEYS =
       Arrays.asList(
-          FieldConstants.STACK_TRACE_EL_METHOD_NAME,
-          FieldConstants.STACK_TRACE_EL_LINE_NUMBER,
-          FieldConstants.STACK_TRACE_EL_FILE_NAME,
+          FieldConstants.METHOD_NAME,
+          FieldConstants.LINE_NUMBER,
+          FieldConstants.FILE_NAME,
           FieldConstants.CLASS_NAME);
 
   @Override
@@ -217,16 +217,16 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   }
 
   private Object findStackTraceValue(String key, StackTraceElement obj) {
-    if (key.equals(FieldConstants.STACK_TRACE_EL_FILE_NAME)) {
+    if (key.equals(FieldConstants.FILE_NAME)) {
       return obj.getFileName();
     }
-    if (key.equals(FieldConstants.STACK_TRACE_EL_LINE_NUMBER)) {
+    if (key.equals(FieldConstants.LINE_NUMBER)) {
       return obj.getLineNumber();
     }
     if (key.equals(FieldConstants.CLASS_NAME)) {
       return obj.getClassName();
     }
-    if (key.equals(FieldConstants.STACK_TRACE_EL_METHOD_NAME)) {
+    if (key.equals(FieldConstants.METHOD_NAME)) {
       return obj.getMethodName();
     }
     return JsonProvider.UNDEFINED;
@@ -234,13 +234,13 @@ public class EchopraxiaJsonProvider implements JsonProvider {
 
   private Object findExceptionValue(String key, Throwable throwable) {
     // XXX Might be nice to do reflection based property introspection here
-    if (key.equals(FieldConstants.THROWABLE_MESSAGE)) {
+    if (key.equals(FieldConstants.MESSAGE)) {
       return throwable.getMessage();
     }
-    if (key.equals(FieldConstants.THROWABLE_CAUSE)) {
+    if (key.equals(FieldConstants.CAUSE)) {
       return throwable.getCause();
     }
-    if (key.equals(FieldConstants.THROWABLE_STACK_TRACE)) {
+    if (key.equals(FieldConstants.STACK_TRACE)) {
       return throwable.getStackTrace();
     }
     if (key.equals(FieldConstants.CLASS_NAME)) {
