@@ -33,7 +33,6 @@ Simple examples and integrations with [dropwizard metrics](https://metrics.dropw
 
 For a web application example,
 see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
-
 ## Statement of Intent
 
 **Echopraxia is not a replacement for SLF4J**.  It is not an attempt to compete with Log4J2 API, JUL, commons-logging for the title of "one true logging API" and restart the [logging mess](https://techblog.bozho.net/the-logging-mess/).  SLF4J won that fight [a long time ago](https://www.semanticscholar.org/paper/Studying-the-Use-of-Java-Logging-Utilities-in-the-Chen-Jiang/be39720a72f04c92b9aece9548171d5fa3a627e6).
@@ -46,9 +45,17 @@ SLF4J is an appropriate solution **when you do not control the logging output**,
 
 Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
 
+## Why Structured Logging?
+
+[Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) has the best take on this:
+
+> Structured data means you don't need crazy regular expression skills to make sense of logs.
+
+You can read more about structured logging [here](https://tersesystems.com/blog/2020/03/10/a-taxonomy-of-logging/).
+
 ## Benchmarks
 
-Benchmarks show [performance inline with straight calls to the implementation](BENCHMARKS.md).  
+Benchmarks are available at [BENCHMARKS.md](BENCHMARKS.md).
 
 Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  
 
@@ -140,7 +147,25 @@ Unfortunately, I don't know of a way to "flatten" fields so that they show up on
 
 ## Basic Usage
 
-For almost all use cases, you will be working with the API which is a single import:
+For almost all use cases, you will be working with the basic logger, which uses a pluggable `FieldBuilder`.
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>logger</artifactId>
+  <version><VERSION></version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:logger:<VERSION>" 
+```
+
+Add the import:
 
 ```
 import com.tersesystems.echopraxia.*;
@@ -163,7 +188,13 @@ try {
 }
 ```
 
-However, when you log arguments, you pass a function which provides you with a field builder and returns a list of fields:
+However, when you log arguments, you pass a function which provides you with a field builder and returns a `FieldBuilderResult` -- a `Field` is a `FieldBuilderResult`, so you can do:
+
+```java
+basicLogger.info("Message name {}", fb -> fb.string("name", "value"));
+```
+
+If you are returning multiple fields, then using `fb.list` will return a result:
 
 ```java
 basicLogger.info("Message name {} age {}", fb -> fb.list(
@@ -172,16 +203,14 @@ basicLogger.info("Message name {} age {}", fb -> fb.list(
 ));
 ```
 
-You can specify a single field using `only`:
+And `fb.list` can take many inputs as needed, for example a stream:
 
 ```java
-basicLogger.info("Message name {}", fb -> fb.only(fb.string("name", "value")));
-```
-
-And there are some shortcut methods like `onlyString` that combine `only` and `string`:
-
-```java
-basicLogger.info("Message name {}", fb -> fb.onlyString("name", "value"));
+String[]
+basicLogger.info("Message name {}", fb -> {
+  Stream<Field> fieldStream = ...;
+  fb.list(arrayOfFields);
+});
 ```
 
 You can log multiple arguments and include the exception if you want the stack trace:
@@ -193,6 +222,10 @@ basicLogger.info("Message name {}", fb -> fb.list(
 ));
 ```
 
+In older versions, `fb.only()` was required to convert a `Field` -- this is no longer required, but a `FieldBuilderWithOnly` interface is available to maintain those methods.
+
+Note that unlike SLF4J, you don't have to worry about including the exception as an argument "swallowing" the stacktrace.  If an exception is present, it's always applied to the underlying logger.
+
 So far so good. But logging strings and numbers can get tedious.  Let's go into custom field builders.  
 
 ### Custom Field Builders
@@ -200,22 +233,18 @@ So far so good. But logging strings and numbers can get tedious.  Let's go into 
 Echopraxia lets you specify custom field builders whenever you want to log domain objects:
 
 ```java
+import com.tersesystems.echopraxia.api.*;
+
 public class BuilderWithDate implements FieldBuilder {
   public BuilderWithDate() {}
 
   // Renders a date as an ISO 8601 string.
-  public StringValue dateValue(Date date) {
+  public Value.StringValue dateValue(Date date) {
     return Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
   }
 
   public Field date(String name, Date date) {
-    return string(name, dateValue(date));
-  }
-
-  // Renders a date using the `only` idiom returning a list of `Field`.
-  // This is a useful shortcut when you only have one field you want to add.
-  public List<Field> onlyDate(String name, Date date) {
-    return only(date(name, date));
+    return value(name, dateValue(date));
   }
 }
 ```
@@ -224,7 +253,7 @@ And now you can render a date automatically:
 
 ```java
 Logger<BuilderWithDate> dateLogger = basicLogger.withFieldBuilder(BuilderWithDate.class);
-dateLogger.info("Date {}", fb -> fb.onlyDate("creation_date", new Date()));
+dateLogger.info("Date {}", fb -> fb.date("creation_date", new Date()));
 ```
 
 This also applies to more complex objects.  In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
@@ -257,7 +286,7 @@ And then you can do the same by calling `fb.person`:
 ```java
 Person user = ...
 Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.class);
-personLogger.info("Person {}", fb -> fb.only(fb.person("user", user)));
+personLogger.info("Person {}", fb -> fb.person("user", user));
 ```
 
 ### Custom Logger Factories
@@ -266,9 +295,29 @@ If you are using a particular set of field builders for your domain and want the
 
 Creating your own logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere, and allow you to create custom methods that leverage field builders.
 
-Continuing from the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), you can build a `PersonLogger`:
+If you want to make sure your logger is the only one available, you should import only the API:
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>api</artifactId>
+  <version><VERSION></version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:api:<VERSION>" 
+```
+
+And then continuing on from the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), you can build a `PersonLogger`:
 
 ```java
+import com.tersesystems.echopraxia.api.*;
+
 public class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFieldBuilder>
   implements DefaultLoggerMethods<PersonFieldBuilder> {
   private static final String FQCN = PersonLogger.class.getName();
@@ -281,9 +330,7 @@ public class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFiel
   public void info(@Nullable String message, Person person) {
     // when using custom methods, you must specify the caller as the class it's defined in.
     this.core().withFQCN(FQCN).log(Level.INFO, message,
-      fb -> {
-        return fb.only(fb.person("person", person));
-      }, fieldBuilder);
+      fb -> fb.person("person", person), fieldBuilder);
   }
 
   @Override
@@ -353,17 +400,7 @@ Field names are never allowed to be null.  If a field name is null, it will be r
 
 ```java
 logger.info("Message name {}", fb -> 
-  fb.only(fb.string(null, "some-value")) // null field names not allowed
-);
-```
-
-In addition, `fb.only()` will return an empty list if a null field is passed in:
-
-
-```java
-logger.info("Message name {}", fb -> 
-  Field field = null;
-  return fb.only(field); // returns an empty list of fields.
+  fb.string(null, "some-value") // null field names not allowed
 );
 ```
 
@@ -372,7 +409,7 @@ Because a field builder function runs in a closure, if an exception occurs it wi
 ```java
 logger.info("Message name {}", fb -> {
   String name = methodThatThrowsException(); // BAD
-  return fb.only(fb.string(name, "some-value"));
+  return fb.string(name, "some-value");
 });
 ```
 
@@ -381,7 +418,7 @@ Instead, only call field builder methods inside the closure and keep any constru
 ```java
 String name = methodThatThrowsException(); // GOOD
 logger.info("Message name {}", fb -> {
-  return fb.only(fb.string(name, "some-value"));
+  return fb.string(name, "some-value");
 });
 ```
 
@@ -390,7 +427,7 @@ logger.info("Message name {}", fb -> {
 You can also add fields directly to the logger using `logger.withFields` for contextual logging:
 
 ```java
-Logger<?> loggerWithFoo = basicLogger.withFields(fb -> fb.onlyString("foo", "bar"));
+Logger<?> loggerWithFoo = basicLogger.withFields(fb -> fb.string("foo", "bar"));
 
 // will log "foo": "bar" field in a JSON appender.
 loggerWithFoo.info("JSON field will log automatically") 
@@ -410,7 +447,7 @@ public class PlayerData {
   private final Logger<BuilderWithDate> logger =
       LoggerFactory.getLogger()
           .withFieldBuilder(BuilderWithDate.class)
-          .withFields(fb -> fb.onlyDate("last_accessed_date", lastAccessedDate));
+          .withFields(fb -> fb.date("last_accessed_date", lastAccessedDate));
 
 }
 ```
@@ -438,7 +475,7 @@ private final static DateFormat df = new SimpleDateFormat("yyyyMMdd");
 // UNSAFE EXAMPLE
 private static final Logger<?> logger =
         LoggerFactory.getLogger()
-        .withFields(fb -> fb.onlyString("unsafe_date", df.format(new Date())));
+        .withFields(fb -> fb.string("unsafe_date", df.format(new Date())));
 ```
 
 ## Conditions
@@ -531,7 +568,7 @@ Optional<List<?>> listOfElements = ctx.findObject("$.exception.stackTrace[5..10]
 Finding an explicitly null value returns a `boolean`:
 
 ```java
-// fb.onlyNull("keyWithNullValue") sets an explicitly null value
+// fb.nullValue("keyWithNullValue") sets an explicitly null value
 boolean isNull = context.findNull("$.keyWithNullValue");
 ```
 
@@ -610,16 +647,38 @@ By default, conditions are evaluated in the running thread.  This can be a probl
 
 Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  All statements are placed on a work queue and run on a thread specified by the executor at a later time.
 
+### Installation
+
+Maven:
+
+```
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>async</artifactId>
+  <version><VERSION></version>
+</dependency>
+```
+
+Gradle:
+
+```
+implementation "com.tersesystems.echopraxia:async:<VERSION>" 
+```
+
+### Usage
+
 All the usual logging statements are available in `AsyncLogger`, i.e. `logger.debug` will log as usual.  
 
 However, there are no `isLogging*` methods in the `AsyncLogger`. Instead, a `Consumer` of `LoggerHandle` is used, which serves the same purpose as the `if (isLogging*()) { .. }` block.
 
 ```java
+import com.tersesystems.echopraxia.async.*;
+
 AsyncLogger<?> logger = AsyncLoggerFactory.getLogger().withExecutor(loggingExecutor);
 logger.info(handle -> {
   // do conditional logic that would normally happen in an if block
   // this may be expensive or blocking because it runs asynchronously
-  handle.log("Message template {}", fb -> fb.onlyString("foo", "bar");
+  handle.log("Message template {}", fb -> fb.string("foo", "bar");
 });
 ```
 
@@ -852,7 +911,7 @@ Using `find_object` or `find_list` returns the appropriate type of `dict` or `li
 library echopraxia {
   function evaluate: (string level, dict ctx) ->
     let {
-      find_list: ctx["find_list"];
+      find_list: ctx[:find_list];
       interests: find_list("$.obj.interests");
     }
     interests[1] == "drink";
@@ -867,7 +926,7 @@ alias std.strings as str;
 library echopraxia {
   function evaluate: (string level, dict ctx) ->
     let {
-      find_string: ctx["find_string"];
+      find_string: ctx[:find_string];
     }
     str.lower_case(find_string("$.person.name")) == "will";
 }
@@ -974,8 +1033,7 @@ implementation "com.tersesystems.echopraxia:scripting:<VERSION>"
 
 ## Semantic Logging
 
-Semantic Loggers are strongly typed, and will only log a particular kind of argument.  All the work of field building and
-setting up a message is done from setup.
+Semantic Loggers are strongly typed, and will only log a particular kind of argument.  All the work of field building and setting up a message is done from setup.
 
 ### Basic Usage
 
@@ -1023,7 +1081,7 @@ Semantic loggers can add fields to context in the same way other loggers do.
 
 ```java
 SemanticLogger<Person> loggerWithContext =
-  logger.withFields(fb -> fb.onlyString("some_context_field", contextValue));
+  logger.withFields(fb -> fb.string("some_context_field", contextValue));
 ```
 
 ### Installation
@@ -1062,8 +1120,8 @@ Person person = new Person("Eloise", 1);
 logger
     .atInfo()
     .message("name = {}, age = {}")
-    .argument(sfb -> sfb.string("name", person.name)) // note only a single field
-    .argument(sfb -> sfb.number("age", person.age))
+    .argument(fb -> fb.string("name", person.name))
+    .argument(fb -> fb.number("age", person.age))
     .log();
 ```
 
@@ -1097,7 +1155,7 @@ First, import the `logstash` package and the `core` package.  This gets you acce
 
 ```java
 import com.tersesystems.echopraxia.logstash.*;
-import com.tersesystems.echopraxia.core.*;
+import com.tersesystems.echopraxia.api.*;
 
 LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
 ```
@@ -1133,7 +1191,7 @@ Similar to Logstash, you can get access to Log4J specific features by importing
 
 ```java
 import com.tersesystems.echopraxia.log4j.*;
-import com.tersesystems.echopraxia.core.*;
+import com.tersesystems.echopraxia.api.*;
 
 Log4JCoreLogger core = (Log4JCoreLogger) CoreLoggerFactory.getLogger();
 ```
@@ -1175,14 +1233,13 @@ For example, to add a `uses_filter` field to every Echopraxia logger:
 ```java
 package example;
 
-import com.tersesystems.echopraxia.*;
-import com.tersesystems.echopraxia.core.*;
+import com.tersesystems.echopraxia.api.*;
 
 public class ExampleFilter implements CoreLoggerFilter {
   @Override
   public CoreLogger apply(CoreLogger coreLogger) {
     return coreLogger
-        .withFields(fb -> fb.onlyBool("uses_filter", true), FieldBuilder.instance());
+        .withFields(fb -> fb.bool("uses_filter", true), FieldBuilder.instance());
   }
 }
 ```
@@ -1226,7 +1283,7 @@ public class SystemInfoFilter implements CoreLoggerFilter {
                 fb.number("available", mem.getAvailable()), //
                 fb.number("total", mem.getTotal()));
         Field sysinfoField = fb.object("sysinfo", loadField, memField);
-        return fb.only(sysinfoField);
+        return sysinfoField;
       }, FieldBuilder.instance());
   }
 }
