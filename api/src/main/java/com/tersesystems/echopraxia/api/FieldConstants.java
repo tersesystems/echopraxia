@@ -4,8 +4,7 @@ import java.util.ResourceBundle;
 
 public final class FieldConstants {
 
-  private static final ResourceBundle bundle =
-      ResourceBundle.getBundle(  "echopraxia/fields");
+  private static final ResourceBundle bundle = ResourceBundle.getBundle("echopraxia/fields");
 
   public static final String EXCEPTION = bundle.getString("exception");
   public static final String CLASS_NAME = bundle.getString("className");
