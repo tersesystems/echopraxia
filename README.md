@@ -23,7 +23,7 @@ Echopraxia is based around several main concepts that build and leverage on each
 * Fluent Logging (API based around log entry builder)
 * Filters (pipeline for adding fields and conditions to loggers)
 
-Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation.
+Although Echopraxia is tied on the backend to an implementation, it is designed to hide implementation details from you, just as SLF4J hides the details of the logging implementation.  For example, `logstash-logback-encoder` provides `Markers` or `StructuredArguments`, but you will not see them in the API.  Instead, Echopraxia works with independent `Field` and `Value` objects that are converted by a `CoreLogger` provided by an implementation `LogstashCoreLogger` which converts fields into `StructuredArguments` on the backend.
 
 Please see the [blog posts](https://tersesystems.com/category/logging/) for more background on logging stuff.
 
@@ -45,13 +45,21 @@ SLF4J is an appropriate solution **when you do not control the logging output**,
 
 Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
 
-## Why Structured Logging?
+### Why Structured Logging?
+
+Structured logging enables logs to be queried as [semi-structured](https://en.wikipedia.org/wiki/Semi-structured_data).
 
 [Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) has the best take on this:
 
 > Structured data means you don't need crazy regular expression skills to make sense of logs.
 
 You can read more about structured logging [here](https://tersesystems.com/blog/2020/03/10/a-taxonomy-of-logging/).
+
+### Why Conditions?
+
+Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.
+
+[A Comprehensive Survey of Logging in Software](https://arxiv.org/pdf/2110.12489.pdf) and [The Bones of the System: A Study of Logging and Telemetry at Microsoft](https://www.microsoft.com/en-us/research/publication/case-the-bones-of-the-system-a-study-of-logging-and-telemetry-at-microsoft/) are great discussions of the implication of being able to adjust logging conditions at runtime.
 
 ## Benchmarks
 
@@ -61,9 +69,9 @@ Please be aware that how fast and how much you can log is [dramatically impacted
 
 Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR).
 
-If you are doing significant diagnostic logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and consider writing to `tmpfs`.
+If you are doing significant **diagnostic** logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and consider writing to `tmpfs`.
 
-If you are doing significant operational logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.  It is very likely that you will run up against budget constraints long before you ever need to optimize your logging for greater throughput.
+If you are doing significant **operational** logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.  It is very likely that you will run up against budget constraints long before you ever need to optimize your logging for greater throughput.
 
 ## Logstash
 
