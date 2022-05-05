@@ -233,7 +233,6 @@ public class EchopraxiaJsonProvider implements JsonProvider {
   }
 
   private Object findExceptionValue(String key, Throwable throwable) {
-    // XXX Might be nice to do reflection based property introspection here
     if (key.equals(FieldConstants.MESSAGE)) {
       return throwable.getMessage();
     }
