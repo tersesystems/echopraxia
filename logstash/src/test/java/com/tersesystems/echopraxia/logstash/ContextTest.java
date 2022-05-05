@@ -96,9 +96,9 @@ public class ContextTest extends TestBase {
 
     final ObjectAppendingMarker marker = (ObjectAppendingMarker) markers.get(0);
 
-    // getFieldValue calls the "logfmt" version that is fed into formatted message
-    final String actual = (String) marker.getFieldValue();
-    assertThat(actual).isEqualTo("{will, 13, toys=[binkie]}");
+    // toStringSelf calls the "logfmt" version that is fed into formatted message
+    final String actual = (String) marker.toStringSelf();
+    assertThat(actual).isEqualTo("person={will, 13, toys=[binkie]}");
 
     final StringWriter sw = new StringWriter();
     final JsonGenerator generator = mapper.createGenerator(sw);
@@ -131,8 +131,8 @@ public class ContextTest extends TestBase {
     final ObjectAppendingMarker marker = (ObjectAppendingMarker) markers.get(0);
 
     // getFieldValue calls the "logfmt" version that is fed into formatted message
-    final String actual = (String) marker.getFieldValue();
-    assertThat(actual).isEqualTo("[[1, 2, 3], [1, 2, 3], [true, false, true]]");
+    final String actual = marker.toStringSelf();
+    assertThat(actual).isEqualTo("a1=[[1, 2, 3], [1, 2, 3], [true, false, true]]");
 
     final StringWriter sw = new StringWriter();
     final JsonGenerator generator = mapper.createGenerator(sw);
@@ -428,7 +428,7 @@ public class ContextTest extends TestBase {
 
     // You can't use ObjectAppendingMarker.equals because it wants instance equality.
     assertThat(m.getFieldName()).isEqualTo(key);
-    assertThat(m.getFieldValue()).isEqualTo(value);
+    assertThat(m.toStringSelf()).isEqualTo(key + "=" + value);
   }
 
   // we can't use the result of Markers.aggregate, as an EmptyLogstashMarker ONLY CHECKS THE NAME.
