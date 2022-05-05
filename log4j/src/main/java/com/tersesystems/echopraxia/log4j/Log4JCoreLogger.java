@@ -143,7 +143,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(@NotNull Level level) {
-    return logger.isEnabled(convertLevel(level), context.getMarker(), (Message) null, null)
+    return logger.isEnabled(convertLevel(level), context.getMarker())
         && condition.test(level, context);
   }
 
@@ -155,7 +155,7 @@ public class Log4JCoreLogger implements CoreLogger {
     if (condition == Condition.never()) {
       return false;
     }
-    return logger.isEnabled(convertLevel(level), context.getMarker(), (Message) null, null)
+    return logger.isEnabled(convertLevel(level), context.getMarker())
         && this.condition.and(condition).test(level, context);
   }
 
@@ -164,8 +164,8 @@ public class Log4JCoreLogger implements CoreLogger {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     // the isEnabled check always goes before the condition check, as conditions can be expensive
-    final Message m = createMessage(message);
-    if (logger.isEnabled(log4jLevel, marker, m, null) && condition.test(level, context)) {
+    if (logger.isEnabled(log4jLevel, marker) && condition.test(level, context)) {
+      final Message m = createMessage(message);
       logger.logMessage(fqcn, log4jLevel, marker, m, null);
     }
   }
@@ -180,15 +180,17 @@ public class Log4JCoreLogger implements CoreLogger {
     // calculate them right up front.
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final List<Field> argumentFields = convertToFields(f.apply(builder));
-    final Throwable e = findThrowable(argumentFields);
-    // When passing a condition through with explicit arguments, we pull the args and make
-    // them available through context.
-    Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
-    final Message message = createMessage(messageTemplate, argumentFields);
-    if (logger.isEnabled(log4jLevel, marker, message, e)
-        && condition.test(level, context.and(argContext))) {
-      logger.logMessage(fqcn, log4jLevel, marker, message, e);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      final List<Field> argumentFields = convertToFields(f.apply(builder));
+      final Throwable e = findThrowable(argumentFields);
+      final Message message = createMessage(messageTemplate, argumentFields);
+
+      // When passing a condition through with explicit arguments, we pull the args and make
+      // them available through context.
+      Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
+      if (condition.test(level, context.and(argContext))) {
+        logger.logMessage(fqcn, log4jLevel, marker, message, e);
+      }
     }
   }
 
@@ -204,9 +206,9 @@ public class Log4JCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final Message m = createMessage(message);
-    if (logger.isEnabled(log4jLevel, marker, m, null)
+    if (logger.isEnabled(log4jLevel, marker)
         && this.condition.and(condition).test(level, context)) {
+      final Message m = createMessage(message);
       logger.logMessage(fqcn, log4jLevel, marker, m, null);
     }
   }
@@ -220,10 +222,10 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    final List<Field> argumentFields = convertToFields(f.apply(builder));
-    final Throwable e = findThrowable(argumentFields);
-    final Message message = createMessage(messageTemplate, argumentFields);
-    if (logger.isEnabled(log4jLevel, marker, message, e)) {
+    if (logger.isEnabled(log4jLevel, marker)) {
+      final List<Field> argumentFields = convertToFields(f.apply(builder));
+      final Throwable e = findThrowable(argumentFields);
+      final Message message = createMessage(messageTemplate, argumentFields);
       // When passing a condition through with explicit arguments, we pull the args and make
       // them available through context.
       Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
@@ -247,9 +249,8 @@ public class Log4JCoreLogger implements CoreLogger {
                 public void log(@Nullable String messageTemplate) {
                   final Marker marker = context.getMarker();
                   final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  final Message message = createMessage(messageTemplate);
-                  if (logger.isEnabled(log4jLevel, marker, message, null)
-                      && condition.test(level, context)) {
+                  if (logger.isEnabled(log4jLevel, marker) && condition.test(level, context)) {
+                    final Message message = createMessage(messageTemplate);
                     logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
                   }
                 }
@@ -261,10 +262,10 @@ public class Log4JCoreLogger implements CoreLogger {
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
                   final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  final List<Field> argumentFields = convertToFields(f.apply(builder));
-                  final Throwable e = findThrowable(argumentFields);
-                  final Message message = createMessage(messageTemplate, argumentFields);
-                  if (logger.isEnabled(log4jLevel, marker, message, e)) {
+                  if (logger.isEnabled(log4jLevel, marker)) {
+                    final List<Field> argumentFields = convertToFields(f.apply(builder));
+                    final Throwable e = findThrowable(argumentFields);
+                    final Message message = createMessage(messageTemplate, argumentFields);
                     // When passing a condition through with explicit arguments, we pull the args
                     // and make them available through context.
                     Log4JLoggingContext argContext =
@@ -296,9 +297,9 @@ public class Log4JCoreLogger implements CoreLogger {
                 public void log(@Nullable String messageTemplate) {
                   final Marker marker = context.getMarker();
                   final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  final Message message = createMessage(messageTemplate);
-                  if (logger.isEnabled(log4jLevel, marker, message, null)
+                  if (logger.isEnabled(log4jLevel, marker)
                       && condition.and(c).test(level, context)) {
+                    final Message message = createMessage(messageTemplate);
                     logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
                   }
                 }
@@ -310,10 +311,10 @@ public class Log4JCoreLogger implements CoreLogger {
                   // calculate them right up front.
                   final Marker marker = context.getMarker();
                   final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  final List<Field> argumentFields = convertToFields(f.apply(builder));
-                  final Throwable e = findThrowable(argumentFields);
-                  final Message message = createMessage(messageTemplate, argumentFields);
-                  if (logger.isEnabled(log4jLevel, marker, message, e)) {
+                  if (logger.isEnabled(log4jLevel, marker)) {
+                    final List<Field> argumentFields = convertToFields(f.apply(builder));
+                    final Throwable e = findThrowable(argumentFields);
+                    final Message message = createMessage(messageTemplate, argumentFields);
                     // When passing a condition through with explicit arguments, we pull the args and
                     // make them available through context.
                     Log4JLoggingContext argContext =
