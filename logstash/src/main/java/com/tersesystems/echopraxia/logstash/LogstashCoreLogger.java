@@ -214,15 +214,15 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
-    // XXX find the right object for this
-    final List<Field> args = convertToFields(f.apply(builder));
     final Marker m = context.getMarker();
-    final LogstashLoggingContext argContext =
-        new LogstashLoggingContext(() -> args, Collections::emptyList);
-    if (logger.isEnabledFor(m, convertLogbackLevel(level))
-        && condition.test(level, context.and(argContext))) {
-      final Object[] arguments = convertArguments(args);
-      logger.log(m, fqcn, convertLevel(level), message, arguments, null);
+    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
+      final List<Field> args = convertToFields(f.apply(builder));
+      final LogstashLoggingContext argContext =
+          new LogstashLoggingContext(() -> args, Collections::emptyList);
+      if (condition.test(level, context.and(argContext))) {
+        final Object[] arguments = convertArguments(args);
+        logger.log(m, fqcn, convertLevel(level), message, arguments, null);
+      }
     }
   }
 
@@ -243,15 +243,16 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
     final Marker m = context.getMarker();
-    // When passing a condition through with explicit arguments, we pull the args and make
-    // them available through context.
-    final List<Field> args = convertToFields(f.apply(builder));
-    LogstashLoggingContext argContext =
-        new LogstashLoggingContext(() -> args, Collections::emptyList);
-    if (logger.isEnabledFor(m, convertLogbackLevel(level))
-        && this.condition.and(condition).test(level, context.and(argContext))) {
-      final Object[] arguments = convertArguments(args);
-      logger.log(m, fqcn, convertLevel(level), message, arguments, null);
+    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
+      // When passing a condition through with explicit arguments, we pull the args and make
+      // them available through context.
+      final List<Field> args = convertToFields(f.apply(builder));
+      LogstashLoggingContext argContext =
+          new LogstashLoggingContext(() -> args, Collections::emptyList);
+      if (this.condition.and(condition).test(level, context.and(argContext))) {
+        final Object[] arguments = convertArguments(args);
+        logger.log(m, fqcn, convertLevel(level), message, arguments, null);
+      }
     }
   }
 
