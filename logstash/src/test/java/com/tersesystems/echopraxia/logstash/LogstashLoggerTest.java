@@ -249,7 +249,7 @@ class LogstashLoggerTest extends TestBase {
     assertThat(message).isEqualTo("user id {}");
     final Object[] args = event.getArgumentArray();
     final ObjectAppendingMarker actual = (ObjectAppendingMarker) args[0];
-    assertThat(actual.getFieldValue()).isEqualTo(uuid.toString());
+    assertThat(actual.toStringSelf()).isEqualTo(uuid.toString());
   }
 
   @Test
