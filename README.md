@@ -57,7 +57,9 @@ You can read more about structured logging [here](https://tersesystems.com/blog/
 
 ### Why Conditions?
 
-Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.
+Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.  
+
+A proof of concept of dynamic debug logging using Echopraxia is [here](https://github.com/tersesystems/dynamic-debug-logging) .
 
 [A Comprehensive Survey of Logging in Software](https://arxiv.org/pdf/2110.12489.pdf) and [The Bones of the System: A Study of Logging and Telemetry at Microsoft](https://www.microsoft.com/en-us/research/publication/case-the-bones-of-the-system-a-study-of-logging-and-telemetry-at-microsoft/) are great discussions of the implication of being able to adjust logging conditions at runtime.
 
@@ -65,17 +67,11 @@ Conditions address the challenge of "whether-to-log", which concerns with dynami
 
 Benchmarks are available at [BENCHMARKS.md](BENCHMARKS.md).
 
-Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.  
-
-Logging can be categorized as either diagnostic (DEBUG/TRACE) or operational (INFO/WARN/ERROR).
-
-If you are doing significant **diagnostic** logging, consider using an appender optimized for fast local logging, such as [Blacklite](https://github.com/tersesystems/blacklite/), and consider writing to `tmpfs`.
-
-If you are doing significant **operational** logging, you should commit to a budget for operational costs i.e. storage, indexing, centralized logging infrastructure.  It is very likely that you will run up against budget constraints long before you ever need to optimize your logging for greater throughput.
+Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.
 
 ## Logstash
 
-There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder).
+There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder).  This library does not provide a front end logger API, so you must pick (or create) one yourself, i.e. normal, async, fluent, or semantic.  
 
 Maven:
 
@@ -95,7 +91,7 @@ implementation "com.tersesystems.echopraxia:logstash:<VERSION>"
 
 ## Log4J
 
-There is a Log4J implementation that works with the [JSON Template Layout](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html).
+There is a Log4J implementation that works with the [JSON Template Layout](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html).  This provides a core logger implementation but does not provide a user visible logging API.
 
 Maven:
 
@@ -155,7 +151,7 @@ Unfortunately, I don't know of a way to "flatten" fields so that they show up on
 
 ## Basic Usage
 
-For almost all use cases, you will be working with the basic logger, which uses a pluggable `FieldBuilder`.
+For most, you will be working with the basic logger, which uses a pluggable `FieldBuilder`.
 
 Maven:
 
