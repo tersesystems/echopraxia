@@ -269,7 +269,7 @@ public class Log4JCoreLogger implements CoreLogger {
                     // When passing a condition through with explicit arguments, we pull the args
                     // and make them available through context.
                     Log4JLoggingContext argContext =
-                      new Log4JLoggingContext(() -> argumentFields, null);
+                        new Log4JLoggingContext(() -> argumentFields, null);
                     if (condition.test(level, context.and(argContext))) {
                       logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
                     }
@@ -315,10 +315,11 @@ public class Log4JCoreLogger implements CoreLogger {
                     final List<Field> argumentFields = convertToFields(f.apply(builder));
                     final Throwable e = findThrowable(argumentFields);
                     final Message message = createMessage(messageTemplate, argumentFields);
-                    // When passing a condition through with explicit arguments, we pull the args and
+                    // When passing a condition through with explicit arguments, we pull the args
+                    // and
                     // make them available through context.
                     Log4JLoggingContext argContext =
-                      new Log4JLoggingContext(() -> argumentFields, null);
+                        new Log4JLoggingContext(() -> argumentFields, null);
                     if (condition.and(c).test(level, context.and(argContext))) {
                       logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
                     }

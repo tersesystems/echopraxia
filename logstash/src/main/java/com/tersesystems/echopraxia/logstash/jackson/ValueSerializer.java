@@ -15,7 +15,7 @@ import java.util.List;
  */
 public class ValueSerializer extends StdSerializer<Value> {
 
-  public static final ValueSerializer INSTANCE = new ValueSerializer();
+  static final ValueSerializer INSTANCE = new ValueSerializer();
 
   public ValueSerializer() {
     super(Value.class);
@@ -67,7 +67,8 @@ public class ValueSerializer extends StdSerializer<Value> {
         gen.writeBoolean(b);
         break;
       case EXCEPTION:
-        // gen.writeString(value.raw().toString());
+        final Throwable throwable = (Throwable) value.raw();
+        gen.writeString(throwable.toString());
         break;
       case NULL:
         gen.writeNull();

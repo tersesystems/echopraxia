@@ -13,7 +13,7 @@ import java.util.List;
 /** The FieldSerializer class plugs into Jackson to serialize Field to JSON. */
 public class FieldSerializer extends StdSerializer<Field> {
 
-  public static final FieldSerializer INSTANCE = new FieldSerializer();
+  static final FieldSerializer INSTANCE = new FieldSerializer();
 
   public FieldSerializer() {
     this(Field.class);
