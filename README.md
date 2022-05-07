@@ -47,7 +47,7 @@ Echopraxia is best described as a specialization or augmentation for application
 
 ### Why Structured Logging?
 
-Structured logging enables logs to be queried as [semi-structured](https://en.wikipedia.org/wiki/Semi-structured_data).
+Structured logging enables logs to be queried as [semi-structured](https://en.wikipedia.org/wiki/Semi-structured_data).  There are other structured logging frameworks, like [Structlog](https://www.structlog.org/en/stable/) (Python), [Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) (Ruby), [Logrus](https://github.com/sirupsen/logrus) (Go), and [Serilog](https://serilog.net/) (C#).
 
 [Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) has the best take on this:
 
@@ -151,7 +151,7 @@ Unfortunately, I don't know of a way to "flatten" fields so that they show up on
 
 ## Basic Usage
 
-For most, you will be working with the basic logger, which uses a pluggable `FieldBuilder`.
+For most, you will be working with the basic logger, which uses a pluggable `FieldBuilder`.  The logger API is a separate dependency -- if you want, you can easily create your own custom logger, so the logger is not packaged with the API.
 
 Maven:
 
@@ -198,7 +198,7 @@ However, when you log arguments, you pass a function which provides you with a f
 basicLogger.info("Message name {}", fb -> fb.string("name", "value"));
 ```
 
-If you are returning multiple fields, then using `fb.list` will return a result:
+If you are returning multiple fields, then using `fb.list` will return a `FieldBuilderResult`:
 
 ```java
 basicLogger.info("Message name {} age {}", fb -> fb.list(
@@ -322,7 +322,7 @@ And then continuing on from the [custom field builder example](https://github.co
 ```java
 import com.tersesystems.echopraxia.api.*;
 
-public class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFieldBuilder>
+public final class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFieldBuilder>
   implements DefaultLoggerMethods<PersonFieldBuilder> {
   private static final String FQCN = PersonLogger.class.getName();
 
@@ -353,7 +353,7 @@ public class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFiel
 and a custom logger factory:
 
 ```java
-public class PersonLoggerFactory {
+public final class PersonLoggerFactory {
 
   private static final PersonFieldBuilder myFieldBuilder = new PersonFieldBuilder();
 
@@ -385,6 +385,8 @@ PersonLogger logger = PersonLoggerFactory.getLogger();
 Person abe = ...
 logger.info("Best person: {}", abe);
 ```
+
+Generally loggers should be final, and any common functionality should be moved out to interfaces you can share.  This is because subclassing can have an impact on JVM optimizations, and can make returning specific types from `with*` methods more complicated. 
 
 ### Nulls and Exceptions
 
@@ -1155,7 +1157,7 @@ Because Echopraxia provides its own implementation independent API, some impleme
 
 ### Logstash API
 
-First, import the `logstash` package and the `core` package.  This gets you access to the `CoreLoggerFactory` and  `CoreLogger`, which can be cast to `LogstashCoreLogger`:
+First, import the `logstash` package.  This gets you access to the `CoreLoggerFactory` and  `CoreLogger`, which can be cast to `LogstashCoreLogger`:
 
 ```java
 import com.tersesystems.echopraxia.logstash.*;
