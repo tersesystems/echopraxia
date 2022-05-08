@@ -6,15 +6,17 @@
 
 The API package now begins with the package name `com.tersesystems.echopraxia.api` and does not contain the `Logger` or `LoggerFactory` classes.  All the classes in `core` and `support` have been moved to `api`.
 
-There is a new `FieldBuilderResult` interface that is responsible for getting fields from a field builder. The `Field.BuilderFunction` interface which extended `Function<FB, List<Field>>` has been replaced with plain `Function<FB, FieldBuilderResult>`.  The `Field` interface now extends `FieldBuilderResult`.  The upshot of this is that both `fb.list` and `field` return a `FieldBuilderResult` and there is no more need for `fb.only`.  A `FieldBuilderWithOnly` interface is available for backwards compatibility.
+There is a new `FieldBuilderResult` interface that is responsible for getting fields from a field builder. The `Field.BuilderFunction` interface which extended `Function<FB, List<Field>>` has been replaced with plain `Function<FB, FieldBuilderResult>`.  The `Field` interface now extends `FieldBuilderResult`.  The upshot of this is that both `fb.list` and `field` return a `FieldBuilderResult` and there is no more need for `fb.only`.  A `FieldBuilderWithOnly` interface is available for backwards compatibility.  `FieldBuilderResult.list` will take most aggregate forms; `Stream`, `Iterator`, etc.
 
-The `Field.Value` classes and subclasses have been moved to a top level class `Value`, i.e. `Value.string("foo")` rather than `Field.Value.string("foo")`.
+The `Field.Builder` interface is now `FieldBuilder`.
 
-There is a `FieldConstants` class that uses a resource bundle to load in hardcoded field constants, such as `exception` and `stackTrace`.
+The `Field.Value` interface and subclasses have been moved to a top level class `Value`, i.e. `Value.string("foo")` rather than `Field.Value.string("foo")`.
+
+There is a `FieldConstants` class that uses a resource bundle to load in hardcoded field constants, such as `exception` and `stackTrace`.  Use `FieldConstants.EXCEPTION` to reference.
 
 The core logger no longer depends on `FB extends FieldBuilder`, so it is now possible to create custom loggers that don't expose `fb.keyValue` or `fb.string`.
 
-There is a new `Utilities.threadContext()` method which is a cleaner way to manage thread context in loggers.
+There is a new `Utilities.threadContext()` method which is a cleaner way to manage thread context in custom loggers. 
 
 ### Logger Changes
 
@@ -22,13 +24,23 @@ Logger has been broken out into a different maven package.  It is still in the s
 
 The `withExecutor` method that returned `AsyncLogger` has been removed.
 
+The `withFieldBuilder(Foo.class)` method has been removed, please use `withFieldBuilder(new Foo)` instead.
+
 ## Async Logger Changes
 
 The async logger has been broken out into a different maven package.   It is still in the same location `com.tersesystems.echopraxia.async.AsyncLogger`.
 
+The `withFieldBuilder(Foo.class)` method has been removed, please use `withFieldBuilder(new Foo)` instead.
+
 ### Fluent Logger Changes
 
-No major changes. The `argument` method now takes `Function<FB, FieldBuilderResult>` and so will work with both lists and single fields.
+The `argument` method now takes `Function<FB, FieldBuilderResult>` and so will work with both lists and single fields.
+
+The `withFieldBuilder(Foo.class)` method has been removed, please use `withFieldBuilder(new Foo)` instead.
+
+### Semantic Logger Changes
+
+The `withFieldBuilder(Foo.class)` method has been removed, please use `withFieldBuilder(new Foo)` instead.
 
 ### Logstash Changes
 
