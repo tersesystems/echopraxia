@@ -130,6 +130,9 @@ public abstract class Value<V> {
    */
   @NotNull
   public static ArrayValue array(Value<?>... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
     return new ArrayValue(Arrays.asList(values));
   }
 
@@ -141,6 +144,9 @@ public abstract class Value<V> {
    */
   @NotNull
   public static ArrayValue array(Boolean @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
     return new ArrayValue(asList(values, Value::bool));
   }
 
@@ -152,6 +158,9 @@ public abstract class Value<V> {
    */
   @NotNull
   public static ArrayValue array(String @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
     return new ArrayValue(asList(values, Value::string));
   }
 
@@ -163,6 +172,9 @@ public abstract class Value<V> {
    */
   @NotNull
   public static ArrayValue array(Number @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
     return new ArrayValue(asList(values, Value::number));
   }
 
@@ -173,6 +185,9 @@ public abstract class Value<V> {
    * @return the Value.
    */
   public static ArrayValue array(@NotNull List<Value<?>> values) {
+    if (values == null || values.size() == 0) {
+      return ArrayValue.EMPTY;
+    }
     return new ArrayValue(values);
   }
 
@@ -187,6 +202,9 @@ public abstract class Value<V> {
   @NotNull
   public static <T> ArrayValue array(
       @NotNull Function<T, Value<?>> transform, @NotNull List<T> values) {
+    if (values == null || values.size() == 0) {
+      return ArrayValue.EMPTY;
+    }
     // Nulls are allowed in array.
     return new ArrayValue(asList(values, transform));
   }
@@ -202,6 +220,9 @@ public abstract class Value<V> {
   @NotNull
   public static <T> ArrayValue array(
       @NotNull Function<T, Value<?>> transform, T @NotNull [] values) {
+    if (values == null || values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
     // nulls are explicitly allowed in array.
     return new ArrayValue(asList(values, transform));
   }
@@ -214,6 +235,9 @@ public abstract class Value<V> {
    */
   @NotNull
   public static ObjectValue object(Field @NotNull ... fields) {
+    if (fields.length == 0) {
+      return ObjectValue.EMPTY;
+    }
     // Null fields are not allowed.
     final List<Field> nonNullList =
         Arrays.stream(fields).filter(Objects::nonNull).collect(Collectors.toList());
@@ -228,6 +252,9 @@ public abstract class Value<V> {
    */
   @NotNull
   public static ObjectValue object(@NotNull List<Field> fields) {
+    if (fields == null || fields.size() == 0) {
+      return ObjectValue.EMPTY;
+    }
     // Null fields are not allowed.
     final List<Field> nonNullList = new ArrayList<>(fields.size());
     for (Field field : fields) {
@@ -249,6 +276,9 @@ public abstract class Value<V> {
   @NotNull
   public static <T> ObjectValue object(
       @NotNull Function<T, Field> transform, T @NotNull [] values) {
+    if (values == null || values.length == 0) {
+      return ObjectValue.EMPTY;
+    }
     List<Field> fields =
         Arrays.stream(values).map(transform).filter(Objects::nonNull).collect(Collectors.toList());
     return new ObjectValue(fields);
@@ -265,6 +295,9 @@ public abstract class Value<V> {
   @NotNull
   public static <T> ObjectValue object(
       @NotNull Function<T, Field> transform, @NotNull List<T> values) {
+    if (values == null || values.size() == 0) {
+      return ObjectValue.EMPTY;
+    }
     List<Field> fields = new ArrayList<>(values.size());
     for (T value : values) {
       Field field = transform.apply(value);
@@ -386,6 +419,8 @@ public abstract class Value<V> {
   public static final class ArrayValue extends Value<List<Value<?>>> {
     private final List<Value<?>> raw;
 
+    public static final ArrayValue EMPTY = new ArrayValue(Collections.emptyList());
+
     private ArrayValue(List<Value<?>> raw) {
       this.raw = raw;
     }
@@ -402,6 +437,8 @@ public abstract class Value<V> {
   }
 
   public static final class ObjectValue extends Value<List<Field>> {
+    public static final ObjectValue EMPTY = new ObjectValue(Collections.emptyList());
+
     private final List<Field> raw;
 
     private ObjectValue(List<Field> raw) {
