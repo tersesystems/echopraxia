@@ -45,6 +45,23 @@ class Internals {
     }
 
     public String toString() {
+      final Object raw = value.raw();
+      final Value.Type type = value.type();
+      if (raw == null || type == Value.Type.NULL) {
+        return "null";
+      }
+      if (type == Value.Type.STRING) {
+        return ((String) raw);
+      }
+
+      if (type == Value.Type.BOOLEAN) {
+        return ((Boolean) raw) ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
+      }
+
+      if (type == Value.Type.NUMBER) {
+        return raw.toString();
+      }
+
       final StringBuilder builder = getThreadLocalStringBuilder();
       formatToBuffer(builder);
       return builder.toString();

@@ -45,10 +45,11 @@ public abstract class Value<V> {
   @NotNull
   public String toString() {
     final Object raw = raw();
-    if (raw == null) { // if null value or a raw value was set to null, keep going.
+    final Type type = type();
+    if (raw == null
+        || type == Type.NULL) { // if null value or a raw value was set to null, keep going.
       return "null";
     }
-    final Type type = type();
     if (type == Type.STRING) {
       return ((String) raw());
     }
@@ -96,7 +97,8 @@ public abstract class Value<V> {
    */
   @NotNull
   public static BooleanValue bool(@NotNull Boolean value) {
-    return (value) ? BooleanValue.TRUE : BooleanValue.FALSE;
+    if (value == null) return BooleanValue.FALSE;
+    else return (value) ? BooleanValue.TRUE : BooleanValue.FALSE;
   }
 
   /**

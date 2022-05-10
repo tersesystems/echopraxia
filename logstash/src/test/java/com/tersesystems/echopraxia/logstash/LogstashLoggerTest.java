@@ -154,7 +154,7 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("boolean is null");
+    assertThat(message).isEqualTo("boolean is false");
   }
 
   @Test
