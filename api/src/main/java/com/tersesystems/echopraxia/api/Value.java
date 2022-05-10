@@ -48,6 +48,19 @@ public abstract class Value<V> {
     if (raw == null) { // if null value or a raw value was set to null, keep going.
       return "null";
     }
+    final Type type = type();
+    if (type == Type.STRING) {
+      return ((String) raw());
+    }
+
+    if (type == Type.BOOLEAN) {
+      return ((Boolean) raw()) ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
+    }
+
+    if (type == Type.NUMBER) {
+      return raw().toString();
+    }
+
     final StringBuilder b = new StringBuilder(255);
     Internals.ValueFormatter.formatToBuffer(b, this);
     return b.toString();
@@ -83,7 +96,7 @@ public abstract class Value<V> {
    */
   @NotNull
   public static BooleanValue bool(@NotNull Boolean value) {
-    return new BooleanValue(value);
+    return (value) ? BooleanValue.TRUE : BooleanValue.FALSE;
   }
 
   /**
@@ -214,7 +227,7 @@ public abstract class Value<V> {
   @NotNull
   public static ObjectValue object(@NotNull List<Field> fields) {
     // Null fields are not allowed.
-    final List<Field> nonNullList = new ArrayList<>();
+    final List<Field> nonNullList = new ArrayList<>(fields.size());
     for (Field field : fields) {
       if (field != null) {
         nonNullList.add(field);
@@ -250,7 +263,7 @@ public abstract class Value<V> {
   @NotNull
   public static <T> ObjectValue object(
       @NotNull Function<T, Field> transform, @NotNull List<T> values) {
-    List<Field> fields = new ArrayList<>();
+    List<Field> fields = new ArrayList<>(values.size());
     for (T value : values) {
       Field field = transform.apply(value);
       if (field != null) {
@@ -301,7 +314,7 @@ public abstract class Value<V> {
   @NotNull
   private static <T> List<Value<?>> asList(
       @NotNull List<T> values, @NotNull Function<T, Value<?>> f) {
-    List<Value<?>> list = new ArrayList<>();
+    List<Value<?>> list = new ArrayList<>(values.size());
     for (T value : values) {
       Value<?> value1 = f.apply(value);
       list.add(value1);
@@ -310,6 +323,11 @@ public abstract class Value<V> {
   }
 
   public static final class BooleanValue extends Value<Boolean> {
+
+    public static final BooleanValue TRUE = new BooleanValue(true);
+
+    public static final BooleanValue FALSE = new BooleanValue(false);
+
     private final Boolean bool;
 
     private BooleanValue(Boolean bool) {
@@ -413,7 +431,7 @@ public abstract class Value<V> {
       return Type.NULL;
     }
 
-    public static @NotNull NullValue instance = new NullValue();
+    public static final @NotNull NullValue instance = new NullValue();
   }
 
   public static final class ExceptionValue extends Value<Throwable> {
