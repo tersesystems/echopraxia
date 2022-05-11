@@ -16,7 +16,9 @@ There is a `FieldConstants` class that uses a resource bundle to load in hardcod
 
 The core logger no longer depends on `FB extends FieldBuilder`, so it is now possible to create custom loggers that don't expose `fb.keyValue` or `fb.string`.
 
-There is a new `Utilities.threadContext()` method which is a cleaner way to manage thread context in custom loggers. 
+There is a new `Utilities.threadContext()` method which is a cleaner way to manage thread context in custom loggers.
+
+Jayway specific predicates removed from `LoggingContext` API.
 
 ### Logger Changes
 
