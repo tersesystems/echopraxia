@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
 
@@ -77,6 +78,23 @@ class Internals {
     public List<Field> fields() {
       return Collections.singletonList(this);
     }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+
+      DefaultValueField that = (DefaultValueField) o;
+      if (!Objects.equals(name, that.name)) return false;
+      return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+      int result = name != null ? name.hashCode() : 0;
+      result = 31 * result + (value != null ? value.hashCode() : 0);
+      return result;
+    }
   }
 
   /** This is a field that prints out key=value to a message template if possible. */
@@ -115,6 +133,25 @@ class Internals {
     @NotNull
     public List<Field> fields() {
       return Collections.singletonList(this);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (!(o instanceof Field)) return false;
+
+      // key/value fields are comparable against value fields.
+      Field that = (Field) o;
+
+      if (!Objects.equals(name, that.name())) return false;
+      return Objects.equals(value, that.value());
+    }
+
+    @Override
+    public int hashCode() {
+      int result = name != null ? name.hashCode() : 0;
+      result = 31 * result + (value != null ? value.hashCode() : 0);
+      return result;
     }
   }
 

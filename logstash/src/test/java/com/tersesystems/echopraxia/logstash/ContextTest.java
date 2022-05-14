@@ -330,10 +330,11 @@ public class ContextTest extends TestBase {
   @Test
   void testElementAsSingletonList() {
     Logger<?> logger = getLogger();
-    final Condition findBooleanAsList = (level, ctx) -> {
-      final Optional<?> first = ctx.findList("$.boolean").stream().findFirst();
-      return (Boolean) first.get();
-    };
+    final Condition findBooleanAsList =
+        (level, ctx) -> {
+          final Optional<?> first = ctx.findList("$.boolean").stream().findFirst();
+          return (Boolean) first.get();
+        };
 
     // property is present but we need to return a list containing the single element.
     logger.info(findBooleanAsList, "log boolean", fb -> fb.bool("boolean", true));
@@ -344,14 +345,14 @@ public class ContextTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("log boolean");
   }
 
-
   @Test
   void testOptionalEmptyForNothingFound() {
     Logger<?> logger = getLogger();
-    final Condition noFindException = (level, ctx) -> {
-      final Optional<?> first = ctx.findList("$.exception").stream().findFirst();
-      return ! first.isPresent();
-    };
+    final Condition noFindException =
+        (level, ctx) -> {
+          final Optional<?> first = ctx.findList("$.exception").stream().findFirst();
+          return !first.isPresent();
+        };
 
     // we didn't find any .exception at all, so good.
     logger.info(noFindException, "empty of exception", fb -> fb.bool("boolean", true));
