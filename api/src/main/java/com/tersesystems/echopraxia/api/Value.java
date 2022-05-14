@@ -363,15 +363,15 @@ public abstract class Value<V> {
 
     public static final BooleanValue FALSE = new BooleanValue(false);
 
-    private final Boolean bool;
+    private final Boolean raw;
 
     private BooleanValue(Boolean bool) {
-      this.bool = bool;
+      this.raw = bool;
     }
 
     @Override
     public @NotNull Boolean raw() {
-      return this.bool;
+      return this.raw;
     }
 
     @Override
@@ -381,38 +381,67 @@ public abstract class Value<V> {
   }
 
   public static final class NumberValue extends Value<Number> {
-    private final Number number;
+    private final Number raw;
 
     private NumberValue(Number number) {
-      this.number = number;
+      this.raw = number;
     }
 
     @Override
     public Number raw() {
-      return number;
+      return raw;
     }
 
     @Override
     public @NotNull Value.Type type() {
       return Type.NUMBER;
     }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      NumberValue that = (NumberValue) o;
+      // follow the Java example of not allowing general comparison here
+      // integer != long, long != float, float != double etc.
+      // if you want specific comparison, then cast the raw value.
+      return Objects.equals(raw, that.raw);
+    }
+
+    @Override
+    public int hashCode() {
+      return raw != null ? raw.hashCode() : 0;
+    }
   }
 
   public static final class StringValue extends Value<String> {
-    private final String s;
+    private final String raw;
 
     private StringValue(String s) {
-      this.s = s;
+      this.raw = s;
     }
 
     @Override
     public String raw() {
-      return s;
+      return raw;
     }
 
     @Override
     public @NotNull Value.Type type() {
       return Type.STRING;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      StringValue that = (StringValue) o;
+      return Objects.equals(raw, that.raw);
+    }
+
+    @Override
+    public int hashCode() {
+      return raw != null ? raw.hashCode() : 0;
     }
   }
 
@@ -434,6 +463,19 @@ public abstract class Value<V> {
     public @NotNull Value.Type type() {
       return Type.ARRAY;
     }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ArrayValue that = (ArrayValue) o;
+      return Objects.equals(raw, that.raw);
+    }
+
+    @Override
+    public int hashCode() {
+      return raw != null ? raw.hashCode() : 0;
+    }
   }
 
   public static final class ObjectValue extends Value<List<Field>> {
@@ -453,6 +495,19 @@ public abstract class Value<V> {
     @Override
     public List<Field> raw() {
       return raw;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ObjectValue that = (ObjectValue) o;
+      return Objects.equals(raw, that.raw);
+    }
+
+    @Override
+    public int hashCode() {
+      return raw != null ? raw.hashCode() : 0;
     }
   }
 
@@ -488,6 +543,19 @@ public abstract class Value<V> {
     @Override
     public Throwable raw() {
       return raw;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      ExceptionValue that = (ExceptionValue) o;
+      return Objects.equals(raw, that.raw);
+    }
+
+    @Override
+    public int hashCode() {
+      return raw != null ? raw.hashCode() : 0;
     }
   }
 }
