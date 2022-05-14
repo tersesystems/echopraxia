@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -313,15 +314,52 @@ public class ContextTest extends TestBase {
   }
 
   @Test
-  void testMismatchedList() {
+  void testListOfElement() {
     Logger<?> logger = getLogger();
-    final Condition noFindException = (level, ctx) -> ctx.findList("$.notalist").size() > 0;
+    final Condition nestedCondition = (level, ctx) -> ctx.findList("$..notalist").size() > 0;
 
-    // property is present but is boolean, not a string
-    logger.info(noFindException, "this should not log", fb -> fb.bool("notalist", true));
+    // property is present but we need to return a list containing the single element.
+    logger.info(nestedCondition, "log element", fb -> fb.bool("notalist", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
-    assertThat(listAppender.list).isEmpty();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("log element");
+  }
+
+  @Test
+  void testElementAsSingletonList() {
+    Logger<?> logger = getLogger();
+    final Condition findBooleanAsList = (level, ctx) -> {
+      final Optional<?> first = ctx.findList("$.boolean").stream().findFirst();
+      return (Boolean) first.get();
+    };
+
+    // property is present but we need to return a list containing the single element.
+    logger.info(findBooleanAsList, "log boolean", fb -> fb.bool("boolean", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("log boolean");
+  }
+
+
+  @Test
+  void testOptionalEmptyForNothingFound() {
+    Logger<?> logger = getLogger();
+    final Condition noFindException = (level, ctx) -> {
+      final Optional<?> first = ctx.findList("$.exception").stream().findFirst();
+      return ! first.isPresent();
+    };
+
+    // we didn't find any .exception at all, so good.
+    logger.info(noFindException, "empty of exception", fb -> fb.bool("boolean", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("empty of exception");
   }
 
   @Test
@@ -358,6 +396,7 @@ public class ContextTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("Matches on exception");
   }
 
+  @Test
   void testFindExceptionStackTraceElement() {
     Logger<?> logger = getLogger();
     Condition c =
