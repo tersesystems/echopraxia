@@ -112,6 +112,10 @@ public abstract class AbstractLoggingContext implements LoggingContext {
     final Object o = getDocumentContext().read(jsonPath);
     if (o instanceof ArrayValue || o instanceof List || o instanceof Object[]) {
       return javaMappingProvider.map(o, List.class, configuration);
+    } else if (o != null) {
+      // $.exception returns an individual exception rather than a list.
+      Value<?> value = (Value<?>) o;
+      return Collections.singletonList(value.raw());
     } else {
       return Collections.emptyList();
     }
