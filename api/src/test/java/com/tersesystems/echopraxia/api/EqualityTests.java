@@ -2,10 +2,11 @@ package com.tersesystems.echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-public class ValuesTest {
+public class EqualityTests {
 
   // two string values are equal
   @Test
@@ -36,6 +37,14 @@ public class ValuesTest {
   void testNumberValueFloat() {
     Value<Number> foo1 = Value.number(1.5);
     Value<Number> foo2 = Value.number(1.5);
+
+    assertThat(foo1).isEqualTo(foo2);
+  }
+
+  @Test
+  void testNumberBigDecimal() {
+    Value<Number> foo1 = Value.number(new BigDecimal("132323428342342323423423421212312"));
+    Value<Number> foo2 = Value.number(new BigDecimal("132323428342342323423423421212312"));
 
     assertThat(foo1).isEqualTo(foo2);
   }
@@ -88,16 +97,51 @@ public class ValuesTest {
     Value<?> o2 = Value.object(name);
 
     assertThat(o1).isEqualTo(o2);
+    assertThat(o2).isEqualTo(o1);
   }
 
   @Test
-  void testObjectWithEqualFields() {
+  void testObjectWithEqualKeyValueFields() {
     Field name1 = Field.keyValue("name", Value.string("foo"));
     Field name2 = Field.keyValue("name", Value.string("foo"));
     Value<?> o1 = Value.object(name1);
     Value<?> o2 = Value.object(name2);
 
     assertThat(o1).isEqualTo(o2);
+    assertThat(o2).isEqualTo(o1);
+  }
+
+  @Test
+  void testObjectWithNotEqualKeyValueFields() {
+    Field name1 = Field.keyValue("name", Value.string("foo"));
+    Field name2 = Field.keyValue("name", Value.string("bar"));
+    Value<?> o1 = Value.object(name1);
+    Value<?> o2 = Value.object(name2);
+
+    assertThat(o1).isNotEqualTo(o2);
+    assertThat(o2).isNotEqualTo(o1);
+  }
+
+  @Test
+  void testObjectWithNotEqualKeyNameFields() {
+    Field name1 = Field.keyValue("name1", Value.string("foo"));
+    Field name2 = Field.keyValue("name2", Value.string("foo"));
+    Value<?> o1 = Value.object(name1);
+    Value<?> o2 = Value.object(name2);
+
+    assertThat(o1).isNotEqualTo(o2);
+    assertThat(o2).isNotEqualTo(o1);
+  }
+
+  @Test
+  void testObjectWithEqualValueFields() {
+    Field name1 = Field.value("name", Value.string("foo"));
+    Field name2 = Field.value("name", Value.string("foo"));
+    Value<?> o1 = Value.object(name1);
+    Value<?> o2 = Value.object(name2);
+
+    assertThat(o1).isEqualTo(o2);
+    assertThat(o2).isEqualTo(o1);
   }
 
   @Test
@@ -108,5 +152,6 @@ public class ValuesTest {
     Value<?> o2 = Value.object(name2);
 
     assertThat(o1).isEqualTo(o2);
+    assertThat(o2).isEqualTo(o1);
   }
 }

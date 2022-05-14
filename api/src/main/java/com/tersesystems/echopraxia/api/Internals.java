@@ -82,11 +82,13 @@ class Internals {
     @Override
     public boolean equals(Object o) {
       if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
+      if (!(o instanceof Field)) return false;
 
-      DefaultValueField that = (DefaultValueField) o;
-      if (!Objects.equals(name, that.name)) return false;
-      return Objects.equals(value, that.value);
+      // key/value fields are comparable against value fields.
+      Field that = (Field) o;
+
+      if (!Objects.equals(name, that.name())) return false;
+      return Objects.equals(value, that.value());
     }
 
     @Override
