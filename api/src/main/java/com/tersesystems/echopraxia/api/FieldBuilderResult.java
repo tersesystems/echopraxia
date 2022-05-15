@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -20,11 +21,11 @@ public interface FieldBuilderResult {
   }
 
   static @NotNull FieldBuilderResult list(@NotNull List<Field> list) {
-    return () -> list;
+    return () -> new CopyOnWriteArrayList<>(list);
   }
 
   static @NotNull FieldBuilderResult list(@NotNull Field[] array) {
-    return () -> Arrays.asList(array);
+    return () -> new CopyOnWriteArrayList<>(array);
   }
 
   static @NotNull FieldBuilderResult list(@NotNull Iterable<Field> iterable) {
