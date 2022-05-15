@@ -4,6 +4,7 @@
 
 * `ctx.findList` returns a list with a single element if an element matches, i.e. `ctx.findList("$.exception")` returns a list containing a single `Throwable`.
 * Add object equality methods for `Value` and `Field` instances.
+* Add `Comparable` interface for `NumberValue` and specialize types so that `NumberValue<Integer>` and `NumberValue<Byte>` are not comparable. 
 
 ## 2.0.0
 

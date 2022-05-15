@@ -2,6 +2,8 @@ package com.tersesystems.echopraxia.api;
 
 import static com.tersesystems.echopraxia.api.FieldConstants.EXCEPTION;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -90,7 +92,35 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default Field number(@NotNull String name, @NotNull Number value) {
+  default Field number(@NotNull String name, @NotNull Byte value) {
+    return value(name, Value.number(value));
+  }
+
+  default Field number(@NotNull String name, @NotNull Integer value) {
+    return value(name, Value.number(value));
+  }
+
+  default Field number(@NotNull String name, @NotNull Long value) {
+    return value(name, Value.number(value));
+  }
+
+  default Field number(@NotNull String name, @NotNull Float value) {
+    return value(name, Value.number(value));
+  }
+
+  default Field number(@NotNull String name, @NotNull Double value) {
+    return value(name, Value.number(value));
+  }
+
+  default Field number(@NotNull String name, @NotNull BigInteger value) {
+    return value(name, Value.number(value));
+  }
+
+  default Field number(@NotNull String name, @NotNull BigDecimal value) {
+    return value(name, Value.number(value));
+  }
+
+  default <N extends Number & Comparable<N>> Field number(@NotNull String name, @NotNull N value) {
     return value(name, Value.number(value));
   }
 
@@ -102,7 +132,8 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default Field number(@NotNull String name, @NotNull Value.NumberValue value) {
+  default <N extends Number & Comparable<N>> Field number(
+      @NotNull String name, @NotNull Value.NumberValue<N> value) {
     return value(name, value);
   }
 
@@ -168,7 +199,7 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default Field array(@NotNull String name, Number... values) {
+  default <N extends Number & Comparable<N>> Field array(@NotNull String name, N... values) {
     return keyValue(name, Value.array(values));
   }
 

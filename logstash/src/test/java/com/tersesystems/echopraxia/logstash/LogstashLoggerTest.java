@@ -137,7 +137,7 @@ class LogstashLoggerTest extends TestBase {
   @Test
   void testNullNumber() {
     Logger<?> logger = getLogger();
-    Number value = null;
+    Integer value = null;
     logger.debug("hello {}", fb -> (fb.number("name", value)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
