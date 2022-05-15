@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -78,6 +80,18 @@ public abstract class Value<V> {
     return new StringValue(value);
   }
 
+  @NotNull
+  public static Value<Byte> number(@NotNull Byte value) {
+    if (Objects.equals(value, (byte) 0)) return NumberValue.ByteValue.ZERO;
+    return new NumberValue.ByteValue(value);
+  }
+
+  @NotNull
+  public static Value<Short> number(@NotNull Short value) {
+    if (Objects.equals(value, (short) 0)) return NumberValue.ShortValue.ZERO;
+    return new NumberValue.ShortValue(value);
+  }
+
   /**
    * Wraps a number with a Value.
    *
@@ -85,8 +99,38 @@ public abstract class Value<V> {
    * @return the Value
    */
   @NotNull
-  public static NumberValue number(@NotNull Number value) {
-    return new NumberValue(value);
+  public static NumberValue<Integer> number(@NotNull Integer value) {
+    if (Objects.equals(value, 0)) return NumberValue.IntegerValue.ZERO;
+    return new NumberValue.IntegerValue(value);
+  }
+
+  public static NumberValue<Long> number(@NotNull Long value) {
+    if (Objects.equals(value, 0L)) return NumberValue.LongValue.ZERO;
+    return new NumberValue.LongValue(value);
+  }
+
+  public static NumberValue<Float> number(@NotNull Float value) {
+    if (Objects.equals(value, 0.0f)) return NumberValue.FloatValue.ZERO;
+    return new NumberValue.FloatValue(value);
+  }
+
+  public static NumberValue<Double> number(@NotNull Double value) {
+    if (Objects.equals(value, 0.0d)) return NumberValue.DoubleValue.ZERO;
+    return new NumberValue.DoubleValue(value);
+  }
+
+  public static NumberValue<BigInteger> number(@NotNull BigInteger value) {
+    if (Objects.equals(value, BigInteger.ZERO)) return NumberValue.BigIntegerValue.ZERO;
+    return new NumberValue.BigIntegerValue(value);
+  }
+
+  public static NumberValue<BigDecimal> number(@NotNull BigDecimal value) {
+    if (Objects.equals(value, BigDecimal.ZERO)) return NumberValue.BigDecimalValue.ZERO;
+    return new NumberValue.BigDecimalValue(value);
+  }
+
+  public static <N extends Number & Comparable<N>> NumberValue<N> number(@NotNull N value) {
+    return new NumberValue<>(value);
   }
 
   /**
@@ -153,7 +197,7 @@ public abstract class Value<V> {
   /**
    * Wraps an array of values with string values.
    *
-   * @param values varadic elements of values.
+   * @param values variadic elements of values.
    * @return the Value.
    */
   @NotNull
@@ -167,11 +211,11 @@ public abstract class Value<V> {
   /**
    * Wraps an array of values with number values.
    *
-   * @param values varadic elements of values.
+   * @param values variadic elements of values.
    * @return the Value.
    */
   @NotNull
-  public static ArrayValue array(Number @NotNull ... values) {
+  public static <N extends Number & Comparable<N>> ArrayValue array(N @NotNull ... values) {
     if (values.length == 0) {
       return ArrayValue.EMPTY;
     }
@@ -380,15 +424,16 @@ public abstract class Value<V> {
     }
   }
 
-  public static final class NumberValue extends Value<Number> {
-    private final Number raw;
+  public static class NumberValue<N extends Number & Comparable<N>> extends Value<N>
+      implements Comparable<NumberValue<N>> {
+    private final N raw;
 
-    private NumberValue(Number number) {
+    private NumberValue(N number) {
       this.raw = number;
     }
 
     @Override
-    public Number raw() {
+    public N raw() {
       return raw;
     }
 
@@ -401,7 +446,7 @@ public abstract class Value<V> {
     public boolean equals(Object o) {
       if (this == o) return true;
       if (o == null || getClass() != o.getClass()) return false;
-      NumberValue that = (NumberValue) o;
+      NumberValue<?> that = (NumberValue<?>) o;
       // follow the Java example of not allowing general comparison here
       // integer != long, long != float, float != double etc.
       // if you want specific comparison, then cast the raw value.
@@ -412,9 +457,78 @@ public abstract class Value<V> {
     public int hashCode() {
       return raw != null ? raw.hashCode() : 0;
     }
+
+    @Override
+    public int compareTo(@NotNull Value.NumberValue<N> o) {
+      return this.raw.compareTo(o.raw);
+    }
+
+    private static final class ByteValue extends NumberValue<Byte> {
+      public static final ByteValue ZERO = new ByteValue((byte) 0);
+
+      private ByteValue(Byte number) {
+        super(number);
+      }
+    }
+
+    private static final class ShortValue extends NumberValue<Short> {
+      public static final ShortValue ZERO = new ShortValue((short) 0);
+
+      private ShortValue(Short number) {
+        super(number);
+      }
+    }
+
+    private static final class IntegerValue extends NumberValue<Integer> {
+      public static final IntegerValue ZERO = new IntegerValue(0);
+
+      private IntegerValue(Integer number) {
+        super(number);
+      }
+    }
+
+    private static final class LongValue extends NumberValue<Long> {
+      public static final LongValue ZERO = new LongValue(0L);
+
+      private LongValue(Long number) {
+        super(number);
+      }
+    }
+
+    private static final class DoubleValue extends NumberValue<Double> {
+      public static final DoubleValue ZERO = new DoubleValue(0.0d);
+
+      private DoubleValue(Double number) {
+        super(number);
+      }
+    }
+
+    private static final class FloatValue extends NumberValue<Float> {
+      public static final FloatValue ZERO = new FloatValue(0.0f);
+
+      private FloatValue(Float number) {
+        super(number);
+      }
+    }
+
+    private static final class BigIntegerValue extends NumberValue<BigInteger> {
+      public static final BigIntegerValue ZERO = new BigIntegerValue(java.math.BigInteger.ZERO);
+
+      private BigIntegerValue(BigInteger number) {
+        super(number);
+      }
+    }
+
+    private static final class BigDecimalValue extends NumberValue<BigDecimal> {
+      public static final BigDecimalValue ZERO = new BigDecimalValue(java.math.BigDecimal.ZERO);
+
+      private BigDecimalValue(BigDecimal number) {
+        super(number);
+      }
+    }
   }
 
-  public static final class StringValue extends Value<String> {
+  public static final class StringValue extends Value<String> implements Comparable<StringValue> {
     private final String raw;
 
     private StringValue(String s) {
@@ -442,6 +556,11 @@ public abstract class Value<V> {
     @Override
     public int hashCode() {
       return raw != null ? raw.hashCode() : 0;
+    }
+
+    @Override
+    public int compareTo(@NotNull Value.StringValue o) {
+      return o.raw.compareTo(this.raw);
     }
   }
 

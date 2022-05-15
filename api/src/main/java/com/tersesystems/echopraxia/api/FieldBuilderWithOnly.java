@@ -52,7 +52,8 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Number value) {
+  default <N extends Number & Comparable<N>> FieldBuilderResult onlyNumber(
+      @NotNull String name, @NotNull N value) {
     return only(number(name, value));
   }
 
@@ -64,7 +65,8 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Value.NumberValue value) {
+  default <N extends Number & Comparable<N>> FieldBuilderResult onlyNumber(
+      @NotNull String name, @NotNull Value.NumberValue<N> value) {
     return only(number(name, value));
   }
 
@@ -124,7 +126,8 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default FieldBuilderResult onlyArray(@NotNull String name, Number... values) {
+  default <N extends Number & Comparable<N>> FieldBuilderResult onlyArray(
+      @NotNull String name, N... values) {
     return only(array(name, values));
   }
 

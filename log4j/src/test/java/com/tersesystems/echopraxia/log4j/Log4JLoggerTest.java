@@ -53,7 +53,7 @@ public class Log4JLoggerTest extends TestBase {
   @Test
   void testNullNumber() {
     Logger<?> logger = getLogger();
-    Number value = null;
+    Integer value = null;
     logger.debug("number is {}", fb -> (fb.number("name", value)));
 
     JsonObject entry = getEntry();
@@ -198,7 +198,7 @@ public class Log4JLoggerTest extends TestBase {
     logger.info(
         "my argument is {}",
         fb -> {
-          Number[] intArray = {1, 2, 3};
+          Integer[] intArray = {1, 2, 3};
           return fb.array("random_key", intArray);
         });
 

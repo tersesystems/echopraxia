@@ -19,40 +19,56 @@ public class EqualityTests {
 
   @Test
   void testNumberValueInteger() {
-    Value<Number> foo1 = Value.number(1);
-    Value<Number> foo2 = Value.number(1);
+    Value<Integer> foo1 = Value.number(1);
+    Value<Integer> foo2 = Value.number(1);
 
     assertThat(foo1).isEqualTo(foo2);
   }
 
   @Test
   void testNumberValueLong() {
-    Value<Number> foo1 = Value.number(1L);
-    Value<Number> foo2 = Value.number(1L);
+    Value<Long> foo1 = Value.number(1L);
+    Value<Long> foo2 = Value.number(1L);
 
     assertThat(foo1).isEqualTo(foo2);
   }
 
   @Test
+  void testNumberCompareToMoreThan() {
+    Value.NumberValue<BigDecimal> foo1 = Value.number(BigDecimal.ONE);
+    Value.NumberValue<BigDecimal> foo2 = Value.number(BigDecimal.ZERO);
+
+    assertThat(foo1.compareTo(foo2)).isEqualTo(1);
+  }
+
+  @Test
+  void testNumberCompareToLessThan() {
+    Value.NumberValue<Long> foo1 = Value.number(0L);
+    Value.NumberValue<Long> foo2 = Value.number(1L);
+
+    assertThat(foo1.compareTo(foo2)).isEqualTo(-1);
+  }
+
+  @Test
   void testNumberValueFloat() {
-    Value<Number> foo1 = Value.number(1.5);
-    Value<Number> foo2 = Value.number(1.5);
+    Value<Double> foo1 = Value.number(1.5);
+    Value<Double> foo2 = Value.number(1.5);
 
     assertThat(foo1).isEqualTo(foo2);
   }
 
   @Test
   void testNumberBigDecimal() {
-    Value<Number> foo1 = Value.number(new BigDecimal("132323428342342323423423421212312"));
-    Value<Number> foo2 = Value.number(new BigDecimal("132323428342342323423423421212312"));
+    Value<BigDecimal> foo1 = Value.number(new BigDecimal("132323428342342323423423421212312"));
+    Value<BigDecimal> foo2 = Value.number(new BigDecimal("132323428342342323423423421212312"));
 
     assertThat(foo1).isEqualTo(foo2);
   }
 
   @Test
   void testNumberValueLongVsInt() {
-    Value<Number> foo1 = Value.number(1);
-    Value<Number> foo2 = Value.number(1L);
+    Value<Integer> foo1 = Value.number(1);
+    Value<Long> foo2 = Value.number(1L);
 
     // https://stackoverflow.com/questions/3214448/comparing-numbers-in-java
     // https://stackoverflow.com/questions/2683202/comparing-the-values-of-two-generic-numbers
