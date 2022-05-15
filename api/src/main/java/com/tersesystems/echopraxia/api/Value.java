@@ -5,7 +5,6 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import jdk.internal.misc.VM;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -49,20 +48,20 @@ public abstract class Value<V> {
   public String toString() {
     final Object raw = raw();
     final Type type = type();
-    if (raw == null
-        || type == Type.NULL) { // if null value or a raw value was set to null, keep going.
+    if (raw == null || type == Type.NULL) { // if null value or a raw value was set to null, keep going.
       return "null";
     }
+
     if (type == Type.STRING) {
-      return ((String) raw());
+      return ((String) raw);
     }
 
     if (type == Type.BOOLEAN) {
-      return ((Boolean) raw()) ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
+      return Boolean.toString((Boolean) raw);
     }
 
     if (type == Type.NUMBER) {
-      return raw().toString();
+      return raw.toString();
     }
 
     final StringBuilder b = new StringBuilder(255);
@@ -515,22 +514,12 @@ public abstract class Value<V> {
       private static class Cache {
         static final int low = -128;
         static final int high = 127;
-        static final IntegerValue[] cache;
-        static IntegerValue[] archivedCache;
+
+        static final IntegerValue[] cache = new IntegerValue[(high - low) + 1];
 
         static {
-          VM.initializeFromArchive(Cache.class);
-          int size = (high - low) + 1;
-          // Use the archived cache if it exists and is large enough
-          if (archivedCache == null || size > archivedCache.length) {
-            IntegerValue[] c = new IntegerValue[size];
-            int j = low;
-            for (int k = 0; k < c.length; k++) c[k] = new IntegerValue(j++);
-            archivedCache = c;
-          }
-          cache = archivedCache;
+          for (int i = 0; i < cache.length; i++) cache[i] = new IntegerValue((i - 128));
         }
-
         private Cache() {}
       }
     }
