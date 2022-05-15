@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import jdk.internal.misc.VM;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -82,14 +83,18 @@ public abstract class Value<V> {
 
   @NotNull
   public static Value<Byte> number(@NotNull Byte value) {
-    if (Objects.equals(value, (byte) 0)) return NumberValue.ByteValue.ZERO;
-    return new NumberValue.ByteValue(value);
+    final int offset = 128;
+    return NumberValue.ByteValue.Cache.cache[(int) value + offset];
   }
 
   @NotNull
-  public static Value<Short> number(@NotNull Short value) {
-    if (Objects.equals(value, (short) 0)) return NumberValue.ShortValue.ZERO;
-    return new NumberValue.ShortValue(value);
+  public static Value<Short> number(@NotNull Short s) {
+    final int offset = 128;
+    int sAsInt = s;
+    if (sAsInt >= -128 && sAsInt <= 127) { // must cache
+      return NumberValue.ShortValue.Cache.cache[sAsInt + offset];
+    }
+    return new NumberValue.ShortValue(s);
   }
 
   /**
@@ -100,12 +105,16 @@ public abstract class Value<V> {
    */
   @NotNull
   public static NumberValue<Integer> number(@NotNull Integer value) {
-    if (Objects.equals(value, 0)) return NumberValue.IntegerValue.ZERO;
+    if (value >= NumberValue.IntegerValue.Cache.low && value <= NumberValue.IntegerValue.Cache.high)
+      return NumberValue.IntegerValue.Cache.cache[value + (-NumberValue.IntegerValue.Cache.low)];
     return new NumberValue.IntegerValue(value);
   }
 
   public static NumberValue<Long> number(@NotNull Long value) {
-    if (Objects.equals(value, 0L)) return NumberValue.LongValue.ZERO;
+    final int offset = 128;
+    if (value >= -128 && value <= 127) { // will cache
+      return NumberValue.LongValue.Cache.cache[value.intValue() + offset];
+    }
     return new NumberValue.LongValue(value);
   }
 
@@ -214,6 +223,7 @@ public abstract class Value<V> {
    * @param values variadic elements of values.
    * @return the Value.
    */
+  @SafeVarargs
   @NotNull
   public static <N extends Number & Comparable<N>> ArrayValue array(N @NotNull ... values) {
     if (values.length == 0) {
@@ -464,10 +474,18 @@ public abstract class Value<V> {
     }
 
     private static final class ByteValue extends NumberValue<Byte> {
-      public static final ByteValue ZERO = new ByteValue((byte) 0);
-
       private ByteValue(Byte number) {
         super(number);
+      }
+
+      private static class Cache {
+        private Cache() {}
+
+        static final ByteValue[] cache = new ByteValue[-(-128) + 127 + 1];
+
+        static {
+          for (int i = 0; i < cache.length; i++) cache[i] = new ByteValue((byte) (i - 128));
+        }
       }
     }
 
@@ -477,21 +495,59 @@ public abstract class Value<V> {
       private ShortValue(Short number) {
         super(number);
       }
+
+      private static class Cache {
+        private Cache() {}
+
+        static final ShortValue[] cache = new ShortValue[-(-128) + 127 + 1];
+
+        static {
+          for (int i = 0; i < cache.length; i++) cache[i] = new ShortValue((short) (i - 128));
+        }
+      }
     }
 
     private static final class IntegerValue extends NumberValue<Integer> {
-      public static final IntegerValue ZERO = new IntegerValue(0);
-
       private IntegerValue(Integer number) {
         super(number);
+      }
+
+      private static class Cache {
+        static final int low = -128;
+        static final int high = 127;
+        static final IntegerValue[] cache;
+        static IntegerValue[] archivedCache;
+
+        static {
+          VM.initializeFromArchive(Cache.class);
+          int size = (high - low) + 1;
+          // Use the archived cache if it exists and is large enough
+          if (archivedCache == null || size > archivedCache.length) {
+            IntegerValue[] c = new IntegerValue[size];
+            int j = low;
+            for (int k = 0; k < c.length; k++) c[k] = new IntegerValue(j++);
+            archivedCache = c;
+          }
+          cache = archivedCache;
+        }
+
+        private Cache() {}
       }
     }
 
     private static final class LongValue extends NumberValue<Long> {
-      public static final LongValue ZERO = new LongValue(0L);
-
       private LongValue(Long number) {
         super(number);
+      }
+
+      private static class Cache {
+        private Cache() {}
+
+        static final LongValue[] cache = new LongValue[-(-128) + 127 + 1];
+
+        static {
+          for (int i = 0; i < cache.length; i++) cache[i] = new LongValue((long) (i - 128));
+        }
       }
     }
 
