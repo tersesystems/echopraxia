@@ -346,11 +346,33 @@ public class LogstashCoreLogger implements CoreLogger {
   // at the end of the array.
   protected Object[] convertArguments(List<Field> args) {
     // Top level arguments must be StructuredArguments, +1 for throwable
+
+    // Exceptions have always been a little wacky.
+
+    // Condition 1:
+    // In SLF4J, if the last argument is a throwable AND there is no parameter for it in the template,
+    // then the throwable is treated as the ThrowableProxy (and see the stack trace).
+    // logger.error("message but no parameter", e)
+
+    // Condition 2:
+    // If the message parameter is passed in, then the exception is treated as an argument!
+    // logger.error("message with parameter {}", e)
+    // This will NOT show a stacktrace, and will instead render e.toString().
+
+    // In Echopraxia, you can pass in multiple throwables, and have arguments, and there is also a
+    // "default" throwable which has the name "exception".
+
+    // So let's do this.  If there's a default exception field `fb.exception(e)` then that is official: it's
+    // added to the end of the array, and does NOT show up as an argument.  If there's multiple, the last one wins.
+
+    // If there are exceptions with different names, then those exceptions are treated as "just plain arguments",
+    // and you can hit it with https://tersesystems.github.io/terse-logback/guide/exception-mapping/
+
     Value<Throwable> throwable = null;
     List<Object> arguments = new ArrayList<>(args.size() + 1);
     for (Field field : args) {
       final Value<?> value = field.value();
-      if (value.type() == Value.Type.EXCEPTION) {
+      if (field.name().equals(FieldConstants.EXCEPTION)) {
         throwable = (Value.ExceptionValue) value;
       } else {
         final String name = field.name();
@@ -361,7 +383,8 @@ public class LogstashCoreLogger implements CoreLogger {
         arguments.add(array);
       }
     }
-    // If the exception exists, it must be raw so the varadic case will pick it up.
+
+    // If the exception exists, it must be raw so the variadic case will pick it up.
     if (throwable != null) {
       arguments.add(throwable.raw());
     }
