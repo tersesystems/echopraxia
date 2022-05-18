@@ -137,10 +137,6 @@ public abstract class Value<V> {
     return new NumberValue.BigDecimalValue(value);
   }
 
-  public static <N extends Number & Comparable<N>> NumberValue<N> number(@NotNull N value) {
-    return new NumberValue<>(value);
-  }
-
   /**
    * Wraps a boolean with a Value.
    *
@@ -222,9 +218,58 @@ public abstract class Value<V> {
    * @param values variadic elements of values.
    * @return the Value.
    */
-  @SafeVarargs
   @NotNull
-  public static <N extends Number & Comparable<N>> ArrayValue array(N @NotNull ... values) {
+  public static ArrayValue array(Byte @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
+    return new ArrayValue(asList(values, Value::number));
+  }
+
+  public static ArrayValue array(Short @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
+    return new ArrayValue(asList(values, Value::number));
+  }
+
+
+  public static ArrayValue array(Integer @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
+    return new ArrayValue(asList(values, Value::number));
+  }
+
+  public static ArrayValue array(Long @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
+    return new ArrayValue(asList(values, Value::number));
+  }
+
+  public static ArrayValue array(Double @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
+    return new ArrayValue(asList(values, Value::number));
+  }
+
+  public static ArrayValue array(Float @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
+    return new ArrayValue(asList(values, Value::number));
+  }
+
+  public static ArrayValue array(BigInteger @NotNull ... values) {
+    if (values.length == 0) {
+      return ArrayValue.EMPTY;
+    }
+    return new ArrayValue(asList(values, Value::number));
+  }
+
+  public static ArrayValue array(BigDecimal @NotNull ... values) {
     if (values.length == 0) {
       return ArrayValue.EMPTY;
     }

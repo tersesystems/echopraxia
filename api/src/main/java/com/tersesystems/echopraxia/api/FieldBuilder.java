@@ -96,6 +96,10 @@ public interface FieldBuilder {
     return value(name, Value.number(value));
   }
 
+  default Field number(@NotNull String name, @NotNull Short value) {
+    return value(name, Value.number(value));
+  }
+
   default Field number(@NotNull String name, @NotNull Integer value) {
     return value(name, Value.number(value));
   }
@@ -117,10 +121,6 @@ public interface FieldBuilder {
   }
 
   default Field number(@NotNull String name, @NotNull BigDecimal value) {
-    return value(name, Value.number(value));
-  }
-
-  default <N extends Number & Comparable<N>> Field number(@NotNull String name, @NotNull N value) {
     return value(name, Value.number(value));
   }
 
@@ -199,7 +199,28 @@ public interface FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default <N extends Number & Comparable<N>> Field array(@NotNull String name, N... values) {
+  default Field array(@NotNull String name, Byte... values) {
+    return keyValue(name, Value.array(values));
+  }
+  default Field array(@NotNull String name, Short... values) {
+    return keyValue(name, Value.array(values));
+  }
+  default Field array(@NotNull String name, Integer... values) {
+    return keyValue(name, Value.array(values));
+  }
+  default Field array(@NotNull String name, Long... values) {
+    return keyValue(name, Value.array(values));
+  }
+  default Field array(@NotNull String name, Double... values) {
+    return keyValue(name, Value.array(values));
+  }
+  default Field array(@NotNull String name, Float... values) {
+    return keyValue(name, Value.array(values));
+  }
+  default Field array(@NotNull String name, BigInteger... values) {
+    return keyValue(name, Value.array(values));
+  }
+  default Field array(@NotNull String name, BigDecimal... values) {
     return keyValue(name, Value.array(values));
   }
 

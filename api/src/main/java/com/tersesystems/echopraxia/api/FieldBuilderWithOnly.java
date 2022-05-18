@@ -1,10 +1,15 @@
 package com.tersesystems.echopraxia.api;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-/** Extended field builder with "only" interfaces for backwards compatibility. */
+/**
+ * Extended field builder with "only" interfaces for backwards compatibility.
+ */
 public interface FieldBuilderWithOnly extends FieldBuilder {
 
   /**
@@ -23,7 +28,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a list of fields out of a name and a raw string value.
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the value of the field.
    * @return a list containing a single field.
    */
@@ -35,7 +40,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a list of fields out of a name and a string value.
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the value of the field.
    * @return a list containing a single field.
    */
@@ -44,36 +49,55 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
     return only(string(name, value));
   }
 
-  /**
-   * Creates a singleton list of fields out of a name and a raw number value.
-   *
-   * @param name the name of the field.
-   * @param value the value of the field.
-   * @return a list containing a single field.
-   */
-  @NotNull
-  default <N extends Number & Comparable<N>> FieldBuilderResult onlyNumber(
-      @NotNull String name, @NotNull N value) {
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Byte value) {
+    return only(number(name, value));
+  }
+
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Short value) {
+    return only(number(name, value));
+  }
+
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Integer value) {
+    return only(number(name, value));
+  }
+
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Long value) {
+    return only(number(name, value));
+  }
+
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Double value) {
+    return only(number(name, value));
+  }
+
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull Float value) {
+    return only(number(name, value));
+  }
+
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull BigInteger value) {
+    return only(number(name, value));
+  }
+
+  default FieldBuilderResult onlyNumber(@NotNull String name, @NotNull BigDecimal value) {
     return only(number(name, value));
   }
 
   /**
    * Creates a singleton list of fields out of a name and a number value.
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the value of the field.
    * @return a list containing a single field.
    */
   @NotNull
   default <N extends Number & Comparable<N>> FieldBuilderResult onlyNumber(
-      @NotNull String name, @NotNull Value.NumberValue<N> value) {
+    @NotNull String name, @NotNull Value.NumberValue<N> value) {
     return only(number(name, value));
   }
 
   /**
    * Creates a singleton list of fields out of a name and a raw boolean value.
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the value of the field.
    * @return a list containing a single field.
    */
@@ -85,7 +109,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of fields out of a name and a boolean value.
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the value of the field.
    * @return a list containing a single field.
    */
@@ -97,7 +121,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of an array field out of a name and object values.
    *
-   * @param name the name of the field.
+   * @param name   the name of the field.
    * @param values the values.
    * @return a list containing a single field.
    */
@@ -109,7 +133,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of an array field out of a name and a variadic array of string.
    *
-   * @param name the name of the field.
+   * @param name   the name of the field.
    * @param values the values.
    * @return a list containing a single field.
    */
@@ -121,20 +145,48 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of an array field out of a name and a variadic array of number.
    *
-   * @param name the name of the field.
+   * @param name   the name of the field.
    * @param values the values.
    * @return a list containing a single field.
    */
   @NotNull
-  default <N extends Number & Comparable<N>> FieldBuilderResult onlyArray(
-      @NotNull String name, N... values) {
+  default FieldBuilderResult onlyArray(@NotNull String name, Byte... values) {
     return only(array(name, values));
   }
+
+  default FieldBuilderResult onlyArray(@NotNull String name, Short... values) {
+    return only(array(name, values));
+  }
+
+  default FieldBuilderResult onlyArray(@NotNull String name, Integer... values) {
+    return only(array(name, values));
+  }
+
+  default FieldBuilderResult onlyArray(@NotNull String name, Long... values) {
+    return only(array(name, values));
+  }
+
+  default FieldBuilderResult onlyArray(@NotNull String name, Double... values) {
+    return only(array(name, values));
+  }
+
+  default FieldBuilderResult onlyArray(@NotNull String name, Float... values) {
+    return only(array(name, values));
+  }
+
+  default FieldBuilderResult onlyArray(@NotNull String name, BigInteger... values) {
+    return only(array(name, values));
+  }
+
+  default FieldBuilderResult onlyArray(@NotNull String name, BigDecimal... values) {
+    return only(array(name, values));
+  }
+
 
   /**
    * Creates a singleton list of an array field out of a name and a variadic array of boolean.
    *
-   * @param name the name of the field.
+   * @param name   the name of the field.
    * @param values the values.
    * @return a list containing a single field.
    */
@@ -148,7 +200,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
    *
    * <p>{@code onlyArray(name, Value.array(1, "a", true))}
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the array value.
    * @return a list containing a single field.
    */
@@ -160,7 +212,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of an object out of a name and array values.
    *
-   * @param name the name of the field.
+   * @param name   the name of the field.
    * @param values the values.
    * @return a list containing a single field.
    */
@@ -172,7 +224,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of an object out of a name and a list of values.
    *
-   * @param name the name of the field.
+   * @param name   the name of the field.
    * @param values the values.
    * @return a list containing a single field.
    */
@@ -184,7 +236,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of an object out of a name and an object value.
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the object values.
    * @return a list containing a single field.
    */
@@ -218,13 +270,13 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
   /**
    * Creates a singleton list of an exception value using an explicit name.
    *
-   * @param name the name of the field.
+   * @param name  the name of the field.
    * @param value the value of the field.
    * @return a list containing a single field.
    */
   @NotNull
   default FieldBuilderResult onlyException(
-      @NotNull String name, @NotNull Value.ExceptionValue value) {
+    @NotNull String name, @NotNull Value.ExceptionValue value) {
     return only(exception(name, value));
   }
 
