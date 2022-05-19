@@ -48,7 +48,8 @@ public abstract class Value<V> {
   public String toString() {
     final Object raw = raw();
     final Type type = type();
-    if (raw == null || type == Type.NULL) { // if null value or a raw value was set to null, keep going.
+    if (raw == null
+        || type == Type.NULL) { // if null value or a raw value was set to null, keep going.
       return "null";
     }
 
@@ -520,6 +521,7 @@ public abstract class Value<V> {
         static {
           for (int i = 0; i < cache.length; i++) cache[i] = new IntegerValue((i - 128));
         }
+
         private Cache() {}
       }
     }

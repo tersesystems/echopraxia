@@ -373,9 +373,9 @@ public class LogstashCoreLogger implements CoreLogger {
         arguments.add(arg);
       } else {
         StructuredArgument arg =
-          field instanceof Field.ValueField
-            ? StructuredArguments.value(name, value)
-            : StructuredArguments.keyValue(name, value);
+            field instanceof Field.ValueField
+                ? StructuredArguments.value(name, value)
+                : StructuredArguments.keyValue(name, value);
         arguments.add(arg);
       }
     }
