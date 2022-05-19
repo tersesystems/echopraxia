@@ -350,7 +350,8 @@ public class LogstashCoreLogger implements CoreLogger {
     // Exceptions have always been a little wacky.
 
     // Condition 1:
-    // In SLF4J, if the last argument is a throwable AND there is no parameter for it in the template,
+    // In SLF4J, if the last argument is a throwable AND there is no parameter for it in the
+    // template,
     // then the throwable is treated as the ThrowableProxy (and see the stack trace).
     // logger.error("message but no parameter", e)
 
@@ -359,32 +360,27 @@ public class LogstashCoreLogger implements CoreLogger {
     // logger.error("message with parameter {}", e)
     // This will NOT show a stacktrace, and will instead render e.toString().
 
-    // In Echopraxia, you can pass in multiple throwables, and have arguments, and there is also a
-    // "default" throwable which has the name "exception".
-
-    // So let's do this.  If there's a default exception field `fb.exception(e)` then that is official: it's
-    // added to the end of the array, and does NOT show up as an argument.  If there's multiple, the last one wins.
-
-    // If there are exceptions with different names, then those exceptions are treated as "just plain arguments",
-    // and you can hit it with https://tersesystems.github.io/terse-logback/guide/exception-mapping/
-
+    // We want the LAST exception to always show up as the canonical exception, but we will
+    // always include it as a "value" parameter.
     Value<Throwable> throwable = null;
     List<Object> arguments = new ArrayList<>(args.size() + 1);
     for (Field field : args) {
+      final String name = field.name();
       final Value<?> value = field.value();
-      if (field.name().equals(FieldConstants.EXCEPTION)) {
+      if (value.type() == Value.Type.EXCEPTION) {
         throwable = (Value.ExceptionValue) value;
+        StructuredArgument arg = StructuredArguments.keyValue(name, throwable.raw());
+        arguments.add(arg);
       } else {
-        final String name = field.name();
-        StructuredArgument array =
-            field instanceof Field.ValueField
-                ? StructuredArguments.value(name, value)
-                : StructuredArguments.keyValue(name, value);
-        arguments.add(array);
+        StructuredArgument arg =
+          field instanceof Field.ValueField
+            ? StructuredArguments.value(name, value)
+            : StructuredArguments.keyValue(name, value);
+        arguments.add(arg);
       }
     }
 
-    // If the exception exists, it must be raw so the variadic case will pick it up.
+    // If the exception exists, it must be raw and at the end of the array.
     if (throwable != null) {
       arguments.add(throwable.raw());
     }
