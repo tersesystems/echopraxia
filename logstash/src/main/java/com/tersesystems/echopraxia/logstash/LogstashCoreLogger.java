@@ -346,22 +346,41 @@ public class LogstashCoreLogger implements CoreLogger {
   // at the end of the array.
   protected Object[] convertArguments(List<Field> args) {
     // Top level arguments must be StructuredArguments, +1 for throwable
+
+    // Exceptions have always been a little wacky.
+
+    // Condition 1:
+    // In SLF4J, if the last argument is a throwable AND there is no parameter for it in the
+    // template,
+    // then the throwable is treated as the ThrowableProxy (and see the stack trace).
+    // logger.error("message but no parameter", e)
+
+    // Condition 2:
+    // If the message parameter is passed in, then the exception is treated as an argument!
+    // logger.error("message with parameter {}", e)
+    // This will NOT show a stacktrace, and will instead render e.toString().
+
+    // We want the LAST exception to always show up as the canonical exception, but we will
+    // always include it as a "value" parameter.
     Value<Throwable> throwable = null;
     List<Object> arguments = new ArrayList<>(args.size() + 1);
     for (Field field : args) {
+      final String name = field.name();
       final Value<?> value = field.value();
       if (value.type() == Value.Type.EXCEPTION) {
         throwable = (Value.ExceptionValue) value;
+        StructuredArgument arg = StructuredArguments.keyValue(name, throwable.raw());
+        arguments.add(arg);
       } else {
-        final String name = field.name();
-        StructuredArgument array =
-            field instanceof Field.ValueField
-                ? StructuredArguments.value(name, value)
-                : StructuredArguments.keyValue(name, value);
-        arguments.add(array);
+        StructuredArgument arg =
+          field instanceof Field.ValueField
+            ? StructuredArguments.value(name, value)
+            : StructuredArguments.keyValue(name, value);
+        arguments.add(arg);
       }
     }
-    // If the exception exists, it must be raw so the varadic case will pick it up.
+
+    // If the exception exists, it must be raw and at the end of the array.
     if (throwable != null) {
       arguments.add(throwable.raw());
     }
