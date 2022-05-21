@@ -58,7 +58,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonObject entry = getEntry();
     final String message = entry.getString("message");
-    assertThat(message).isEqualTo("number is null");
+    assertThat(message).isEqualTo("number is 0");
   }
 
   @Test
