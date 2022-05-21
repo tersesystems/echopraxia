@@ -2,9 +2,14 @@
 
 ## 2.0.1
 
+Bug fixes and some enhancements around number values.
+
 * `ctx.findList` returns a list with a single element if an element matches, i.e. `ctx.findList("$.exception")` returns a list containing a single `Throwable`.
 * Add object equality methods for `Value` and `Field` instances.
-* Add `Comparable` interface for `NumberValue` and specialize types so that `NumberValue<Integer>` and `NumberValue<Byte>` are not comparable. 
+* Add `Comparable` interface for `NumberValue` and specialize types so that `NumberValue<Integer>` and `NumberValue<Byte>` are not comparable.
+* Set null numbers to return `0` rather than `null` to better reflect java number behavior.
+* Remove generic `Numeric` methods, use specific numbers in methods. 
+* Add cache for number values corresponding to the java.lang number caches.
 
 ## 2.0.0
 
