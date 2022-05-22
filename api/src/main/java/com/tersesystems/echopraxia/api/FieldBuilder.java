@@ -202,24 +202,31 @@ public interface FieldBuilder {
   default Field array(@NotNull String name, Byte... values) {
     return keyValue(name, Value.array(values));
   }
+
   default Field array(@NotNull String name, Short... values) {
     return keyValue(name, Value.array(values));
   }
+
   default Field array(@NotNull String name, Integer... values) {
     return keyValue(name, Value.array(values));
   }
+
   default Field array(@NotNull String name, Long... values) {
     return keyValue(name, Value.array(values));
   }
+
   default Field array(@NotNull String name, Double... values) {
     return keyValue(name, Value.array(values));
   }
+
   default Field array(@NotNull String name, Float... values) {
     return keyValue(name, Value.array(values));
   }
+
   default Field array(@NotNull String name, BigInteger... values) {
     return keyValue(name, Value.array(values));
   }
+
   default Field array(@NotNull String name, BigDecimal... values) {
     return keyValue(name, Value.array(values));
   }

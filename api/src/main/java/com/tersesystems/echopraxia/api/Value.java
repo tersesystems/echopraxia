@@ -107,7 +107,8 @@ public abstract class Value<V> {
    */
   @NotNull
   public static NumberValue<Integer> number(@NotNull Integer value) {
-    if (value == null) return NumberValue.IntegerValue.Cache.cache[-NumberValue.IntegerValue.Cache.low];
+    if (value == null)
+      return NumberValue.IntegerValue.Cache.cache[-NumberValue.IntegerValue.Cache.low];
     if (value >= NumberValue.IntegerValue.Cache.low && value <= NumberValue.IntegerValue.Cache.high)
       return NumberValue.IntegerValue.Cache.cache[value + (-NumberValue.IntegerValue.Cache.low)];
     return new NumberValue.IntegerValue(value);
@@ -133,12 +134,14 @@ public abstract class Value<V> {
   }
 
   public static NumberValue<BigInteger> number(@NotNull BigInteger value) {
-    if (value == null || Objects.equals(value, BigInteger.ZERO)) return NumberValue.BigIntegerValue.ZERO;
+    if (value == null || Objects.equals(value, BigInteger.ZERO))
+      return NumberValue.BigIntegerValue.ZERO;
     return new NumberValue.BigIntegerValue(value);
   }
 
   public static NumberValue<BigDecimal> number(@NotNull BigDecimal value) {
-    if (value == null || Objects.equals(value, BigDecimal.ZERO)) return NumberValue.BigDecimalValue.ZERO;
+    if (value == null || Objects.equals(value, BigDecimal.ZERO))
+      return NumberValue.BigDecimalValue.ZERO;
     return new NumberValue.BigDecimalValue(value);
   }
 
@@ -237,7 +240,6 @@ public abstract class Value<V> {
     }
     return new ArrayValue(asList(values, Value::number));
   }
-
 
   public static ArrayValue array(Integer @NotNull ... values) {
     if (values.length == 0) {
