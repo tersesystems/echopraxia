@@ -55,6 +55,11 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     return markersSupplier.get();
   }
 
+  public LogstashLoggingContext withFields(Supplier<List<Field>> o) {
+    Supplier<List<Field>> joinedFields = joinFields(o, this::getFields);
+    return new LogstashLoggingContext(joinedFields, this::getMarkers);
+  }
+
   /**
    * Joins the two contexts together, concatenating the lists in a supplier function.
    *
@@ -68,7 +73,7 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
 
     // This MUST be lazy, we can't get the fields until statement evaluation
     Supplier<List<Field>> joinedFields =
-        joinFields(LogstashLoggingContext.this::getFields, context::getFields);
+        joinFields(this::getFields, context::getFields);
     Supplier<List<Marker>> joinedMarkers =
         joinMarkers(context::getMarkers, LogstashLoggingContext.this::getMarkers);
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
@@ -126,4 +131,5 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     markerList.addAll(markers);
     return Markers.aggregate(markerList);
   }
+
 }

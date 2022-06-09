@@ -80,10 +80,9 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    Log4JLoggingContext newContext =
-        new Log4JLoggingContext(() -> convertToFields(f.apply(builder)), null);
+    Log4JLoggingContext newContext = context.withFields(() -> convertToFields(f.apply(builder)));
     return new Log4JCoreLogger(
-        fqcn, logger, context.and(newContext), condition, executor, threadContextFunction);
+        fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
 
   @Override
