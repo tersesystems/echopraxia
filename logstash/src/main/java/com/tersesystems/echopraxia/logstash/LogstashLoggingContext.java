@@ -72,8 +72,7 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     }
 
     // This MUST be lazy, we can't get the fields until statement evaluation
-    Supplier<List<Field>> joinedFields =
-        joinFields(this::getFields, context::getFields);
+    Supplier<List<Field>> joinedFields = joinFields(this::getFields, context::getFields);
     Supplier<List<Marker>> joinedMarkers =
         joinMarkers(context::getMarkers, LogstashLoggingContext.this::getMarkers);
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
@@ -131,5 +130,4 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     markerList.addAll(markers);
     return Markers.aggregate(markerList);
   }
-
 }

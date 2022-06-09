@@ -102,7 +102,8 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull CoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    final LogstashLoggingContext contextWithFields = this.context.withFields(() -> convertToFields(f.apply(builder)));
+    final LogstashLoggingContext contextWithFields =
+        this.context.withFields(() -> convertToFields(f.apply(builder)));
     return new LogstashCoreLogger(
         fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
   }

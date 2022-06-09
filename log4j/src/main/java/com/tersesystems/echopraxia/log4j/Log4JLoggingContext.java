@@ -40,7 +40,7 @@ public class Log4JLoggingContext extends AbstractLoggingContext {
   }
 
   private Supplier<List<Field>> joinFields(
-    Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
+      Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
     return () -> {
       List<Field> thisFields = thisFieldsSupplier.get();
       List<Field> ctxFields = ctxFieldsSupplier.get();
