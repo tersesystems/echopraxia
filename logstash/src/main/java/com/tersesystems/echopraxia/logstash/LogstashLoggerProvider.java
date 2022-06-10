@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
  */
 public class LogstashLoggerProvider implements CoreLoggerProvider {
 
-  private final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+  private static final LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+
+  static boolean asyncCallerEnabled = Boolean.parseBoolean(loggerContext.getProperty(LogstashCoreLogger.ECHOPRAXIA_ASYNC_CALLER_PROPERTY));
 
   public @NotNull CoreLogger getLogger(@NotNull String fqcn, @NotNull Class<?> clazz) {
     return getLogger(fqcn, clazz.getName());

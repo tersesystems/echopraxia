@@ -78,7 +78,7 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
   }
 
-  private Supplier<List<Marker>> joinMarkers(
+  static Supplier<List<Marker>> joinMarkers(
       Supplier<List<Marker>> markersSupplier, Supplier<List<Marker>> thisMarkersSupplier) {
     return () -> {
       final List<Marker> markers = markersSupplier.get();
@@ -93,7 +93,7 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     };
   }
 
-  private Supplier<List<Field>> joinFields(
+  static Supplier<List<Field>> joinFields(
       Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
     return () -> {
       List<Field> thisFields = thisFieldsSupplier.get();
