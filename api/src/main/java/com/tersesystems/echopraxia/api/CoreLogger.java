@@ -217,10 +217,10 @@ public interface CoreLogger {
    * @param builder the field builder.
    */
   <FB> void asyncLog(
-    @NotNull Level level,
-    @NotNull Supplier<List<Field>> extraFields,
-    @NotNull Consumer<LoggerHandle<FB>> consumer,
-    @NotNull FB builder);
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder);
 
   /**
    * Logs a statement asynchronously using an executor and the given condition.
@@ -233,9 +233,9 @@ public interface CoreLogger {
    * @param builder the field builder.
    */
   <FB> void asyncLog(
-    @NotNull Level level,
-    @NotNull Supplier<List<Field>> extraFields,
-    @NotNull Condition condition,
-    @NotNull Consumer<LoggerHandle<FB>> consumer,
-    @NotNull FB builder);
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder);
 }

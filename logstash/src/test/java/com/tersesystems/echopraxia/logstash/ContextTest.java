@@ -16,12 +16,11 @@ import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Value;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
 import net.logstash.logback.marker.EmptyLogstashMarker;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.junit.jupiter.api.Test;
@@ -157,9 +156,9 @@ public class ContextTest extends TestBase {
     final String formattedMessage = event.getFormattedMessage();
     assertThat(formattedMessage).isEqualTo("This should have two contexts.");
 
-    final List<Marker> markers = getMarkers(event);
-    final ObjectAppendingMarker m1 = (ObjectAppendingMarker) markers.get(0);
-    final ObjectAppendingMarker m2 = (ObjectAppendingMarker) markers.get(1);
+    final List<ObjectAppendingMarker> markers = getMarkers(event).stream().map(m -> (ObjectAppendingMarker) m).collect(Collectors.toList());
+    final Marker m1 = markers.stream().filter(m -> Objects.equals(m.getFieldName(), "key")).findFirst().get();
+    final Marker m2 = markers.stream().filter(m -> Objects.equals(m.getFieldName(), "key2")).findFirst().get();
 
     testMarker(m1, "key", "value");
     testMarker(m2, "key2", "value2");
