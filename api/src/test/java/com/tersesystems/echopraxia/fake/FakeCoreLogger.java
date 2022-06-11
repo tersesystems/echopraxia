@@ -161,9 +161,7 @@ public class FakeCoreLogger implements CoreLogger {
 
   @Override
   public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-
-  }
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
 
   @Override
   public <FB> void asyncLog(
@@ -173,12 +171,17 @@ public class FakeCoreLogger implements CoreLogger {
       @NotNull FB builder) {}
 
   @Override
-  public <FB> void asyncLog(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-
-  }
+  public <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {}
 
   @Override
-  public <FB> void asyncLog(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @NotNull Condition condition, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-
-  }
+  public <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {}
 }

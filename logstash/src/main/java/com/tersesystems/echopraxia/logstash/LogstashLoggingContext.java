@@ -56,7 +56,8 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
   }
 
   public LogstashLoggingContext withFields(Supplier<List<Field>> o) {
-    Supplier<List<Field>> joinedFields = joinFields(o, this::getFields);
+    // existing context should be concatenated before the new fields
+    Supplier<List<Field>> joinedFields = joinFields(this::getFields, o);
     return new LogstashLoggingContext(joinedFields, this::getMarkers);
   }
 
