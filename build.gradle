@@ -50,8 +50,8 @@ subprojects { subproj ->
 
         // To enable the built-in stacktrace sampling profiler
         //args = ['-prof', 'stack']
-        // args = ['-prof', 'gc']
-        args = ['-prof', 'async:output=flamegraph']
+        //args = ['-prof', 'gc']
+        //args = ['-prof', 'async:output=flamegraph']
     }
 
     // to make sure benchmarks always get compiled
