@@ -8,6 +8,7 @@ dependencies {
     testImplementation project(":logger")
     testImplementation project(":async")
     jmhImplementation project(":logger")
+    jmhImplementation project(":async")
 
     implementation "org.slf4j:slf4j-api:1.7.36"
     implementation 'ch.qos.logback:logback-classic:1.2.11'

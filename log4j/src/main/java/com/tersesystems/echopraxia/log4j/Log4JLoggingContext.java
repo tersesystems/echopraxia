@@ -34,6 +34,29 @@ public class Log4JLoggingContext extends AbstractLoggingContext {
     return marker;
   }
 
+  public Log4JLoggingContext withFields(Supplier<List<Field>> o) {
+    Supplier<List<Field>> joinedFields = joinFields(o, this::getFields);
+    return new Log4JLoggingContext(joinedFields, this.getMarker());
+  }
+
+  private Supplier<List<Field>> joinFields(
+      Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
+    return () -> {
+      List<Field> thisFields = thisFieldsSupplier.get();
+      List<Field> ctxFields = ctxFieldsSupplier.get();
+
+      if (thisFields.isEmpty()) {
+        return ctxFields;
+      } else if (ctxFields.isEmpty()) {
+        return thisFields;
+      } else {
+        // Stream.concat is actually faster than explicit ArrayList!
+        // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
+        return Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
+      }
+    };
+  }
+
   /**
    * Joins the two contexts together, concatenating the lists in a supplier function.
    *
@@ -42,12 +65,7 @@ public class Log4JLoggingContext extends AbstractLoggingContext {
    */
   public Log4JLoggingContext and(Log4JLoggingContext context) {
     if (context != null) {
-      Supplier<List<Field>> joinedFields =
-          () -> {
-            final List<Field> listOne = Log4JLoggingContext.this.getFields();
-            final List<Field> listTwo = context.getFields();
-            return Stream.concat(listOne.stream(), listTwo.stream()).collect(Collectors.toList());
-          };
+      Supplier<List<Field>> joinedFields = joinFields(context::getFields, this::getFields);
       Marker m = context.getMarker() != null ? context.getMarker() : this.marker;
       return new Log4JLoggingContext(joinedFields, m);
     } else {

@@ -80,10 +80,8 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    Log4JLoggingContext newContext =
-        new Log4JLoggingContext(() -> convertToFields(f.apply(builder)), null);
-    return new Log4JCoreLogger(
-        fqcn, logger, context.and(newContext), condition, executor, threadContextFunction);
+    Log4JLoggingContext newContext = context.withFields(() -> convertToFields(f.apply(builder)));
+    return newLogger(newContext);
   }
 
   @Override
@@ -91,8 +89,7 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
     Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
-    return new Log4JCoreLogger(
-        fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
+    return newLogger(this.context.and(newContext));
   }
 
   @Override
@@ -106,7 +103,7 @@ public class Log4JCoreLogger implements CoreLogger {
             r2.run();
           };
         };
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, supplier);
+    return newLogger(supplier);
   }
 
   @Override
@@ -118,10 +115,9 @@ public class Log4JCoreLogger implements CoreLogger {
       if (this.condition == Condition.never()) {
         return this;
       }
-      return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+      return newLogger(condition);
     }
-    return new Log4JCoreLogger(
-        fqcn, logger, context, this.condition.and(condition), executor, threadContextFunction);
+    return newLogger(this.condition.and(condition));
   }
 
   @Override
@@ -137,8 +133,7 @@ public class Log4JCoreLogger implements CoreLogger {
   @NotNull
   public Log4JCoreLogger withMarker(@NotNull Marker marker) {
     Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
-    return new Log4JCoreLogger(
-        fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
+    return newLogger(this.context.and(newContext));
   }
 
   @Override
@@ -243,39 +238,7 @@ public class Log4JCoreLogger implements CoreLogger {
     runAsyncLog(
         () -> {
           threadLocalRunnable.run();
-          consumer.accept(
-              new LoggerHandle<FB>() {
-                @Override
-                public void log(@Nullable String messageTemplate) {
-                  final Marker marker = context.getMarker();
-                  final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  if (logger.isEnabled(log4jLevel, marker) && condition.test(level, context)) {
-                    final Message message = createMessage(messageTemplate);
-                    logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
-                  }
-                }
-
-                @Override
-                public void log(
-                    @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
-                  // because the isEnabled check looks for message and throwable, we have to
-                  // calculate them right up front.
-                  final Marker marker = context.getMarker();
-                  final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  if (logger.isEnabled(log4jLevel, marker)) {
-                    final List<Field> argumentFields = convertToFields(f.apply(builder));
-                    final Throwable e = findThrowable(argumentFields);
-                    final Message message = createMessage(messageTemplate, argumentFields);
-                    // When passing a condition through with explicit arguments, we pull the args
-                    // and make them available through context.
-                    Log4JLoggingContext argContext =
-                        new Log4JLoggingContext(() -> argumentFields, null);
-                    if (condition.test(level, context.and(argContext))) {
-                      logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
-                    }
-                  }
-                }
-              });
+          consumer.accept(newHandle(level, builder, location));
         });
   }
 
@@ -287,45 +250,41 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
     Runnable threadLocalRunnable = threadContextFunction.get();
-
     runAsyncLog(
         () -> {
           threadLocalRunnable.run();
-          consumer.accept(
-              new LoggerHandle<FB>() {
-                @Override
-                public void log(@Nullable String messageTemplate) {
-                  final Marker marker = context.getMarker();
-                  final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  if (logger.isEnabled(log4jLevel, marker)
-                      && condition.and(c).test(level, context)) {
-                    final Message message = createMessage(messageTemplate);
-                    logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
-                  }
-                }
+          consumer.accept(newHandle(level, c, builder, location));
+        });
+  }
 
-                @Override
-                public void log(
-                    @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
-                  // because the isEnabled check looks for message and throwable, we have to
-                  // calculate them right up front.
-                  final Marker marker = context.getMarker();
-                  final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-                  if (logger.isEnabled(log4jLevel, marker)) {
-                    final List<Field> argumentFields = convertToFields(f.apply(builder));
-                    final Throwable e = findThrowable(argumentFields);
-                    final Message message = createMessage(messageTemplate, argumentFields);
-                    // When passing a condition through with explicit arguments, we pull the args
-                    // and
-                    // make them available through context.
-                    Log4JLoggingContext argContext =
-                        new Log4JLoggingContext(() -> argumentFields, null);
-                    if (condition.and(c).test(level, context.and(argContext))) {
-                      logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
-                    }
-                  }
-                }
-              });
+  @Override
+  public <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
+    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
+    Runnable threadLocalRunnable = threadContextFunction.get();
+    runAsyncLog(
+        () -> {
+          threadLocalRunnable.run();
+          consumer.accept(newHandle(level, builder, location));
+        });
+  }
+
+  @Override
+  public <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition c,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
+    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
+    Runnable threadLocalRunnable = threadContextFunction.get();
+    runAsyncLog(
+        () -> {
+          threadLocalRunnable.run();
+          consumer.accept(newHandle(level, c, builder, location));
         });
   }
 
@@ -357,6 +316,7 @@ public class Log4JCoreLogger implements CoreLogger {
   protected Throwable findThrowable(List<Field> fields) {
     for (Field field : fields) {
       final Value<?> value = field.value();
+      // FIXME This needs to look for both name and value
       if (value instanceof Value.ExceptionValue) {
         return ((Value.ExceptionValue) value).raw();
       }
@@ -411,6 +371,94 @@ public class Log4JCoreLogger implements CoreLogger {
     } else {
       return false;
     }
+  }
+
+  @NotNull
+  private Log4JCoreLogger newLogger(Log4JLoggingContext newContext) {
+    return new Log4JCoreLogger(
+        fqcn, logger, newContext, condition, executor, threadContextFunction);
+  }
+
+  @NotNull
+  private Log4JCoreLogger newLogger(Supplier<Runnable> supplier) {
+    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, supplier);
+  }
+
+  @NotNull
+  private Log4JCoreLogger newLogger(@NotNull Condition condition) {
+    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+  }
+
+  @NotNull
+  private <FB> LoggerHandle<FB> newHandle(
+      @NotNull Level level, @NotNull FB builder, StackTraceElement location) {
+    return new LoggerHandle<FB>() {
+      @Override
+      public void log(@Nullable String messageTemplate) {
+        final Marker marker = context.getMarker();
+        final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+        if (logger.isEnabled(log4jLevel, marker) && condition.test(level, context)) {
+          final Message message = createMessage(messageTemplate);
+          logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
+        }
+      }
+
+      @Override
+      public void log(
+          @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+        // because the isEnabled check looks for message and throwable, we have to
+        // calculate them right up front.
+        final Marker marker = context.getMarker();
+        final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+        if (logger.isEnabled(log4jLevel, marker)) {
+          final List<Field> argumentFields = convertToFields(f.apply(builder));
+          final Throwable e = findThrowable(argumentFields);
+          final Message message = createMessage(messageTemplate, argumentFields);
+          // When passing a condition through with explicit arguments, we pull the args
+          // and make them available through context.
+          Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
+          if (condition.test(level, context.and(argContext))) {
+            logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
+          }
+        }
+      }
+    };
+  }
+
+  @NotNull
+  private <FB> LoggerHandle<FB> newHandle(
+      @NotNull Level level, @NotNull Condition c, @NotNull FB builder, StackTraceElement location) {
+    return new LoggerHandle<FB>() {
+      @Override
+      public void log(@Nullable String messageTemplate) {
+        // XXX this should just call a regular logger.
+        final Marker marker = context.getMarker();
+        final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+        if (logger.isEnabled(log4jLevel, marker) && condition.and(c).test(level, context)) {
+          final Message message = createMessage(messageTemplate);
+          logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
+        }
+      }
+
+      @Override
+      public void log(
+          @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+        // XXX this should call a regular logger.
+        final Marker marker = context.getMarker();
+        final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+        if (logger.isEnabled(log4jLevel, marker)) {
+          final List<Field> argumentFields = convertToFields(f.apply(builder));
+          final Throwable e = findThrowable(argumentFields);
+          final Message message = createMessage(messageTemplate, argumentFields);
+          // When passing a condition through with explicit arguments, we pull the args
+          // and make them available through context.
+          Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
+          if (condition.and(c).test(level, context.and(argContext))) {
+            logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
+          }
+        }
+      }
+    };
   }
 
   public String toString() {

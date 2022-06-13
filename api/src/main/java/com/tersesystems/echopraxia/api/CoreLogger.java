@@ -206,4 +206,36 @@ public interface CoreLogger {
       @NotNull Condition condition,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder);
+
+  /**
+   * Logs a statement asynchronously using an executor.
+   *
+   * @param <FB> the field builder type
+   * @param level the logging level
+   * @param extraFields fields to be added to the logger context
+   * @param consumer the consumer of the logger handle
+   * @param builder the field builder.
+   */
+  <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder);
+
+  /**
+   * Logs a statement asynchronously using an executor and the given condition.
+   *
+   * @param <FB> the field builder type
+   * @param level the logging level
+   * @param extraFields fields to be added to the logger context
+   * @param condition the condition
+   * @param consumer the consumer of the logger handle
+   * @param builder the field builder.
+   */
+  <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder);
 }

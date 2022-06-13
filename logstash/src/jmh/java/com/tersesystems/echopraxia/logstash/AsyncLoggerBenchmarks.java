@@ -1,29 +1,41 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.async.AsyncLogger;
+import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 import org.openjdk.jmh.annotations.*;
-import org.openjdk.jmh.infra.Blackhole;
 
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.NANOSECONDS)
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
-public class LoggerBenchmarks {
-  private static final Logger<?> logger = LoggerFactory.getLogger();
+public class AsyncLoggerBenchmarks {
+  private static final AsyncLogger<?> logger =
+      AsyncLoggerFactory.getLogger()
+          .withExecutor(
+              new Executor() {
+                @Override
+                public void execute(@NotNull Runnable command) {
+                  // do nothing
+                }
+              });
+
   private static final Exception exception = new RuntimeException();
 
-  private static final Logger<?> neverLogger = logger.withCondition(Condition.never());
-  private static final Logger<?> alwaysLogger = logger.withCondition(Condition.always());
-  private static final Logger<?> conditionLogger =
+  private static final AsyncLogger<?> neverLogger = logger.withCondition(Condition.never());
+  private static final AsyncLogger<?> alwaysLogger = logger.withCondition(Condition.always());
+  private static final AsyncLogger<?> conditionLogger =
       logger.withCondition((level, context) -> level.equals(Level.ERROR));
-  private static final Logger<?> fieldBuilderLogger =
+  private static final AsyncLogger<?> fieldBuilderLogger =
       logger.withFieldBuilder(FieldBuilder.instance());
-  private static final Logger<?> contextLogger = logger.withFields(fb -> fb.string("foo", "bar"));
+  private static final AsyncLogger<?> contextLogger =
+      logger.withFields(fb -> fb.string("foo", "bar"));
 
   @Benchmark
   public void info() {
@@ -48,11 +60,6 @@ public class LoggerBenchmarks {
   @Benchmark
   public void infoWithErrorCondition() {
     conditionLogger.info("Message");
-  }
-
-  @Benchmark
-  public void isInfoEnabled(Blackhole blackhole) {
-    blackhole.consume(logger.isInfoEnabled());
   }
 
   @Benchmark

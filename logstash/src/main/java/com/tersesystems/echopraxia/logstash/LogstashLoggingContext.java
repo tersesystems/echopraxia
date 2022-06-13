@@ -55,6 +55,12 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     return markersSupplier.get();
   }
 
+  public LogstashLoggingContext withFields(Supplier<List<Field>> o) {
+    // existing context should be concatenated before the new fields
+    Supplier<List<Field>> joinedFields = joinFields(this::getFields, o);
+    return new LogstashLoggingContext(joinedFields, this::getMarkers);
+  }
+
   /**
    * Joins the two contexts together, concatenating the lists in a supplier function.
    *
@@ -67,14 +73,13 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     }
 
     // This MUST be lazy, we can't get the fields until statement evaluation
-    Supplier<List<Field>> joinedFields =
-        joinFields(LogstashLoggingContext.this::getFields, context::getFields);
+    Supplier<List<Field>> joinedFields = joinFields(this::getFields, context::getFields);
     Supplier<List<Marker>> joinedMarkers =
         joinMarkers(context::getMarkers, LogstashLoggingContext.this::getMarkers);
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
   }
 
-  private Supplier<List<Marker>> joinMarkers(
+  static Supplier<List<Marker>> joinMarkers(
       Supplier<List<Marker>> markersSupplier, Supplier<List<Marker>> thisMarkersSupplier) {
     return () -> {
       final List<Marker> markers = markersSupplier.get();
@@ -89,7 +94,7 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     };
   }
 
-  private Supplier<List<Field>> joinFields(
+  static Supplier<List<Field>> joinFields(
       Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
     return () -> {
       List<Field> thisFields = thisFieldsSupplier.get();
