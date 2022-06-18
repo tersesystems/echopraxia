@@ -11,6 +11,7 @@ import java.util.stream.Stream;
 import net.logstash.logback.marker.LogstashMarker;
 import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Marker;
 
 /**
@@ -111,10 +112,25 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     };
   }
 
+  @Nullable org.slf4j.Marker resolveMarkers() {
+    List<Marker> markers = getMarkers();
+    // XXX there should be a way to cache this if we know it hasn't changed, since it
+    // could be calculated repeatedly.
+    if (markers.isEmpty()) {
+      return null;
+    } else if (markers.size() == 1) {
+      return markers.get(0);
+    } else {
+      return Markers.aggregate(markers);
+    }
+  }
+
   // Convert markers explicitly.
-  org.slf4j.Marker getMarker() {
+  @Nullable org.slf4j.Marker resolveFieldsAndMarkers() {
     final List<Field> fields = getFields();
     final List<Marker> markers = getMarkers();
+
+    // XXX use resolve markers?
 
     // XXX there should be a way to cache this if we know it hasn't changed, since it
     // could be calculated repeatedly.
