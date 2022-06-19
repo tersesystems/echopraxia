@@ -29,7 +29,7 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
   protected final Supplier<List<Marker>> markersSupplier;
 
   protected LogstashLoggingContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
-    this.fieldsSupplier = Utilities.memoize(f);
+    this.fieldsSupplier = f;
     this.markersSupplier = m;
   }
 
