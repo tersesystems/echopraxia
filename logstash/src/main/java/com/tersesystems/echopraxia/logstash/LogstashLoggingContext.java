@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.AbstractLoggingContext;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Utilities;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -25,12 +26,24 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
   private static final LogstashLoggingContext EMPTY =
       new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
 
-  protected final Supplier<List<Field>> fieldsSupplier;
-  protected final Supplier<List<Marker>> markersSupplier;
+  private final Supplier<List<Field>> fieldsSupplier;
+  private final Supplier<List<Marker>> markersSupplier;
+
+  private final Supplier<Marker> markersResult;
 
   protected LogstashLoggingContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
     this.fieldsSupplier = f;
     this.markersSupplier = m;
+    this.markersResult = Utilities.memoize(() -> {
+      List<Marker> markers = getMarkers();
+      if (markers.isEmpty()) {
+        return null;
+      } else if (markers.size() == 1) {
+        return markers.get(0);
+      } else {
+        return Markers.aggregate(markers);
+      }
+    });
   }
 
   public static LogstashLoggingContext create(List<Field> fields) {
@@ -59,6 +72,11 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     // existing context should be concatenated before the new fields
     Supplier<List<Field>> joinedFields = joinFields(this::getFields, o);
     return new LogstashLoggingContext(joinedFields, this::getMarkers);
+  }
+
+  public LogstashLoggingContext withMarkers(Supplier<List<Marker>> o) {
+    Supplier<List<Marker>> joinedMarkers = joinMarkers(this::getMarkers, o);
+    return new LogstashLoggingContext(this::getFields, joinedMarkers);
   }
 
   /**
@@ -112,38 +130,28 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     };
   }
 
-  @Nullable org.slf4j.Marker resolveMarkers() {
-    List<Marker> markers = getMarkers();
-    // XXX there should be a way to cache this if we know it hasn't changed, since it
-    // could be calculated repeatedly.
-    if (markers.isEmpty()) {
-      return null;
-    } else if (markers.size() == 1) {
-      return markers.get(0);
-    } else {
-      return Markers.aggregate(markers);
-    }
+  @Nullable
+  org.slf4j.Marker resolveMarkers() {
+    return markersResult.get();
   }
 
   // Convert markers explicitly.
-  @Nullable org.slf4j.Marker resolveFieldsAndMarkers() {
+  @Nullable
+  org.slf4j.Marker resolveFieldsAndMarkers() {
     final List<Field> fields = getFields();
-    final List<Marker> markers = getMarkers();
-
-    // XXX use resolve markers?
-
-    // XXX there should be a way to cache this if we know it hasn't changed, since it
-    // could be calculated repeatedly.
-    if (fields.isEmpty() && markers.isEmpty()) {
-      return null;
+    if (fields.isEmpty()) {
+      return markersResult.get();
+    } else {
+      final Marker marker = markersResult.get();
+      final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
+      for (Field field : fields) {
+        LogstashMarker append = Markers.append(field.name(), field.value());
+        markerList.add(append);
+      }
+      if (marker != null) {
+        markerList.add(marker);
+      }
+      return Markers.aggregate(markerList);
     }
-
-    final List<Marker> markerList = new ArrayList<>();
-    for (Field field : fields) {
-      LogstashMarker append = Markers.append(field.name(), field.value());
-      markerList.add(append);
-    }
-    markerList.addAll(markers);
-    return Markers.aggregate(markerList);
   }
 }

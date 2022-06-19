@@ -109,25 +109,19 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   public CoreLogger withMarkers(Marker... markers) {
-    LogstashLoggingContext newContext =
-      new LogstashLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
+    final LogstashLoggingContext contextWithMarkers =
+        this.context.withMarkers(() -> Arrays.asList(markers));
     return new LogstashCoreLogger(
-      fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
-  }
-
-  private List<Field> convertToFields(FieldBuilderResult result) {
-    if (result == null) {
-      // XXX log an error
-      return Collections.emptyList();
-    }
-    return result.fields();
+        fqcn, logger, contextWithMarkers, condition, executor, threadContextFunction);
   }
 
   @Override
   public @NotNull CoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
-    LogstashLoggingContext newContext = context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
-    return new LogstashCoreLogger(fqcn, logger, newContext, condition, executor, threadContextFunction);
+    LogstashLoggingContext newContext =
+        context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
+    return new LogstashCoreLogger(
+        fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
 
   @Override
@@ -218,7 +212,8 @@ public class LogstashCoreLogger implements CoreLogger {
       final LogstashLoggingContext argContext = context.withFields(() -> args);
       if (condition.test(level, argContext)) {
         final Object[] arguments = convertArguments(args);
-        logger.log(context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
+        logger.log(
+            context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
       }
     }
   }
@@ -247,7 +242,8 @@ public class LogstashCoreLogger implements CoreLogger {
       final LogstashLoggingContext argContext = context.withFields(() -> args);
       if (this.condition.and(condition).test(level, argContext)) {
         final Object[] arguments = convertArguments(args);
-        logger.log(context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
+        logger.log(
+            context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
       }
     }
   }
@@ -498,6 +494,14 @@ public class LogstashCoreLogger implements CoreLogger {
         callerLogger.log(level, c, message, f, builder);
       }
     };
+  }
+
+  private List<Field> convertToFields(FieldBuilderResult result) {
+    if (result == null) {
+      // XXX log an error
+      return Collections.emptyList();
+    }
+    return result.fields();
   }
 
   public String toString() {
