@@ -21,7 +21,7 @@ public class Log4JLoggingContext extends AbstractLoggingContext {
   }
 
   protected Log4JLoggingContext(Supplier<List<Field>> f, Marker m) {
-    this.fieldsSupplier = Utilities.memoize(f);
+    this.fieldsSupplier = f;
     this.marker = m;
   }
 
