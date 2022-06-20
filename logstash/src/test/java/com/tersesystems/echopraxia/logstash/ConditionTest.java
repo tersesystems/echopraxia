@@ -12,6 +12,7 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 public class ConditionTest extends TestBase {
@@ -46,6 +47,27 @@ public class ConditionTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     String message = event.getFormattedMessage();
     assertThat(message).isEqualTo("info");
+  }
+
+  @Test
+  void testConditionIsLive() {
+    Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
+    Logger<?> logger = getLogger();
+    final AtomicReference<String> changeableValue = new AtomicReference<>("derp");
+
+    // we need to know that withFields is "call by name" and is evaluated fresh on every statement.
+    Logger<?> loggerWithContext = logger.withFields(f -> f.string("herp", changeableValue.get()));
+
+    loggerWithContext.info(hasDerp, "has derp");
+    changeableValue.set("notderp");
+    loggerWithContext.info(hasDerp, "should not log");
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list.size()).isEqualTo(1);
+
+    final ILoggingEvent event = listAppender.list.get(0);
+    String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("has derp");
   }
 
   @Test

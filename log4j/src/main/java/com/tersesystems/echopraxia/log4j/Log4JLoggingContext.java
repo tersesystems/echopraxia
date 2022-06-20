@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.api.AbstractLoggingContext;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Utilities;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
@@ -21,7 +20,7 @@ public class Log4JLoggingContext extends AbstractLoggingContext {
   }
 
   protected Log4JLoggingContext(Supplier<List<Field>> f, Marker m) {
-    this.fieldsSupplier = Utilities.memoize(f);
+    this.fieldsSupplier = f;
     this.marker = m;
   }
 

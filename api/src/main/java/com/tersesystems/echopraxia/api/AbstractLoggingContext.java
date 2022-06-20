@@ -28,7 +28,7 @@ public abstract class AbstractLoggingContext implements LoggingContext {
           .build();
 
   private final Supplier<DocumentContext> supplier =
-      new Utilities.MemoizingSupplier<>(() -> JsonPath.parse(this, configuration));
+      Utilities.memoize(() -> JsonPath.parse(this, configuration));
 
   private @NotNull <T> Optional<T> optionalFind(
       @NotNull String jsonPath, @NotNull Class<T> desiredClass) {

@@ -458,6 +458,18 @@ public class PlayerData {
 }
 ```
 
+Because values may be tied to state or variables that can change between method calls, the function call made by `withFields` is [call by name](https://en.wikipedia.org/wiki/Evaluation_strategy#Call_by_name) i.e. the function is called on every logging statement for evaluation against any conditions and the logging statement will contain whatever the current value of `lastAccessedDate` at evaluation.
+
+It's important to note that context evaluation only happens after enabled checks.  For example, `isInfoEnabled` will not trigger context evaluation by itself.  However, any implementation specific markers attached to the context will be passed in for the enabled check, as both Logback and Log4J incorporate marker checks in `isEnabled`.
+
+```java
+// will not evaluate context fields
+// will evaluate any impl-specific markers (Logback or Log4J)
+boolean enabled = logger.isInfoEnabled();
+```
+
+The way that context works in conjunction with conditions is more involved, and is covered in the conditions section.
+
 ### Thread Context
 
 You can also resolve any fields in Mapped Diagnostic Context (MDC) into fields, using `logger.withThreadContext()`.  This method provides a pre-built function that calls `fb.string` for each entry in the map.
@@ -468,6 +480,8 @@ Because MDC is thread local, if you pass the logger between threads or use async
 org.slf4j.MDC.put("mdckey", "mdcvalue");
 myLogger.withThreadContext().info("This statement has MDC values in context");
 ```
+
+This method is call by name, and so will provide the MDC state as fields at the time the logging statement is evaluated.
 
 ### Thread Safety
 
@@ -615,6 +629,7 @@ class FindException {
 
 There are many more options available using JSONPath.  You can try out the [online evaluator](https://jsonpath.herokuapp.com/) to test out expressions.
 
+
 ### Logger
 
 You can use conditions in a logger, and statements will only log if the condition is met:
@@ -629,9 +644,24 @@ You can also build up conditions:
 Logger<?> loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
 ```
 
+Conditions are only evaluated once a level/marker check is passed, so something like
+
+```java
+loggerWithAandB.trace("some message");
+```
+
+will short circuit on the level check before any condition is reached.
+
+Conditions look for fields, but those fields can come from *either* context or argument.  For example, the following condition will log because the condition finds an argument field:
+
+```java
+Condition cond = (level, ctx) -> ctx.findString("somename").isPresent();
+logger.withCondition(cond).info("some message", fb -> fb.string("somename", "somevalue")); // matches argument
+```
+
 ### Statement
 
-You can use conditions in an individual statement:
+You can also use conditions in an individual statement:
 
 ```java
 logger.info(mustHaveFoo, "Only log if foo is present");
@@ -645,6 +675,49 @@ Conditions can also be used in predicate blocks for expensive objects.
 if (logger.isInfoEnabled(condition)) {
   // only true if condition and is info  
 }
+```
+
+Conditions will only be checked after an `isEnabled` check is passed -- the level (and optional marker) is always checked first, before any conditions.
+
+A condition may also evaluate context fields that are set in a logger:
+
+```java
+// Conditions may evaluate context
+Condition cond = (level, ctx) -> ctx.findString("somename").isPresent();
+boolean loggerEnabled = logger
+  .withFields(fb -> fb.string("somename", "somevalue"))
+  .withCondition(condition)
+  .isInfoEnabled();
+```
+
+Using a predicate with a condition does not trigger any logging, so it can be a nice way to "dry run" a condition.  Note that the context evaluation takes place every time a condition is run, so doing something like this is not good:
+
+```java
+Logger<?> loggerWithContextAndCondition =  logger
+  .withFields(fb -> fb.string("somename", "somevalue"))
+  .withCondition(condition);
+
+// check evaluates context
+if (loggerWithContextAndCondition.isInfoEnabled()) {
+  // info statement _also_ evaluates context
+  loggerWithContextAndCondition.info("some message");
+}
+```
+
+This results in the context being evaluated both in the block and in the info statement itself, which is inefficient.
+
+It is generally preferable to pass in a condition explicitly on the statement, as it will only evaluate once.
+
+```java
+Logger<?> loggerWithContext = logger
+  .withFields(fb -> fb.string("somename", "somevalue"))
+loggerWithContext.info(condition, "message");
+```
+
+or just on the statement.
+
+```java
+loggerWithContextAndCondition.info("some message");
 ```
 
 ## Asynchronous Logging
