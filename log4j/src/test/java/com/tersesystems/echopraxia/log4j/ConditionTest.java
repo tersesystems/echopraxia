@@ -13,6 +13,7 @@ import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 import javax.json.JsonObject;
 import org.junit.jupiter.api.Test;
@@ -64,6 +65,28 @@ public class ConditionTest extends TestBase {
     JsonObject entry = getEntry();
     final JsonObject fields = entry.getJsonObject("fields");
     assertThat(fields.getString("herp")).isEqualTo("derp");
+  }
+
+  @Test
+  void testConditionIsLive() {
+    Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
+    Logger<?> logger = getLogger();
+    final AtomicReference<String> changeableValue = new AtomicReference<>("derp");
+
+    // we need to know that withFields is "call by name" and is evaluated fresh on every statement.
+    Logger<?> loggerWithContext = logger.withFields(f -> f.string("herp", changeableValue.get()));
+
+    loggerWithContext.info(hasDerp, "has derp");
+    changeableValue.set("notderp");
+    loggerWithContext.info(hasDerp, "should not log");
+
+    final ListAppender listAppender = getListAppender("ListAppender");
+    final List<String> messages = listAppender.getMessages();
+    assertThat(messages.size()).isEqualTo(1);
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("has derp");
   }
 
   @Test
