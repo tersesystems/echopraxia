@@ -78,6 +78,11 @@ public class LoggerBenchmarks {
   }
 
   @Benchmark
+  public void infoWithContextChain() {
+    logger.withFields(fb -> fb.string("foo", "bar")).info("Message");
+  }
+
+  @Benchmark
   public void trace() {
     // should never log
     logger.trace("Trace Message");
@@ -87,5 +92,10 @@ public class LoggerBenchmarks {
   public void traceWithParameterizedString() {
     // should never log
     logger.trace("Message {}", fb -> fb.string("foo", "bar"));
+  }
+
+  @Benchmark
+  public void traceWithContextChain() {
+    logger.withFields(fb -> fb.string("foo", "bar")).trace("Message");
   }
 }

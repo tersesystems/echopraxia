@@ -47,6 +47,38 @@ SLF4JLoggerBenchmarks.infoWithException           avgt    5  236.811 ±  0.590  
 SLF4JLoggerBenchmarks.isInfoEnabled               avgt    5    3.407 ±  0.229  ns/op
 ```
 
+Benchmark                                             Mode  Cnt    Score    Error  Units
+LoggerBenchmarks.info                                 avgt    5   56.929 ±  0.950  ns/op
+LoggerBenchmarks.info:·async                          avgt           NaN             ---
+LoggerBenchmarks.infoWithAlways                       avgt    5   54.330 ±  1.807  ns/op
+LoggerBenchmarks.infoWithAlways:·async                avgt           NaN             ---
+LoggerBenchmarks.infoWithContextChain                 avgt    5  238.810 ± 39.113  ns/op
+LoggerBenchmarks.infoWithContextChain:·async          avgt           NaN             ---
+LoggerBenchmarks.infoWithContextString                avgt    5   61.978 ±  0.351  ns/op
+LoggerBenchmarks.infoWithContextString:·async         avgt           NaN             ---
+LoggerBenchmarks.infoWithErrorCondition               avgt    5    4.480 ±  0.506  ns/op
+LoggerBenchmarks.infoWithErrorCondition:·async        avgt           NaN             ---
+LoggerBenchmarks.infoWithException                    avgt    5  294.817 ± 33.051  ns/op
+LoggerBenchmarks.infoWithException:·async             avgt           NaN             ---
+LoggerBenchmarks.infoWithFieldBuilder                 avgt    5   61.851 ±  0.174  ns/op
+LoggerBenchmarks.infoWithFieldBuilder:·async          avgt           NaN             ---
+LoggerBenchmarks.infoWithNever                        avgt    5    0.426 ±  0.009  ns/op
+LoggerBenchmarks.infoWithNever:·async                 avgt           NaN             ---
+LoggerBenchmarks.infoWithParameterizedString          avgt    5  122.649 ± 16.556  ns/op
+LoggerBenchmarks.infoWithParameterizedString:·async   avgt           NaN             ---
+LoggerBenchmarks.infoWithStringArg                    avgt    5  122.520 ± 12.063  ns/op
+LoggerBenchmarks.infoWithStringArg:·async             avgt           NaN             ---
+LoggerBenchmarks.isInfoEnabled                        avgt    5    3.974 ±  0.899  ns/op
+LoggerBenchmarks.isInfoEnabled:·async                 avgt           NaN             ---
+LoggerBenchmarks.trace                                avgt    5    3.425 ±  0.184  ns/op
+LoggerBenchmarks.trace:·async                         avgt           NaN             ---
+LoggerBenchmarks.traceWithContextChain                avgt    5   58.407 ±  8.117  ns/op
+LoggerBenchmarks.traceWithContextChain:·async         avgt           NaN             ---
+LoggerBenchmarks.traceWithParameterizedString         avgt    5    3.477 ±  0.051  ns/op
+LoggerBenchmarks.traceWithParameterizedString:·async  avgt           NaN             ---
+
+
+
 `CoreLoggerBenchmarks` shows the CoreLogger SPI.  
 
 `SLF4JLoggerBenchmarks` show the SLF4J API being called directly for comparison -- what you'd see if you were using straight Logback.

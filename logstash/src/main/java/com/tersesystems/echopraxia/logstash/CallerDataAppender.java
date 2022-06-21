@@ -15,22 +15,34 @@ public class CallerDataAppender extends TransformingAppender<ILoggingEvent> {
   }
 
   protected ILoggingEvent setCallerData(ILoggingEvent event) {
+    final LoggingEvent internalEvent = (LoggingEvent) event;
     final Marker marker = event.getMarker();
-    if (marker != null) {
+    if (marker == null) {
+      return event;
+    } else if (marker instanceof LogstashCallerMarker) {
+      final StackTraceElement[] stackTraceElements =
+          extractFromMarker((LogstashCallerMarker) marker);
+      internalEvent.setCallerData(stackTraceElements);
+      return internalEvent;
+    } else {
       final Iterator<Marker> iterator = marker.iterator();
       while (iterator.hasNext()) {
         final Marker next = iterator.next();
         if (next instanceof LogstashCallerMarker) {
-          LogstashCallerMarker callerMarker = (LogstashCallerMarker) next;
-          final LoggingEvent internalEvent = (LoggingEvent) event;
-          final String fqcn = callerMarker.getFqcn();
-          final Throwable callSite = callerMarker.getCallSite();
-          final StackTraceElement[] callerData = extractCallerData(fqcn, callSite);
-          internalEvent.setCallerData(callerData);
+          final StackTraceElement[] stackTraceElements =
+              extractFromMarker((LogstashCallerMarker) next);
+          internalEvent.setCallerData(stackTraceElements);
+          return event;
         }
       }
     }
     return event;
+  }
+
+  private StackTraceElement[] extractFromMarker(LogstashCallerMarker callerMarker) {
+    final String fqcn = callerMarker.getFqcn();
+    final Throwable callSite = callerMarker.getCallSite();
+    return extractCallerData(fqcn, callSite);
   }
 
   protected StackTraceElement[] extractCallerData(String fqcn, Throwable callsite) {

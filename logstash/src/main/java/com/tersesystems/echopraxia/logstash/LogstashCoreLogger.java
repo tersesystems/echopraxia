@@ -108,22 +108,20 @@ public class LogstashCoreLogger implements CoreLogger {
         fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
   }
 
-  private List<Field> convertToFields(FieldBuilderResult result) {
-    if (result == null) {
-      // XXX log an error
-      return Collections.emptyList();
-    }
-    return result.fields();
+  public CoreLogger withMarkers(Marker... markers) {
+    final LogstashLoggingContext contextWithMarkers =
+        this.context.withMarkers(() -> Arrays.asList(markers));
+    return new LogstashCoreLogger(
+        fqcn, logger, contextWithMarkers, condition, executor, threadContextFunction);
   }
 
   @Override
   public @NotNull CoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
-    Supplier<List<Field>> fieldSupplier = mapTransform.apply(MDC::getCopyOfContextMap);
     LogstashLoggingContext newContext =
-        new LogstashLoggingContext(fieldSupplier, Collections::emptyList);
+        context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
     return new LogstashCoreLogger(
-        fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
+        fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
 
   @Override
@@ -143,7 +141,7 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
     if (condition == Condition.always()) {
-      return this;
+      return this; // "x && true" is always x
     }
     if (condition == Condition.never()) {
       if (this.condition == Condition.never()) {
@@ -168,19 +166,12 @@ public class LogstashCoreLogger implements CoreLogger {
         fqcn, logger, context, condition, executor, threadContextFunction);
   }
 
-  public CoreLogger withMarkers(Marker... markers) {
-    LogstashLoggingContext newContext =
-        new LogstashLoggingContext(Collections::emptyList, () -> Arrays.asList(markers));
-    return new LogstashCoreLogger(
-        fqcn, logger, this.context.and(newContext), condition, executor, threadContextFunction);
-  }
-
   @Override
   public boolean isEnabled(@NotNull Level level) {
     if (condition == Condition.never()) {
       return false;
     }
-    Marker marker = context.getMarker();
+    Marker marker = context.resolveMarkers();
     return logger.isEnabledFor(marker, convertLogbackLevel(level))
         && condition.test(level, context);
   }
@@ -193,16 +184,16 @@ public class LogstashCoreLogger implements CoreLogger {
     if (condition == Condition.never()) {
       return false;
     }
-    Marker marker = context.getMarker();
+    Marker marker = context.resolveMarkers();
     return logger.isEnabledFor(marker, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context);
   }
 
   @Override
   public void log(@NotNull Level level, String message) {
-    Marker m = context.getMarker();
+    Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context)) {
-      logger.log(m, fqcn, convertLevel(level), message, null, null);
+      logger.log(context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, null, null);
     }
   }
 
@@ -214,24 +205,24 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
-    final Marker m = context.getMarker();
+    final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
       final List<Field> args = convertToFields(f.apply(builder));
-      final LogstashLoggingContext argContext =
-          new LogstashLoggingContext(() -> args, Collections::emptyList);
-      if (condition.test(level, context.and(argContext))) {
+      final LogstashLoggingContext argContext = context.withFields(() -> args);
+      if (condition.test(level, argContext)) {
         final Object[] arguments = convertArguments(args);
-        logger.log(m, fqcn, convertLevel(level), message, arguments, null);
+        logger.log(
+            context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
       }
     }
   }
 
   @Override
   public void log(@NotNull Level level, @NotNull Condition condition, String message) {
-    final Marker m = context.getMarker();
+    final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context)) {
-      logger.log(m, fqcn, convertLevel(level), message, null, null);
+      logger.log(context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, null, null);
     }
   }
 
@@ -242,16 +233,16 @@ public class LogstashCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
-    final Marker m = context.getMarker();
+    final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
       // When passing a condition through with explicit arguments, we pull the args and make
       // them available through context.
       final List<Field> args = convertToFields(f.apply(builder));
-      LogstashLoggingContext argContext =
-          new LogstashLoggingContext(() -> args, Collections::emptyList);
-      if (this.condition.and(condition).test(level, context.and(argContext))) {
+      final LogstashLoggingContext argContext = context.withFields(() -> args);
+      if (this.condition.and(condition).test(level, argContext)) {
         final Object[] arguments = convertArguments(args);
-        logger.log(m, fqcn, convertLevel(level), message, arguments, null);
+        logger.log(
+            context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
       }
     }
   }
@@ -259,7 +250,13 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -275,7 +272,13 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -292,7 +295,13 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Supplier<List<Field>> extraFields,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    final Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    final Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -310,7 +319,13 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    final Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    final Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -319,15 +334,6 @@ public class LogstashCoreLogger implements CoreLogger {
           final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, callerLogger);
           consumer.accept(loggerHandle);
         });
-  }
-
-  @Nullable
-  protected LogstashCallerMarker callerMarker() {
-    if (isAsyncCallerEnabled()) {
-      return new LogstashCallerMarker(fqcn, new Throwable());
-    } else {
-      return null;
-    }
   }
 
   /**
@@ -502,6 +508,14 @@ public class LogstashCoreLogger implements CoreLogger {
         callerLogger.log(level, c, message, f, builder);
       }
     };
+  }
+
+  private List<Field> convertToFields(FieldBuilderResult result) {
+    if (result == null) {
+      // XXX log an error
+      return Collections.emptyList();
+    }
+    return result.fields();
   }
 
   public String toString() {
