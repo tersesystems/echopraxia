@@ -141,8 +141,7 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
     if (condition == Condition.always()) {
-      // XXX this can't be right, test it
-      return this;
+      return this; // "x && true" is always x
     }
     if (condition == Condition.never()) {
       if (this.condition == Condition.never()) {
@@ -251,7 +250,13 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -267,7 +272,13 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -284,7 +295,13 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Supplier<List<Field>> extraFields,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    final Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    final Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -302,7 +319,13 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    final Marker callerMarker = callerMarker();
+    @Nullable LogstashCallerMarker result;
+    if (isAsyncCallerEnabled()) {
+      result = new LogstashCallerMarker(fqcn, new Throwable());
+    } else {
+      result = null;
+    }
+    final Marker callerMarker = result;
     Runnable threadLocalRunnable = threadContextFunction.get();
     runAsyncLog(
         () -> {
@@ -311,15 +334,6 @@ public class LogstashCoreLogger implements CoreLogger {
           final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, callerLogger);
           consumer.accept(loggerHandle);
         });
-  }
-
-  @Nullable
-  protected LogstashCallerMarker callerMarker() {
-    if (isAsyncCallerEnabled()) {
-      return new LogstashCallerMarker(fqcn, new Throwable());
-    } else {
-      return null;
-    }
   }
 
   /**

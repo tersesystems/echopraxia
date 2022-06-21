@@ -34,16 +34,18 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
   protected LogstashLoggingContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
     this.fieldsSupplier = f;
     this.markersSupplier = m;
-    this.markersResult = Utilities.memoize(() -> {
-      List<Marker> markers = getMarkers();
-      if (markers.isEmpty()) {
-        return null;
-      } else if (markers.size() == 1) {
-        return markers.get(0);
-      } else {
-        return Markers.aggregate(markers);
-      }
-    });
+    this.markersResult =
+        Utilities.memoize(
+            () -> {
+              List<Marker> markers = getMarkers();
+              if (markers.isEmpty()) {
+                return null;
+              } else if (markers.size() == 1) {
+                return markers.get(0);
+              } else {
+                return Markers.aggregate(markers);
+              }
+            });
   }
 
   public static LogstashLoggingContext create(List<Field> fields) {

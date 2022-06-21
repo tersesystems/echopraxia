@@ -61,7 +61,7 @@ class LogstashLoggerTest extends TestBase {
   }
 
   @Test
-  public void testAsyncLoggerLocation() throws InterruptedException {
+  public void testAsyncLoggerLocation() {
     final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
     AsyncLogger<?> asyncLogger = getAsyncLogger();
     asyncLogger.info("Boring Message");

@@ -98,5 +98,4 @@ public class LoggerBenchmarks {
   public void traceWithContextChain() {
     logger.withFields(fb -> fb.string("foo", "bar")).trace("Message");
   }
-
 }
