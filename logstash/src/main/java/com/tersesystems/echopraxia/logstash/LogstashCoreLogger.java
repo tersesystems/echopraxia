@@ -103,11 +103,11 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public <FB> @NotNull CoreLogger withFields(
-      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+    @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     final LogstashLoggingContext contextWithFields =
-        this.context.withFields(fieldsSupplier(f.apply(builder)));
+      this.context.withFields(() -> convertToFields(f.apply(builder)));
     return new LogstashCoreLogger(
-        fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
+      fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
   }
 
   public CoreLogger withMarkers(Marker... markers) {
@@ -212,7 +212,7 @@ public class LogstashCoreLogger implements CoreLogger {
       // show up in conditions, but are only resolved on request (and if the
       // condition fails without querying fields, won't resolve them at all)
       SnapshotLoggingContext snapshotContext =
-          new SnapshotLoggingContext(context, fieldsSupplier(f.apply(builder)));
+          new SnapshotLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (condition.test(level, snapshotContext)) {
         final Object[] arguments = convertArguments(snapshotContext.arguments());
         logger.log(
@@ -245,7 +245,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
       SnapshotLoggingContext snapshotContext =
-          new SnapshotLoggingContext(context, fieldsSupplier(f.apply(builder)));
+          new SnapshotLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, snapshotContext)) {
         final Object[] arguments = convertArguments(snapshotContext.arguments());
         logger.log(
@@ -522,10 +522,6 @@ public class LogstashCoreLogger implements CoreLogger {
     };
   }
 
-  private Supplier<List<Field>> fieldsSupplier(FieldBuilderResult result) {
-    return result == null ? Collections::emptyList : result::fields;
-  }
-
   private Marker resolveSnapshotFields(Marker ctxMarker, SnapshotLoggingContext ctx) {
     final List<Field> fields = ctx.getFields();
     if (fields.isEmpty()) {
@@ -561,6 +557,14 @@ public class LogstashCoreLogger implements CoreLogger {
       }
       return Markers.aggregate(markerList);
     }
+  }
+
+  private List<Field> convertToFields(FieldBuilderResult result) {
+    if (result == null) {
+      // XXX log an error
+      return Collections.emptyList();
+    }
+    return result.fields();
   }
 
   public String toString() {
