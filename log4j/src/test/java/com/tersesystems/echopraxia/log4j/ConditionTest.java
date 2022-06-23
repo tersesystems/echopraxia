@@ -16,6 +16,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 import javax.json.JsonObject;
+import org.apache.logging.log4j.ThreadContext;
 import org.junit.jupiter.api.Test;
 
 public class ConditionTest extends TestBase {
@@ -68,7 +69,7 @@ public class ConditionTest extends TestBase {
   }
 
   @Test
-  void testConditionIsLive() {
+  void testFieldConditionIsLive() {
     Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
     Logger<?> logger = getLogger();
     final AtomicReference<String> changeableValue = new AtomicReference<>("derp");
@@ -78,6 +79,29 @@ public class ConditionTest extends TestBase {
 
     loggerWithContext.info(hasDerp, "has derp");
     changeableValue.set("notderp");
+    loggerWithContext.info(hasDerp, "should not log");
+
+    final ListAppender listAppender = getListAppender("ListAppender");
+    final List<String> messages = listAppender.getMessages();
+    assertThat(messages.size()).isEqualTo(1);
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("has derp");
+  }
+
+  @Test
+  void testThreadContextConditionIsLive() {
+    Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
+    Logger<?> logger = getLogger();
+
+    ThreadContext.put("herp", "derp");
+    // we need to know that withThreadContext is "call by name" and is evaluated fresh on every
+    // statement.
+    Logger<?> loggerWithContext = logger.withThreadContext();
+    loggerWithContext.info(hasDerp, "has derp");
+
+    ThreadContext.put("herp", "notderp");
     loggerWithContext.info(hasDerp, "should not log");
 
     final ListAppender listAppender = getListAppender("ListAppender");
