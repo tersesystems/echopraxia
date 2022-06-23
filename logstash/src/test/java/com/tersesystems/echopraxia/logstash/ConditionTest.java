@@ -14,6 +14,7 @@ import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 public class ConditionTest extends TestBase {
 
@@ -50,7 +51,7 @@ public class ConditionTest extends TestBase {
   }
 
   @Test
-  void testConditionIsLive() {
+  void testFieldConditionIsLive() {
     Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
     Logger<?> logger = getLogger();
     final AtomicReference<String> changeableValue = new AtomicReference<>("derp");
@@ -60,6 +61,27 @@ public class ConditionTest extends TestBase {
 
     loggerWithContext.info(hasDerp, "has derp");
     changeableValue.set("notderp");
+    loggerWithContext.info(hasDerp, "should not log");
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list.size()).isEqualTo(1);
+
+    final ILoggingEvent event = listAppender.list.get(0);
+    String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("has derp");
+  }
+
+  @Test
+  void testMDCConditionIsLive() {
+    Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
+    Logger<?> logger = getLogger();
+
+    MDC.put("herp", "derp");
+    // we need to know that withFields is "call by name" and is evaluated fresh on every statement.
+    Logger<?> loggerWithContext = logger.withThreadContext();
+
+    loggerWithContext.info(hasDerp, "has derp");
+    MDC.put("herp", "notderp");
     loggerWithContext.info(hasDerp, "should not log");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
