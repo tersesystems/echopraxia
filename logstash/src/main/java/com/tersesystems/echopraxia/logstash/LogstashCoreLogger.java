@@ -14,6 +14,8 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.argument.StructuredArguments;
+import net.logstash.logback.marker.LogstashMarker;
+import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
@@ -103,7 +105,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public <FB> @NotNull CoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     final LogstashLoggingContext contextWithFields =
-        this.context.withFields(() -> convertToFields(f.apply(builder)));
+        this.context.withFields(fieldsSupplier(f.apply(builder)));
     return new LogstashCoreLogger(
         fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
   }
@@ -193,7 +195,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, String message) {
     Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context)) {
-      logger.log(context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, null, null);
+      logger.log(resolveContextFields(context), fqcn, convertLevel(level), message, null, null);
     }
   }
 
@@ -203,16 +205,23 @@ public class LogstashCoreLogger implements CoreLogger {
       String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
-    // When passing a condition through with explicit arguments, we pull the args and make
-    // them available through context.
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      final List<Field> args = convertToFields(f.apply(builder));
-      final LogstashLoggingContext argContext = context.withFields(() -> args);
-      if (condition.test(level, argContext)) {
-        final Object[] arguments = convertArguments(args);
+      // we made it past the first check, add context that incorporates fields.
+      // this can be memoized so it won't re-resolve fields or markers if they
+      // show up in conditions, but are only resolved on request (and if the
+      // condition fails without querying fields, won't resolve them at all)
+      SnapshotLoggingContext snapshotContext =
+          new SnapshotLoggingContext(context, fieldsSupplier(f.apply(builder)));
+      if (condition.test(level, snapshotContext)) {
+        final Object[] arguments = convertArguments(snapshotContext.arguments());
         logger.log(
-            context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
+            resolveSnapshotFields(m, snapshotContext),
+            fqcn,
+            convertLevel(level),
+            message,
+            arguments,
+            null);
       }
     }
   }
@@ -222,7 +231,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))
         && this.condition.and(condition).test(level, context)) {
-      logger.log(context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, null, null);
+      logger.log(resolveContextFields(context), fqcn, convertLevel(level), message, null, null);
     }
   }
 
@@ -235,14 +244,17 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      // When passing a condition through with explicit arguments, we pull the args and make
-      // them available through context.
-      final List<Field> args = convertToFields(f.apply(builder));
-      final LogstashLoggingContext argContext = context.withFields(() -> args);
-      if (this.condition.and(condition).test(level, argContext)) {
-        final Object[] arguments = convertArguments(args);
+      SnapshotLoggingContext snapshotContext =
+          new SnapshotLoggingContext(context, fieldsSupplier(f.apply(builder)));
+      if (this.condition.and(condition).test(level, snapshotContext)) {
+        final Object[] arguments = convertArguments(snapshotContext.arguments());
         logger.log(
-            context.resolveFieldsAndMarkers(), fqcn, convertLevel(level), message, arguments, null);
+            resolveSnapshotFields(m, snapshotContext),
+            fqcn,
+            convertLevel(level),
+            message,
+            arguments,
+            null);
       }
     }
   }
@@ -510,12 +522,45 @@ public class LogstashCoreLogger implements CoreLogger {
     };
   }
 
-  private List<Field> convertToFields(FieldBuilderResult result) {
-    if (result == null) {
-      // XXX log an error
-      return Collections.emptyList();
+  private Supplier<List<Field>> fieldsSupplier(FieldBuilderResult result) {
+    return result == null ? Collections::emptyList : result::fields;
+  }
+
+  private Marker resolveSnapshotFields(Marker ctxMarker, SnapshotLoggingContext ctx) {
+    final List<Field> fields = ctx.getFields();
+    if (fields.isEmpty()) {
+      return ctxMarker;
+    } else {
+      final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
+      for (Field field : fields) {
+        LogstashMarker append = Markers.append(field.name(), field.value());
+        markerList.add(append);
+      }
+      if (ctxMarker != null) {
+        markerList.add(ctxMarker);
+      }
+      return Markers.aggregate(markerList);
     }
-    return result.fields();
+  }
+
+  // Convert markers explicitly.
+  @Nullable
+  org.slf4j.Marker resolveContextFields(LogstashLoggingContext ctx) {
+    final List<Field> fields = ctx.getFields();
+    if (fields.isEmpty()) {
+      return context.resolveMarkers();
+    } else {
+      final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
+      for (Field field : fields) {
+        LogstashMarker append = Markers.append(field.name(), field.value());
+        markerList.add(append);
+      }
+      final Marker marker = context.resolveMarkers();
+      if (marker != null) {
+        markerList.add(marker);
+      }
+      return Markers.aggregate(markerList);
+    }
   }
 
   public String toString() {
