@@ -3,13 +3,11 @@ package com.tersesystems.echopraxia.logstash;
 import com.tersesystems.echopraxia.api.AbstractLoggingContext;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Utilities;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.logstash.logback.marker.LogstashMarker;
 import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +19,7 @@ import org.slf4j.Marker;
  * <p>Note that this makes field evaluation lazy so that functions can pull things out of a thread
  * local (typically hard to do if when loggers are set up initially).
  */
-public class LogstashLoggingContext extends AbstractLoggingContext {
+public class LogstashLoggingContext extends AbstractLoggingContext implements MarkerLoggingContext {
 
   private static final LogstashLoggingContext EMPTY =
       new LogstashLoggingContext(Collections::emptyList, Collections::emptyList);
@@ -66,7 +64,9 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
     return fieldsSupplier.get();
   }
 
-  public List<Marker> getMarkers() {
+  // XXX make this an interface method
+  @Override
+  public @NotNull List<Marker> getMarkers() {
     return markersSupplier.get();
   }
 
@@ -134,26 +134,9 @@ public class LogstashLoggingContext extends AbstractLoggingContext {
 
   @Nullable
   org.slf4j.Marker resolveMarkers() {
+    // Markers are always resolved on isEnabled, but contexts can also be
+    // composed with each other, so we don't want every single context's marker,
+    // only the final result.
     return markersResult.get();
-  }
-
-  // Convert markers explicitly.
-  @Nullable
-  org.slf4j.Marker resolveFieldsAndMarkers() {
-    final List<Field> fields = getFields();
-    if (fields.isEmpty()) {
-      return markersResult.get();
-    } else {
-      final Marker marker = markersResult.get();
-      final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
-      for (Field field : fields) {
-        LogstashMarker append = Markers.append(field.name(), field.value());
-        markerList.add(append);
-      }
-      if (marker != null) {
-        markerList.add(marker);
-      }
-      return Markers.aggregate(markerList);
-    }
   }
 }

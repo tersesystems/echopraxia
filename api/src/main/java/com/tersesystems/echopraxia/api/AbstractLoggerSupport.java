@@ -41,6 +41,13 @@ public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<S
     return fieldBuilder;
   }
 
+  /**
+   * Returns a logger with the given condition attached. All statements must satisfy the
+   * condition(s) to be logged.
+   *
+   * @param condition the condition to evaluate
+   * @return a logger with the condition.
+   */
   @NotNull
   public SELF withCondition(@NotNull Condition condition) {
     if (condition == Condition.always()) {
@@ -52,11 +59,24 @@ public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<S
     }
   }
 
+  /**
+   * Returns a logger that will evaluate the builder function on every statement and make the
+   * computed fields available to conditions. This method has call-by-name semantics.
+   *
+   * @param f the function to evaluate on every statement.
+   * @return a logger with the context fields.
+   */
   @NotNull
   public SELF withFields(@NotNull Function<FB, FieldBuilderResult> f) {
     return newLogger(core().withFields(f, fieldBuilder));
   }
 
+  /**
+   * Returns a logger with fields provided from the given thread context, i.e. SLF4J or Log4J MDC.
+   * This method is implementation specific, and has call-by-name semantics.
+   *
+   * @return a logger with the given thread context fields.
+   */
   @NotNull
   public SELF withThreadContext() {
     return newLogger(core().withThreadContext(Utilities.threadContext()));
