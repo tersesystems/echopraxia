@@ -12,9 +12,16 @@ import javax.json.JsonObject;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.ThreadContext;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class ContextTest extends TestBase {
+
+
+  @BeforeEach
+  void clearThreadContext() {
+    ThreadContext.clearAll();
+  }
 
   @Test
   void testMarkers() {

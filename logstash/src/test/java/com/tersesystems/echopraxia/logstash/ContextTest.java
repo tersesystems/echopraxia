@@ -22,6 +22,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import net.logstash.logback.marker.EmptyLogstashMarker;
 import net.logstash.logback.marker.ObjectAppendingMarker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
@@ -30,6 +31,11 @@ import org.slf4j.MarkerFactory;
 public class ContextTest extends TestBase {
 
   private static final ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
+
+  @BeforeEach
+  void clearMDC() {
+    MDC.clear();
+  }
 
   @Test
   void testMarkers() {
