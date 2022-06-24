@@ -76,7 +76,6 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   // attempt to cover all permutations of output.
-  @SuppressWarnings("unchecked")
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
@@ -88,8 +87,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public @NotNull Log4JCoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
-    Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
-    return newLogger(this.context.and(newContext));
+    return newLogger(context.withFields(fieldSupplier));
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.logstash;
 import com.tersesystems.echopraxia.api.AbstractLoggingContext;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Utilities;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
@@ -14,6 +15,10 @@ class SnapshotLoggingContext extends AbstractLoggingContext implements MarkerLog
   private final Supplier<List<Field>> fields;
 
   private final LogstashLoggingContext context;
+
+  public SnapshotLoggingContext(LogstashLoggingContext context) {
+    this(context, Collections::emptyList);
+  }
 
   public SnapshotLoggingContext(LogstashLoggingContext context, Supplier<List<Field>> arguments) {
     // Defers and memoizes the arguments and fields for a single logging statement.
