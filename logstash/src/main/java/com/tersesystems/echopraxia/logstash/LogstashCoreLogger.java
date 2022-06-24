@@ -170,25 +170,35 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(@NotNull Level level) {
+    if (condition == Condition.always()) {
+      return logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level));
+    }
     if (condition == Condition.never()) {
       return false;
     }
     Marker marker = context.resolveMarkers();
-    return logger.isEnabledFor(marker, convertLogbackLevel(level))
-        && condition.test(level, context);
+    if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      return condition.test(level, snapshotContext);
+    }
+    return false;
   }
 
   @Override
   public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
-    if (condition == Condition.always()) {
-      return isEnabled(level);
+    final Condition bothConditions = this.condition.and(condition);
+    if (bothConditions == Condition.always()) {
+      return logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level));
     }
-    if (condition == Condition.never()) {
+    if (bothConditions == Condition.never()) {
       return false;
     }
     Marker marker = context.resolveMarkers();
-    return logger.isEnabledFor(marker, convertLogbackLevel(level))
-        && this.condition.and(condition).test(level, context);
+    if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      return bothConditions.test(level, snapshotContext);
+    }
+    return false;
   }
 
   @Override

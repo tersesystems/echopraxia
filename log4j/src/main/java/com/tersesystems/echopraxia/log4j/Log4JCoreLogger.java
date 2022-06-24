@@ -136,20 +136,33 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(@NotNull Level level) {
-    return logger.isEnabled(convertLevel(level), context.getMarker())
-        && condition.test(level, context);
-  }
-
-  @Override
-  public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
     if (condition == Condition.always()) {
-      return isEnabled(level);
+      return logger.isEnabled(convertLevel(level), context.getMarker());
     }
     if (condition == Condition.never()) {
       return false;
     }
-    return logger.isEnabled(convertLevel(level), context.getMarker())
-        && this.condition.and(condition).test(level, context);
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      return condition.test(level, snapshotContext);
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
+    final Condition bothConditions = this.condition.and(condition);
+    if (bothConditions == Condition.always()) {
+      return logger.isEnabled(convertLevel(level), context.getMarker());
+    }
+    if (bothConditions == Condition.never()) {
+      return false;
+    }
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      return bothConditions.test(level, snapshotContext);
+    }
+    return false;
   }
 
   @Override
