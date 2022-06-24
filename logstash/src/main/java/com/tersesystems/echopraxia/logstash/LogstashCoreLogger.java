@@ -194,8 +194,17 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public void log(@NotNull Level level, String message) {
     Marker m = context.resolveMarkers();
-    if (logger.isEnabledFor(m, convertLogbackLevel(level)) && condition.test(level, context)) {
-      logger.log(resolveContextFields(context), fqcn, convertLevel(level), message, null, null);
+    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      if (condition.test(level, snapshotContext)) {
+        logger.log(
+            resolveSnapshotFields(m, snapshotContext),
+            fqcn,
+            convertLevel(level),
+            message,
+            null,
+            null);
+      }
     }
   }
 
@@ -229,9 +238,17 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public void log(@NotNull Level level, @NotNull Condition condition, String message) {
     final Marker m = context.resolveMarkers();
-    if (logger.isEnabledFor(m, convertLogbackLevel(level))
-        && this.condition.and(condition).test(level, context)) {
-      logger.log(resolveContextFields(context), fqcn, convertLevel(level), message, null, null);
+    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      if (this.condition.and(condition).test(level, snapshotContext)) {
+        logger.log(
+            resolveSnapshotFields(m, snapshotContext),
+            fqcn,
+            convertLevel(level),
+            message,
+            null,
+            null);
+      }
     }
   }
 
@@ -534,26 +551,6 @@ public class LogstashCoreLogger implements CoreLogger {
       }
       if (ctxMarker != null) {
         markerList.add(ctxMarker);
-      }
-      return Markers.aggregate(markerList);
-    }
-  }
-
-  // Convert markers explicitly.
-  @Nullable
-  org.slf4j.Marker resolveContextFields(LogstashLoggingContext ctx) {
-    final List<Field> fields = ctx.getFields();
-    if (fields.isEmpty()) {
-      return context.resolveMarkers();
-    } else {
-      final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
-      for (Field field : fields) {
-        LogstashMarker append = Markers.append(field.name(), field.value());
-        markerList.add(append);
-      }
-      final Marker marker = context.resolveMarkers();
-      if (marker != null) {
-        markerList.add(marker);
       }
       return Markers.aggregate(markerList);
     }

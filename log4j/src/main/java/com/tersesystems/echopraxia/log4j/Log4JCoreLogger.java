@@ -76,7 +76,6 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   // attempt to cover all permutations of output.
-  @SuppressWarnings("unchecked")
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
@@ -88,8 +87,7 @@ public class Log4JCoreLogger implements CoreLogger {
   public @NotNull Log4JCoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     Supplier<List<Field>> fieldSupplier = mapTransform.apply(ThreadContext::getImmutableContext);
-    Log4JLoggingContext newContext = new Log4JLoggingContext(fieldSupplier, null);
-    return newLogger(this.context.and(newContext));
+    return newLogger(context.withFields(fieldSupplier));
   }
 
   @Override
@@ -159,9 +157,12 @@ public class Log4JCoreLogger implements CoreLogger {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     // the isEnabled check always goes before the condition check, as conditions can be expensive
-    if (logger.isEnabled(log4jLevel, marker) && condition.test(level, context)) {
-      final Message m = createMessage(message);
-      logger.logMessage(fqcn, log4jLevel, marker, m, null);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      SnapshotLoggingContext argContext = new SnapshotLoggingContext(context);
+      if (condition.test(level, argContext)) {
+        final Message m = createMessage(message);
+        logger.logMessage(fqcn, log4jLevel, marker, m, null);
+      }
     }
   }
 
@@ -176,14 +177,11 @@ public class Log4JCoreLogger implements CoreLogger {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     if (logger.isEnabled(log4jLevel, marker)) {
-      final List<Field> argumentFields = convertToFields(f.apply(builder));
-      final Throwable e = findThrowable(argumentFields);
-      final Message message = createMessage(messageTemplate, argumentFields);
-
-      // When passing a condition through with explicit arguments, we pull the args and make
-      // them available through context.
-      Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
-      if (condition.test(level, context.and(argContext))) {
+      SnapshotLoggingContext argContext =
+          new SnapshotLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      if (condition.test(level, argContext)) {
+        final Throwable e = findThrowable(argContext.arguments());
+        final Message message = createMessage(messageTemplate, argContext.arguments());
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
       }
     }
@@ -201,10 +199,13 @@ public class Log4JCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-    if (logger.isEnabled(log4jLevel, marker)
-        && this.condition.and(condition).test(level, context)) {
-      final Message m = createMessage(message);
-      logger.logMessage(fqcn, log4jLevel, marker, m, null);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      // We want to memoize context fields even if no argument...
+      SnapshotLoggingContext argContext = new SnapshotLoggingContext(context);
+      if (this.condition.and(condition).test(level, argContext)) {
+        final Message m = createMessage(message);
+        logger.logMessage(fqcn, log4jLevel, marker, m, null);
+      }
     }
   }
 
@@ -218,13 +219,11 @@ public class Log4JCoreLogger implements CoreLogger {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     if (logger.isEnabled(log4jLevel, marker)) {
-      final List<Field> argumentFields = convertToFields(f.apply(builder));
-      final Throwable e = findThrowable(argumentFields);
-      final Message message = createMessage(messageTemplate, argumentFields);
-      // When passing a condition through with explicit arguments, we pull the args and make
-      // them available through context.
-      Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
-      if (this.condition.and(condition).test(level, context.and(argContext))) {
+      SnapshotLoggingContext argContext =
+          new SnapshotLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      if (this.condition.and(condition).test(level, argContext)) {
+        final Throwable e = findThrowable(argContext.arguments());
+        final Message message = createMessage(messageTemplate, argContext.arguments());
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
       }
     }
