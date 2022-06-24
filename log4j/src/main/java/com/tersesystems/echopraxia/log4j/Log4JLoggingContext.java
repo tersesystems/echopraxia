@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-public class Log4JLoggingContext extends AbstractLoggingContext {
+public class Log4JLoggingContext extends AbstractLoggingContext implements MarkerLoggingContext {
   protected final Supplier<List<Field>> fieldsSupplier;
   protected final Marker marker;
 
@@ -29,6 +29,7 @@ public class Log4JLoggingContext extends AbstractLoggingContext {
     return fieldsSupplier.get();
   }
 
+  @Override
   public Marker getMarker() {
     return marker;
   }
@@ -38,7 +39,7 @@ public class Log4JLoggingContext extends AbstractLoggingContext {
     return new Log4JLoggingContext(joinedFields, this.getMarker());
   }
 
-  private Supplier<List<Field>> joinFields(
+  static Supplier<List<Field>> joinFields(
       Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
     return () -> {
       List<Field> thisFields = thisFieldsSupplier.get();
