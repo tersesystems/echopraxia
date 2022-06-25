@@ -171,8 +171,8 @@ public class Log4JCoreLogger implements CoreLogger {
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     // the isEnabled check always goes before the condition check, as conditions can be expensive
     if (logger.isEnabled(log4jLevel, marker)) {
-      SnapshotLoggingContext argContext = new SnapshotLoggingContext(context);
-      if (condition.test(level, argContext)) {
+      SnapshotLoggingContext memoContext = new SnapshotLoggingContext(context);
+      if (condition.test(level, memoContext)) {
         final Message m = createMessage(message);
         logger.logMessage(fqcn, log4jLevel, marker, m, null);
       }
