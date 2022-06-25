@@ -54,7 +54,6 @@ public final class Utilities {
         synchronized (this) {
           if (!initialized) {
             T t = delegate.get();
-            System.out.println("Initialized value " + t);
             value = t;
             initialized = true;
             return t;
