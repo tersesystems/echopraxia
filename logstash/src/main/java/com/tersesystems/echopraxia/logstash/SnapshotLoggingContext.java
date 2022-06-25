@@ -24,17 +24,18 @@ class SnapshotLoggingContext extends AbstractLoggingContext implements MarkerLog
     // Defers and memoizes the arguments and fields for a single logging statement.
     this.context = context;
     this.arguments = Utilities.memoize(arguments);
-    this.fields =
-        Utilities.memoize(LogstashLoggingContext.joinFields(context::getFields, this.arguments));
+    this.fields = Utilities.memoize(context::getFields);
   }
 
   @Override
   public @NotNull List<Field> getFields() {
-    return fields.get();
+    List<Field> value = fields.get();
+    return value;
   }
 
   public List<Field> arguments() {
-    return arguments.get();
+    List<Field> value = arguments.get();
+    return value;
   }
 
   @Override
