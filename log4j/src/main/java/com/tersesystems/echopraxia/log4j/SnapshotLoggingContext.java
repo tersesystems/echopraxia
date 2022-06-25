@@ -17,11 +17,10 @@ class SnapshotLoggingContext extends AbstractLoggingContext implements MarkerLog
   private final Log4JLoggingContext context;
 
   public SnapshotLoggingContext(Log4JLoggingContext context, Supplier<List<Field>> arguments) {
-    // Defers and memoizes the arguments and fields for a single logging statement.
+    // Defers and memoizes the arguments and context fields for a single logging statement.
     this.context = context;
     this.arguments = Utilities.memoize(arguments);
-    this.fields =
-        Utilities.memoize(Log4JLoggingContext.joinFields(context::getFields, this.arguments));
+    this.fields = Utilities.memoize(context::getFields);
   }
 
   public SnapshotLoggingContext(Log4JLoggingContext context) {

@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 public class ContextTest extends TestBase {
 
-
   @BeforeEach
   void clearThreadContext() {
     ThreadContext.clearAll();
