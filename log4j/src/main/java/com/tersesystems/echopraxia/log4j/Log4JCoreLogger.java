@@ -136,20 +136,33 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(@NotNull Level level) {
-    return logger.isEnabled(convertLevel(level), context.getMarker())
-        && condition.test(level, context);
-  }
-
-  @Override
-  public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
     if (condition == Condition.always()) {
-      return isEnabled(level);
+      return logger.isEnabled(convertLevel(level), context.getMarker());
     }
     if (condition == Condition.never()) {
       return false;
     }
-    return logger.isEnabled(convertLevel(level), context.getMarker())
-        && this.condition.and(condition).test(level, context);
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      return condition.test(level, snapshotContext);
+    }
+    return false;
+  }
+
+  @Override
+  public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
+    final Condition bothConditions = this.condition.and(condition);
+    if (bothConditions == Condition.always()) {
+      return logger.isEnabled(convertLevel(level), context.getMarker());
+    }
+    if (bothConditions == Condition.never()) {
+      return false;
+    }
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      return bothConditions.test(level, snapshotContext);
+    }
+    return false;
   }
 
   @Override
@@ -158,8 +171,8 @@ public class Log4JCoreLogger implements CoreLogger {
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     // the isEnabled check always goes before the condition check, as conditions can be expensive
     if (logger.isEnabled(log4jLevel, marker)) {
-      SnapshotLoggingContext argContext = new SnapshotLoggingContext(context);
-      if (condition.test(level, argContext)) {
+      SnapshotLoggingContext memoContext = new SnapshotLoggingContext(context);
+      if (condition.test(level, memoContext)) {
         final Message m = createMessage(message);
         logger.logMessage(fqcn, log4jLevel, marker, m, null);
       }
