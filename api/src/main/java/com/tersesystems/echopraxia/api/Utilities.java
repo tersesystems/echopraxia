@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -21,6 +22,9 @@ public final class Utilities {
   }
 
   public @NotNull static List<Field> buildThreadContext(Map<String, String> contextMap) {
+    if (contextMap == null || contextMap.isEmpty()) {
+      return Collections.emptyList();
+    }
     List<Field> list = new ArrayList<>();
     for (Map.Entry<String, String> e : contextMap.entrySet()) {
       Field field = Field.keyValue(e.getKey(), Value.string(e.getValue()));
