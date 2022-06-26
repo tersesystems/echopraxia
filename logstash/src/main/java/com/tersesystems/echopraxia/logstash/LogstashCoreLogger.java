@@ -127,17 +127,17 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newSupplier) {
-    Supplier<Runnable> supplier =
+  public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newThreadContextFunction) {
+    Supplier<Runnable> joinedThreadContextFunction =
         () -> {
-          final Runnable r1 = newSupplier.get();
+          final Runnable r1 = newThreadContextFunction.get();
           final Runnable r2 = threadContextFunction.get();
           return () -> {
             r1.run();
             r2.run();
           };
         };
-    return new LogstashCoreLogger(fqcn, logger, context, condition, executor, supplier);
+    return new LogstashCoreLogger(fqcn, logger, context, condition, executor, joinedThreadContextFunction);
   }
 
   @Override
@@ -178,7 +178,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
     Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
       return condition.test(level, snapshotContext);
     }
     return false;
@@ -195,7 +195,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
     Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
       return bothConditions.test(level, snapshotContext);
     }
     return false;
@@ -205,7 +205,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, String message) {
     Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
       if (condition.test(level, snapshotContext)) {
         logger.log(
             resolveSnapshotFields(m, snapshotContext),
@@ -230,8 +230,8 @@ public class LogstashCoreLogger implements CoreLogger {
       // this can be memoized so it won't re-resolve fields or markers if they
       // show up in conditions, but are only resolved on request (and if the
       // condition fails without querying fields, won't resolve them at all)
-      SnapshotLoggingContext snapshotContext =
-          new SnapshotLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      MemoLoggingContext snapshotContext =
+          new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (condition.test(level, snapshotContext)) {
         final Object[] arguments = convertArguments(snapshotContext.arguments());
         logger.log(
@@ -249,7 +249,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, @NotNull Condition condition, String message) {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      SnapshotLoggingContext snapshotContext = new SnapshotLoggingContext(context);
+      MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
       if (this.condition.and(condition).test(level, snapshotContext)) {
         logger.log(
             resolveSnapshotFields(m, snapshotContext),
@@ -271,8 +271,8 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      SnapshotLoggingContext snapshotContext =
-          new SnapshotLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      MemoLoggingContext snapshotContext =
+          new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, snapshotContext)) {
         final Object[] arguments = convertArguments(snapshotContext.arguments());
         logger.log(
@@ -549,7 +549,7 @@ public class LogstashCoreLogger implements CoreLogger {
     };
   }
 
-  private Marker resolveSnapshotFields(Marker ctxMarker, SnapshotLoggingContext ctx) {
+  private Marker resolveSnapshotFields(Marker ctxMarker, MemoLoggingContext ctx) {
     final List<Field> fields = ctx.getFields();
     if (fields.isEmpty()) {
       return ctxMarker;
