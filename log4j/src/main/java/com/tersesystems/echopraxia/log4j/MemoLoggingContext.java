@@ -9,21 +9,21 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-class SnapshotLoggingContext extends AbstractLoggingContext implements MarkerLoggingContext {
+class MemoLoggingContext extends AbstractLoggingContext implements MarkerLoggingContext {
 
   private final Supplier<List<Field>> arguments;
   private final Supplier<List<Field>> fields;
 
   private final Log4JLoggingContext context;
 
-  public SnapshotLoggingContext(Log4JLoggingContext context, Supplier<List<Field>> arguments) {
+  public MemoLoggingContext(Log4JLoggingContext context, Supplier<List<Field>> arguments) {
     // Defers and memoizes the arguments and context fields for a single logging statement.
     this.context = context;
     this.arguments = Utilities.memoize(arguments);
     this.fields = Utilities.memoize(context::getFields);
   }
 
-  public SnapshotLoggingContext(Log4JLoggingContext context) {
+  public MemoLoggingContext(Log4JLoggingContext context) {
     this(context, Collections::emptyList);
   }
 

@@ -64,7 +64,6 @@ public class LogstashLoggingContext extends AbstractLoggingContext implements Ma
     return fieldsSupplier.get();
   }
 
-  // XXX make this an interface method
   @Override
   public @NotNull List<Marker> getMarkers() {
     return markersSupplier.get();
