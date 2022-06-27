@@ -137,7 +137,8 @@ public class LogstashCoreLogger implements CoreLogger {
             r2.run();
           };
         };
-    return new LogstashCoreLogger(fqcn, logger, context, condition, executor, joinedThreadContextFunction);
+    return new LogstashCoreLogger(
+        fqcn, logger, context, condition, executor, joinedThreadContextFunction);
   }
 
   @Override
