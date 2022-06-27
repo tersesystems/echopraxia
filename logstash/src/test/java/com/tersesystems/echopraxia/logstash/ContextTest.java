@@ -29,7 +29,6 @@ import org.slf4j.Marker;
 import org.slf4j.MarkerFactory;
 
 public class ContextTest extends TestBase {
-
   private static final ObjectMapper mapper = JsonMapper.builder().findAndAddModules().build();
 
   @BeforeEach

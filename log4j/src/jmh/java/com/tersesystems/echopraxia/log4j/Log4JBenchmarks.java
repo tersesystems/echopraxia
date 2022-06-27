@@ -33,10 +33,10 @@ public class Log4JBenchmarks {
       new EchopraxiaFieldsMessage("message", emptyList(), emptyList());
 
   private static final Message messageWithArgument =
-      new EchopraxiaFieldsMessage("message {}", singletonList(field), emptyList());
+      new EchopraxiaFieldsMessage("message {}", emptyList(), singletonList(field));
 
   private static final EchopraxiaFieldsMessage fieldsMessage =
-      new EchopraxiaFieldsMessage("message {} {} {} {}", fields, emptyList());
+      new EchopraxiaFieldsMessage("message {} {} {} {}", emptyList(), fields);
 
   @Benchmark
   public void info() {

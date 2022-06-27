@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.api.Level.INFO;
 
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.logstash.LogstashLoggerContext;
 import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +22,7 @@ public class Main {
 
       final ScriptHandle handle = watchService.watchScript(filePath, Throwable::printStackTrace);
       final Condition condition = ScriptCondition.create(handle);
-      LoggingContext context = LogstashLoggingContext.empty();
+      LoggingContext context = new LogstashLoggingContext(LogstashLoggerContext.empty());
       if (condition.test(INFO, context)) {
         System.out.println("First test should eval but take a while...");
       }
@@ -32,7 +33,7 @@ public class Main {
         Thread.sleep(300);
 
         // and then we should be able to see the changed condition evaluate.
-        if (condition.test(INFO, LogstashLoggingContext.empty())) {
+        if (condition.test(INFO, new LogstashLoggingContext(LogstashLoggerContext.empty()))) {
           System.out.println(
               "this doesn't log, because even though we pass in INFO the script changed to DEBUG");
         }
@@ -42,13 +43,13 @@ public class Main {
         Thread.sleep(300);
 
         // Now the first time it sees, it'll re-evaluate and process again!
-        if (condition.test(INFO, LogstashLoggingContext.empty())) {
+        if (condition.test(INFO, new LogstashLoggingContext(LogstashLoggerContext.empty()))) {
           System.out.println("this logs because we have changed the script back to INFO.");
         }
 
         Files.deleteIfExists(filePath);
         Thread.sleep(300);
-        if (condition.test(INFO, LogstashLoggingContext.empty())) {
+        if (condition.test(INFO, new LogstashLoggingContext(LogstashLoggerContext.empty()))) {
           System.out.println("see what happens when script is deleted");
         }
       }

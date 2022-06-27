@@ -1,7 +1,8 @@
 package com.tersesystems.echopraxia.fake;
 
-import com.tersesystems.echopraxia.api.AbstractLoggingContext;
+import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -10,20 +11,24 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-public class FakeLoggingContext extends AbstractLoggingContext {
-  private static final FakeLoggingContext EMPTY = new FakeLoggingContext(Collections::emptyList);
-  protected final Supplier<List<Field>> fieldsSupplier;
+public class FakeLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+  private static final FakeLoggingContext EMPTY =
+      new FakeLoggingContext(Collections::emptyList, Collections::emptyList);
+  protected final Supplier<List<Field>> loggerFields;
+  protected final Supplier<List<Field>> argumentFields;
 
-  protected FakeLoggingContext(Supplier<List<Field>> f) {
-    this.fieldsSupplier = f;
+  protected FakeLoggingContext(
+      Supplier<List<Field>> loggerFields, Supplier<List<Field>> argumentFields) {
+    this.loggerFields = loggerFields;
+    this.argumentFields = argumentFields;
   }
 
   public static FakeLoggingContext single(Field field) {
-    return new FakeLoggingContext(() -> Collections.singletonList(field));
+    return new FakeLoggingContext(() -> Collections.singletonList(field), Collections::emptyList);
   }
 
   public static FakeLoggingContext of(Field... fields) {
-    return new FakeLoggingContext(() -> Arrays.asList(fields));
+    return new FakeLoggingContext(() -> Arrays.asList(fields), Collections::emptyList);
   }
 
   public static FakeLoggingContext empty() {
@@ -32,7 +37,18 @@ public class FakeLoggingContext extends AbstractLoggingContext {
 
   @Override
   public @NotNull List<Field> getFields() {
-    return fieldsSupplier.get();
+    return Stream.concat(loggerFields.get().stream(), argumentFields.get().stream())
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<Field> getArgumentFields() {
+    return argumentFields.get();
+  }
+
+  @Override
+  public List<Field> getLoggerFields() {
+    return loggerFields.get();
   }
 
   public FakeLoggingContext and(FakeLoggingContext context) {
@@ -40,26 +56,28 @@ public class FakeLoggingContext extends AbstractLoggingContext {
       return this;
     }
 
-    // This MUST be lazy, we can't get the fields until statement evaluation
-    Supplier<List<Field>> joinedFields =
-        joinFields(FakeLoggingContext.this::getFields, context::getFields);
-    return new FakeLoggingContext(joinedFields);
+    Supplier<List<Field>> lfields =
+        joinFields(FakeLoggingContext.this::getLoggerFields, context::getLoggerFields);
+    Supplier<List<Field>> afields =
+        joinFields(FakeLoggingContext.this::getArgumentFields, context::getArgumentFields);
+    return new FakeLoggingContext(lfields, afields);
   }
 
   private Supplier<List<Field>> joinFields(
-      Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
+      Supplier<List<Field>> first, Supplier<List<Field>> second) {
     return () -> {
-      List<Field> thisFields = thisFieldsSupplier.get();
-      List<Field> ctxFields = ctxFieldsSupplier.get();
+      List<Field> firstFields = first.get();
+      List<Field> secondFields = second.get();
 
-      if (thisFields.isEmpty()) {
-        return ctxFields;
-      } else if (ctxFields.isEmpty()) {
-        return thisFields;
+      if (firstFields.isEmpty()) {
+        return secondFields;
+      } else if (secondFields.isEmpty()) {
+        return firstFields;
       } else {
         // Stream.concat is actually faster than explicit ArrayList!
         // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
-        return Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
+        return Stream.concat(firstFields.stream(), secondFields.stream())
+            .collect(Collectors.toList());
       }
     };
   }
