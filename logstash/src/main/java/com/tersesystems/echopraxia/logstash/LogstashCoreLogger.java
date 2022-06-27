@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.api.Utilities.joinFields;
 import static org.slf4j.event.EventConstants.*;
 
 import com.tersesystems.echopraxia.api.*;
@@ -476,8 +477,7 @@ public class LogstashCoreLogger implements CoreLogger {
   @NotNull
   protected LogstashCoreLogger.Context newContext(
       @NotNull Supplier<List<Field>> fieldsSupplier, Marker callerMarker) {
-    Supplier<List<Field>> loggerFields =
-        Context.joinFields(fieldsSupplier, context::getLoggerFields);
+    Supplier<List<Field>> loggerFields = joinFields(fieldsSupplier, context::getLoggerFields);
     Supplier<List<Marker>> markers;
     if (callerMarker == null) {
       markers = context::getMarkers;
@@ -657,25 +657,6 @@ public class LogstashCoreLogger implements CoreLogger {
           return markers;
         } else {
           return Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
-        }
-      };
-    }
-
-    static Supplier<List<Field>> joinFields(
-        Supplier<List<Field>> first, Supplier<List<Field>> second) {
-      return () -> {
-        List<Field> firstFields = first.get();
-        List<Field> secondFields = second.get();
-
-        if (firstFields.isEmpty()) {
-          return secondFields;
-        } else if (secondFields.isEmpty()) {
-          return firstFields;
-        } else {
-          // Stream.concat is actually faster than explicit ArrayList!
-          // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
-          return Stream.concat(firstFields.stream(), secondFields.stream())
-              .collect(Collectors.toList());
         }
       };
     }

@@ -6,7 +6,6 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import com.tersesystems.echopraxia.api.Value;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -23,7 +22,8 @@ public class Main {
 
       final ScriptHandle handle = watchService.watchScript(filePath, Throwable::printStackTrace);
       final Condition condition = ScriptCondition.create(handle);
-      LoggingContext context = new FakeLoggingContext(Field.keyValue("correlation_id", Value.string("match")));
+      LoggingContext context =
+          new FakeLoggingContext(Field.keyValue("correlation_id", Value.string("match")));
       if (condition.test(INFO, context)) {
         System.out.println("First test should eval but take a while...");
       }

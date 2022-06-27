@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.*;
@@ -9,8 +11,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.ThreadContext;
@@ -503,25 +503,6 @@ public class Log4JCoreLogger implements CoreLogger {
     public Context withFields(Supplier<List<Field>> o) {
       Supplier<List<Field>> joinedFields = joinFields(o, this::getLoggerFields);
       return new Context(joinedFields, this.getMarker());
-    }
-
-    static Supplier<List<Field>> joinFields(
-        Supplier<List<Field>> first, Supplier<List<Field>> second) {
-      return () -> {
-        List<Field> firstFields = first.get();
-        List<Field> secondFields = second.get();
-
-        if (firstFields.isEmpty()) {
-          return secondFields;
-        } else if (secondFields.isEmpty()) {
-          return firstFields;
-        } else {
-          // Stream.concat is actually faster than explicit ArrayList!
-          // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
-          return Stream.concat(firstFields.stream(), secondFields.stream())
-              .collect(Collectors.toList());
-        }
-      };
     }
 
     /**

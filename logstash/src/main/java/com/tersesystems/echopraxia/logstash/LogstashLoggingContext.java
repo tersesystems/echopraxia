@@ -1,17 +1,18 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+import static com.tersesystems.echopraxia.api.Utilities.memoize;
+
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.api.Utilities;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
-class LogstashLoggingContext extends AbstractJsonPathFinder
-    implements LoggingContext, MarkerLoggingContext {
+public class LogstashLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
 
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
@@ -26,11 +27,9 @@ class LogstashLoggingContext extends AbstractJsonPathFinder
   public LogstashLoggingContext(
       LogstashCoreLogger.Context context, Supplier<List<Field>> arguments) {
     this.context = context;
-    this.argumentFields = Utilities.memoize(arguments);
-    this.loggerFields = Utilities.memoize(context::getLoggerFields);
-    this.fields =
-        Utilities.memoize(
-            LogstashCoreLogger.Context.joinFields(this.loggerFields, this.argumentFields));
+    this.argumentFields = memoize(arguments);
+    this.loggerFields = memoize(context::getLoggerFields);
+    this.fields = memoize(joinFields(this.loggerFields, this.argumentFields));
   }
 
   @Override
@@ -48,7 +47,6 @@ class LogstashLoggingContext extends AbstractJsonPathFinder
     return argumentFields.get();
   }
 
-  @Override
   public @NotNull List<Marker> getMarkers() {
     return context.getMarkers();
   }

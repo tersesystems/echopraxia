@@ -1,16 +1,18 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+import static com.tersesystems.echopraxia.api.Utilities.memoize;
+
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.api.Utilities;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-class Log4JLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+public class Log4JLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
   private final Supplier<List<Field>> joinedFields;
@@ -19,11 +21,9 @@ class Log4JLoggingContext extends AbstractJsonPathFinder implements LoggingConte
   public Log4JLoggingContext(Log4JCoreLogger.Context context, Supplier<List<Field>> arguments) {
     // Defers and memoizes the arguments and context fields for a single logging statement.
     this.context = context;
-    this.argumentFields = Utilities.memoize(arguments);
-    this.loggerFields = Utilities.memoize(context::getLoggerFields);
-    this.joinedFields =
-        Utilities.memoize(
-            Log4JCoreLogger.Context.joinFields(this.loggerFields, this.argumentFields));
+    this.argumentFields = memoize(arguments);
+    this.loggerFields = memoize(context::getLoggerFields);
+    this.joinedFields = memoize(joinFields(this.loggerFields, this.argumentFields));
   }
 
   public Log4JLoggingContext(Log4JCoreLogger.Context context) {
