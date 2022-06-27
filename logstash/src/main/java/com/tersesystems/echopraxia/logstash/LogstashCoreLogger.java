@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.api.Utilities.joinFields;
 import static org.slf4j.event.EventConstants.*;
 
 import com.tersesystems.echopraxia.api.*;
@@ -12,6 +13,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import net.logstash.logback.argument.StructuredArgument;
 import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.LogstashMarker;
@@ -28,7 +31,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
 
   private final ch.qos.logback.classic.Logger logger;
-  private final LogstashLoggerContext context;
+  private final Context context;
   private final Condition condition;
   private final Executor executor;
   private final String fqcn;
@@ -37,7 +40,7 @@ public class LogstashCoreLogger implements CoreLogger {
   protected LogstashCoreLogger(String fqcn, ch.qos.logback.classic.Logger logger) {
     this.fqcn = fqcn;
     this.logger = logger;
-    this.context = LogstashLoggerContext.empty();
+    this.context = Context.empty();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = mdcContext();
@@ -46,7 +49,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public LogstashCoreLogger(
       @NotNull String fqcn,
       @NotNull ch.qos.logback.classic.Logger logger,
-      @NotNull LogstashLoggerContext context,
+      @NotNull LogstashCoreLogger.Context context,
       @NotNull Condition condition,
       @NotNull Executor executor,
       @NotNull Supplier<Runnable> threadContextSupplier) {
@@ -104,15 +107,14 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull CoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    final LogstashLoggerContext contextWithFields =
+    final Context contextWithFields =
         this.context.withFields(() -> convertToFields(f.apply(builder)));
     return new LogstashCoreLogger(
         fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
   }
 
   public CoreLogger withMarkers(Marker... markers) {
-    final LogstashLoggerContext contextWithMarkers =
-        this.context.withMarkers(() -> Arrays.asList(markers));
+    final Context contextWithMarkers = this.context.withMarkers(() -> Arrays.asList(markers));
     return new LogstashCoreLogger(
         fqcn, logger, contextWithMarkers, condition, executor, threadContextFunction);
   }
@@ -120,8 +122,7 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public @NotNull CoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
-    LogstashLoggerContext newContext =
-        context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
+    Context newContext = context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
     return new LogstashCoreLogger(
         fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
@@ -474,34 +475,31 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @NotNull
-  protected LogstashLoggerContext newContext(
+  protected LogstashCoreLogger.Context newContext(
       @NotNull Supplier<List<Field>> fieldsSupplier, Marker callerMarker) {
-    Supplier<List<Field>> loggerFields =
-        LogstashLoggerContext.joinFields(fieldsSupplier, context::getLoggerFields);
+    Supplier<List<Field>> loggerFields = joinFields(fieldsSupplier, context::getLoggerFields);
     Supplier<List<Marker>> markers;
     if (callerMarker == null) {
       markers = context::getMarkers;
     } else {
       markers =
-          LogstashLoggerContext.joinMarkers(
-              () -> Collections.singletonList(callerMarker), context::getMarkers);
+          Context.joinMarkers(() -> Collections.singletonList(callerMarker), context::getMarkers);
     }
-    return new LogstashLoggerContext(loggerFields, markers);
+    return new Context(loggerFields, markers);
   }
 
-  protected LogstashLoggerContext newContext(Marker callerMarker) {
+  protected Context newContext(Marker callerMarker) {
     if (callerMarker == null) {
       return context;
     } else {
       Supplier<List<Marker>> markers;
       markers =
-          LogstashLoggerContext.joinMarkers(
-              () -> Collections.singletonList(callerMarker), context::getMarkers);
-      return new LogstashLoggerContext(context::getLoggerFields, markers);
+          Context.joinMarkers(() -> Collections.singletonList(callerMarker), context::getMarkers);
+      return new Context(context::getLoggerFields, markers);
     }
   }
 
-  protected LogstashCoreLogger newLogger(LogstashLoggerContext newContext) {
+  protected LogstashCoreLogger newLogger(Context newContext) {
     return new LogstashCoreLogger(
         fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
@@ -568,5 +566,80 @@ public class LogstashCoreLogger implements CoreLogger {
 
   public String toString() {
     return "LogstashCoreLogger[" + logger.getName() + "]";
+  }
+
+  /** A logging context that stores fields belonging to the logger. */
+  protected static class Context {
+
+    private static final Context EMPTY =
+        new Context(Collections::emptyList, Collections::emptyList);
+
+    private final Supplier<List<Field>> fieldsSupplier;
+    private final Supplier<List<Marker>> markersSupplier;
+
+    private final Supplier<Marker> markersResult;
+
+    protected Context(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
+      this.fieldsSupplier = f;
+      this.markersSupplier = m;
+      this.markersResult =
+          Utilities.memoize(
+              () -> {
+                List<Marker> markers = getMarkers();
+                if (markers.isEmpty()) {
+                  return null;
+                } else if (markers.size() == 1) {
+                  return markers.get(0);
+                } else {
+                  return Markers.aggregate(markers);
+                }
+              });
+    }
+
+    public static Context empty() {
+      return EMPTY;
+    }
+
+    public @NotNull List<Field> getLoggerFields() {
+      return fieldsSupplier.get();
+    }
+
+    public @NotNull List<Marker> getMarkers() {
+      return markersSupplier.get();
+    }
+
+    public Context withFields(Supplier<List<Field>> o) {
+      // existing context should be concatenated before the new fields
+      Supplier<List<Field>> joinedFields = joinFields(this::getLoggerFields, o);
+      return new Context(joinedFields, this::getMarkers);
+    }
+
+    public Context withMarkers(Supplier<List<Marker>> o) {
+      Supplier<List<Marker>> joinedMarkers = joinMarkers(this::getMarkers, o);
+      return new Context(this::getLoggerFields, joinedMarkers);
+    }
+
+    static Supplier<List<Marker>> joinMarkers(
+        Supplier<List<Marker>> markersSupplier, Supplier<List<Marker>> thisMarkersSupplier) {
+      return () -> {
+        final List<Marker> markers = markersSupplier.get();
+        final List<Marker> thisMarkers = thisMarkersSupplier.get();
+        if (markers.isEmpty()) {
+          return thisMarkers;
+        } else if (thisMarkers.isEmpty()) {
+          return markers;
+        } else {
+          return Stream.concat(thisMarkers.stream(), markers.stream()).collect(Collectors.toList());
+        }
+      };
+    }
+
+    @Nullable
+    Marker resolveMarkers() {
+      // Markers are always resolved on isEnabled, but contexts can also be
+      // composed with each other, so we don't want every single context's marker,
+      // only the final result.
+      return markersResult.get();
+    }
   }
 }

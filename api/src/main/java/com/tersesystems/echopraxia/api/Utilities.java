@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 /** Utilities for classes implementing a logger. */
@@ -31,6 +33,25 @@ public final class Utilities {
       list.add(field);
     }
     return list;
+  }
+
+  public static Supplier<List<Field>> joinFields(
+      Supplier<List<Field>> first, Supplier<List<Field>> second) {
+    return () -> {
+      List<Field> firstFields = first.get();
+      List<Field> secondFields = second.get();
+
+      if (firstFields.isEmpty()) {
+        return secondFields;
+      } else if (secondFields.isEmpty()) {
+        return firstFields;
+      } else {
+        // Stream.concat is actually faster than explicit ArrayList!
+        // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
+        return Stream.concat(firstFields.stream(), secondFields.stream())
+            .collect(Collectors.toList());
+      }
+    };
   }
 
   public @NotNull static Function<Supplier<Map<String, String>>, Supplier<List<Field>>>

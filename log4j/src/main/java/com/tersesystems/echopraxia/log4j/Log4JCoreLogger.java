@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import java.util.*;
@@ -23,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class Log4JCoreLogger implements CoreLogger {
 
   private final ExtendedLogger logger;
-  private final Log4JLoggerContext context;
+  private final Context context;
   private final Condition condition;
   private final Executor executor;
   private final String fqcn;
@@ -33,7 +35,7 @@ public class Log4JCoreLogger implements CoreLogger {
   Log4JCoreLogger(@NotNull String fqcn, @NotNull ExtendedLogger log4jLogger) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
-    this.context = new Log4JLoggerContext();
+    this.context = new Context();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = threadContext();
@@ -42,7 +44,7 @@ public class Log4JCoreLogger implements CoreLogger {
   protected Log4JCoreLogger(
       @NotNull String fqcn,
       @NotNull ExtendedLogger log4jLogger,
-      @NotNull Log4JLoggerContext context,
+      @NotNull Log4JCoreLogger.Context context,
       @NotNull Condition condition,
       @NotNull Executor executor,
       @NotNull Supplier<Runnable> threadContextSupplier) {
@@ -79,7 +81,7 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    Log4JLoggerContext newContext = context.withFields(() -> convertToFields(f.apply(builder)));
+    Context newContext = context.withFields(() -> convertToFields(f.apply(builder)));
     return newLogger(newContext);
   }
 
@@ -130,8 +132,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @NotNull
   public Log4JCoreLogger withMarker(@NotNull Marker marker) {
-    Log4JLoggerContext newContext = new Log4JLoggerContext(Collections::emptyList, marker);
-    return newLogger(this.context.and(newContext));
+    return newLogger(this.context.withMarker(marker));
   }
 
   @Override
@@ -381,7 +382,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @NotNull
-  private Log4JCoreLogger newLogger(Log4JLoggerContext newContext) {
+  private Log4JCoreLogger newLogger(Context newContext) {
     return new Log4JCoreLogger(
         fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
@@ -474,5 +475,37 @@ public class Log4JCoreLogger implements CoreLogger {
 
   public String toString() {
     return "Log4JCoreLogger[" + logger.getName() + "]";
+  }
+
+  protected static class Context {
+    protected final Supplier<List<Field>> fieldsSupplier;
+    protected final Marker marker;
+
+    Context() {
+      this.fieldsSupplier = Collections::emptyList;
+      this.marker = null;
+    }
+
+    protected Context(Supplier<List<Field>> f, Marker m) {
+      this.fieldsSupplier = f;
+      this.marker = m;
+    }
+
+    public @NotNull List<Field> getLoggerFields() {
+      return fieldsSupplier.get();
+    }
+
+    public Marker getMarker() {
+      return marker;
+    }
+
+    public Context withFields(Supplier<List<Field>> o) {
+      Supplier<List<Field>> joinedFields = joinFields(o, this::getLoggerFields);
+      return new Context(joinedFields, this.getMarker());
+    }
+
+    public Context withMarker(Marker m) {
+      return new Context(this.fieldsSupplier, m);
+    }
   }
 }

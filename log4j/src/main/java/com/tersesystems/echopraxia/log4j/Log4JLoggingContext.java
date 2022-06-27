@@ -1,34 +1,32 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+import static com.tersesystems.echopraxia.api.Utilities.memoize;
+
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.api.Utilities;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-class Log4JLoggingContext extends AbstractJsonPathFinder
-    implements LoggingContext, MarkerLoggingContext {
-
+public class Log4JLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
   private final Supplier<List<Field>> joinedFields;
+  private final Log4JCoreLogger.Context context;
 
-  private final Log4JLoggerContext context;
-
-  public Log4JLoggingContext(Log4JLoggerContext context, Supplier<List<Field>> arguments) {
+  public Log4JLoggingContext(Log4JCoreLogger.Context context, Supplier<List<Field>> arguments) {
     // Defers and memoizes the arguments and context fields for a single logging statement.
     this.context = context;
-    this.argumentFields = Utilities.memoize(arguments);
-    this.loggerFields = Utilities.memoize(context::getLoggerFields);
-    this.joinedFields =
-        Utilities.memoize(Log4JLoggerContext.joinFields(this.loggerFields, this.argumentFields));
+    this.argumentFields = memoize(arguments);
+    this.loggerFields = memoize(context::getLoggerFields);
+    this.joinedFields = memoize(joinFields(this.loggerFields, this.argumentFields));
   }
 
-  public Log4JLoggingContext(Log4JLoggerContext context) {
+  public Log4JLoggingContext(Log4JCoreLogger.Context context) {
     this(context, Collections::emptyList);
   }
 
@@ -47,7 +45,6 @@ class Log4JLoggingContext extends AbstractJsonPathFinder
     return loggerFields.get();
   }
 
-  @Override
   public @NotNull Marker getMarker() {
     return context.getMarker();
   }

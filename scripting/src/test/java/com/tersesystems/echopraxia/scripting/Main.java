@@ -3,9 +3,9 @@ package com.tersesystems.echopraxia.scripting;
 import static com.tersesystems.echopraxia.api.Level.INFO;
 
 import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.logstash.LogstashLoggerContext;
-import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
+import com.tersesystems.echopraxia.api.Value;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +22,8 @@ public class Main {
 
       final ScriptHandle handle = watchService.watchScript(filePath, Throwable::printStackTrace);
       final Condition condition = ScriptCondition.create(handle);
-      LoggingContext context = new LogstashLoggingContext(LogstashLoggerContext.empty());
+      LoggingContext context =
+          new FakeLoggingContext(Field.keyValue("correlation_id", Value.string("match")));
       if (condition.test(INFO, context)) {
         System.out.println("First test should eval but take a while...");
       }
@@ -33,7 +34,7 @@ public class Main {
         Thread.sleep(300);
 
         // and then we should be able to see the changed condition evaluate.
-        if (condition.test(INFO, new LogstashLoggingContext(LogstashLoggerContext.empty()))) {
+        if (condition.test(INFO, context)) {
           System.out.println(
               "this doesn't log, because even though we pass in INFO the script changed to DEBUG");
         }
@@ -43,13 +44,13 @@ public class Main {
         Thread.sleep(300);
 
         // Now the first time it sees, it'll re-evaluate and process again!
-        if (condition.test(INFO, new LogstashLoggingContext(LogstashLoggerContext.empty()))) {
+        if (condition.test(INFO, context)) {
           System.out.println("this logs because we have changed the script back to INFO.");
         }
 
         Files.deleteIfExists(filePath);
         Thread.sleep(300);
-        if (condition.test(INFO, new LogstashLoggingContext(LogstashLoggerContext.empty()))) {
+        if (condition.test(INFO, context)) {
           System.out.println("see what happens when script is deleted");
         }
       }
@@ -59,7 +60,7 @@ public class Main {
   private static List<String> lines(String name) {
     return Arrays.asList(
         "library echopraxia {",
-        "  function evaluate: (string level, function ctx) ->",
+        "  function evaluate: (string level, dict ctx) ->",
         "    level == \"" + name + "\";",
         "}");
   }
