@@ -7,6 +7,7 @@ import static org.awaitility.Awaitility.await;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
+import com.tersesystems.echopraxia.logstash.MemoLoggingContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,7 +54,7 @@ public class ScriptManagerTest {
         };
     final ScriptManager scriptManager = new ScriptManager(handle);
 
-    LoggingContext empty = LogstashLoggingContext.empty();
+    LoggingContext empty = new MemoLoggingContext(LogstashLoggingContext.empty());
     int parallel = 4;
     final ExecutorService executorService = Executors.newWorkStealingPool(parallel);
     LongAdder count = new LongAdder();

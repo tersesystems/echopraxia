@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.CoreLoggerFactory;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import java.util.Map;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
 import org.apache.logging.log4j.Marker;
@@ -94,5 +96,33 @@ public class ContextTest extends TestBase {
     JsonObject context = entry.getJsonObject("context");
     final String value = context.getString("mdckey");
     assertThat(value).isEqualTo("mdcvalue");
+  }
+
+  @Test
+  void testFindExceptionStackTraceElement() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) -> {
+          Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
+          return element.get("fileName").toString().endsWith("ContextTest.java");
+        };
+    RuntimeException e = new RuntimeException("test message");
+    logger.info(c, "Matches on exception", e);
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("Matches on exception");
+  }
+
+  @Test
+  void testFindDouble() {
+    Logger<?> logger = getLogger();
+    Condition c =
+        (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
+    logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1.5));
+
+    JsonObject entry = getEntry();
+    final String message = entry.getString("message");
+    assertThat(message).isEqualTo("Matches on arg1");
   }
 }

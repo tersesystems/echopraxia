@@ -24,8 +24,7 @@ public class Log4JLoggingContext extends AbstractLoggingContext implements Marke
     this.marker = m;
   }
 
-  @Override
-  public @NotNull List<Field> getFields() {
+  public @NotNull List<Field> getLoggerFields() {
     return fieldsSupplier.get();
   }
 
@@ -35,24 +34,25 @@ public class Log4JLoggingContext extends AbstractLoggingContext implements Marke
   }
 
   public Log4JLoggingContext withFields(Supplier<List<Field>> o) {
-    Supplier<List<Field>> joinedFields = joinFields(o, this::getFields);
+    Supplier<List<Field>> joinedFields = joinFields(o, this::getLoggerFields);
     return new Log4JLoggingContext(joinedFields, this.getMarker());
   }
 
   static Supplier<List<Field>> joinFields(
-      Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
+      Supplier<List<Field>> first, Supplier<List<Field>> second) {
     return () -> {
-      List<Field> thisFields = thisFieldsSupplier.get();
-      List<Field> ctxFields = ctxFieldsSupplier.get();
+      List<Field> firstFields = first.get();
+      List<Field> secondFields = second.get();
 
-      if (thisFields.isEmpty()) {
-        return ctxFields;
-      } else if (ctxFields.isEmpty()) {
-        return thisFields;
+      if (firstFields.isEmpty()) {
+        return secondFields;
+      } else if (secondFields.isEmpty()) {
+        return firstFields;
       } else {
         // Stream.concat is actually faster than explicit ArrayList!
         // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
-        return Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
+        return Stream.concat(firstFields.stream(), secondFields.stream())
+            .collect(Collectors.toList());
       }
     };
   }
@@ -65,7 +65,8 @@ public class Log4JLoggingContext extends AbstractLoggingContext implements Marke
    */
   public Log4JLoggingContext and(Log4JLoggingContext context) {
     if (context != null) {
-      Supplier<List<Field>> joinedFields = joinFields(context::getFields, this::getFields);
+      Supplier<List<Field>> joinedFields =
+          joinFields(context::getLoggerFields, this::getLoggerFields);
       Marker m = context.getMarker() != null ? context.getMarker() : this.marker;
       return new Log4JLoggingContext(joinedFields, m);
     } else {

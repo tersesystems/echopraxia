@@ -137,7 +137,8 @@ public class LogstashCoreLogger implements CoreLogger {
             r2.run();
           };
         };
-    return new LogstashCoreLogger(fqcn, logger, context, condition, executor, joinedThreadContextFunction);
+    return new LogstashCoreLogger(
+        fqcn, logger, context, condition, executor, joinedThreadContextFunction);
   }
 
   @Override
@@ -208,7 +209,7 @@ public class LogstashCoreLogger implements CoreLogger {
       MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
       if (condition.test(level, snapshotContext)) {
         logger.log(
-            resolveSnapshotFields(m, snapshotContext),
+            resolveContextFields(m, snapshotContext),
             fqcn,
             convertLevel(level),
             message,
@@ -233,9 +234,9 @@ public class LogstashCoreLogger implements CoreLogger {
       MemoLoggingContext snapshotContext =
           new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (condition.test(level, snapshotContext)) {
-        final Object[] arguments = convertArguments(snapshotContext.arguments());
+        final Object[] arguments = convertArguments(snapshotContext.getArgumentFields());
         logger.log(
-            resolveSnapshotFields(m, snapshotContext),
+            resolveContextFields(m, snapshotContext),
             fqcn,
             convertLevel(level),
             message,
@@ -252,7 +253,7 @@ public class LogstashCoreLogger implements CoreLogger {
       MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
       if (this.condition.and(condition).test(level, snapshotContext)) {
         logger.log(
-            resolveSnapshotFields(m, snapshotContext),
+            resolveContextFields(m, snapshotContext),
             fqcn,
             convertLevel(level),
             message,
@@ -274,9 +275,9 @@ public class LogstashCoreLogger implements CoreLogger {
       MemoLoggingContext snapshotContext =
           new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, snapshotContext)) {
-        final Object[] arguments = convertArguments(snapshotContext.arguments());
+        final Object[] arguments = convertArguments(snapshotContext.getArgumentFields());
         logger.log(
-            resolveSnapshotFields(m, snapshotContext),
+            resolveContextFields(m, snapshotContext),
             fqcn,
             convertLevel(level),
             message,
@@ -484,8 +485,8 @@ public class LogstashCoreLogger implements CoreLogger {
   @NotNull
   protected LogstashLoggingContext newContext(
       @NotNull Supplier<List<Field>> fieldsSupplier, Marker callerMarker) {
-    Supplier<List<Field>> fields =
-        LogstashLoggingContext.joinFields(fieldsSupplier, context::getFields);
+    Supplier<List<Field>> contextFields =
+        LogstashLoggingContext.joinFields(fieldsSupplier, context::getLoggerFields);
     Supplier<List<Marker>> markers;
     if (callerMarker == null) {
       markers = context::getMarkers;
@@ -494,7 +495,7 @@ public class LogstashCoreLogger implements CoreLogger {
           LogstashLoggingContext.joinMarkers(
               () -> Collections.singletonList(callerMarker), context::getMarkers);
     }
-    return new LogstashLoggingContext(fields, markers);
+    return new LogstashLoggingContext(contextFields, markers);
   }
 
   protected LogstashLoggingContext newContext(Marker callerMarker) {
@@ -505,7 +506,7 @@ public class LogstashCoreLogger implements CoreLogger {
       markers =
           LogstashLoggingContext.joinMarkers(
               () -> Collections.singletonList(callerMarker), context::getMarkers);
-      return new LogstashLoggingContext(context::getFields, markers);
+      return new LogstashLoggingContext(context::getLoggerFields, markers);
     }
   }
 
@@ -549,8 +550,8 @@ public class LogstashCoreLogger implements CoreLogger {
     };
   }
 
-  private Marker resolveSnapshotFields(Marker ctxMarker, MemoLoggingContext ctx) {
-    final List<Field> fields = ctx.getFields();
+  private Marker resolveContextFields(Marker ctxMarker, MemoLoggingContext ctx) {
+    final List<Field> fields = ctx.getLoggerFields();
     if (fields.isEmpty()) {
       return ctxMarker;
     } else {

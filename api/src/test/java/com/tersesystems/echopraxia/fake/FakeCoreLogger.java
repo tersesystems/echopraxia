@@ -69,9 +69,9 @@ public class FakeCoreLogger implements CoreLogger {
   @Override
   public @NotNull <FB> CoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    FakeLoggingContext newContext = new FakeLoggingContext(() -> convert(f.apply(builder)));
-    return new FakeCoreLogger(
-        fqcn, context.and(newContext), this.condition.and(condition), executor, tlsSupplier);
+    FakeLoggingContext ctx =
+        new FakeLoggingContext(context::getLoggerFields, () -> convert(f.apply(builder)));
+    return new FakeCoreLogger(fqcn, ctx, this.condition.and(condition), executor, tlsSupplier);
   }
 
   private List<Field> convert(FieldBuilderResult input) {
@@ -121,17 +121,20 @@ public class FakeCoreLogger implements CoreLogger {
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
     List<Field> args = convert(f.apply(builder));
-    FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
-    if (isEnabledFor(level) && this.condition.test(level, context.and(argContext))) {
-      List<Field> fields = context.getFields();
-      System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);
+    if (isEnabledFor(level)) {
+      FakeLoggingContext memo =
+          new FakeLoggingContext(context::getLoggerFields, context::getArgumentFields);
+      if (this.condition.test(level, memo)) {
+        List<Field> fields = context.getFields();
+        System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);
+      }
     }
   }
 
   @Override
   public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
     if (isEnabledFor(level) && this.condition.and(condition).test(level, context)) {
-      List<Field> fields = context.getFields();
+      List<Field> fields = context.getLoggerFields();
       System.out.printf("" + message + " level %s fields %s\n", level, fields);
     }
   }
@@ -145,11 +148,14 @@ public class FakeCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     // When passing a condition through with explicit arguments, we pull the args and make
     // them available through context.
-    List<Field> fields = context.getFields();
-    List<Field> args = convert(f.apply(builder));
-    FakeLoggingContext argContext = new FakeLoggingContext(() -> args);
-    if (isEnabledFor(level) && this.condition.and(condition).test(level, context.and(argContext))) {
-      System.out.printf("" + message + " level %s fields %s args %s\n", level, fields, args);
+    FakeLoggingContext argContext =
+        new FakeLoggingContext(context::getLoggerFields, () -> convert(f.apply(builder)));
+    if (isEnabledFor(level) && this.condition.and(condition).test(level, argContext)) {
+      System.out.printf(
+          "" + message + " level %s fields %s args %s\n",
+          level,
+          argContext.getLoggerFields(),
+          argContext.getArgumentFields());
     }
   }
 

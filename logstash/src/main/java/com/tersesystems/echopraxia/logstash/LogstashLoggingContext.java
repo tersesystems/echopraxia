@@ -13,12 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Marker;
 
-/**
- * Logstash logging context implementation.
- *
- * <p>Note that this makes field evaluation lazy so that functions can pull things out of a thread
- * local (typically hard to do if when loggers are set up initially).
- */
+/** A logging context that stores fields belonging to the logger. */
 public class LogstashLoggingContext extends AbstractLoggingContext implements MarkerLoggingContext {
 
   private static final LogstashLoggingContext EMPTY =
@@ -59,8 +54,7 @@ public class LogstashLoggingContext extends AbstractLoggingContext implements Ma
     return EMPTY;
   }
 
-  @Override
-  public @NotNull List<Field> getFields() {
+  public @NotNull List<Field> getLoggerFields() {
     return fieldsSupplier.get();
   }
 
@@ -71,13 +65,13 @@ public class LogstashLoggingContext extends AbstractLoggingContext implements Ma
 
   public LogstashLoggingContext withFields(Supplier<List<Field>> o) {
     // existing context should be concatenated before the new fields
-    Supplier<List<Field>> joinedFields = joinFields(this::getFields, o);
+    Supplier<List<Field>> joinedFields = joinFields(this::getLoggerFields, o);
     return new LogstashLoggingContext(joinedFields, this::getMarkers);
   }
 
   public LogstashLoggingContext withMarkers(Supplier<List<Marker>> o) {
     Supplier<List<Marker>> joinedMarkers = joinMarkers(this::getMarkers, o);
-    return new LogstashLoggingContext(this::getFields, joinedMarkers);
+    return new LogstashLoggingContext(this::getLoggerFields, joinedMarkers);
   }
 
   /**
@@ -92,7 +86,8 @@ public class LogstashLoggingContext extends AbstractLoggingContext implements Ma
     }
 
     // This MUST be lazy, we can't get the fields until statement evaluation
-    Supplier<List<Field>> joinedFields = joinFields(this::getFields, context::getFields);
+    Supplier<List<Field>> joinedFields =
+        joinFields(this::getLoggerFields, context::getLoggerFields);
     Supplier<List<Marker>> joinedMarkers =
         joinMarkers(context::getMarkers, LogstashLoggingContext.this::getMarkers);
     return new LogstashLoggingContext(joinedFields, joinedMarkers);
@@ -114,19 +109,20 @@ public class LogstashLoggingContext extends AbstractLoggingContext implements Ma
   }
 
   static Supplier<List<Field>> joinFields(
-      Supplier<List<Field>> thisFieldsSupplier, Supplier<List<Field>> ctxFieldsSupplier) {
+      Supplier<List<Field>> first, Supplier<List<Field>> second) {
     return () -> {
-      List<Field> thisFields = thisFieldsSupplier.get();
-      List<Field> ctxFields = ctxFieldsSupplier.get();
+      List<Field> firstFields = first.get();
+      List<Field> secondFields = second.get();
 
-      if (thisFields.isEmpty()) {
-        return ctxFields;
-      } else if (ctxFields.isEmpty()) {
-        return thisFields;
+      if (firstFields.isEmpty()) {
+        return secondFields;
+      } else if (secondFields.isEmpty()) {
+        return firstFields;
       } else {
         // Stream.concat is actually faster than explicit ArrayList!
         // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
-        return Stream.concat(thisFields.stream(), ctxFields.stream()).collect(Collectors.toList());
+        return Stream.concat(firstFields.stream(), secondFields.stream())
+            .collect(Collectors.toList());
       }
     };
   }

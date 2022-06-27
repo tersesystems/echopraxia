@@ -173,7 +173,7 @@ public class Log4JCoreLogger implements CoreLogger {
     if (logger.isEnabled(log4jLevel, marker)) {
       MemoLoggingContext memoContext = new MemoLoggingContext(context);
       if (condition.test(level, memoContext)) {
-        final Message m = createMessage(message);
+        final Message m = createMessage(memoContext, message);
         logger.logMessage(fqcn, log4jLevel, marker, m, null);
       }
     }
@@ -193,8 +193,8 @@ public class Log4JCoreLogger implements CoreLogger {
       MemoLoggingContext argContext =
           new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (condition.test(level, argContext)) {
-        final Throwable e = findThrowable(argContext.arguments());
-        final Message message = createMessage(messageTemplate, argContext.arguments());
+        final Throwable e = findThrowable(argContext.getArgumentFields());
+        final Message message = createMessage(argContext, messageTemplate);
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
       }
     }
@@ -216,7 +216,7 @@ public class Log4JCoreLogger implements CoreLogger {
       // We want to memoize context fields even if no argument...
       MemoLoggingContext argContext = new MemoLoggingContext(context);
       if (this.condition.and(condition).test(level, argContext)) {
-        final Message m = createMessage(message);
+        final Message m = createMessage(argContext, message);
         logger.logMessage(fqcn, log4jLevel, marker, m, null);
       }
     }
@@ -235,8 +235,8 @@ public class Log4JCoreLogger implements CoreLogger {
       MemoLoggingContext argContext =
           new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, argContext)) {
-        final Throwable e = findThrowable(argContext.arguments());
-        final Message message = createMessage(messageTemplate, argContext.arguments());
+        final Throwable e = findThrowable(argContext.getArgumentFields());
+        final Message message = createMessage(argContext, messageTemplate);
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
       }
     }
@@ -300,13 +300,8 @@ public class Log4JCoreLogger implements CoreLogger {
         });
   }
 
-  protected Message createMessage(String message) {
-    return createMessage(message, Collections.emptyList());
-  }
-
-  protected Message createMessage(String template, List<Field> arguments) {
-    List<Field> contextFields = context.getFields();
-    return new EchopraxiaFieldsMessage(template, arguments, contextFields);
+  protected Message createMessage(MemoLoggingContext ctx, String template) {
+    return new EchopraxiaFieldsMessage(template, ctx.getArgumentFields(), ctx.getLoggerFields());
   }
 
   protected org.apache.logging.log4j.Level convertLevel(Level level) {
@@ -409,9 +404,12 @@ public class Log4JCoreLogger implements CoreLogger {
       public void log(@Nullable String messageTemplate) {
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-        if (logger.isEnabled(log4jLevel, marker) && condition.test(level, context)) {
-          final Message message = createMessage(messageTemplate);
-          logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
+        if (logger.isEnabled(log4jLevel, marker)) {
+          MemoLoggingContext memo = new MemoLoggingContext(context);
+          if (condition.test(level, memo)) {
+            final Message message = createMessage(memo, messageTemplate);
+            logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
+          }
         }
       }
 
@@ -423,13 +421,14 @@ public class Log4JCoreLogger implements CoreLogger {
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
         if (logger.isEnabled(log4jLevel, marker)) {
-          final List<Field> argumentFields = convertToFields(f.apply(builder));
-          final Throwable e = findThrowable(argumentFields);
-          final Message message = createMessage(messageTemplate, argumentFields);
-          // When passing a condition through with explicit arguments, we pull the args
-          // and make them available through context.
-          Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
-          if (condition.test(level, context.and(argContext))) {
+          MemoLoggingContext memo =
+              new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
+          if (condition.test(level, memo)) {
+            final Throwable e = findThrowable(memo.getArgumentFields());
+            final Message message = createMessage(memo, messageTemplate);
+            // When passing a condition through with explicit arguments, we pull the args
+            // and make them available through context.
+
             logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
           }
         }
@@ -446,26 +445,26 @@ public class Log4JCoreLogger implements CoreLogger {
         // XXX this should just call a regular logger.
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
-        if (logger.isEnabled(log4jLevel, marker) && condition.and(c).test(level, context)) {
-          final Message message = createMessage(messageTemplate);
-          logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
+        if (logger.isEnabled(log4jLevel, marker)) {
+          MemoLoggingContext memo = new MemoLoggingContext(context);
+          if (condition.and(c).test(level, memo)) {
+            final Message message = createMessage(memo, messageTemplate);
+            logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
+          }
         }
       }
 
       @Override
       public void log(
           @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
-        // XXX this should call a regular logger.
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
         if (logger.isEnabled(log4jLevel, marker)) {
-          final List<Field> argumentFields = convertToFields(f.apply(builder));
-          final Throwable e = findThrowable(argumentFields);
-          final Message message = createMessage(messageTemplate, argumentFields);
-          // When passing a condition through with explicit arguments, we pull the args
-          // and make them available through context.
-          Log4JLoggingContext argContext = new Log4JLoggingContext(() -> argumentFields, null);
-          if (condition.and(c).test(level, context.and(argContext))) {
+          MemoLoggingContext memo =
+              new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
+          if (condition.and(c).test(level, memo)) {
+            final Throwable e = findThrowable(memo.getArgumentFields());
+            final Message message = createMessage(memo, messageTemplate);
             logger.logMessage(log4jLevel, marker, fqcn, location, message, e);
           }
         }
