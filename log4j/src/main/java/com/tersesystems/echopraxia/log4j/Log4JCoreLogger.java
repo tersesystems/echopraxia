@@ -132,8 +132,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @NotNull
   public Log4JCoreLogger withMarker(@NotNull Marker marker) {
-    Context newContext = new Context(Collections::emptyList, marker);
-    return newLogger(this.context.and(newContext));
+    return newLogger(this.context.withMarker(marker));
   }
 
   @Override
@@ -505,21 +504,8 @@ public class Log4JCoreLogger implements CoreLogger {
       return new Context(joinedFields, this.getMarker());
     }
 
-    /**
-     * Joins the two contexts together, concatenating the lists in a supplier function.
-     *
-     * @param context the context to join
-     * @return the new context containing fields and markers from both.
-     */
-    public Context and(Context context) {
-      if (context != null) {
-        Supplier<List<Field>> joinedFields =
-            joinFields(context::getLoggerFields, this::getLoggerFields);
-        Marker m = context.getMarker() != null ? context.getMarker() : this.marker;
-        return new Context(joinedFields, m);
-      } else {
-        return this;
-      }
+    public Context withMarker(Marker m) {
+      return new Context(this.fieldsSupplier, m);
     }
   }
 }

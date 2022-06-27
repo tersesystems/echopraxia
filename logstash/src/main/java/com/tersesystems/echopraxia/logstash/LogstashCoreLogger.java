@@ -596,14 +596,6 @@ public class LogstashCoreLogger implements CoreLogger {
               });
     }
 
-    public static Context create(List<Field> fields) {
-      return new Context(() -> fields, Collections::emptyList);
-    }
-
-    public static Context create(Field field) {
-      return new Context(() -> Collections.singletonList(field), Collections::emptyList);
-    }
-
     public static Context empty() {
       return EMPTY;
     }
@@ -625,25 +617,6 @@ public class LogstashCoreLogger implements CoreLogger {
     public Context withMarkers(Supplier<List<Marker>> o) {
       Supplier<List<Marker>> joinedMarkers = joinMarkers(this::getMarkers, o);
       return new Context(this::getLoggerFields, joinedMarkers);
-    }
-
-    /**
-     * Joins the two contexts together, concatenating the lists in a supplier function.
-     *
-     * @param context the context to join
-     * @return the new context containing fields and markers from both.
-     */
-    public Context and(Context context) {
-      if (context == null) {
-        return this;
-      }
-
-      // This MUST be lazy, we can't get the fields until statement evaluation
-      Supplier<List<Field>> joinedFields =
-          joinFields(this::getLoggerFields, context::getLoggerFields);
-      Supplier<List<Marker>> joinedMarkers =
-          joinMarkers(context::getMarkers, Context.this::getMarkers);
-      return new Context(joinedFields, joinedMarkers);
     }
 
     static Supplier<List<Marker>> joinMarkers(
