@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractLoggingContext implements FindPathMethods {
+public abstract class AbstractJsonPathFinder implements FindPathMethods {
   private static final String EXCEPTION_PATH = "$." + EXCEPTION;
 
   private static final JsonProvider jsonProvider = new EchopraxiaJsonProvider();

@@ -12,14 +12,14 @@ public class EchopraxiaFieldsMessage implements Message {
 
   private final String message;
   private final List<Field> argumentFields;
-  private final List<Field> contextFields;
+  private final List<Field> loggerFields;
   private final String formattedMessage;
 
   public EchopraxiaFieldsMessage(
-      String message, List<Field> argumentFields, List<Field> contextFields) {
+      String message, List<Field> loggerFields, List<Field> argumentFields) {
     this.message = message;
     this.argumentFields = argumentFields;
-    this.contextFields = contextFields;
+    this.loggerFields = loggerFields;
     this.formattedMessage = ParameterizedMessage.format(getFormat(), getParameters());
   }
 
@@ -42,12 +42,12 @@ public class EchopraxiaFieldsMessage implements Message {
     return argumentFields;
   }
 
-  public List<Field> getContextFields() {
-    return contextFields;
+  public List<Field> getLoggerFields() {
+    return loggerFields;
   }
 
   public List<Field> getFields() {
-    return Stream.concat(argumentFields.stream(), contextFields.stream())
+    return Stream.concat(argumentFields.stream(), loggerFields.stream())
         .collect(Collectors.toList());
   }
 

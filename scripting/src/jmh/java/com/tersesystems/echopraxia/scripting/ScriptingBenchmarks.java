@@ -2,8 +2,8 @@ package com.tersesystems.echopraxia.scripting;
 
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.logstash.LogstashLoggerContext;
 import com.tersesystems.echopraxia.logstash.LogstashLoggingContext;
-import com.tersesystems.echopraxia.logstash.MemoLoggingContext;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
@@ -65,11 +65,11 @@ public class ScriptingBenchmarks {
   private static final Condition watchedCondition = ScriptCondition.create(false, watchedScript);
 
   private static final LoggingContext passContext =
-      new MemoLoggingContext(
-          LogstashLoggingContext.create(Field.value("some_field", Value.number(1))));
+      new LogstashLoggingContext(
+          LogstashLoggerContext.create(Field.value("some_field", Value.number(1))));
 
   private static final LoggingContext failContext =
-      new MemoLoggingContext(LogstashLoggingContext.empty());
+      new LogstashLoggingContext(LogstashLoggerContext.empty());
 
   @Benchmark
   public void testFileConditionMatch(Blackhole blackhole) {

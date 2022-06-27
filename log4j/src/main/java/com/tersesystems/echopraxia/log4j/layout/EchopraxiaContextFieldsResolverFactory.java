@@ -48,7 +48,7 @@ public class EchopraxiaContextFieldsResolverFactory implements EventResolverFact
 
     @Override
     protected List<Field> resolveFields(EchopraxiaFieldsMessage message) {
-      return message.getContextFields();
+      return message.getLoggerFields();
     }
   }
 }

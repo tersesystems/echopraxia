@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.fake;
 
-import com.tersesystems.echopraxia.api.AbstractLoggingContext;
+import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.Arrays;
@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-public class FakeLoggingContext extends AbstractLoggingContext implements LoggingContext {
+public class FakeLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
   private static final FakeLoggingContext EMPTY =
       new FakeLoggingContext(Collections::emptyList, Collections::emptyList);
   protected final Supplier<List<Field>> loggerFields;

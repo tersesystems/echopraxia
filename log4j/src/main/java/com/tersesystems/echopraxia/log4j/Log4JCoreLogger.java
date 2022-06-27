@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 public class Log4JCoreLogger implements CoreLogger {
 
   private final ExtendedLogger logger;
-  private final Log4JLoggingContext context;
+  private final Log4JLoggerContext context;
   private final Condition condition;
   private final Executor executor;
   private final String fqcn;
@@ -33,7 +33,7 @@ public class Log4JCoreLogger implements CoreLogger {
   Log4JCoreLogger(@NotNull String fqcn, @NotNull ExtendedLogger log4jLogger) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
-    this.context = new Log4JLoggingContext();
+    this.context = new Log4JLoggerContext();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = threadContext();
@@ -42,7 +42,7 @@ public class Log4JCoreLogger implements CoreLogger {
   protected Log4JCoreLogger(
       @NotNull String fqcn,
       @NotNull ExtendedLogger log4jLogger,
-      @NotNull Log4JLoggingContext context,
+      @NotNull Log4JLoggerContext context,
       @NotNull Condition condition,
       @NotNull Executor executor,
       @NotNull Supplier<Runnable> threadContextSupplier) {
@@ -79,7 +79,7 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    Log4JLoggingContext newContext = context.withFields(() -> convertToFields(f.apply(builder)));
+    Log4JLoggerContext newContext = context.withFields(() -> convertToFields(f.apply(builder)));
     return newLogger(newContext);
   }
 
@@ -130,7 +130,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @NotNull
   public Log4JCoreLogger withMarker(@NotNull Marker marker) {
-    Log4JLoggingContext newContext = new Log4JLoggingContext(Collections::emptyList, marker);
+    Log4JLoggerContext newContext = new Log4JLoggerContext(Collections::emptyList, marker);
     return newLogger(this.context.and(newContext));
   }
 
@@ -143,7 +143,7 @@ public class Log4JCoreLogger implements CoreLogger {
       return false;
     }
     if (logger.isEnabled(convertLevel(level), context.getMarker())) {
-      MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
+      Log4JLoggingContext snapshotContext = new Log4JLoggingContext(context);
       return condition.test(level, snapshotContext);
     }
     return false;
@@ -159,7 +159,7 @@ public class Log4JCoreLogger implements CoreLogger {
       return false;
     }
     if (logger.isEnabled(convertLevel(level), context.getMarker())) {
-      MemoLoggingContext snapshotContext = new MemoLoggingContext(context);
+      Log4JLoggingContext snapshotContext = new Log4JLoggingContext(context);
       return bothConditions.test(level, snapshotContext);
     }
     return false;
@@ -171,7 +171,7 @@ public class Log4JCoreLogger implements CoreLogger {
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     // the isEnabled check always goes before the condition check, as conditions can be expensive
     if (logger.isEnabled(log4jLevel, marker)) {
-      MemoLoggingContext memoContext = new MemoLoggingContext(context);
+      Log4JLoggingContext memoContext = new Log4JLoggingContext(context);
       if (condition.test(level, memoContext)) {
         final Message m = createMessage(memoContext, message);
         logger.logMessage(fqcn, log4jLevel, marker, m, null);
@@ -190,8 +190,8 @@ public class Log4JCoreLogger implements CoreLogger {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     if (logger.isEnabled(log4jLevel, marker)) {
-      MemoLoggingContext argContext =
-          new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      Log4JLoggingContext argContext =
+          new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (condition.test(level, argContext)) {
         final Throwable e = findThrowable(argContext.getArgumentFields());
         final Message message = createMessage(argContext, messageTemplate);
@@ -214,7 +214,7 @@ public class Log4JCoreLogger implements CoreLogger {
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     if (logger.isEnabled(log4jLevel, marker)) {
       // We want to memoize context fields even if no argument...
-      MemoLoggingContext argContext = new MemoLoggingContext(context);
+      Log4JLoggingContext argContext = new Log4JLoggingContext(context);
       if (this.condition.and(condition).test(level, argContext)) {
         final Message m = createMessage(argContext, message);
         logger.logMessage(fqcn, log4jLevel, marker, m, null);
@@ -232,8 +232,8 @@ public class Log4JCoreLogger implements CoreLogger {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
     if (logger.isEnabled(log4jLevel, marker)) {
-      MemoLoggingContext argContext =
-          new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      Log4JLoggingContext argContext =
+          new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, argContext)) {
         final Throwable e = findThrowable(argContext.getArgumentFields());
         final Message message = createMessage(argContext, messageTemplate);
@@ -300,8 +300,8 @@ public class Log4JCoreLogger implements CoreLogger {
         });
   }
 
-  protected Message createMessage(MemoLoggingContext ctx, String template) {
-    return new EchopraxiaFieldsMessage(template, ctx.getArgumentFields(), ctx.getLoggerFields());
+  protected Message createMessage(Log4JLoggingContext ctx, String template) {
+    return new EchopraxiaFieldsMessage(template, ctx.getLoggerFields(), ctx.getArgumentFields());
   }
 
   protected org.apache.logging.log4j.Level convertLevel(Level level) {
@@ -381,7 +381,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @NotNull
-  private Log4JCoreLogger newLogger(Log4JLoggingContext newContext) {
+  private Log4JCoreLogger newLogger(Log4JLoggerContext newContext) {
     return new Log4JCoreLogger(
         fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
@@ -405,7 +405,7 @@ public class Log4JCoreLogger implements CoreLogger {
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
         if (logger.isEnabled(log4jLevel, marker)) {
-          MemoLoggingContext memo = new MemoLoggingContext(context);
+          Log4JLoggingContext memo = new Log4JLoggingContext(context);
           if (condition.test(level, memo)) {
             final Message message = createMessage(memo, messageTemplate);
             logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
@@ -421,8 +421,8 @@ public class Log4JCoreLogger implements CoreLogger {
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
         if (logger.isEnabled(log4jLevel, marker)) {
-          MemoLoggingContext memo =
-              new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
+          Log4JLoggingContext memo =
+              new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
           if (condition.test(level, memo)) {
             final Throwable e = findThrowable(memo.getArgumentFields());
             final Message message = createMessage(memo, messageTemplate);
@@ -446,7 +446,7 @@ public class Log4JCoreLogger implements CoreLogger {
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
         if (logger.isEnabled(log4jLevel, marker)) {
-          MemoLoggingContext memo = new MemoLoggingContext(context);
+          Log4JLoggingContext memo = new Log4JLoggingContext(context);
           if (condition.and(c).test(level, memo)) {
             final Message message = createMessage(memo, messageTemplate);
             logger.logMessage(log4jLevel, marker, fqcn, location, message, null);
@@ -460,8 +460,8 @@ public class Log4JCoreLogger implements CoreLogger {
         final Marker marker = context.getMarker();
         final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
         if (logger.isEnabled(log4jLevel, marker)) {
-          MemoLoggingContext memo =
-              new MemoLoggingContext(context, () -> convertToFields(f.apply(builder)));
+          Log4JLoggingContext memo =
+              new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
           if (condition.and(c).test(level, memo)) {
             final Throwable e = findThrowable(memo.getArgumentFields());
             final Message message = createMessage(memo, messageTemplate);
