@@ -9,6 +9,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.ThreadContext;
@@ -23,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 public class Log4JCoreLogger implements CoreLogger {
 
   private final ExtendedLogger logger;
-  private final Log4JLoggerContext context;
+  private final Context context;
   private final Condition condition;
   private final Executor executor;
   private final String fqcn;
@@ -33,7 +35,7 @@ public class Log4JCoreLogger implements CoreLogger {
   Log4JCoreLogger(@NotNull String fqcn, @NotNull ExtendedLogger log4jLogger) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
-    this.context = new Log4JLoggerContext();
+    this.context = new Context();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = threadContext();
@@ -42,7 +44,7 @@ public class Log4JCoreLogger implements CoreLogger {
   protected Log4JCoreLogger(
       @NotNull String fqcn,
       @NotNull ExtendedLogger log4jLogger,
-      @NotNull Log4JLoggerContext context,
+      @NotNull Log4JCoreLogger.Context context,
       @NotNull Condition condition,
       @NotNull Executor executor,
       @NotNull Supplier<Runnable> threadContextSupplier) {
@@ -79,7 +81,7 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    Log4JLoggerContext newContext = context.withFields(() -> convertToFields(f.apply(builder)));
+    Context newContext = context.withFields(() -> convertToFields(f.apply(builder)));
     return newLogger(newContext);
   }
 
@@ -130,7 +132,7 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @NotNull
   public Log4JCoreLogger withMarker(@NotNull Marker marker) {
-    Log4JLoggerContext newContext = new Log4JLoggerContext(Collections::emptyList, marker);
+    Context newContext = new Context(Collections::emptyList, marker);
     return newLogger(this.context.and(newContext));
   }
 
@@ -381,7 +383,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @NotNull
-  private Log4JCoreLogger newLogger(Log4JLoggerContext newContext) {
+  private Log4JCoreLogger newLogger(Context newContext) {
     return new Log4JCoreLogger(
         fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
@@ -474,5 +476,69 @@ public class Log4JCoreLogger implements CoreLogger {
 
   public String toString() {
     return "Log4JCoreLogger[" + logger.getName() + "]";
+  }
+
+  protected static class Context {
+    protected final Supplier<List<Field>> fieldsSupplier;
+    protected final Marker marker;
+
+    Context() {
+      this.fieldsSupplier = Collections::emptyList;
+      this.marker = null;
+    }
+
+    protected Context(Supplier<List<Field>> f, Marker m) {
+      this.fieldsSupplier = f;
+      this.marker = m;
+    }
+
+    public @NotNull List<Field> getLoggerFields() {
+      return fieldsSupplier.get();
+    }
+
+    public Marker getMarker() {
+      return marker;
+    }
+
+    public Context withFields(Supplier<List<Field>> o) {
+      Supplier<List<Field>> joinedFields = joinFields(o, this::getLoggerFields);
+      return new Context(joinedFields, this.getMarker());
+    }
+
+    static Supplier<List<Field>> joinFields(
+        Supplier<List<Field>> first, Supplier<List<Field>> second) {
+      return () -> {
+        List<Field> firstFields = first.get();
+        List<Field> secondFields = second.get();
+
+        if (firstFields.isEmpty()) {
+          return secondFields;
+        } else if (secondFields.isEmpty()) {
+          return firstFields;
+        } else {
+          // Stream.concat is actually faster than explicit ArrayList!
+          // https://blog.soebes.de/blog/2020/03/31/performance-stream-concat/
+          return Stream.concat(firstFields.stream(), secondFields.stream())
+              .collect(Collectors.toList());
+        }
+      };
+    }
+
+    /**
+     * Joins the two contexts together, concatenating the lists in a supplier function.
+     *
+     * @param context the context to join
+     * @return the new context containing fields and markers from both.
+     */
+    public Context and(Context context) {
+      if (context != null) {
+        Supplier<List<Field>> joinedFields =
+            joinFields(context::getLoggerFields, this::getLoggerFields);
+        Marker m = context.getMarker() != null ? context.getMarker() : this.marker;
+        return new Context(joinedFields, m);
+      } else {
+        return this;
+      }
+    }
   }
 }

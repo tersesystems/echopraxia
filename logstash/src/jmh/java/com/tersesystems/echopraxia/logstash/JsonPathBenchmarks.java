@@ -25,10 +25,10 @@ public class JsonPathBenchmarks {
 
   private static final LoggingContext passContext =
       new LogstashLoggingContext(
-          LogstashLoggerContext.create(Field.value("some_field", Value.string("testing"))));
+          LogstashCoreLogger.Context.create(Field.value("some_field", Value.string("testing"))));
 
   private static final LoggingContext failContext =
-      new LogstashLoggingContext(LogstashLoggerContext.empty());
+      new LogstashLoggingContext(LogstashCoreLogger.Context.empty());
 
   @Benchmark
   public void testStreamConditionPass(Blackhole blackhole) {

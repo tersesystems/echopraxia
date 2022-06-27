@@ -10,25 +10,23 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-class Log4JLoggingContext extends AbstractJsonPathFinder
-    implements LoggingContext, MarkerLoggingContext {
-
+class Log4JLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
   private final Supplier<List<Field>> joinedFields;
+  private final Log4JCoreLogger.Context context;
 
-  private final Log4JLoggerContext context;
-
-  public Log4JLoggingContext(Log4JLoggerContext context, Supplier<List<Field>> arguments) {
+  public Log4JLoggingContext(Log4JCoreLogger.Context context, Supplier<List<Field>> arguments) {
     // Defers and memoizes the arguments and context fields for a single logging statement.
     this.context = context;
     this.argumentFields = Utilities.memoize(arguments);
     this.loggerFields = Utilities.memoize(context::getLoggerFields);
     this.joinedFields =
-        Utilities.memoize(Log4JLoggerContext.joinFields(this.loggerFields, this.argumentFields));
+        Utilities.memoize(
+            Log4JCoreLogger.Context.joinFields(this.loggerFields, this.argumentFields));
   }
 
-  public Log4JLoggingContext(Log4JLoggerContext context) {
+  public Log4JLoggingContext(Log4JCoreLogger.Context context) {
     this(context, Collections::emptyList);
   }
 
@@ -47,7 +45,6 @@ class Log4JLoggingContext extends AbstractJsonPathFinder
     return loggerFields.get();
   }
 
-  @Override
   public @NotNull Marker getMarker() {
     return context.getMarker();
   }

@@ -10,25 +10,27 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
-public class LogstashLoggingContext extends AbstractJsonPathFinder
+class LogstashLoggingContext extends AbstractJsonPathFinder
     implements LoggingContext, MarkerLoggingContext {
 
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
 
-  private final LogstashLoggerContext context;
+  private final LogstashCoreLogger.Context context;
   private final Supplier<List<Field>> fields;
 
-  public LogstashLoggingContext(LogstashLoggerContext context) {
+  public LogstashLoggingContext(LogstashCoreLogger.Context context) {
     this(context, Collections::emptyList);
   }
 
-  public LogstashLoggingContext(LogstashLoggerContext context, Supplier<List<Field>> arguments) {
+  public LogstashLoggingContext(
+      LogstashCoreLogger.Context context, Supplier<List<Field>> arguments) {
     this.context = context;
     this.argumentFields = Utilities.memoize(arguments);
     this.loggerFields = Utilities.memoize(context::getLoggerFields);
     this.fields =
-        Utilities.memoize(LogstashLoggerContext.joinFields(this.loggerFields, this.argumentFields));
+        Utilities.memoize(
+            LogstashCoreLogger.Context.joinFields(this.loggerFields, this.argumentFields));
   }
 
   @Override
