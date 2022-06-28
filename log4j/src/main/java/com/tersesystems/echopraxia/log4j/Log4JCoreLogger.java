@@ -246,10 +246,14 @@ public class Log4JCoreLogger implements CoreLogger {
   @Override
   public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-    Runnable threadLocalRunnable = threadContextFunction.get();
-    Runnable runnable = createRunnable(location, threadLocalRunnable, context, level, condition, consumer, builder);
-    runAsyncLog(runnable);
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      Runnable runnable =
+          createRunnable(
+              location, threadLocalRunnable, context, level, condition, consumer, builder);
+      runAsyncLog(runnable);
+    }
   }
 
   @Override
@@ -258,10 +262,14 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-    Runnable threadLocalRunnable = threadContextFunction.get();
-    Runnable runnable = createRunnable(location, threadLocalRunnable, context, level, condition.and(c), consumer, builder);
-    runAsyncLog(runnable);
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      Runnable runnable =
+          createRunnable(
+              location, threadLocalRunnable, context, level, condition.and(c), consumer, builder);
+      runAsyncLog(runnable);
+    }
   }
 
   @Override
@@ -270,10 +278,20 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Supplier<List<Field>> extraFields,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-    Runnable threadLocalRunnable = threadContextFunction.get();
-    Runnable runnable = createRunnable(location, threadLocalRunnable, context.withFields(extraFields), level, condition, consumer, builder);
-    runAsyncLog(runnable);
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      Runnable runnable =
+          createRunnable(
+              location,
+              threadLocalRunnable,
+              context.withFields(extraFields),
+              level,
+              condition,
+              consumer,
+              builder);
+      runAsyncLog(runnable);
+    }
   }
 
   @Override
@@ -283,17 +301,30 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-    Runnable threadLocalRunnable = threadContextFunction.get();
-    Runnable runnable = createRunnable(location, threadLocalRunnable, context.withFields(extraFields), level, condition.and(c), consumer, builder);
-    runAsyncLog(runnable);
+    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
+      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      Runnable runnable =
+          createRunnable(
+              location,
+              threadLocalRunnable,
+              context.withFields(extraFields),
+              level,
+              condition.and(c),
+              consumer,
+              builder);
+      runAsyncLog(runnable);
+    }
   }
 
-  private <FB> Runnable createRunnable(@Nullable StackTraceElement location,
-                                        Runnable threadLocalRunnable,
-                                        Context extraContext,
-                                        Level level,
-                                        Condition c, Consumer<LoggerHandle<FB>> consumer, FB builder) {
+  private <FB> Runnable createRunnable(
+      @Nullable StackTraceElement location,
+      Runnable threadLocalRunnable,
+      Context extraContext,
+      Level level,
+      Condition c,
+      Consumer<LoggerHandle<FB>> consumer,
+      FB builder) {
     return () -> {
       threadLocalRunnable.run();
       final LoggerHandle<FB> loggerHandle = newHandle(location, extraContext, level, c, builder);
@@ -302,11 +333,11 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   protected <FB> LoggerHandle<FB> newHandle(
-          @Nullable StackTraceElement location,
-          @NotNull Context extraContext,
-          @NotNull Level level,
-          @NotNull Condition c,
-          @NotNull FB builder) {
+      @Nullable StackTraceElement location,
+      @NotNull Context extraContext,
+      @NotNull Level level,
+      @NotNull Condition c,
+      @NotNull FB builder) {
     return new LoggerHandle<FB>() {
       @Override
       public void log(@Nullable String messageTemplate) {
@@ -322,11 +353,13 @@ public class Log4JCoreLogger implements CoreLogger {
       }
 
       @Override
-      public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+      public void log(
+          @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
         Marker marker = extraContext.getMarker();
         org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
         if (logger.isEnabled(log4jLevel, marker)) {
-          Log4JLoggingContext ctx = new Log4JLoggingContext(extraContext, () -> convertToFields(f.apply(builder)));
+          Log4JLoggingContext ctx =
+              new Log4JLoggingContext(extraContext, () -> convertToFields(f.apply(builder)));
           if (c.test(level, ctx)) {
             final Throwable e = findThrowable(ctx.getArgumentFields());
             final Message message = createMessage(messageTemplate, ctx);
