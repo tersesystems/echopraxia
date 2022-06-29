@@ -144,6 +144,15 @@ public interface CoreLogger {
    * Log a message at the given level.
    *
    * @param level the level to log at.
+   * @param message the message string to be logged, may be null.
+   */
+  void log(
+      @NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message);
+
+  /**
+   * Log a message at the given level.
+   *
+   * @param level the level to log at.
    * @param message the message string to be logged
    * @param f the field builder function
    * @param builder the field builder
@@ -151,6 +160,22 @@ public interface CoreLogger {
    */
   <FB> void log(
       @NotNull Level level,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder);
+
+  /**
+   * Log a message at the given level.
+   *
+   * @param level the level to log at.
+   * @param message the message string to be logged
+   * @param f the field builder function
+   * @param builder the field builder
+   * @param <FB> the type of field builder.
+   */
+  <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder);
@@ -168,6 +193,20 @@ public interface CoreLogger {
    * Log a message at the given level.
    *
    * @param level the level to log at.
+   * @param extraFields fields to be added to the logger context
+   * @param condition the given condition
+   * @param message the message string to be logged
+   */
+  void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @Nullable String message);
+
+  /**
+   * Log a message at the given level.
+   *
+   * @param level the level to log at.
    * @param condition the given condition.
    * @param message the message string to be logged
    * @param f the field builder function
@@ -176,6 +215,25 @@ public interface CoreLogger {
    */
   <FB> void log(
       @NotNull Level level,
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder);
+
+  /**
+   * Log a message at the given level.
+   *
+   * @param level the level to log at.
+   * @param extraFields fields to be added to the logger context
+   * @param condition the given condition.
+   * @param message the message string to be logged
+   * @param f the field builder function
+   * @param builder the field builder
+   * @param <FB> the type of field builder.
+   */
+  <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
       @NotNull Condition condition,
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,

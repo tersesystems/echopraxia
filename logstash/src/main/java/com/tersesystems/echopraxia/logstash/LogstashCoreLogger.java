@@ -221,6 +221,25 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
+  public void log(
+      @NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message) {
+    Marker m = context.resolveMarkers();
+    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
+      LogstashLoggingContext snapshotContext =
+          new LogstashLoggingContext(context.withFields(extraFields));
+      if (condition.test(level, snapshotContext)) {
+        logger.log(
+            resolveLoggerFields(m, snapshotContext),
+            fqcn,
+            convertLevel(level),
+            message,
+            null,
+            null);
+      }
+    }
+  }
+
+  @Override
   public <FB> void log(
       @NotNull Level level,
       String message,
@@ -239,10 +258,51 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
+  public <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
+    final Marker m = context.resolveMarkers();
+    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
+      LoggingContext ctx =
+          new LogstashLoggingContext(
+              context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
+      if (condition.test(level, ctx)) {
+        final Object[] arguments = convertArguments(ctx.getArgumentFields());
+        logger.log(
+            resolveLoggerFields(m, ctx), fqcn, convertLevel(level), message, arguments, null);
+      }
+    }
+  }
+
+  @Override
   public void log(@NotNull Level level, @NotNull Condition condition, String message) {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
       LoggingContext snapshotContext = new LogstashLoggingContext(context);
+      if (this.condition.and(condition).test(level, snapshotContext)) {
+        logger.log(
+            resolveLoggerFields(m, snapshotContext),
+            fqcn,
+            convertLevel(level),
+            message,
+            null,
+            null);
+      }
+    }
+  }
+
+  @Override
+  public void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @Nullable String message) {
+    final Marker m = context.resolveMarkers();
+    if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
+      LoggingContext snapshotContext = new LogstashLoggingContext(context.withFields(extraFields));
       if (this.condition.and(condition).test(level, snapshotContext)) {
         logger.log(
             resolveLoggerFields(m, snapshotContext),
@@ -270,6 +330,32 @@ public class LogstashCoreLogger implements CoreLogger {
         final Object[] arguments = convertArguments(snapshotContext.getArgumentFields());
         logger.log(
             resolveLoggerFields(m, snapshotContext),
+            fqcn,
+            convertLevel(level),
+            message,
+            arguments,
+            null);
+      }
+    }
+  }
+
+  @Override
+  public <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
+    final Marker marker = context.resolveMarkers();
+    if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
+      LoggingContext snapshotContext =
+          new LogstashLoggingContext(
+              context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
+      if (this.condition.and(condition).test(level, snapshotContext)) {
+        final Object[] arguments = convertArguments(snapshotContext.getArgumentFields());
+        logger.log(
+            resolveLoggerFields(marker, snapshotContext),
             fqcn,
             convertLevel(level),
             message,
