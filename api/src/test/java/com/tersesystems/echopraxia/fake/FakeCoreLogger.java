@@ -57,6 +57,19 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
+  public boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields) {
+    return false;
+  }
+
+  @Override
+  public boolean isEnabled(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Supplier<List<Field>> extraFields) {
+    return false;
+  }
+
+  @Override
   public @NotNull Condition condition() {
     return condition;
   }
@@ -157,6 +170,11 @@ public class FakeCoreLogger implements CoreLogger {
           argContext.getLoggerFields(),
           argContext.getArgumentFields());
     }
+  }
+
+  @Override
+  public @NotNull <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder) {
+    return null;
   }
 
   private boolean isEnabledFor(Level level) {

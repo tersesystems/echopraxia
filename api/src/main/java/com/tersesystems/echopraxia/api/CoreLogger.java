@@ -132,6 +132,13 @@ public interface CoreLogger {
    */
   boolean isEnabled(@NotNull Level level, @NotNull Condition condition);
 
+  boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields);
+
+  boolean isEnabled(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Supplier<List<Field>> extraFields);
+
   /**
    * Log a message at the given level.
    *
@@ -238,6 +245,18 @@ public interface CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder);
+
+  /**
+   * Returns a handle to the underlying logger, which will do a straight passthrough without any
+   * enabled or condition checks.
+   *
+   * @param <FB> the field builder type
+   * @param level the logging level
+   * @param builder the field builder.
+   * @return logger handle.
+   */
+  @NotNull
+  <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder);
 
   /**
    * Logs a statement asynchronously using an executor.

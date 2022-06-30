@@ -167,6 +167,33 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
+  public boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      Log4JLoggingContext ctx = new Log4JLoggingContext(context.withFields(extraFields));
+      return condition.test(level, ctx);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean isEnabled(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Supplier<List<Field>> extraFields) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      Log4JLoggingContext ctx = new Log4JLoggingContext(context.withFields(extraFields));
+      return this.condition.and(condition).test(level, ctx);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public void log(@NotNull Level level, String message) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
@@ -317,6 +344,12 @@ public class Log4JCoreLogger implements CoreLogger {
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
       }
     }
+  }
+
+  @Override
+  public @NotNull <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder) {
+    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
+    return null; // XXX FIXME
   }
 
   @Override
