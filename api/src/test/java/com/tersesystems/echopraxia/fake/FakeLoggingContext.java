@@ -81,4 +81,10 @@ public class FakeLoggingContext extends AbstractJsonPathFinder implements Loggin
       }
     };
   }
+
+  public LoggingContext withFields(Supplier<List<Field>> extraFields) {
+    Supplier<List<Field>> lfields =
+        joinFields(FakeLoggingContext.this::getLoggerFields, extraFields);
+    return new FakeLoggingContext(lfields, this::getArgumentFields);
+  }
 }
