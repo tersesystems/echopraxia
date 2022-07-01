@@ -361,9 +361,10 @@ public class Log4JCoreLogger implements CoreLogger {
       }
 
       @Override
-      public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+      public void log(
+          @Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
         Log4JLoggingContext ctx =
-          new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
+            new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
         final Throwable e = findThrowable(ctx.getArgumentFields());
         final Message message = createMessage(messageTemplate, ctx);
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
