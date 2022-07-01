@@ -1,5 +1,16 @@
 ## Changelog
 
+## 2.1.0
+
+Changes to `CoreLogger` API to allow for more flexible loggers in [echopraxia-plusscala](https://github.com/tersesystems/echopraxia-plusscala).  Some optimizations.
+
+* Add `extraFields` parameter to `CoreLogger` methods. [#201](https://github.com/tersesystems/echopraxia/pull/201)
+* Document "call-by-name" semantics on `logger.withFields`. [#188](https://github.com/tersesystems/echopraxia/pull/188)
+* Expose `getArgumentFields()` and `getLoggerFields()` methods on `LoggingContext`. [#197](https://github.com/tersesystems/echopraxia/pull/197)
+* Upgrade logstash-logback-encoder to 7.2 [#203](https://github.com/tersesystems/echopraxia/pull/203)
+* Add `coreLogger.logHandle` for loggers that may log multiple times internally when called. [#202](https://github.com/tersesystems/echopraxia/pull/202)
+* Fix a bug where `withFields` was being memoized and evaluated once. [#187](https://github.com/tersesystems/echopraxia/pull/187)
+
 ## 2.0.1
 
 Bug fixes and some enhancements around number values.

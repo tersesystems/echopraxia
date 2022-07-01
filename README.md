@@ -32,7 +32,8 @@ Please see the [blog posts](https://tersesystems.com/category/logging/) for more
 Simple examples and integrations with [dropwizard metrics](https://metrics.dropwizard.io/4.2.0/) and [OSHI](https://github.com/oshi/oshi) are available at [echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
 For a web application example,
-see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
+see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).0
+
 ## Statement of Intent
 
 **Echopraxia is not a replacement for SLF4J**.  It is not an attempt to compete with Log4J2 API, JUL, commons-logging for the title of "one true logging API" and restart the [logging mess](https://techblog.bozho.net/the-logging-mess/).  SLF4J won that fight [a long time ago](https://www.semanticscholar.org/paper/Studying-the-Use-of-Java-Logging-Utilities-in-the-Chen-Jiang/be39720a72f04c92b9aece9548171d5fa3a627e6).
