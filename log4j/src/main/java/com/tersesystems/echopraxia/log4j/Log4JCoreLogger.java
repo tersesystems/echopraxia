@@ -348,8 +348,27 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder) {
-    StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-    return null; // XXX FIXME
+    return new LoggerHandle<FB>() {
+      final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+      final Marker marker = context.getMarker();
+
+      @Override
+      public void log(@Nullable String messageTemplate) {
+        Log4JLoggingContext ctx = new Log4JLoggingContext(context);
+        final Throwable e = findThrowable(ctx.getArgumentFields());
+        final Message message = createMessage(messageTemplate, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, message, e);
+      }
+
+      @Override
+      public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+        Log4JLoggingContext ctx =
+          new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
+        final Throwable e = findThrowable(ctx.getArgumentFields());
+        final Message message = createMessage(messageTemplate, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, message, e);
+      }
+    };
   }
 
   @Override
