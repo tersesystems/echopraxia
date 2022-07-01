@@ -133,6 +133,28 @@ public interface CoreLogger {
   boolean isEnabled(@NotNull Level level, @NotNull Condition condition);
 
   /**
+   * Is the logger instance enabled for the given level and conditions?
+   *
+   * @param level the level to log at.
+   * @param extraFields extra fields to present to the logger's condition.
+   * @return true if the instance is enabled for the given level, false otherwise.
+   */
+  boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields);
+
+  /**
+   * Is the logger instance enabled for the given level and conditions?
+   *
+   * @param level the level to log at.
+   * @param condition the explicit condition that must be met.
+   * @param extraFields extra fields to present to the condition.
+   * @return true if the instance is enabled for the given level, false otherwise.
+   */
+  boolean isEnabled(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Supplier<List<Field>> extraFields);
+
+  /**
    * Log a message at the given level.
    *
    * @param level the level to log at.
@@ -144,6 +166,7 @@ public interface CoreLogger {
    * Log a message at the given level.
    *
    * @param level the level to log at.
+   * @param extraFields the extra fields to log.
    * @param message the message string to be logged, may be null.
    */
   void log(
@@ -168,6 +191,7 @@ public interface CoreLogger {
    * Log a message at the given level.
    *
    * @param level the level to log at.
+   * @param extraFields the extra fields to log.
    * @param message the message string to be logged
    * @param f the field builder function
    * @param builder the field builder
@@ -238,6 +262,18 @@ public interface CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder);
+
+  /**
+   * Returns a handle to the underlying logger, which will do a straight passthrough without any
+   * enabled or condition checks.
+   *
+   * @param <FB> the field builder type
+   * @param level the logging level
+   * @param builder the field builder.
+   * @return logger handle.
+   */
+  @NotNull
+  <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder);
 
   /**
    * Logs a statement asynchronously using an executor.

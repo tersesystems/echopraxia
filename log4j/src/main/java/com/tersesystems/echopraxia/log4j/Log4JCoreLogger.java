@@ -167,6 +167,33 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
+  public boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      Log4JLoggingContext ctx = new Log4JLoggingContext(context.withFields(extraFields));
+      return condition.test(level, ctx);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean isEnabled(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Supplier<List<Field>> extraFields) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      Log4JLoggingContext ctx = new Log4JLoggingContext(context.withFields(extraFields));
+      return this.condition.and(condition).test(level, ctx);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public void log(@NotNull Level level, String message) {
     final Marker marker = context.getMarker();
     final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
@@ -317,6 +344,31 @@ public class Log4JCoreLogger implements CoreLogger {
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
       }
     }
+  }
+
+  @Override
+  public @NotNull <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder) {
+    return new LoggerHandle<FB>() {
+      final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+      final Marker marker = context.getMarker();
+
+      @Override
+      public void log(@Nullable String messageTemplate) {
+        Log4JLoggingContext ctx = new Log4JLoggingContext(context);
+        final Throwable e = findThrowable(ctx.getArgumentFields());
+        final Message message = createMessage(messageTemplate, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, message, e);
+      }
+
+      @Override
+      public void log(@Nullable String messageTemplate, @NotNull Function<FB, FieldBuilderResult> f) {
+        Log4JLoggingContext ctx =
+          new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
+        final Throwable e = findThrowable(ctx.getArgumentFields());
+        final Message message = createMessage(messageTemplate, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, message, e);
+      }
+    };
   }
 
   @Override

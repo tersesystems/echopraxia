@@ -204,6 +204,33 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @Override
+  public boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields) {
+    Marker marker = context.resolveMarkers();
+    if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
+      LogstashLoggingContext snapshotContext =
+          new LogstashLoggingContext(context.withFields(extraFields));
+      return condition.test(level, snapshotContext);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  public boolean isEnabled(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Supplier<List<Field>> extraFields) {
+    Marker marker = context.resolveMarkers();
+    if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
+      LogstashLoggingContext snapshotContext =
+          new LogstashLoggingContext(context.withFields(extraFields));
+      return this.condition.and(condition).test(level, snapshotContext);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   public void log(@NotNull Level level, String message) {
     Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
@@ -363,6 +390,28 @@ public class LogstashCoreLogger implements CoreLogger {
             null);
       }
     }
+  }
+
+  @Override
+  public @NotNull <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder) {
+    return new LoggerHandle<FB>() {
+      private final Marker m = context.resolveMarkers();
+      private final int logbackLevel = convertLevel(level);
+
+      @Override
+      public void log(@Nullable String message) {
+        LogstashLoggingContext ctx = new LogstashLoggingContext(context);
+        logger.log(resolveLoggerFields(m, ctx), fqcn, logbackLevel, message, null, null);
+      }
+
+      @Override
+      public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        LoggingContext ctx =
+            new LogstashLoggingContext(context, () -> convertToFields(f.apply(builder)));
+        final Object[] arguments = convertArguments(ctx.getArgumentFields());
+        logger.log(resolveLoggerFields(m, ctx), fqcn, logbackLevel, message, arguments, null);
+      }
+    };
   }
 
   @Override
