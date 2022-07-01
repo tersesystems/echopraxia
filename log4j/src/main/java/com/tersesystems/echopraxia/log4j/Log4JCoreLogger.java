@@ -181,6 +181,21 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
+  public void log(
+      @NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    // the isEnabled check always goes before the condition check, as conditions can be expensive
+    if (logger.isEnabled(log4jLevel, marker)) {
+      Log4JLoggingContext ctx = new Log4JLoggingContext(context.withFields(extraFields));
+      if (condition.test(level, ctx)) {
+        final Message m = createMessage(message, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, m, null);
+      }
+    }
+  }
+
+  @Override
   public <FB> void log(
       @NotNull Level level,
       @Nullable String messageTemplate,
@@ -193,6 +208,27 @@ public class Log4JCoreLogger implements CoreLogger {
     if (logger.isEnabled(log4jLevel, marker)) {
       Log4JLoggingContext ctx =
           new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      if (condition.test(level, ctx)) {
+        final Throwable e = findThrowable(ctx.getArgumentFields());
+        final Message message = createMessage(messageTemplate, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, message, e);
+      }
+    }
+  }
+
+  @Override
+  public <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @Nullable String messageTemplate,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      Log4JLoggingContext ctx =
+          new Log4JLoggingContext(
+              context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
       if (condition.test(level, ctx)) {
         final Throwable e = findThrowable(ctx.getArgumentFields());
         final Message message = createMessage(messageTemplate, ctx);
@@ -224,6 +260,24 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
+  public void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @Nullable String message) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      // We want to memoize context fields even if no argument...
+      Log4JLoggingContext ctx = new Log4JLoggingContext(context.withFields(extraFields));
+      if (this.condition.and(condition).test(level, ctx)) {
+        final Message m = createMessage(message, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, m, null);
+      }
+    }
+  }
+
+  @Override
   public <FB> void log(
       @NotNull Level level,
       @NotNull Condition condition,
@@ -235,6 +289,28 @@ public class Log4JCoreLogger implements CoreLogger {
     if (logger.isEnabled(log4jLevel, marker)) {
       Log4JLoggingContext ctx =
           new Log4JLoggingContext(context, () -> convertToFields(f.apply(builder)));
+      if (this.condition.and(condition).test(level, ctx)) {
+        final Throwable e = findThrowable(ctx.getArgumentFields());
+        final Message message = createMessage(messageTemplate, ctx);
+        logger.logMessage(fqcn, log4jLevel, marker, message, e);
+      }
+    }
+  }
+
+  @Override
+  public <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @Nullable String messageTemplate,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
+    final Marker marker = context.getMarker();
+    final org.apache.logging.log4j.Level log4jLevel = convertLevel(level);
+    if (logger.isEnabled(log4jLevel, marker)) {
+      Log4JLoggingContext ctx =
+          new Log4JLoggingContext(
+              context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, ctx)) {
         final Throwable e = findThrowable(ctx.getArgumentFields());
         final Message message = createMessage(messageTemplate, ctx);
