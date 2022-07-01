@@ -84,6 +84,7 @@ public interface FieldBuilderWithOnly extends FieldBuilder {
    * @param name the name of the field.
    * @param value the value of the field.
    * @return a list containing a single field.
+   * @param <N> the type of number
    */
   @NotNull
   default <N extends Number & Comparable<N>> FieldBuilderResult onlyNumber(
