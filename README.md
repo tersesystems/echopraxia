@@ -32,7 +32,7 @@ Please see the [blog posts](https://tersesystems.com/category/logging/) for more
 Simple examples and integrations with [dropwizard metrics](https://metrics.dropwizard.io/4.2.0/) and [OSHI](https://github.com/oshi/oshi) are available at [echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
 For a web application example,
-see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).0
+see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
 ## Statement of Intent
 
