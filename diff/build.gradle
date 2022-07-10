@@ -1,0 +1,21 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api project(":api")
+    implementation project(":logstash")
+
+    // https://github.com/flipkart-incubator/zjsonpatch/
+    // jackson dependency on 2.12.1
+    // works at the base json serialization level, means we to serialize,
+    // compare, then log the JSON node
+    implementation 'com.flipkart.zjsonpatch:zjsonpatch:0.4.12'
+
+    // implementation 'de.danielbechler:java-object-diff:0.95'
+
+
+    testImplementation project(":logger")
+    testImplementation 'ch.qos.logback:logback-classic:1.2.10'
+    testImplementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
+}
