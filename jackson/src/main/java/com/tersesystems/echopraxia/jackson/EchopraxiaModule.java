@@ -1,13 +1,14 @@
-package com.tersesystems.echopraxia.logstash.jackson;
+package com.tersesystems.echopraxia.jackson;
 
 import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.Module;
+import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Value;
 
-/** A Jackson module that is loaded in automatically by logstash-logback-encoder. */
+/** A Jackson module that is loaded in automatically by mapper.findAndRegisterModules() */
 public class EchopraxiaModule extends Module {
   //
   // https://github.com/FasterXML/jackson-docs/wiki/JacksonHowToCustomSerializers
@@ -25,7 +26,7 @@ public class EchopraxiaModule extends Module {
   @SuppressWarnings("deprecation")
   public Version version() {
     final ClassLoader loader = EchopraxiaModule.class.getClassLoader();
-    return VersionUtil.mavenVersionFor(loader, "com.tersesystems.echopraxia", "logstash");
+    return VersionUtil.mavenVersionFor(loader, "com.tersesystems.echopraxia", "jackson");
   }
 
   @Override
@@ -34,5 +35,9 @@ public class EchopraxiaModule extends Module {
     serializers.addSerializer(Field.class, FieldSerializer.INSTANCE);
     serializers.addSerializer(Value.class, ValueSerializer.INSTANCE);
     context.addSerializers(serializers);
+
+    final SimpleDeserializers deserializers = new SimpleDeserializers();
+    deserializers.addDeserializer(Value.class, ValueDeserializer.INSTANCE);
+    context.addDeserializers(deserializers);
   }
 }

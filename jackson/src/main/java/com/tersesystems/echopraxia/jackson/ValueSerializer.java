@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash.jackson;
+package com.tersesystems.echopraxia.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api project(":api")
+    implementation project(":jackson")
 
     testImplementation project(":logger")
     testImplementation project(":async")
