@@ -6,6 +6,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Level;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
-import javax.json.JsonObject;
 import org.apache.logging.log4j.ThreadContext;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +34,8 @@ public class ConditionTest extends TestBase {
 
     assertThat(adder.intValue()).isEqualTo(1);
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("info");
   }
 
@@ -63,9 +63,9 @@ public class ConditionTest extends TestBase {
 
     assertThat(fieldConditionAdder.intValue()).isEqualTo(1);
     assertThat(contextConditionAdder.intValue()).isEqualTo(1);
-    JsonObject entry = getEntry();
-    final JsonObject fields = entry.getJsonObject("fields");
-    assertThat(fields.getString("herp")).isEqualTo("derp");
+    JsonNode entry = getEntry();
+    final JsonNode fields = entry.path("fields");
+    assertThat(fields.path("herp").asText()).isEqualTo("derp");
   }
 
   @Test
@@ -85,8 +85,8 @@ public class ConditionTest extends TestBase {
     final List<String> messages = listAppender.getMessages();
     assertThat(messages.size()).isEqualTo(1);
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("has derp");
   }
 
@@ -108,8 +108,8 @@ public class ConditionTest extends TestBase {
     final List<String> messages = listAppender.getMessages();
     assertThat(messages.size()).isEqualTo(1);
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("has derp");
   }
 
@@ -139,8 +139,8 @@ public class ConditionTest extends TestBase {
 
     await().atMost(1, SECONDS).until(logged::get);
 
-    JsonObject entry = getEntry();
-    String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    String message = entry.path("message").asText();
     assertThat(message).isEqualTo("async logging test");
   }
 
@@ -163,10 +163,10 @@ public class ConditionTest extends TestBase {
         });
 
     await().atLeast(100, MILLISECONDS).until(logged::get);
-    JsonObject entry = getEntry();
-    String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    String exceptionMessage = entry.getJsonObject("thrown").getString("message");
+    String exceptionMessage = entry.path("thrown").path("message").asText();
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 
@@ -188,10 +188,10 @@ public class ConditionTest extends TestBase {
         });
 
     await().atLeast(100, MILLISECONDS).until(logged::get);
-    JsonObject entry = getEntry();
-    String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    String exceptionMessage = entry.getJsonObject("thrown").getString("message");
+    String exceptionMessage = entry.path("thrown").path("message").asText();
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 }

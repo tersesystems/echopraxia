@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.log4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
@@ -10,10 +11,9 @@ import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import java.util.Arrays;
 import java.util.List;
-import javax.json.JsonArray;
-import javax.json.JsonNumber;
-import javax.json.JsonObject;
-import javax.json.JsonValue;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+
 import org.junit.jupiter.api.Test;
 
 public class Log4JLoggerTest extends TestBase {
@@ -23,8 +23,8 @@ public class Log4JLoggerTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.debug(null);
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("null");
   }
 
@@ -34,8 +34,8 @@ public class Log4JLoggerTest extends TestBase {
     String value = null;
     logger.info("hello {}", fb -> (fb.string("name", value)));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("hello null");
   }
 
@@ -45,8 +45,8 @@ public class Log4JLoggerTest extends TestBase {
     String value = "value";
     logger.debug("array field is {}", fb -> (fb.array(null, value)));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("array field is echopraxia-unknown-1=[value]");
   }
 
@@ -56,8 +56,8 @@ public class Log4JLoggerTest extends TestBase {
     Integer value = null;
     logger.debug("number is {}", fb -> (fb.number("name", value)));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("number is 0");
   }
 
@@ -66,8 +66,8 @@ public class Log4JLoggerTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.debug("boolean is {}", fb -> (fb.bool("name", (Boolean) null)));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("boolean is false");
   }
 
@@ -77,8 +77,8 @@ public class Log4JLoggerTest extends TestBase {
     String[] values = {"1", null, "3"};
     logger.debug("array field is {}", fb -> (fb.array("arrayName", values)));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("array field is arrayName=[1, null, 3]");
   }
 
@@ -87,8 +87,8 @@ public class Log4JLoggerTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.debug("object is {}", fb -> (fb.object("name", Value.object((Field) null))));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message)
         .isEqualTo("object is name={}"); // {} here is literally an object with no fields
   }
@@ -98,12 +98,12 @@ public class Log4JLoggerTest extends TestBase {
     Logger<?> logger = LoggerFactory.getLogger(getClass());
     logger.info("my argument is {}", fb -> fb.string("random_key", "random_value"));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("my argument is random_value");
 
-    final JsonObject fields = entry.getJsonObject("fields");
-    assertThat(fields.getString("random_key")).isEqualTo("random_value");
+    final JsonNode fields = entry.path("fields");
+    assertThat(fields.path("random_key").asText()).isEqualTo("random_value");
   }
 
   @Test
@@ -111,12 +111,12 @@ public class Log4JLoggerTest extends TestBase {
     Logger<?> logger = LoggerFactory.getLogger(getClass());
     logger.info("Boring Message"); // this is line 109
 
-    JsonObject entry = getEntry();
-    final JsonObject fields = entry.getJsonObject("source");
-    assertThat(fields.getString("class"))
+    JsonNode entry = getEntry();
+    final JsonNode fields = entry.path("source");
+    assertThat(fields.path("class").asText())
         .isEqualTo("com.tersesystems.echopraxia.log4j.Log4JLoggerTest");
-    assertThat(fields.getString("method")).isEqualTo("testLoggerLocation");
-    assertThat(fields.getString("file")).isEqualTo("Log4JLoggerTest.java");
+    assertThat(fields.path("method").asText()).isEqualTo("testLoggerLocation");
+    assertThat(fields.path("file").asText()).isEqualTo("Log4JLoggerTest.java");
     // disable the line check as it keeps changing...
     // assertThat(fields.getJsonNumber("line").intValue()).isEqualTo(109); // this is very
     // sensitive!
@@ -131,13 +131,13 @@ public class Log4JLoggerTest extends TestBase {
 
     waitUntilMessages();
 
-    JsonObject entry = getEntry();
+    JsonNode entry = getEntry();
 
-    final JsonObject fields = entry.getJsonObject("source");
-    assertThat(fields.getString("class"))
+    final JsonNode fields = entry.path("source");
+    assertThat(fields.path("class").asText())
         .isEqualTo("com.tersesystems.echopraxia.log4j.Log4JLoggerTest");
-    assertThat(fields.getString("method")).isEqualTo("testLoggerLocationWithAsyncLogger");
-    assertThat(fields.getString("file")).isEqualTo("Log4JLoggerTest.java");
+    assertThat(fields.path("method").asText()).isEqualTo("testLoggerLocationWithAsyncLogger");
+    assertThat(fields.path("file").asText()).isEqualTo("Log4JLoggerTest.java");
   }
 
   @Test
@@ -151,14 +151,14 @@ public class Log4JLoggerTest extends TestBase {
           return fb.object("random_object", field1, field2);
         });
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("my argument is random_object={value1, value2}");
 
-    final JsonObject fields = entry.getJsonObject("fields");
-    final JsonObject randomObject = fields.getJsonObject("random_object");
-    assertThat(randomObject.getString("key1")).isEqualTo("value1");
-    assertThat(randomObject.getString("key2")).isEqualTo("value2");
+    final JsonNode fields = entry.path("fields");
+    final JsonNode randomObject = fields.path("random_object");
+    assertThat(randomObject.path("key1").asText()).isEqualTo("value1");
+    assertThat(randomObject.path("key2").asText()).isEqualTo("value2");
   }
 
   @Test
@@ -176,20 +176,20 @@ public class Log4JLoggerTest extends TestBase {
                     "object2", //
                     fb.string("key3", "value3"),
                     fb.string("key4", "value4"))));
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message)
         .isEqualTo("my arguments are object1={value1, value2} object2={value3, value4}");
 
-    final JsonObject fields = entry.getJsonObject("fields");
+    final JsonNode fields = entry.path("fields");
 
-    final JsonObject object1 = fields.getJsonObject("object1");
-    assertThat(object1.getString("key1")).isEqualTo("value1");
-    assertThat(object1.getString("key2")).isEqualTo("value2");
+    final JsonNode object1 = fields.path("object1");
+    assertThat(object1.path("key1").asText()).isEqualTo("value1");
+    assertThat(object1.path("key2").asText()).isEqualTo("value2");
 
-    final JsonObject object2 = fields.getJsonObject("object2");
-    assertThat(object2.getString("key3")).isEqualTo("value3");
-    assertThat(object2.getString("key4")).isEqualTo("value4");
+    final JsonNode object2 = fields.path("object2");
+    assertThat(object2.path("key3").asText()).isEqualTo("value3");
+    assertThat(object2.path("key4").asText()).isEqualTo("value4");
   }
 
   @Test
@@ -202,14 +202,15 @@ public class Log4JLoggerTest extends TestBase {
           return fb.array("random_key", intArray);
         });
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("my argument is random_key=[1, 2, 3]");
 
-    final JsonObject fields = entry.getJsonObject("fields");
-    final JsonArray jsonArray = fields.getJsonArray("random_key");
-    final List<Integer> arrayList = jsonArray.getValuesAs(JsonNumber::intValue);
-    assertThat(arrayList).isEqualTo(Arrays.asList(1, 2, 3));
+    final JsonNode fields = entry.path("fields");
+    final JsonNode jsonArray = fields.path("random_key");
+    assertThat(jsonArray.get(0).asInt()).isEqualTo(1);
+    assertThat(jsonArray.get(1).asInt()).isEqualTo(2);
+    assertThat(jsonArray.get(2).asInt()).isEqualTo(3);
   }
 
   @Test
@@ -218,11 +219,11 @@ public class Log4JLoggerTest extends TestBase {
     Exception exception = new RuntimeException("Some exception");
     logger.error("Message", exception);
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Message");
 
-    final JsonValue ex = entry.get("thrown");
+    final JsonNode ex = entry.get("thrown");
     assertThat(ex).isNotNull();
   }
 
@@ -232,11 +233,11 @@ public class Log4JLoggerTest extends TestBase {
     Exception exception = new RuntimeException("Some exception");
     logger.error("Message {}", fb -> fb.exception(exception));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Message exception=java.lang.RuntimeException: Some exception");
 
-    final JsonValue ex = entry.get("thrown");
+    final JsonNode ex = entry.get("thrown");
     assertThat(ex).isNotNull();
   }
 
@@ -247,12 +248,12 @@ public class Log4JLoggerTest extends TestBase {
             .withFields(fb -> fb.string("context_name", "context_field"));
     logger.error("Message");
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Message");
 
-    final JsonObject fields = entry.getJsonObject("fields");
-    assertThat(fields.getString("context_name")).isEqualTo("context_field");
+    final JsonNode fields = entry.path("fields");
+    assertThat(fields.path("context_name").asText()).isEqualTo("context_field");
   }
 
   @Test
@@ -262,12 +263,12 @@ public class Log4JLoggerTest extends TestBase {
             .withFields(fb -> fb.string("context_name", "context_field"));
     logger.error("Message {}", fb -> fb.string("arg_name", "arg_field"));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Message arg_field");
 
-    final JsonObject fields = entry.getJsonObject("fields");
-    assertThat(fields.getString("arg_name")).isEqualTo("arg_field");
-    assertThat(fields.getString("context_name")).isEqualTo("context_field");
+    final JsonNode fields = entry.path("fields");
+    assertThat(fields.path("arg_name").asText()).isEqualTo("arg_field");
+    assertThat(fields.path("context_name").asText()).isEqualTo("context_field");
   }
 }

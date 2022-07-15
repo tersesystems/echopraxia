@@ -24,6 +24,11 @@ public class ValueSerializer extends StdSerializer<Value> {
   @Override
   public void serialize(Value value, JsonGenerator gen, SerializerProvider provider)
       throws IOException {
+    if (value == null || value.raw() == null) {
+      gen.writeNull();
+      return;
+    }
+
     switch (value.type()) {
       case ARRAY:
         List<Value<?>> arrayValues = ((Value.ArrayValue) value).raw();
@@ -67,7 +72,7 @@ public class ValueSerializer extends StdSerializer<Value> {
         gen.writeBoolean(b);
         break;
       case EXCEPTION:
-        final Throwable throwable = (Throwable) value.raw();
+        final Throwable throwable = ((Value.ExceptionValue) value).raw();
         gen.writeString(throwable.toString());
         break;
       case NULL:

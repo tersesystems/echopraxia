@@ -4,14 +4,11 @@ plugins {
 
 dependencies {
     api project(":api")
+    api project(":jackson")
 
     implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
     implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
     implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.17.2'
-
-    // Use javax.json implementation so we can stay out of the way of Jackson versioning issues.
-    implementation 'javax.json:javax.json-api:1.1.4'
-    implementation 'org.glassfish:javax.json:1.1.4'
 
     jmhImplementation project(":logger")
     testImplementation project(":logger")

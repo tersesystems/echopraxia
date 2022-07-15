@@ -26,14 +26,24 @@ public class FieldSerializer extends StdSerializer<Field> {
   @Override
   public void serialize(Field field, JsonGenerator jgen, SerializerProvider provider)
       throws IOException {
-    final Value<?> value = field.value();
     final String name = field.name();
+    final Value<?> value = field.value();
+    // short circuit if a null value's been passed in, so we can keep logging.
+    if (value.raw() == null) {
+      jgen.writeNullField(name);
+      return;
+    }
     switch (value.type()) {
       case ARRAY:
         List<Value<?>> arrayValues = ((Value.ArrayValue) value).raw();
         jgen.writeArrayFieldStart(name);
         for (Value<?> av : arrayValues) {
-          jgen.writeObject(av);
+          if (av != null) {
+            jgen.writeObject(av);
+          } else {
+            // fallback for when passed a null value directly (grrr)
+            jgen.writeNull();
+          }
         }
         jgen.writeEndArray();
         break;

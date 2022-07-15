@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.log4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Condition;
@@ -9,8 +10,6 @@ import com.tersesystems.echopraxia.api.CoreLoggerFactory;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import java.util.Map;
-import javax.json.JsonArray;
-import javax.json.JsonObject;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.apache.logging.log4j.ThreadContext;
@@ -33,10 +32,10 @@ public class ContextTest extends TestBase {
         LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
     logger.error("Message {}", fb -> fb.string("field_name", "field_value"));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Message field_value");
-    final String actual = entry.getString("marker");
+    final String actual = entry.path("marker").asText();
     assertThat(actual).isEqualTo("SECURITY");
   }
 
@@ -77,13 +76,13 @@ public class ContextTest extends TestBase {
             })
         .error("this is a message with complex fields");
 
-    JsonObject entry = getEntry();
-    JsonObject context = entry.getJsonObject("context");
-    final JsonObject person = context.getJsonObject("person");
-    assertThat(person.getString("name")).isEqualTo("will");
-    assertThat(person.getInt("age")).isEqualTo(13);
-    JsonArray toys = person.getJsonArray("toys");
-    assertThat(toys.getString(0)).isEqualTo("binkie");
+    JsonNode entry = getEntry();
+    JsonNode context = entry.path("context");
+    final JsonNode person = context.path("person");
+    assertThat(person.path("name").asText()).isEqualTo("will");
+    assertThat(person.path("age").asInt()).isEqualTo(13);
+    JsonNode toys = person.path("toys");
+    assertThat(toys.get(0).asText()).isEqualTo("binkie");
   }
 
   @Test
@@ -92,9 +91,9 @@ public class ContextTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.withThreadContext().error("message with mdc context");
 
-    JsonObject entry = getEntry();
-    JsonObject context = entry.getJsonObject("context");
-    final String value = context.getString("mdckey");
+    JsonNode entry = getEntry();
+    JsonNode context = entry.path("context");
+    final String value = context.path("mdckey").asText();
     assertThat(value).isEqualTo("mdcvalue");
   }
 
@@ -109,8 +108,8 @@ public class ContextTest extends TestBase {
     RuntimeException e = new RuntimeException("test message");
     logger.info(c, "Matches on exception", e);
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Matches on exception");
   }
 
@@ -121,8 +120,8 @@ public class ContextTest extends TestBase {
         (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
     logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1.5));
 
-    JsonObject entry = getEntry();
-    final String message = entry.getString("message");
+    JsonNode entry = getEntry();
+    final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("Matches on arg1");
   }
 }
