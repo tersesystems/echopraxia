@@ -10,7 +10,6 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
-import java.io.StringReader;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -47,5 +46,5 @@ public class TestBase {
     }
   }
 
-  private final static ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+  private static final ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 }

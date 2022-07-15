@@ -8,7 +8,6 @@ import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Value;
-
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -25,7 +24,8 @@ public class ValueDeserializer extends StdDeserializer<Value<?>> {
   }
 
   @Override
-  public Value<?> deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+  public Value<?> deserialize(JsonParser p, DeserializationContext ctxt)
+      throws IOException, JacksonException {
     final JsonNode jsonNode = p.readValueAs(JsonNode.class);
     return processNode(jsonNode);
   }
@@ -37,7 +37,7 @@ public class ValueDeserializer extends StdDeserializer<Value<?>> {
       case BINARY:
         return Value.string(jsonNode.textValue());
       case BOOLEAN:
-        return Value.bool(jsonNode.booleanValue()) ;
+        return Value.bool(jsonNode.booleanValue());
       case MISSING:
         return Value.nullValue();
       case NULL:
@@ -71,7 +71,7 @@ public class ValueDeserializer extends StdDeserializer<Value<?>> {
   private Value<?> processObjectValue(JsonNode jsonNode) {
     ObjectNode node = (ObjectNode) jsonNode;
     List<Field> fields = new ArrayList<>();
-    for (Iterator<Map.Entry<String, JsonNode>> it = node.fields(); it.hasNext();) {
+    for (Iterator<Map.Entry<String, JsonNode>> it = node.fields(); it.hasNext(); ) {
       Map.Entry<String, JsonNode> entry = it.next();
       Value<?> value = processNode(entry.getValue());
       Field field = Field.keyValue(entry.getKey(), value);

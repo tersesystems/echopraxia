@@ -1,14 +1,11 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tersesystems.echopraxia.api.Field;
-
+import com.tersesystems.echopraxia.api.Value;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
-
-import com.tersesystems.echopraxia.api.Value;
 import org.apache.logging.log4j.core.LogEvent;
 import org.apache.logging.log4j.layout.template.json.resolver.EventResolver;
 import org.apache.logging.log4j.layout.template.json.util.JsonWriter;
