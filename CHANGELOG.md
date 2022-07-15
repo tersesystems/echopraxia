@@ -1,5 +1,12 @@
 ## Changelog
 
+## 2.1.1
+
+Break out Jackson serde module and make both Logstash and Log4J2 implementations depend on it.
+
+* Break out jackson module as a distinct dependency.
+* Upgrade to Log4J2 2.18.0
+
 ## 2.1.0
 
 Changes to `CoreLogger` API to allow for more flexible loggers in [echopraxia-plusscala](https://github.com/tersesystems/echopraxia-plusscala).  Some optimizations.
