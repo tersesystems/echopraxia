@@ -2,6 +2,9 @@ package com.tersesystems.echopraxia.log4j;
 
 import static com.tersesystems.echopraxia.log4j.appender.ListAppender.getListAppender;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.async.AsyncLogger;
@@ -9,9 +12,6 @@ import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
 import java.io.StringReader;
 import java.util.List;
-import javax.json.Json;
-import javax.json.JsonObject;
-import javax.json.JsonReader;
 import org.junit.jupiter.api.BeforeEach;
 
 public class TestBase {
@@ -35,12 +35,17 @@ public class TestBase {
     org.awaitility.Awaitility.await().until(() -> !listAppender.getMessages().isEmpty());
   }
 
-  JsonObject getEntry() {
+  JsonNode getEntry() {
     final ListAppender listAppender = getListAppender("ListAppender");
     final List<String> messages = listAppender.getMessages();
 
     final String jsonLine = messages.get(0);
-    JsonReader reader = Json.createReader(new StringReader(jsonLine));
-    return reader.readObject();
+    try {
+      return mapper.readTree(jsonLine);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException(e);
+    }
   }
+
+  private final static ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
 }
