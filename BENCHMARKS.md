@@ -35,7 +35,6 @@ Uses logback 1.2.11 and logstash-logback-encoder 7.2.
 The core logger resolves arguments only if an `isEnabled(marker, level)` check is passed.  All arguments are passed into the condition, and if the condition passes then the logger sends it to various appenders.
 
 `CoreLoggerBenchmarks` shows the CoreLogger SPI.  
-`CoreLoggerBenchmarks` shows the CoreLogger SPI.
 
 `SLF4JLoggerBenchmarks` show the SLF4J API being called directly for comparison -- what you'd see if you were using straight Logback.
 
@@ -43,10 +42,10 @@ The core logger resolves arguments only if an `isEnabled(marker, level)` check i
 
 ### Running
 
-```scala
+```bash
 ./gradlew logstash:jmh
 LOGDATE=$(date +%Y%m%dT%H%M%S)
-mv logstash/jmh-result.json logstash/benchmarks/$LOGDATE.json
+mv logstash/jmh-result.json logstash/benchmarks/17.0.3.6.1-amzn/$LOGDATE.json
 ```
 
 ### Results
@@ -126,15 +125,14 @@ library echopraxia {
 
 The runtime cost for evaluating the simplest "boolean condition" is around 670 +/- 109 nanoseconds, which comes mainly from setting up a function map to `findBoolean`, `findString` etc.
 
-
 ### Running
 
 ```bash
-./gradlew semantic:jmh
+./gradlew scripting:jmh
 LOGDATE=$(date +%Y%m%dT%H%M%S)
-mv semantic/jmh-result.json semantic/benchmarks/17.0.3.6.1-amzn/$LOGDATE.json
+mv scripting/jmh-result.json scripting/benchmarks/17.0.3.6.1-amzn/$LOGDATE.json
 ```
 
 ### Results
 
-[20220715T115730.json](https://jmh.morethan.io/?source=https://raw.githubusercontent.com/tersesystems/echopraxia/main/semantic/benchmarks/17.0.3.6.1-amzn/20220715T115730.json)
+[20220715T144743.json](https://jmh.morethan.io/?source=https://raw.githubusercontent.com/tersesystems/echopraxia/main/scripting/benchmarks/17.0.3.6.1-amzn/20220715T144743.json)
