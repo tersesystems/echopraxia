@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.difflogger;
+package com.tersesystems.echopraxia.diff;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;

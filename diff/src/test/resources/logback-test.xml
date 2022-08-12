@@ -9,7 +9,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.tersesystems.echopraxia.difflogger" value="DEBUG"/>
+    <logger name="com.tersesystems.echopraxia.diff" value="DEBUG"/>
 
     <root level="DEBUG">
         <appender-ref ref="LIST"/>
