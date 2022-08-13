@@ -16,7 +16,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
-public class DiffLoggerTests {
+public class DiffFieldBuilderTests {
 
   @Test
   public void testLogger() {
