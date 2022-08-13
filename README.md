@@ -241,7 +241,8 @@ Echopraxia lets you specify custom field builders whenever you want to log domai
 import com.tersesystems.echopraxia.api.*;
 
 public class BuilderWithDate implements FieldBuilder {
-  public BuilderWithDate() {}
+  private BuilderWithDate() {}
+  public static final BuilderWithDate instance = new BuilderWithDate();
 
   // Renders a date as an ISO 8601 string.
   public Value.StringValue dateValue(Date date) {
@@ -257,7 +258,7 @@ public class BuilderWithDate implements FieldBuilder {
 And now you can render a date automatically:
 
 ```java
-Logger<BuilderWithDate> dateLogger = basicLogger.withFieldBuilder(BuilderWithDate.class);
+Logger<BuilderWithDate> dateLogger = basicLogger.withFieldBuilder(BuilderWithDate.instance);
 dateLogger.info("Date {}", fb -> fb.date("creation_date", new Date()));
 ```
 
@@ -265,9 +266,11 @@ This also applies to more complex objects.  In the [custom field builder example
 
 ```java
 public class PersonFieldBuilder implements FieldBuilder {
+  private PersonFieldBuilder() {}
+  public static final PersonFieldBuilder instance = new PersonFieldBuilder();
 
   // Renders a `Person` as an object field.
-  public Field person(String fieldName, Person p) {
+  public Field keyValue(String fieldName, Person p) {
     return keyValue(fieldName, personValue(p));
   }
 
@@ -286,13 +289,51 @@ public class PersonFieldBuilder implements FieldBuilder {
 }
 ```
 
-And then you can do the same by calling `fb.person`:
+And then you can do the same by calling `fb.keyValue` with `Person`:
 
 ```java
 Person user = ...
-Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.class);
-personLogger.info("Person {}", fb -> fb.person("user", user));
+Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.instance);
+personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 ```
+
+Once you have a custom field builder, you can layer in additional functionality like the "diff" field builder.
+
+### Diff Field Builder 
+
+The "diff" field builder is useful for debugging a change in state in complex objects because it can compare "before" and "after" objects and only render the changes between the two values, using [RFC 6902](https://datatracker.ietf.org/doc/html/rfc6902) format with [zjsonpatch](https://github.com/flipkart-incubator/zjsonpatch/).
+
+To add the diff field builder, add the `diff` module:
+
+```gradle
+implementation "com.tersesystems.echopraxia:diff:<VERSION>"
+```
+
+And implement `DiffFieldBuilder`:
+
+```java
+import com.tersesystems.echopraxia.diff.DiffFieldBuilder;
+
+class PersonFieldBuilder implements DiffFieldBuilder {
+  // ...
+  public FieldBuilderResult diff(String name, Person before, Person after) {
+    return diff(name, personValue(before), personValue(after));
+  }
+}
+```
+
+You can then compare a change in an object by rendering the diff:
+
+```java
+Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger().withFieldBuilder(PersonFieldBuilder.instance);
+
+Person before = new Person("Jim", 1);
+Person after = before.withName("Will");
+
+logger.info("{}", fb -> fb.diff("personDiff", before, after));
+```
+
+The diff field builder depends on Jackson 2.13, and will use a static object mapper by default, which you can override using the `_objectMapper` method.
 
 ### Custom Logger Factories
 
@@ -356,7 +397,7 @@ and a custom logger factory:
 ```java
 public final class PersonLoggerFactory {
 
-  private static final PersonFieldBuilder myFieldBuilder = new PersonFieldBuilder();
+  private static final PersonFieldBuilder myFieldBuilder = PersonFieldBuilder.instance;
 
   // the class containing the error/warn/info/debug/trace methods
   private static final String FQCN = DefaultLoggerMethods.class.getName();

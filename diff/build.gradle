@@ -15,6 +15,6 @@ dependencies {
     // implementation 'de.danielbechler:java-object-diff:0.95'
 
     testImplementation project(":logger")
+    testImplementation project(":logstash")
     testImplementation 'ch.qos.logback:logback-classic:1.2.10'
-    testImplementation 'net.logstash.logback:logstash-logback-encoder:7.0.1'
 }

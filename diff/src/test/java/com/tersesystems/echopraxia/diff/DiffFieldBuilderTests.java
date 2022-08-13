@@ -1,5 +1,8 @@
 package com.tersesystems.echopraxia.diff;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.slf4j.Logger.ROOT_LOGGER_NAME;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
@@ -8,29 +11,27 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import com.tersesystems.echopraxia.api.Value;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
 public class DiffFieldBuilderTests {
 
   @Test
   public void testLogger() {
-    Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger().withFieldBuilder(new PersonFieldBuilder());
+    Logger<PersonFieldBuilder> logger =
+        LoggerFactory.getLogger().withFieldBuilder(PersonFieldBuilder.instance);
 
     Person before = new Person("Eloise", 1);
     Person after = before.withName("Will");
 
-    logger.info("{}", fb -> fb.diffPerson("personDiff", before, after));
+    logger.info("{}", fb -> fb.diff("personDiff", before, after));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
     ILoggingEvent event = list.get(0);
-    assertThat(event.getFormattedMessage()).isEqualTo("personDiff=[{\"op\":\"replace\",\"path\":\"/name\",\"value\":\"Will\"}]");
+    assertThat(event.getFormattedMessage())
+        .isEqualTo("personDiff=[{op=replace, path=/name, value=Will}]");
   }
 
   @BeforeEach
@@ -44,7 +45,7 @@ public class DiffFieldBuilderTests {
 
   ListAppender<ILoggingEvent> getListAppender() {
     return (ListAppender<ILoggingEvent>)
-            loggerContext().getLogger(ROOT_LOGGER_NAME).getAppender("LIST");
+        loggerContext().getLogger(ROOT_LOGGER_NAME).getAppender("LIST");
   }
 }
 
@@ -74,15 +75,18 @@ class Person {
   }
 }
 
-
 class PersonFieldBuilder implements DiffFieldBuilder {
 
+  private PersonFieldBuilder() {}
+
+  public static final PersonFieldBuilder instance = new PersonFieldBuilder();
+
   // Renders a `Person` as an object field.
-  public Field person(String fieldName, Person p) {
+  public Field keyValue(String fieldName, Person p) {
     return keyValue(fieldName, personValue(p));
   }
 
-  public FieldBuilderResult diffPerson(String name, Person before, Person after) {
+  public FieldBuilderResult diff(String name, Person before, Person after) {
     return diff(name, personValue(before), personValue(after));
   }
 
@@ -95,4 +99,3 @@ class PersonFieldBuilder implements DiffFieldBuilder {
     return Value.object(name, age);
   }
 }
-
