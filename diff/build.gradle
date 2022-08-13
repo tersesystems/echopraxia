@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     api project(":api")
-    implementation project(":jackson")
+    api project(":jackson")
 
     // https://github.com/flipkart-incubator/zjsonpatch/
     // jackson dependency on 2.12.1
