@@ -98,7 +98,6 @@ public class ConditionTest extends TestBase {
 
   @Test
   void testArrayMatch() {
-    Field field = Field.keyValue("foo", Value.string("bar"));
     Condition logins = Condition.arrayMatch("myarray", v -> v.equals(Value.array("foo")));
     Logger<?> logger = getLogger();
     logger.info(logins, "{}", fb -> fb.array("myarray", "foo"));
