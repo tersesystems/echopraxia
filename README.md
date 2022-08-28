@@ -58,11 +58,25 @@ You can read more about structured logging [here](https://tersesystems.com/blog/
 
 ### Why Conditions?
 
-Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.  
+Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.  Structured logging enables queries, and conditions do the querying.
+
+This makes targeted logging far more powerful because the arguments in a structured logging statement can be queried directly:
+
+```java
+Condition isLocalhost = (level, ctx) -> ctx
+    .findString("$.request_remote_addr")
+    .map(s -> Objects.equals(s, "127.0.0.1"))
+    .orElse(false);
+logger.debug(isLocalhost, "address is {}", fb -> fb.string("request_remote_addr", addr));
+```
 
 A proof of concept of dynamic debug logging using Echopraxia is [here](https://github.com/tersesystems/dynamic-debug-logging) .
 
 [A Comprehensive Survey of Logging in Software](https://arxiv.org/pdf/2110.12489.pdf) and [The Bones of the System: A Study of Logging and Telemetry at Microsoft](https://www.microsoft.com/en-us/research/publication/case-the-bones-of-the-system-a-study-of-logging-and-telemetry-at-microsoft/) are great discussions of the implication of being able to adjust logging conditions at runtime.
+
+## Scala API
+
+There is a Scala API available at [https://github.com/tersesystems/echopraxia-plusscala](https://github.com/tersesystems/echopraxia-plusscala).
 
 ## Benchmarks
 
