@@ -10,6 +10,7 @@ import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.async.AsyncLogger;
@@ -78,6 +79,36 @@ public class ConditionTest extends TestBase {
     final ILoggingEvent event = listAppender.list.get(0);
     String message = event.getFormattedMessage();
     assertThat(message).isEqualTo("true");
+  }
+
+  @Test
+  void testObjectMatch() {
+    Field field = Field.keyValue("foo", Value.string("bar"));
+    Condition logins = Condition.objectMatch("myObject", v -> v.equals(Value.object(field)));
+    Logger<?> logger = getLogger();
+    logger.info(logins, "{}", fb -> fb.object("myObject", fb.string("foo", "bar")));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list.size()).isEqualTo(1);
+
+    final ILoggingEvent event = listAppender.list.get(0);
+    String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("myObject={bar}");
+  }
+
+  @Test
+  void testArrayMatch() {
+    Field field = Field.keyValue("foo", Value.string("bar"));
+    Condition logins = Condition.arrayMatch("myarray", v -> v.equals(Value.array("foo")));
+    Logger<?> logger = getLogger();
+    logger.info(logins, "{}", fb -> fb.array("myarray", "foo"));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list.size()).isEqualTo(1);
+
+    final ILoggingEvent event = listAppender.list.get(0);
+    String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("myarray=[foo]");
   }
 
   @Test
