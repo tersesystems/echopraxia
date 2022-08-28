@@ -430,6 +430,10 @@ public abstract class Value<V> {
     return nullValue();
   }
 
+  public static <T> boolean equals(Value<? extends T> value1, Value<? extends T> value2) {
+    return Objects.equals(value1, value2);
+  }
+
   /**
    * Utility method to turn an array into a list of values with a transformer.
    *

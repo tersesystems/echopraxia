@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.api.Value.*;
 import static java.util.concurrent.TimeUnit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
@@ -10,6 +11,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -51,8 +53,36 @@ public class ConditionTest extends TestBase {
   }
 
   @Test
+  void testNumberMatch() {
+    Condition logins = Condition.numberMatch("logins", v -> v.equals(number(1)));
+    Logger<?> logger = getLogger();
+    logger.info(logins, "{}", fb -> fb.number("logins", 1));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list.size()).isEqualTo(1);
+
+    final ILoggingEvent event = listAppender.list.get(0);
+    String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("1");
+  }
+
+  @Test
+  void testBooleanMatch() {
+    Condition logins = Condition.booleanMatch("isAwesome", v -> v.equals(Value.bool(true)));
+    Logger<?> logger = getLogger();
+    logger.info(logins, "{}", fb -> fb.bool("isAwesome", true));
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    assertThat(listAppender.list.size()).isEqualTo(1);
+
+    final ILoggingEvent event = listAppender.list.get(0);
+    String message = event.getFormattedMessage();
+    assertThat(message).isEqualTo("true");
+  }
+
+  @Test
   void testFieldConditionIsLive() {
-    Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
+    Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, string("derp")));
     Logger<?> logger = getLogger();
     final AtomicReference<String> changeableValue = new AtomicReference<>("derp");
 
@@ -73,7 +103,7 @@ public class ConditionTest extends TestBase {
 
   @Test
   void testMDCConditionIsLive() {
-    Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
+    Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, string("herp")));
     Logger<?> logger = getLogger();
 
     MDC.put("herp", "derp");
