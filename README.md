@@ -48,7 +48,7 @@ Echopraxia is best described as a specialization or augmentation for application
 
 ### Why Structured Logging?
 
-Structured logging enables logs to be queried as [semi-structured](https://en.wikipedia.org/wiki/Semi-structured_data).  There are other structured logging frameworks, like [Structlog](https://www.structlog.org/en/stable/) (Python), [Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) (Ruby), [Logrus](https://github.com/sirupsen/logrus) (Go), and [Serilog](https://serilog.net/) (C#).
+Structured logging enables logs to be queried as [semi-structured data](https://en.wikipedia.org/wiki/Semi-structured_data).  There are other structured logging frameworks, like [Structlog](https://www.structlog.org/en/stable/) (Python), [Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) (Ruby), [Logrus](https://github.com/sirupsen/logrus) (Go), and [Serilog](https://serilog.net/) (C#).
 
 [Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) has the best take on this:
 
@@ -58,9 +58,9 @@ You can read more about structured logging [here](https://tersesystems.com/blog/
 
 ### Why Conditions?
 
-Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.  Structured logging enables queries, and conditions do the querying.
+Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.  A statement is only logged if it passes the condition associated with it.
 
-This makes targeted logging far more powerful because the arguments in a structured logging statement can be queried directly:
+Conditions can leverage the data exposed by structured logging.  For example, here's a debug statement that only logs if the remote address is localhost:
 
 ```java
 Condition isLocalhost = (level, ctx) -> ctx
@@ -70,7 +70,7 @@ Condition isLocalhost = (level, ctx) -> ctx
 logger.debug(isLocalhost, "address is {}", fb -> fb.string("request_remote_addr", addr));
 ```
 
-A proof of concept of dynamic debug logging using Echopraxia is [here](https://github.com/tersesystems/dynamic-debug-logging) .
+This makes targeted logging far more powerful, because diagnostic logging is no longer an "all or nothing" proposition -- conditions can dynamically filter what is logged, creating a "control plane" for logging.  A proof of concept of dynamic debug logging using Echopraxia is [here](https://github.com/tersesystems/dynamic-debug-logging) .
 
 [A Comprehensive Survey of Logging in Software](https://arxiv.org/pdf/2110.12489.pdf) and [The Bones of the System: A Study of Logging and Telemetry at Microsoft](https://www.microsoft.com/en-us/research/publication/case-the-bones-of-the-system-a-study-of-logging-and-telemetry-at-microsoft/) are great discussions of the implication of being able to adjust logging conditions at runtime.
 
