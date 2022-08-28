@@ -603,6 +603,16 @@ public class MyBusinessConditions {
 }
 ```
 
+Matching values is best done using `Value.equals` in conjunction with one of the match methods:
+
+```java
+// Better type safety using Value.equals
+Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, Value.string("herp")))
+
+// this works too
+Condition logins = Condition.numberMatch("logins", v -> v.equals(number(1)));
+```
+
 This is only a part of the available functionality in conditions.  You can tie conditions directly to a backend, such as a database or key/value store, or trigger them to work in response to an exception or unusual metrics.  See the [redis example](https://github.com/tersesystems/echopraxia-examples/tree/main/redis), [jmx example](https://github.com/tersesystems/echopraxia-examples/tree/main/jmx), [metrics example](https://github.com/tersesystems/echopraxia-examples/tree/main/metrics), and [timed diagnostic example](https://github.com/tersesystems/echopraxia-examples/tree/main/timed-diagnostic).
 
 ### JSON Path

@@ -1,6 +1,9 @@
 package com.tersesystems.echopraxia.api;
 
+import java.util.List;
 import java.util.function.Predicate;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A condition is used to conditionally log statements based on the level and context of the logger.
@@ -121,11 +124,58 @@ public interface Condition {
    * @param predicate a predicate
    * @return true if no elements match the predicate, false otherwise.
    */
-  static Condition valueMatch(String fieldName, Predicate<Value<?>> predicate) {
+  @Contract(pure = true)
+  static @NotNull Condition valueMatch(String fieldName, Predicate<Value<?>> predicate) {
     return (level, ctx) ->
         ctx.getFields().stream()
             .filter(f -> f.name().equals(fieldName))
             .map(Field::value)
+            .anyMatch(predicate);
+  }
+
+  static Condition stringMatch(String fieldName, Predicate<Value<String>> predicate) {
+    return (level, ctx) ->
+        ctx.getFields().stream()
+            .filter(f -> f.name().equals(fieldName))
+            .filter(f -> (f.value().type() == Value.Type.STRING))
+            .map(f -> (Value.StringValue) f.value())
+            .anyMatch(predicate);
+  }
+
+  static Condition numberMatch(
+      String fieldName, Predicate<? super Value.NumberValue<?>> predicate) {
+    return (level, ctx) ->
+        ctx.getFields().stream()
+            .filter(f -> f.name().equals(fieldName))
+            .filter(f -> (f.value().type() == Value.Type.NUMBER))
+            .map(f -> (Value.NumberValue<?>) f.value())
+            .anyMatch(predicate);
+  }
+
+  static Condition booleanMatch(String fieldName, Predicate<Value<Boolean>> predicate) {
+    return (level, ctx) ->
+        ctx.getFields().stream()
+            .filter(f -> f.name().equals(fieldName))
+            .filter(f -> (f.value().type() == Value.Type.BOOLEAN))
+            .map(f -> (Value.BooleanValue) f.value())
+            .anyMatch(predicate);
+  }
+
+  static Condition arrayMatch(String fieldName, Predicate<Value<List<Value<?>>>> predicate) {
+    return (level, ctx) ->
+        ctx.getFields().stream()
+            .filter(f -> f.name().equals(fieldName))
+            .filter(f -> (f.value().type() == Value.Type.ARRAY))
+            .map(f -> (Value.ArrayValue) f.value())
+            .anyMatch(predicate);
+  }
+
+  static Condition objectMatch(String fieldName, Predicate<Value<List<Field>>> predicate) {
+    return (level, ctx) ->
+        ctx.getFields().stream()
+            .filter(f -> f.name().equals(fieldName))
+            .filter(f -> (f.value().type() == Value.Type.OBJECT))
+            .map(f -> (Value.ObjectValue) f.value())
             .anyMatch(predicate);
   }
 }
