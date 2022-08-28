@@ -32,10 +32,10 @@ public class Log4JCoreLogger implements CoreLogger {
 
   private final Supplier<Runnable> threadContextFunction;
 
-  Log4JCoreLogger(@NotNull String fqcn, @NotNull ExtendedLogger log4jLogger) {
+  public Log4JCoreLogger(@NotNull String fqcn, @NotNull ExtendedLogger log4jLogger) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
-    this.context = new Context();
+    this.context = Context.empty();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = threadContext();
@@ -602,6 +602,12 @@ public class Log4JCoreLogger implements CoreLogger {
   protected static class Context {
     protected final Supplier<List<Field>> fieldsSupplier;
     protected final Marker marker;
+
+    private static final Context EMPTY = new Context();
+
+    static Context empty() {
+      return EMPTY;
+    }
 
     Context() {
       this.fieldsSupplier = Collections::emptyList;
