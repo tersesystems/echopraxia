@@ -103,7 +103,7 @@ public class ConditionTest extends TestBase {
 
   @Test
   void testMDCConditionIsLive() {
-    Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, string("herp")));
+    Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, string("derp")));
     Logger<?> logger = getLogger();
 
     MDC.put("herp", "derp");
