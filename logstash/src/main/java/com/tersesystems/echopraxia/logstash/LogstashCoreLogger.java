@@ -24,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
 import org.slf4j.Marker;
 
-/** Logstash implementation of CoreLogger. */
+/** The Logstash implementation of CoreLogger. */
 public class LogstashCoreLogger implements CoreLogger {
 
   // The logger context property used to set up caller info for async logging.
@@ -37,7 +37,7 @@ public class LogstashCoreLogger implements CoreLogger {
   private final String fqcn;
   private final Supplier<Runnable> threadContextFunction;
 
-  protected LogstashCoreLogger(String fqcn, ch.qos.logback.classic.Logger logger) {
+  public LogstashCoreLogger(@NotNull String fqcn, @NotNull ch.qos.logback.classic.Logger logger) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = Context.empty();
