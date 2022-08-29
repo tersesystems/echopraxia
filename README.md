@@ -311,9 +311,19 @@ Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFie
 personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 ```
 
-Once you have a custom field builder, you can layer in additional functionality like the "diff" field builder.
+### Interop with SLF4J
+
+There will be times when the application uses an SLF4J logger, and it's not feasible to use an Echopraxia Logger.  This is not a problem: you can pass Echopraxia fields directly as arguments through SLF4J, and they will be rendered as expected.  You'll need to have a field builder in scope, but everything will work as expected.
+
+```java
+FieldBuilder fb = FieldBuilder.instance();
+org.slf4j.Logger slf4jLogger = org.slf4j.LoggerFactory.getLogger("com.example.Main");
+slf4jLogger.info("SLF4J message {}", fb.string("foo", "bar"));
+```
 
 ### Diff Field Builder 
+
+Once you have a custom field builder, you can layer in additional functionality like the "diff" field builder.
 
 The "diff" field builder is useful for debugging a change in state in complex objects because it can compare "before" and "after" objects and only render the changes between the two values, using [RFC 6902](https://datatracker.ietf.org/doc/html/rfc6902) format with [zjsonpatch](https://github.com/flipkart-incubator/zjsonpatch/).
 
