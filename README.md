@@ -311,16 +311,6 @@ Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFie
 personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 ```
 
-### Interop with SLF4J
-
-There will be times when the application uses an SLF4J logger, and it's not feasible to use an Echopraxia Logger.  This is not a problem: you can pass Echopraxia fields directly as arguments through SLF4J, and they will be rendered as expected.  You'll need to have a field builder in scope, but everything will work as expected.
-
-```java
-FieldBuilder fb = FieldBuilder.instance();
-org.slf4j.Logger slf4jLogger = org.slf4j.LoggerFactory.getLogger("com.example.Main");
-slf4jLogger.info("SLF4J message {}", fb.string("foo", "bar"));
-```
-
 ### Diff Field Builder 
 
 Once you have a custom field builder, you can layer in additional functionality like the "diff" field builder.
@@ -1445,3 +1435,41 @@ public class SystemInfoFilter implements CoreLoggerFilter {
 ```
 
 Please see the [system info example](https://github.com/tersesystems/echopraxia-examples/tree/main/system-info) for details.
+
+## Logback / SLF4J API
+
+There will be times when the application uses an SLF4J logger, and it's not feasible to use an Echopraxia Logger.  This is not a problem: you can pass Echopraxia fields directly as arguments through SLF4J, and they will be rendered as expected.  You'll need to have a field builder in scope:
+
+```java
+FieldBuilder fb = FieldBuilder.instance();
+org.slf4j.Logger slf4jLogger = org.slf4j.LoggerFactory.getLogger("com.example.Main");
+slf4jLogger.info("SLF4J message {}", fb.string("foo", "bar"));
+```
+
+And you will want to pass fields individually as arguments (not using `fb.list`):
+
+```java
+slf4jLogger.info("SLF4J message string {} number {}", fb.string("foo", "bar"), fb.number("count", 1));
+```
+
+SLF4J has no direct support for conditions, but we can fake it with a `ConditionMarker`:
+
+```java
+import com.tersesystems.echopraxia.logback.*;
+
+Marker marker = ConditionMarker.apply(condition);
+slf4jLogger.info(marker, "SLF4J message string {} number {}", fb.string("foo", "bar"), fb.number("count", 1));
+```
+
+To make this work, you will need to have a `ConditionTurboFilter` which will evaluate conditions wrapped in `ConditionMarker`:
+
+```xml
+<configuration> <!-- logback.xml -->
+    <!-- handles conditions passed through ConditionMarker -->
+    <turboFilter class="com.tersesystems.echopraxia.logback.ConditionTurboFilter"/>
+    <!-- ... -->
+</configuration>
+```
+
+Note that the logging context available to the condition is provided by the `LoggingEvent` directly, so you can only query on the passed in arguments (there are no "logger fields").
+
