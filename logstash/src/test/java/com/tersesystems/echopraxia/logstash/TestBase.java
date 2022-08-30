@@ -11,6 +11,7 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
+import com.tersesystems.echopraxia.logback.TransformingAppender;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,0 +1,11 @@
+<configuration>
+    <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
+    </appender>
+
+    <!-- handles conditions passed through ConditionMarker -->
+    <turboFilter class="com.tersesystems.echopraxia.logback.ConditionTurboFilter"/>
+
+    <root level="TRACE">
+        <appender-ref ref="LIST"/>
+    </root>
+</configuration>

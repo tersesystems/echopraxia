@@ -6,6 +6,7 @@ import static org.slf4j.event.EventConstants.*;
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.logback.CallerMarker;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -419,8 +420,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     final Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      Marker callerMarker =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+      Marker callerMarker = isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {
@@ -438,8 +438,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
     if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
-      LogstashCallerMarker result =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+      CallerMarker result = isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {
@@ -459,7 +458,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
       final Marker callerMarker =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+          isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {
@@ -480,7 +479,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
       final Marker callerMarker =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+          isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {

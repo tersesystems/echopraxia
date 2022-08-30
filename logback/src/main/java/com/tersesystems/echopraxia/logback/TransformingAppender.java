@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.logback;
 
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.UnsynchronizedAppenderBase;

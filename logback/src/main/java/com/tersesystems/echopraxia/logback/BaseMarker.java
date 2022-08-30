@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.logback;
 
 import static java.util.Objects.requireNonNull;
 
@@ -9,12 +9,12 @@ import java.util.Vector;
 import org.slf4j.Marker;
 
 /** A basic marker implementation that can be extended. */
-public abstract class LogstashBaseMarker implements Marker {
+public abstract class BaseMarker implements Marker {
 
   private final String name;
   private List<Marker> referenceList;
 
-  public LogstashBaseMarker(String name) {
+  public BaseMarker(String name) {
     requireNonNull(name, "A marker name cannot be null");
     this.name = name;
   }
