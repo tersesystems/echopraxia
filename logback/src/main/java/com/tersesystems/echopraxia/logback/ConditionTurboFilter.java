@@ -5,7 +5,6 @@ import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.spi.FilterReply;
 import com.tersesystems.echopraxia.api.*;
 import java.util.*;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 import org.jetbrains.annotations.NotNull;
@@ -62,33 +61,15 @@ public class ConditionTurboFilter extends TurboFilter {
     return FilterReply.NEUTRAL;
   }
 
-  static class MarkerContext implements Context {
-    private final List<Marker> markers;
-
-    public MarkerContext(Marker marker) {
-      Iterable<Marker> iterable = marker::iterator;
-      this.markers =
-          StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
-    }
-
-    @Override
-    public Supplier<List<Field>> getLoggerFields() {
-      return Collections::emptyList;
-    }
-
-    @Override
-    public List<Marker> getMarkers() {
-      return markers;
-    }
-  }
-  ;
-
   private Level level(ch.qos.logback.classic.Level level) {
     return Level.valueOf(level.levelStr);
   }
 
   private LoggingContext loggingContext(Marker marker, Object[] arguments) {
-    MarkerContext markerContext = new MarkerContext(marker);
+    Iterable<Marker> iterable = marker::iterator;
+    List<Marker> markers =
+        StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
+    FilterMarkerContext markerContext = new FilterMarkerContext(markers);
     return new LogbackLoggingContext(markerContext, () -> getFields(arguments));
   }
 
@@ -110,5 +91,23 @@ public class ConditionTurboFilter extends TurboFilter {
       }
     }
     return fields;
+  }
+
+  static class FilterMarkerContext implements LogbackLoggerContext {
+    private final List<Marker> markers;
+
+    public FilterMarkerContext(List<Marker> markers) {
+      this.markers = markers;
+    }
+
+    @Override
+    public @NotNull List<Field> getLoggerFields() {
+      return Collections.emptyList();
+    }
+
+    @Override
+    public List<Marker> getMarkers() {
+      return markers;
+    }
   }
 }

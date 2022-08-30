@@ -12,22 +12,26 @@ import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
+/**
+ * The logging context composes the "logger context" (markers/fields associated with the logger) and
+ * the field arguments associated with the individual logging event.
+ */
 public class LogbackLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
 
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
 
-  private final Context context;
+  private final LogbackLoggerContext context;
   private final Supplier<List<Field>> fields;
 
-  public LogbackLoggingContext(Context context) {
+  public LogbackLoggingContext(LogbackLoggerContext context) {
     this(context, Collections::emptyList);
   }
 
-  public LogbackLoggingContext(Context context, Supplier<List<Field>> arguments) {
+  public LogbackLoggingContext(LogbackLoggerContext context, Supplier<List<Field>> arguments) {
     this.context = context;
     this.argumentFields = memoize(arguments);
-    this.loggerFields = memoize(context.getLoggerFields());
+    this.loggerFields = memoize(context::getLoggerFields);
     this.fields = memoize(joinFields(this.loggerFields, this.argumentFields));
   }
 
@@ -46,7 +50,7 @@ public class LogbackLoggingContext extends AbstractJsonPathFinder implements Log
     return argumentFields.get();
   }
 
-  public @NotNull List<Marker> getMarkers() {
+  public List<Marker> getMarkers() {
     return context.getMarkers();
   }
 }

@@ -6,6 +6,11 @@ import ch.qos.logback.core.spi.AppenderAttachable;
 import ch.qos.logback.core.spi.AppenderAttachableImpl;
 import java.util.Iterator;
 
+/**
+ * An abstract appender that provides a base to wrap other appenders.
+ *
+ * @param <E> the logging event
+ */
 public abstract class TransformingAppender<E> extends UnsynchronizedAppenderBase<E>
     implements AppenderAttachable<E> {
 

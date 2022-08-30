@@ -977,7 +977,7 @@ For Log4J, you must set `includeLocation=true` on the logger you want to capture
 
 Logback is a little more complicated, because there is no direct way to get the logging event from a logger.  Instead, a special `caller` marker is added, and an appender is used to extract caller data from the marker and set it on the event, 
 
-To enable it, you must set the context property `echopraxia.async.caller` to `true`, and wrap your appenders with `com.tersesystems.echopraxia.logstash.CallerDataAppender`:
+To enable it, you must set the context property `echopraxia.async.caller` to `true`, and wrap your appenders with `com.tersesystems.echopraxia.logback.CallerDataAppender`:
 
 ```xml
 <configuration>
@@ -1013,7 +1013,7 @@ To enable it, you must set the context property `echopraxia.async.caller` to `tr
            CallerDataAppender sets the caller data on event from marker.
            Note this depends on setting the newRule above!
          -->
-        <appender class="com.tersesystems.echopraxia.logstash.CallerDataAppender">
+        <appender class="com.tersesystems.echopraxia.logback.CallerDataAppender">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="JSON"/>
         </appender>
