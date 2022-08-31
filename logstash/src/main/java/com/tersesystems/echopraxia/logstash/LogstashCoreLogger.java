@@ -522,29 +522,37 @@ public class LogstashCoreLogger implements CoreLogger {
 
     // We want the LAST exception to always show up as the canonical exception, but we will
     // always include it as a "value" parameter.
-    Value<Throwable> throwable = null;
+    Throwable throwable = null;
     List<Object> arguments = new ArrayList<>(args.size() + 1);
     for (Field field : args) {
       final String name = field.name();
       final Value<?> value = field.value();
       if (value.type() == Value.Type.EXCEPTION) {
-        throwable = (Value.ExceptionValue) value;
-        StructuredArgument arg = StructuredArguments.keyValue(name, throwable.raw());
+        throwable = ((Value.ExceptionValue) value).raw();
+        StructuredArgument arg = StructuredArguments.keyValue(name, convertThrowable(throwable));
         arguments.add(arg);
       } else {
         StructuredArgument arg =
-            field instanceof Field.ValueField
-                ? StructuredArguments.value(name, value)
-                : StructuredArguments.keyValue(name, value);
+          field instanceof Field.ValueField
+            ? StructuredArguments.value(name, value)
+            : StructuredArguments.keyValue(name, value);
         arguments.add(arg);
       }
     }
 
     // If the exception exists, it must be raw and at the end of the array.
     if (throwable != null) {
-      arguments.add(throwable.raw());
+      arguments.add(throwable);
     }
     return arguments.toArray();
+  }
+
+  protected Object convertThrowable(Throwable throwable) {
+    // https://github.com/logfellow/logstash-logback-encoder#customizing-stack-traces
+    // says "Do NOT use structured arguments or markers for exceptions."
+    // We still may want a better logfmt oriented representation of a throwable, so
+    // use a different method so that it can be tweaked.
+    return throwable.toString();
   }
 
   protected void runAsyncLog(Runnable runnable) {
