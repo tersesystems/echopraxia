@@ -1495,4 +1495,12 @@ EchopraxiaFieldsMessage structured(String message, FieldBuilderResult args) {
 }
 ```
 
+Note that exceptions must also be passed outside the message to be fully processed by Log4J:
+
+```java
+Exception e = new RuntimeException();
+EchopraxiaFieldsMessage message = structured("exception {}", fb.exception(e));
+logger.info(message, e);
+```
+
 Unfortunately, I don't understand Log4J internals well enough to make conditions work using the Log4J API.  One option could be to write a [Log4J Filter](https://logging.apache.org/log4j/2.x/manual/filters.html) to work on a message.
