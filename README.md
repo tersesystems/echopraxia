@@ -1452,6 +1452,13 @@ And you will want to pass fields individually as arguments (not using `fb.list`)
 slf4jLogger.info("SLF4J message string {} number {}", fb.string("foo", "bar"), fb.number("count", 1));
 ```
 
+Note that you will have to pass exceptions through twice, once for the argument and again for the exception itself -- it must be the last argument, and must *not* have a message parameter to register as an exception:
+
+```java
+Exception e = new RuntimeException();
+slf4jLogger.error("SLF4J exception {}", fb.exception(e), e);
+```
+
 SLF4J has no direct support for conditions, but we can fake it with a `ConditionMarker`:
 
 ```java
