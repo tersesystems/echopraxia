@@ -6,6 +6,9 @@ import static org.slf4j.event.EventConstants.*;
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.logback.CallerMarker;
+import com.tersesystems.echopraxia.logback.LogbackLoggerContext;
+import com.tersesystems.echopraxia.logback.LogbackLoggingContext;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -31,7 +34,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
 
   private final ch.qos.logback.classic.Logger logger;
-  private final Context context;
+  private final LogstashMarkerContext context;
   private final Condition condition;
   private final Executor executor;
   private final String fqcn;
@@ -40,7 +43,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public LogstashCoreLogger(@NotNull String fqcn, @NotNull ch.qos.logback.classic.Logger logger) {
     this.fqcn = fqcn;
     this.logger = logger;
-    this.context = Context.empty();
+    this.context = LogstashMarkerContext.empty();
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = mdcContext();
@@ -49,7 +52,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public LogstashCoreLogger(
       @NotNull String fqcn,
       @NotNull ch.qos.logback.classic.Logger logger,
-      @NotNull LogstashCoreLogger.Context context,
+      @NotNull LogstashCoreLogger.LogstashMarkerContext context,
       @NotNull Condition condition,
       @NotNull Executor executor,
       @NotNull Supplier<Runnable> threadContextSupplier) {
@@ -107,14 +110,15 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public <FB> @NotNull CoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
-    final Context contextWithFields =
+    final LogstashMarkerContext contextWithFields =
         this.context.withFields(() -> convertToFields(f.apply(builder)));
     return new LogstashCoreLogger(
         fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
   }
 
   public CoreLogger withMarkers(Marker... markers) {
-    final Context contextWithMarkers = this.context.withMarkers(() -> Arrays.asList(markers));
+    final LogstashMarkerContext contextWithMarkers =
+        this.context.withMarkers(() -> Arrays.asList(markers));
     return new LogstashCoreLogger(
         fqcn, logger, contextWithMarkers, condition, executor, threadContextFunction);
   }
@@ -122,7 +126,8 @@ public class LogstashCoreLogger implements CoreLogger {
   @Override
   public @NotNull CoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
-    Context newContext = context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
+    LogstashMarkerContext newContext =
+        context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
     return new LogstashCoreLogger(
         fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
@@ -180,7 +185,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
     Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      LogstashLoggingContext snapshotContext = new LogstashLoggingContext(context);
+      LoggingContext snapshotContext = new LogbackLoggingContext(context);
       return condition.test(level, snapshotContext);
     }
     return false;
@@ -197,7 +202,7 @@ public class LogstashCoreLogger implements CoreLogger {
     }
     Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      LogstashLoggingContext snapshotContext = new LogstashLoggingContext(context);
+      LoggingContext snapshotContext = new LogbackLoggingContext(context);
       return bothConditions.test(level, snapshotContext);
     }
     return false;
@@ -207,8 +212,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields) {
     Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      LogstashLoggingContext snapshotContext =
-          new LogstashLoggingContext(context.withFields(extraFields));
+      LoggingContext snapshotContext = new LogbackLoggingContext(context.withFields(extraFields));
       return condition.test(level, snapshotContext);
     } else {
       return false;
@@ -222,8 +226,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Supplier<List<Field>> extraFields) {
     Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      LogstashLoggingContext snapshotContext =
-          new LogstashLoggingContext(context.withFields(extraFields));
+      LoggingContext snapshotContext = new LogbackLoggingContext(context.withFields(extraFields));
       return this.condition.and(condition).test(level, snapshotContext);
     } else {
       return false;
@@ -234,7 +237,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, String message) {
     Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      LogstashLoggingContext snapshotContext = new LogstashLoggingContext(context);
+      LoggingContext snapshotContext = new LogbackLoggingContext(context);
       if (condition.test(level, snapshotContext)) {
         logger.log(
             resolveLoggerFields(m, snapshotContext),
@@ -252,8 +255,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message) {
     Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      LogstashLoggingContext snapshotContext =
-          new LogstashLoggingContext(context.withFields(extraFields));
+      LoggingContext snapshotContext = new LogbackLoggingContext(context.withFields(extraFields));
       if (condition.test(level, snapshotContext)) {
         logger.log(
             resolveLoggerFields(m, snapshotContext),
@@ -275,7 +277,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
       LoggingContext ctx =
-          new LogstashLoggingContext(context, () -> convertToFields(f.apply(builder)));
+          new LogbackLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (condition.test(level, ctx)) {
         final Object[] arguments = convertArguments(ctx.getArgumentFields());
         logger.log(
@@ -294,7 +296,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
       LoggingContext ctx =
-          new LogstashLoggingContext(
+          new LogbackLoggingContext(
               context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
       if (condition.test(level, ctx)) {
         final Object[] arguments = convertArguments(ctx.getArgumentFields());
@@ -308,7 +310,7 @@ public class LogstashCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, @NotNull Condition condition, String message) {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      LoggingContext snapshotContext = new LogstashLoggingContext(context);
+      LoggingContext snapshotContext = new LogbackLoggingContext(context);
       if (this.condition.and(condition).test(level, snapshotContext)) {
         logger.log(
             resolveLoggerFields(m, snapshotContext),
@@ -329,7 +331,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @Nullable String message) {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
-      LoggingContext snapshotContext = new LogstashLoggingContext(context.withFields(extraFields));
+      LoggingContext snapshotContext = new LogbackLoggingContext(context.withFields(extraFields));
       if (this.condition.and(condition).test(level, snapshotContext)) {
         logger.log(
             resolveLoggerFields(m, snapshotContext),
@@ -352,7 +354,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final Marker m = context.resolveMarkers();
     if (logger.isEnabledFor(m, convertLogbackLevel(level))) {
       LoggingContext snapshotContext =
-          new LogstashLoggingContext(context, () -> convertToFields(f.apply(builder)));
+          new LogbackLoggingContext(context, () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, snapshotContext)) {
         final Object[] arguments = convertArguments(snapshotContext.getArgumentFields());
         logger.log(
@@ -377,7 +379,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
       LoggingContext snapshotContext =
-          new LogstashLoggingContext(
+          new LogbackLoggingContext(
               context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
       if (this.condition.and(condition).test(level, snapshotContext)) {
         final Object[] arguments = convertArguments(snapshotContext.getArgumentFields());
@@ -400,14 +402,14 @@ public class LogstashCoreLogger implements CoreLogger {
 
       @Override
       public void log(@Nullable String message) {
-        LogstashLoggingContext ctx = new LogstashLoggingContext(context);
+        LoggingContext ctx = new LogbackLoggingContext(context);
         logger.log(resolveLoggerFields(m, ctx), fqcn, logbackLevel, message, null, null);
       }
 
       @Override
       public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
         LoggingContext ctx =
-            new LogstashLoggingContext(context, () -> convertToFields(f.apply(builder)));
+            new LogbackLoggingContext(context, () -> convertToFields(f.apply(builder)));
         final Object[] arguments = convertArguments(ctx.getArgumentFields());
         logger.log(resolveLoggerFields(m, ctx), fqcn, logbackLevel, message, arguments, null);
       }
@@ -419,8 +421,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     final Marker marker = context.resolveMarkers();
     if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-      Marker callerMarker =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+      Marker callerMarker = isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {
@@ -438,8 +439,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
     if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
-      LogstashCallerMarker result =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+      CallerMarker result = isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {
@@ -459,7 +459,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
       final Marker callerMarker =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+          isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {
@@ -480,7 +480,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull FB builder) {
     if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
       final Marker callerMarker =
-          isAsyncCallerEnabled() ? new LogstashCallerMarker(fqcn, new Throwable()) : null;
+          isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
       Runnable threadLocalRunnable = threadContextFunction.get();
       runAsyncLog(
           () -> {
@@ -599,7 +599,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   @NotNull
-  protected LogstashCoreLogger.Context newContext(
+  protected LogstashCoreLogger.LogstashMarkerContext newContext(
       @NotNull Supplier<List<Field>> fieldsSupplier, Marker callerMarker) {
     Supplier<List<Field>> loggerFields = joinFields(fieldsSupplier, context::getLoggerFields);
     Supplier<List<Marker>> markers;
@@ -607,23 +607,25 @@ public class LogstashCoreLogger implements CoreLogger {
       markers = context::getMarkers;
     } else {
       markers =
-          Context.joinMarkers(() -> Collections.singletonList(callerMarker), context::getMarkers);
+          LogstashMarkerContext.joinMarkers(
+              () -> Collections.singletonList(callerMarker), context::getMarkers);
     }
-    return new Context(loggerFields, markers);
+    return new LogstashMarkerContext(loggerFields, markers);
   }
 
-  protected Context newContext(Marker callerMarker) {
+  protected LogstashMarkerContext newContext(Marker callerMarker) {
     if (callerMarker == null) {
       return context;
     } else {
       Supplier<List<Marker>> markers;
       markers =
-          Context.joinMarkers(() -> Collections.singletonList(callerMarker), context::getMarkers);
-      return new Context(context::getLoggerFields, markers);
+          LogstashMarkerContext.joinMarkers(
+              () -> Collections.singletonList(callerMarker), context::getMarkers);
+      return new LogstashMarkerContext(context::getLoggerFields, markers);
     }
   }
 
-  protected LogstashCoreLogger newLogger(Context newContext) {
+  protected LogstashCoreLogger newLogger(LogstashMarkerContext newContext) {
     return new LogstashCoreLogger(
         fqcn, logger, newContext, condition, executor, threadContextFunction);
   }
@@ -693,17 +695,17 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   /** A logging context that stores fields belonging to the logger. */
-  protected static class Context {
+  protected static class LogstashMarkerContext implements LogbackLoggerContext {
 
-    private static final Context EMPTY =
-        new Context(Collections::emptyList, Collections::emptyList);
+    private static final LogstashMarkerContext EMPTY =
+        new LogstashMarkerContext(Collections::emptyList, Collections::emptyList);
 
     private final Supplier<List<Field>> fieldsSupplier;
     private final Supplier<List<Marker>> markersSupplier;
 
     private final Supplier<Marker> markersResult;
 
-    protected Context(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
+    protected LogstashMarkerContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
       this.fieldsSupplier = f;
       this.markersSupplier = m;
       this.markersResult =
@@ -720,7 +722,7 @@ public class LogstashCoreLogger implements CoreLogger {
               });
     }
 
-    public static Context empty() {
+    public static LogstashMarkerContext empty() {
       return EMPTY;
     }
 
@@ -732,15 +734,15 @@ public class LogstashCoreLogger implements CoreLogger {
       return markersSupplier.get();
     }
 
-    public Context withFields(Supplier<List<Field>> o) {
+    public LogstashMarkerContext withFields(Supplier<List<Field>> o) {
       // existing context should be concatenated before the new fields
       Supplier<List<Field>> joinedFields = joinFields(this::getLoggerFields, o);
-      return new Context(joinedFields, this::getMarkers);
+      return new LogstashMarkerContext(joinedFields, this::getMarkers);
     }
 
-    public Context withMarkers(Supplier<List<Marker>> o) {
+    public LogstashMarkerContext withMarkers(Supplier<List<Marker>> o) {
       Supplier<List<Marker>> joinedMarkers = joinMarkers(this::getMarkers, o);
-      return new Context(this::getLoggerFields, joinedMarkers);
+      return new LogstashMarkerContext(this::getLoggerFields, joinedMarkers);
     }
 
     static Supplier<List<Marker>> joinMarkers(

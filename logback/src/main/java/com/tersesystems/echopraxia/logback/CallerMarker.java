@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.logback;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -6,11 +6,11 @@ import org.jetbrains.annotations.NotNull;
  * A marker containing caller data. This can be used by a filter to set caller data on a logging
  * event prior to encoding.
  */
-public class LogstashCallerMarker extends LogstashBaseMarker {
+public class CallerMarker extends BaseMarker {
   private final String fqcn;
   private final Throwable callsite;
 
-  public LogstashCallerMarker(@NotNull String fqcn, @NotNull Throwable callsite) {
+  public CallerMarker(@NotNull String fqcn, @NotNull Throwable callsite) {
     super("caller");
     this.fqcn = fqcn;
     this.callsite = callsite;
