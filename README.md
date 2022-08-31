@@ -1436,7 +1436,7 @@ public class SystemInfoFilter implements CoreLoggerFilter {
 
 Please see the [system info example](https://github.com/tersesystems/echopraxia-examples/tree/main/system-info) for details.
 
-## Logback / SLF4J API
+## Direct Logback / SLF4J API
 
 There will be times when the application uses an SLF4J logger, and it's not feasible to use an Echopraxia Logger.  This is not a problem: you can pass Echopraxia fields directly as arguments through SLF4J, and they will be rendered as expected.  You'll need to have a field builder in scope:
 
@@ -1450,6 +1450,13 @@ And you will want to pass fields individually as arguments (not using `fb.list`)
 
 ```java
 slf4jLogger.info("SLF4J message string {} number {}", fb.string("foo", "bar"), fb.number("count", 1));
+```
+
+Note that you will have to pass exceptions through twice, once for the argument and again for the exception itself -- it must be the last argument, and must *not* have a message parameter to register as an exception:
+
+```java
+Exception e = new RuntimeException();
+slf4jLogger.error("SLF4J exception {}", fb.exception(e), e);
 ```
 
 SLF4J has no direct support for conditions, but we can fake it with a `ConditionMarker`:
@@ -1473,3 +1480,34 @@ To make this work, you will need to have a `ConditionTurboFilter` which will eva
 
 Note that the logging context available to the condition is provided by the `LoggingEvent` directly, so you can only query on the passed in arguments (there are no "logger fields").
 
+## Direct Log4J API
+
+In the event that the Log4J2 API must be used directly, an `EchopraxiaFieldsMessage` can be sent in for JSON rendering.
+
+```java
+import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.FieldBuilderResult;
+import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+FieldBuilder fb = FieldBuilder.instance();
+Logger logger = LogManager.getLogger();
+EchopraxiaFieldsMessage message = structured("echopraxia message {}", fb.string("foo", "bar"));
+logger.info(message);
+
+EchopraxiaFieldsMessage structured(String message, FieldBuilderResult args) {
+  List<FIeld> loggerFields = Collections.emptyList();
+  return new EchopraxiaFieldsMessage(message, loggerFields, result.fields());
+}
+```
+
+Note that exceptions must also be passed outside the message to be fully processed by Log4J:
+
+```java
+Exception e = new RuntimeException();
+EchopraxiaFieldsMessage message = structured("exception {}", fb.exception(e));
+logger.info(message, e);
+```
+
+Unfortunately, I don't understand Log4J internals well enough to make conditions work using the Log4J API.  One option could be to write a [Log4J Filter](https://logging.apache.org/log4j/2.x/manual/filters.html) to work on a message.
