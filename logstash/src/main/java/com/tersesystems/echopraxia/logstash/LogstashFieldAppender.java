@@ -1,23 +1,20 @@
 package com.tersesystems.echopraxia.logstash;
 
-
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.logback.TransformingAppender;
-import net.logstash.logback.argument.StructuredArgument;
-import net.logstash.logback.argument.StructuredArguments;
 
 /**
- * An appender that converts the logging event from containing Field into
- * containing StructuredArgument so that it can be rendered as JSON.
+ * An appender that converts the logging event from containing Field into containing
+ * StructuredArgument so that it can be rendered as JSON.
  *
- * This should only really be used if you are working with SLF4J directly,
- * as it's a hack.
+ * <p>This should only really be used if you are working with SLF4J directly, as it's a hack.
  */
-public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
+public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent>
+    implements LogstashFieldConverter {
   @Override
   protected ILoggingEvent decorateEvent(ILoggingEvent eventObject) {
     // what comes in is fields, what comes out is structured arguments
@@ -26,15 +23,13 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
       final Object arg = argumentArray[i];
       if (arg instanceof Field) {
         Field field = (Field) arg;
-        final StructuredArgument structuredArgument = convertArgument(field);
-        argumentArray[i] = structuredArgument;
+        argumentArray[i] = convertArgument(field);
 
         // swap out the throwable if one is found
         if (eventObject.getThrowableProxy() == null) {
-          final Throwable throwable = convertThrowable(field);
+          final Throwable throwable = extractThrowable(field);
           if (throwable != null) {
-            ThrowableProxy proxy = new ThrowableProxy(throwable);
-            ((LoggingEvent) eventObject).setThrowableProxy(proxy);
+            ((LoggingEvent) eventObject).setThrowableProxy(new ThrowableProxy(throwable));
           }
         }
       }
@@ -43,7 +38,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
     return eventObject;
   }
 
-  protected Throwable convertThrowable(Field field) {
+  protected Throwable extractThrowable(Field field) {
     Value<?> value = field.value();
     if (value.type() == Value.Type.EXCEPTION) {
       Value.ExceptionValue throwable = (Value.ExceptionValue) value;
@@ -52,20 +47,4 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
       return null;
     }
   }
-
-  protected StructuredArgument convertArgument(Field field) {
-    final String name = field.name();
-    final Value<?> value = field.value();
-    if (value.type() == Value.Type.EXCEPTION) {
-      Value.ExceptionValue throwable = (Value.ExceptionValue) value;
-      return StructuredArguments.keyValue(name, throwable.raw().toString());
-    } else {
-      return
-        field instanceof Field.ValueField
-          ? StructuredArguments.value(name, value)
-          : StructuredArguments.keyValue(name, value);
-    }
-  }
-
-
 }
