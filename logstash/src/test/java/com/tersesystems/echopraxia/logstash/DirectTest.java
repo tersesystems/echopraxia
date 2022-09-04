@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static net.logstash.logback.marker.Markers.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
@@ -10,12 +11,17 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.read.ListAppender;
+import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.logback.ConditionMarker;
 import com.tersesystems.echopraxia.logback.FieldMarker;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
 import java.util.List;
+
+import net.logstash.logback.marker.Markers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,6 +76,89 @@ public class DirectTest {
     final String json = jsonList.get(0);
     assertThat(json).contains("\"foo\" : \"bar\"");
   }
+
+  @Test
+  void testConditionAndMarkerAndArgument() {
+    FieldBuilder fb = FieldBuilder.instance();
+    final FieldMarker fields =
+      FieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
+    final ConditionMarker condition = ConditionMarker.apply(Condition.always());
+
+    org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
+    logger.info(aggregate(fields, condition), "message with argument {}", fb.string("foo", "bar"));
+
+    final List<ILoggingEvent> eventList = getListAppender().list;
+    final List<String> jsonList = getStringAppender().list;
+
+    final ILoggingEvent event = eventList.get(0);
+    assertThat(event.getFormattedMessage()).isEqualTo("message with argument bar");
+    final String json = jsonList.get(0);
+    assertThat(json).contains("\"foo\" : \"bar\"");
+    assertThat(json).contains("\"someNumber\" : 1");
+  }
+
+  @Test
+  void testConditionDependingOnMarkerPass() {
+    FieldBuilder fb = FieldBuilder.instance();
+    final FieldMarker fields =
+      FieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
+    Condition condition = Condition.stringMatch("extra", s -> s.raw().equals("value"));
+
+    org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
+    logger.info(aggregate(fields, ConditionMarker.apply(condition)), "testConditionDependingOnMarkerPass");
+
+    final List<ILoggingEvent> eventList = getListAppender().list;
+    final List<String> jsonList = getStringAppender().list;
+
+    final ILoggingEvent event = eventList.get(0);
+    assertThat(event.getFormattedMessage()).isEqualTo("testConditionDependingOnMarkerPass");
+    final String json = jsonList.get(0);
+    assertThat(json).contains("\"someNumber\" : 1");
+  }
+
+  @Test
+  void testConditionDependingOnMarkerFail() {
+    FieldBuilder fb = FieldBuilder.instance();
+    final FieldMarker fields =
+      FieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
+    Condition condition = Condition.stringMatch("extra", s -> ! s.raw().equals("value"));
+
+    org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
+    logger.info(aggregate(fields, ConditionMarker.apply(condition)), "testConditionDependingOnMarkerFail");
+
+    final List<ILoggingEvent> eventList = getListAppender().list;
+    assertThat(eventList).isEmpty();
+  }
+
+  @Test
+  void testConditionDependingOnArgumentPass() {
+    FieldBuilder fb = FieldBuilder.instance();
+    Condition condition = Condition.stringMatch("extra", s -> s.raw().equals("value"));
+
+    org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
+    logger.info(aggregate(ConditionMarker.apply(condition)), "testConditionDependingOnMarkerPass", fb.string("extra", "value"));
+
+    final List<ILoggingEvent> eventList = getListAppender().list;
+    final List<String> jsonList = getStringAppender().list;
+
+    final ILoggingEvent event = eventList.get(0);
+    assertThat(event.getFormattedMessage()).isEqualTo("testConditionDependingOnMarkerPass");
+    final String json = jsonList.get(0);
+    assertThat(json).contains("\"extra\" : \"value\"");
+  }
+
+  @Test
+  void testConditionDependingOnArgumentFail() {
+    FieldBuilder fb = FieldBuilder.instance();
+    Condition condition = Condition.stringMatch("extra", s -> ! s.raw().equals("value"));
+
+    org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
+    logger.info(aggregate(ConditionMarker.apply(condition)), "testConditionDependingOnArgumentFail", fb.number("someNumber", 1));
+
+    final List<ILoggingEvent> eventList = getListAppender().list;
+    assertThat(eventList).isEmpty();
+  }
+
 
   @BeforeEach
   public void before() {
