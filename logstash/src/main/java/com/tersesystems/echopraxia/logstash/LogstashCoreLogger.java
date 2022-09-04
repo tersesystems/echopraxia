@@ -19,7 +19,6 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import net.logstash.logback.argument.StructuredArgument;
-import net.logstash.logback.argument.StructuredArguments;
 import net.logstash.logback.marker.LogstashMarker;
 import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +27,7 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 /** The Logstash implementation of CoreLogger. */
-public class LogstashCoreLogger implements CoreLogger {
+public class LogstashCoreLogger implements CoreLogger, LogstashFieldConverter {
 
   // The logger context property used to set up caller info for async logging.
   public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
@@ -525,19 +524,12 @@ public class LogstashCoreLogger implements CoreLogger {
     Throwable throwable = null;
     List<Object> arguments = new ArrayList<>(args.size() + 1);
     for (Field field : args) {
-      final String name = field.name();
       final Value<?> value = field.value();
       if (value.type() == Value.Type.EXCEPTION) {
         throwable = ((Value.ExceptionValue) value).raw();
-        StructuredArgument arg = StructuredArguments.keyValue(name, convertThrowable(throwable));
-        arguments.add(arg);
-      } else {
-        StructuredArgument arg =
-          field instanceof Field.ValueField
-            ? StructuredArguments.value(name, value)
-            : StructuredArguments.keyValue(name, value);
-        arguments.add(arg);
       }
+      StructuredArgument arg = convertArgument(field);
+      arguments.add(arg);
     }
 
     // If the exception exists, it must be raw and at the end of the array.
@@ -545,14 +537,6 @@ public class LogstashCoreLogger implements CoreLogger {
       arguments.add(throwable);
     }
     return arguments.toArray();
-  }
-
-  protected Object convertThrowable(Throwable throwable) {
-    // https://github.com/logfellow/logstash-logback-encoder#customizing-stack-traces
-    // says "Do NOT use structured arguments or markers for exceptions."
-    // We still may want a better logfmt oriented representation of a throwable, so
-    // use a different method so that it can be tweaked.
-    return throwable.toString();
   }
 
   protected void runAsyncLog(Runnable runnable) {
@@ -680,7 +664,7 @@ public class LogstashCoreLogger implements CoreLogger {
     } else {
       final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
       for (Field field : fields) {
-        LogstashMarker append = Markers.append(field.name(), field.value());
+        LogstashMarker append = convertMarker(field);
         markerList.add(append);
       }
       if (ctxMarker != null) {

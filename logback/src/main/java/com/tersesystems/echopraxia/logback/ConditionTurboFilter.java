@@ -5,8 +5,6 @@ import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.spi.FilterReply;
 import com.tersesystems.echopraxia.api.*;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
@@ -66,10 +64,7 @@ public class ConditionTurboFilter extends TurboFilter {
   }
 
   private LoggingContext loggingContext(Marker marker, Object[] arguments) {
-    Iterable<Marker> iterable = marker::iterator;
-    List<Marker> markers =
-        StreamSupport.stream(iterable.spliterator(), false).collect(Collectors.toList());
-    FilterMarkerContext markerContext = new FilterMarkerContext(markers);
+    FilterMarkerContext markerContext = new FilterMarkerContext(marker);
     return new LogbackLoggingContext(markerContext, () -> getFields(arguments));
   }
 
@@ -94,20 +89,43 @@ public class ConditionTurboFilter extends TurboFilter {
   }
 
   static class FilterMarkerContext implements LogbackLoggerContext {
-    private final List<Marker> markers;
+    private final Marker marker;
+    private final List<Field> fields;
 
-    public FilterMarkerContext(List<Marker> markers) {
-      this.markers = markers;
+    public FilterMarkerContext(Marker marker) {
+      this.marker = marker;
+      this.fields = extractFields(marker);
     }
 
-    @Override
-    public @NotNull List<Field> getLoggerFields() {
+    private List<Field> extractFields(Marker marker) {
+      if (marker == null) {
+        return Collections.emptyList();
+      }
+      if (marker instanceof FieldMarker) {
+        return ((FieldMarker) marker).getFields();
+      }
+      if (marker.hasReferences()) {
+        List<Field> list = new ArrayList<>();
+        Iterator<Marker> iterator = marker.iterator();
+        while (iterator.hasNext()) {
+          Marker m = iterator.next();
+          if (m instanceof FieldMarker) {
+            list.addAll(((FieldMarker) m).getFields());
+          }
+        }
+        return list;
+      }
       return Collections.emptyList();
     }
 
     @Override
+    public @NotNull List<Field> getLoggerFields() {
+      return fields;
+    }
+
+    @Override
     public List<Marker> getMarkers() {
-      return markers;
+      return Collections.singletonList(marker);
     }
   }
 }
