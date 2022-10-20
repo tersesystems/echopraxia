@@ -1,6 +1,22 @@
 ## Changelog
 
-## 2.1.1
+## 2.2.3
+
+Allow filters to be instantiated from a context classloader.
+
+## 2.2.2
+
+* Break out the underlying Logback classes from Logstash, so that "direct access" can be used as a fallback.
+* Fix a bug in JSON exception rendering using Logstash
+* StructuredArgument where exception was being rendered a full nested JSON object.
+
+## 2.2.1
+
+* Added Condition.booleanMatch/objectMatch/*match for better direct matching.
+* Added a type safe Values.equals static method.
+* Also opened up the Logstash / Log4J constructors, so that it's easier to wrap Logback Logger / ExtendedLogger directly into a core logger.
+
+## 2.2.0
 
 Break out Jackson serde module and make both Logstash and Log4J2 implementations depend on it.
 
