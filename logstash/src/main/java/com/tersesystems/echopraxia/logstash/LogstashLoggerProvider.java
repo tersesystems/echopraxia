@@ -5,11 +5,10 @@ import static com.tersesystems.echopraxia.logstash.LogstashCoreLogger.ECHOPRAXIA
 import ch.qos.logback.classic.LoggerContext;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.CoreLoggerProvider;
+import java.util.ServiceConfigurationError;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
-
-import java.util.ServiceConfigurationError;
 
 /**
  * Logstash implementation of a logger provider.
@@ -17,6 +16,10 @@ import java.util.ServiceConfigurationError;
  * <p>This is the main SPI hook into the ServiceLoader.
  */
 public class LogstashLoggerProvider implements CoreLoggerProvider {
+
+  // Customize the number of retries, using 10 as the default
+  private static final int retryCount =
+      Integer.parseInt(System.getProperty("echopraxia.logback.retries", "10"));
 
   private volatile LoggerContext loggerContext;
 
@@ -37,7 +40,7 @@ public class LogstashLoggerProvider implements CoreLoggerProvider {
     // https://www.slf4j.org/codes.html#substituteLogger
     // https://www.slf4j.org/codes.html#replay
     if (loggerContext == null) {
-      int retries = 10;
+      int retries = retryCount;
       ILoggerFactory factory = null;
       while (retries > 0) {
         try {
