@@ -18,7 +18,18 @@ public class CoreLoggerFactory {
 
   private static final ClassLoader[] classLoaders = {ClassLoader.getSystemClassLoader()};
 
-  private static final Filters filters = new Filters(classLoaders);
+  private static Filters filters;
+
+  static {
+    try {
+      filters = new Filters(classLoaders);
+    } catch (Exception e) {
+      // If we get to this point, something has gone horribly wrong, print to STDERR.
+      e.printStackTrace();
+      // Keep going with no filters.
+      filters = new Filters(Collections.emptyList());
+    }
+  }
 
   @NotNull
   public static CoreLogger getLogger(@NotNull String fqcn, @NotNull Class<?> clazz) {
@@ -72,6 +83,10 @@ public class CoreLoggerFactory {
       } else {
         filterList = Collections.emptyList();
       }
+    }
+
+    public Filters(List<CoreLoggerFilter> filterList) {
+      this.filterList = filterList;
     }
 
     @NotNull
