@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
+import java.util.ServiceConfigurationError;
+
 /**
  * Logstash implementation of a logger provider.
  *
@@ -61,7 +63,7 @@ public class LogstashLoggerProvider implements CoreLoggerProvider {
       if (loggerContext == null) {
         System.err.println(
             "LogstashLoggerProvider: No Logback implementation can be found after 10 retries.  Giving up.");
-        throw new IllegalStateException("Invalid ILoggerFactory implementation " + factory);
+        throw new ServiceConfigurationError("Invalid ILoggerFactory implementation " + factory);
       }
     }
   }
