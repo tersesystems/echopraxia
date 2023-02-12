@@ -1,0 +1,22 @@
+<configuration>
+
+    <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
+    </appender>
+
+    <conversionRule conversionWord="fields" converterClass="com.tersesystems.echopraxia.logstash.FieldConverter"/>
+    <conversionRule conversionWord="argctx" converterClass="com.tersesystems.echopraxia.logstash.ArgumentFieldConverter"/>
+    <conversionRule conversionWord="loggerctx" converterClass="com.tersesystems.echopraxia.logstash.LoggerFieldConverter"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %-4relative [%thread] %-5level [%fields{$.book}] [%loggerctx{$.book}] [%argctx{$.book}] %logger - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="DEBUG">
+        <appender-ref ref="LIST"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+</configuration>

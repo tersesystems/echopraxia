@@ -104,6 +104,8 @@ Gradle:
 implementation "com.tersesystems.echopraxia:logstash:<VERSION>" 
 ```
 
+There are a couple of features that are Logback specific, such as the [logback converters(#logback-converters) and the direct Logback API.
+
 ## Log4J
 
 There is a Log4J implementation that works with the [JSON Template Layout](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html).  This provides a core logger implementation but does not provide a user visible logging API.
@@ -1341,7 +1343,46 @@ public class SystemInfoFilter implements CoreLoggerFilter {
 
 Please see the [system info example](https://github.com/tersesystems/echopraxia-examples/tree/main/system-info) for details.
 
-## Direct Logback / SLF4J API
+## Logback Converters
+
+If you want to extract some fields directly in a line oriented context, you can use `FieldConverter`, `ArgumentFieldConverter`, or `LoggerFieldConverter` to extract fields using a JSON path.
+
+For example, if you log something with a field called `book`:
+
+```java
+logger.info("{}", fb -> fb.string("book", "Interesting Book"));
+```
+
+Then you can use `%fields{$.book}` to extract the `book` field from the event and render it.  In most cases you will want to use `FieldConverter`, which searches for fields in both arguments and logger context, but if you want to isolate for one or the other, you can respectively use `ArgumentFieldConverter` or `LoggerFieldConverter`.
+
+```xml
+<configuration>
+
+    <!-- Search both arguments and context, arguments takes precedence -->
+    <conversionRule conversionWord="fields" converterClass="com.tersesystems.echopraxia.logstash.FieldConverter"/>
+    
+    <!-- Search fields defined as arguments logger.info("{}", fb -> ...) -->
+    <conversionRule conversionWord="argctx" converterClass="com.tersesystems.echopraxia.logstash.ArgumentFieldConverter"/>
+    
+    <!-- Search fields defined in logger.withFields(...) -->
+    <conversionRule conversionWord="loggerctx" converterClass="com.tersesystems.echopraxia.logstash.LoggerFieldConverter"/>
+    
+    <root>
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>
+                    %-4relative [%thread] %-5level [%fields{$.book}] [%loggerctx{$.book}] [%argctx{$.book}] %logger - %msg%n
+                </pattern>
+            </encoder>
+        </appender>
+    </root>
+</configuration>
+```
+
+## Direct API
+
+
+### Direct Logback / SLF4J API
 
 There will be times when the application uses an SLF4J logger, and it's not feasible to use an Echopraxia Logger.  This is not a problem: you can pass Echopraxia fields directly as arguments through SLF4J, and they will be rendered as expected.  You'll need to have a field builder in scope:
 
@@ -1414,8 +1455,7 @@ To integrate this with Logback, you will need to have a `ConditionTurboFilter` w
 </configuration>
 ```
 
-
-## Direct Log4J API
+### Direct Log4J API
 
 In the event that the Log4J2 API must be used directly, an `EchopraxiaFieldsMessage` can be sent in for JSON rendering.
 
