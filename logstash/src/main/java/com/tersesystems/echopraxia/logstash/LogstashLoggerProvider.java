@@ -15,8 +15,6 @@ public class LogstashLoggerProvider implements CoreLoggerProvider {
 
   private volatile LoggerContext loggerContext;
 
-  static boolean asyncCallerEnabled;
-
   private void initialize() {
     if (loggerContext == null) {
       // block until the logger context comes up, we don't want the substitute logger factory
