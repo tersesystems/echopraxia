@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.logstash;
 import static com.tersesystems.echopraxia.api.Utilities.joinFields;
 import static org.slf4j.event.EventConstants.*;
 
+import ch.qos.logback.classic.LoggerContext;
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Value;
@@ -498,7 +499,12 @@ public class LogstashCoreLogger implements CoreLogger, LogstashFieldConverter {
    * @return if caller data is enabled.
    */
   protected boolean isAsyncCallerEnabled() {
-    return LogstashLoggerProvider.asyncCallerEnabled;
+    final LoggerContext loggerContext = logger.getLoggerContext();
+    if (loggerContext != null) {
+      return Boolean.parseBoolean(loggerContext.getProperty(ECHOPRAXIA_ASYNC_CALLER_PROPERTY));
+    } else {
+      return false;
+    }
   }
 
   // Top level conversion to Logback must be StructuredArgument, with an optional throwable
