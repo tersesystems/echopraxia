@@ -30,9 +30,10 @@ public abstract class AbstractJsonPathFinder implements FindPathMethods {
   private final Supplier<DocumentContext> supplier =
       Utilities.memoize(() -> JsonPath.parse(this, configuration));
 
-  private @NotNull <T> Optional<T> optionalFind(
+  protected @NotNull <T> Optional<T> optionalFind(
       @NotNull String jsonPath, @NotNull Class<T> desiredClass) {
-    final Object o = getDocumentContext().read(jsonPath);
+    final DocumentContext documentContext = getDocumentContext();
+    final Object o = documentContext.read(jsonPath);
 
     // We asked for Foo, and it was Foo.  Return Foo.
     if (desiredClass.isInstance(o)) {

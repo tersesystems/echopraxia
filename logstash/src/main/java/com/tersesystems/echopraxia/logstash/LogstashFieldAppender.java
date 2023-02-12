@@ -20,7 +20,7 @@ import org.slf4j.Marker;
  * <p>This should only really be used if you are working with SLF4J directly, as it's a hack.
  */
 public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent>
-    implements LogstashFieldConverter {
+    implements FieldToArgumentConverter, FieldToMarkerConverter {
   @Override
   protected ILoggingEvent decorateEvent(ILoggingEvent eventObject) {
     // Run through the markers and convert FieldMarker to LogstashMarker

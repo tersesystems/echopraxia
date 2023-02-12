@@ -28,7 +28,8 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 /** The Logstash implementation of CoreLogger. */
-public class LogstashCoreLogger implements CoreLogger, LogstashFieldConverter {
+public class LogstashCoreLogger
+    implements CoreLogger, FieldToArgumentConverter, FieldToMarkerConverter {
 
   // The logger context property used to set up caller info for async logging.
   public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
