@@ -68,7 +68,7 @@ class LogstashLoggerTest extends TestBase {
 
     waitUntilMessages();
 
-    // The async logger's even more work, because we need to set a filter up so that we
+    // The async logger's even more work, because we need to set a filter up so we
     // can splice in the correct caller information before the encoder can call
     // event.getCallerData().
     final String json = stringAppender.list.get(0);
