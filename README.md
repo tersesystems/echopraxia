@@ -1021,8 +1021,8 @@ library echopraxia {
   # level: the logging level
   # ctx: the logging context
   function evaluate: (string level, dict ctx) ->
-    {
-      let find_string: ctx[:find_string]
+    let {
+      find_string: ctx[:find_string];
     }
     str.lower_case(find_string("$.person.name")) == "will";   
 }
