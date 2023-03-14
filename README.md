@@ -29,6 +29,8 @@ Please see the [blog posts](https://tersesystems.com/category/logging/) for more
 
 ## Examples 
 
+For the fastest possible way to try out Echopraxia, download and run the [JBang script](https://github.com/tersesystems/smallest-dynamic-logging-example/blob/main/jbang/Script.java).
+
 Simple examples and integrations with [dropwizard metrics](https://metrics.dropwizard.io/4.2.0/) and [OSHI](https://github.com/oshi/oshi) are available at [echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
 For a web application example,
