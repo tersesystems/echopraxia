@@ -18,7 +18,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -45,7 +44,8 @@ public class ScriptManager {
   private static final com.twineworks.tweakflow.lang.values.Value ERROR_VALUE =
       Values.make(Level.ERROR.name());
 
-  private static final ValueMapEntry NOW_FUNCTION = addUserFunction("now", () -> Values.make(Instant.now()));
+  private static final ValueMapEntry NOW_FUNCTION =
+      addUserFunction("now", () -> Values.make(Instant.now()));
 
   private final ScriptHandle handle;
   private Arity2CallSite callSite;
@@ -87,7 +87,8 @@ public class ScriptManager {
     }
   }
 
-  private static ValueMapEntry addUserFunction(String functionName, Supplier<com.twineworks.tweakflow.lang.values.Value> valueSupplier) {
+  private static ValueMapEntry addUserFunction(
+      String functionName, Supplier<com.twineworks.tweakflow.lang.values.Value> valueSupplier) {
     return new ValueMapEntry(functionName, arity0FunctionValue(userCtx -> valueSupplier.get()));
   }
 
@@ -109,12 +110,19 @@ public class ScriptManager {
   }
 
   private void addContextFunctions(List<ValueMapEntry> functionMapList, LoggingContext ctx) {
-    functionMapList.add(new ValueMapEntry("fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields()))));
-    functionMapList.add(new ValueMapEntry("find_number", userFunctionValue(optionalFunction(ctx::findNumber))));
-    functionMapList.add(new ValueMapEntry("find_string", userFunctionValue(optionalFunction(ctx::findString))));
-    functionMapList.add(new ValueMapEntry("find_boolean", userFunctionValue(optionalFunction(ctx::findBoolean))));
-    functionMapList.add(new ValueMapEntry("find_list", userFunctionValue(listFunction(ctx::findList))));
-    functionMapList.add(new ValueMapEntry("find_null", userFunctionValue(nullFunction(ctx::findNull))));
+    functionMapList.add(
+        new ValueMapEntry(
+            "fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields()))));
+    functionMapList.add(
+        new ValueMapEntry("find_number", userFunctionValue(optionalFunction(ctx::findNumber))));
+    functionMapList.add(
+        new ValueMapEntry("find_string", userFunctionValue(optionalFunction(ctx::findString))));
+    functionMapList.add(
+        new ValueMapEntry("find_boolean", userFunctionValue(optionalFunction(ctx::findBoolean))));
+    functionMapList.add(
+        new ValueMapEntry("find_list", userFunctionValue(listFunction(ctx::findList))));
+    functionMapList.add(
+        new ValueMapEntry("find_null", userFunctionValue(nullFunction(ctx::findNull))));
   }
 
   private com.twineworks.tweakflow.lang.values.Value call(
@@ -163,7 +171,8 @@ public class ScriptManager {
     return Values.make(new UserFunctionValue(ANY_FUNCTION_SIGNATURE, userFunction));
   }
 
-  private static Arity1UserFunction optionalFunction(Function<String, Optional<?>> contextFunction) {
+  private static Arity1UserFunction optionalFunction(
+      Function<String, Optional<?>> contextFunction) {
     return (context, pathValue) -> {
       final String path = pathValue.string();
       final Optional<?> opt = contextFunction.apply(path);

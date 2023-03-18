@@ -59,16 +59,16 @@ public class ScriptConditionTest {
   @Test
   public void testNowCondition() {
     Condition condition =
-      ScriptCondition.create(
-        false,
-        "import * as std from \"std\";\n"
-        + "alias std.time as time;\n"
-          + "library echopraxia {"
-          + "  function evaluate: (string level, dict ctx) ->"
-          + "    let { now: ctx[\"now\"]; }"
-          + "    time.unix_timestamp(now()) > 0;"
-          + "}",
-        Throwable::printStackTrace);
+        ScriptCondition.create(
+            false,
+            "import * as std from \"std\";\n"
+                + "alias std.time as time;\n"
+                + "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    let { now: ctx[\"now\"]; }"
+                + "    time.unix_timestamp(now()) > 0;"
+                + "}",
+            Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("time is good");
 
