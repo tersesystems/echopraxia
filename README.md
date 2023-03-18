@@ -935,7 +935,17 @@ Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.co
 The call site for a script is the function `evaluate` inside a library called `echopraxia`.  The level and context are
 passed through as `(string level, dict ctx)`, where `ctx` is a dictionary of functions that connect back to the logging context.
 
-Methods in the context are snake case, separated by underscores. For example, to call the equivalent of `ctx.findString("$.person.name")`, you would call `ctx[:find_string]("$.person.name")`.  You can use the `let` construct in Tweakflow to make this clearer:
+Methods in the context are snake case, separated by underscores. For example, to call the equivalent of `ctx.findString("$.person.name")`, you would call `ctx[:find_string]("$.person.name")`.  
+
+* `ctx[:find_number]` returns a [number](https://twineworks.github.io/tweakflow/reference.html#long) or null
+* `ctx[:find_string]` returns a [string](https://twineworks.github.io/tweakflow/reference.html#string) or null
+* `ctx[:find_boolean]` returns a [boolean](https://twineworks.github.io/tweakflow/reference.html#boolean) or null
+* `ctx[:find_object]` returns a [dict](https://twineworks.github.io/tweakflow/reference.html#dict) or null
+* `ctx[:find_list]` returns a [list](https://twineworks.github.io/tweakflow/reference.html#list) or null
+* `ctx[:find_null]` returns a [boolean](https://twineworks.github.io/tweakflow/reference.html#boolean)
+* `ctx[:fields]` returns a [list](https://twineworks.github.io/tweakflow/reference.html#list) of fields
+
+You can use the `let` construct in Tweakflow to make this clearer:
 
 ```
 library echopraxia {
@@ -944,18 +954,6 @@ library echopraxia {
       find_string: ctx[:find_string];
     }
     find_string("$.person.name") == "testing";
-}
-```
-
-You can get access to the raw fields of the logging context with `ctx[:fields]`, although this will iterate over every field and is less efficient than using the `find` functions:
-
-```
-library echopraxia {
-  function evaluate: (string level, dict ctx) ->
-    let {
-      fields: ctx[:fields]();
-    }
-    fields[:name] = "Will";
 }
 ```
 
@@ -972,7 +970,7 @@ library echopraxia {
 }
 ```
 
-And you can use the Tweakflow standard library to allow for more advanced functionality, i.e.
+And you can use the Tweakflow [standard library](https://twineworks.github.io/tweakflow/modules/std.html) to allow for more advanced functionality, i.e.
 
 ```
 import * as std from "std";
