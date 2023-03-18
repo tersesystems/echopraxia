@@ -986,6 +986,18 @@ library echopraxia {
 }
 ```
 
+The context method also has functionality to access "impure" methods such as the current instant, using `ctx[:now]`:
+
+```
+import * as std from "std";
+alias std.time as time;
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+    let { now: ctx[:now]; }
+    time.unix_timestamp(now()) > 0;
+}
+```
+
 ### Creating Script Conditions
 
 The simplest way to handle a script is to pass it in directly as a string:
