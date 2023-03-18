@@ -1,19 +1,16 @@
 package com.tersesystems.echopraxia.api;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-/**
- * A convenient core logger that delegates.  This is useful for overrides.
- */
-public class DelegateCoreLogger implements CoreLogger{
+/** A convenient core logger that delegates. This is useful for overrides. */
+public class DelegateCoreLogger implements CoreLogger {
 
   protected CoreLogger core;
 
@@ -41,13 +38,15 @@ public class DelegateCoreLogger implements CoreLogger{
 
   @Override
   @NotNull
-  public <FB> CoreLogger withFields(@NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+  public <FB> CoreLogger withFields(
+      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     return core.withFields(f, builder);
   }
 
   @Override
   @NotNull
-  public CoreLogger withThreadContext(@NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
+  public CoreLogger withThreadContext(
+      @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     return core.withThreadContext(mapTransform);
   }
 
@@ -91,7 +90,10 @@ public class DelegateCoreLogger implements CoreLogger{
   }
 
   @Override
-  public boolean isEnabled(@NotNull Level level, @NotNull Condition condition, @NotNull Supplier<List<Field>> extraFields) {
+  public boolean isEnabled(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Supplier<List<Field>> extraFields) {
     return core.isEnabled(level, condition, extraFields);
   }
 
@@ -101,17 +103,27 @@ public class DelegateCoreLogger implements CoreLogger{
   }
 
   @Override
-  public void log(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message) {
+  public void log(
+      @NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message) {
     core.log(level, extraFields, message);
   }
 
   @Override
-  public <FB> void log(@NotNull Level level, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+  public <FB> void log(
+      @NotNull Level level,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
     core.log(level, message, f, builder);
   }
 
   @Override
-  public <FB> void log(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+  public <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
     core.log(level, extraFields, message, f, builder);
   }
 
@@ -121,17 +133,32 @@ public class DelegateCoreLogger implements CoreLogger{
   }
 
   @Override
-  public void log(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @NotNull Condition condition, @Nullable String message) {
+  public void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @Nullable String message) {
     core.log(level, extraFields, condition, message);
   }
 
   @Override
-  public <FB> void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+  public <FB> void log(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
     core.log(level, condition, message, f, builder);
   }
 
   @Override
-  public <FB> void log(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @NotNull Condition condition, @Nullable String message, @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+  public <FB> void log(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @Nullable String message,
+      @NotNull Function<FB, FieldBuilderResult> f,
+      @NotNull FB builder) {
     core.log(level, extraFields, condition, message, f, builder);
   }
 
@@ -142,22 +169,36 @@ public class DelegateCoreLogger implements CoreLogger{
   }
 
   @Override
-  public <FB> void asyncLog(@NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+  public <FB> void asyncLog(
+      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
     core.asyncLog(level, consumer, builder);
   }
 
   @Override
-  public <FB> void asyncLog(@NotNull Level level, @NotNull Condition condition, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+  public <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Condition condition,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
     core.asyncLog(level, condition, consumer, builder);
   }
 
   @Override
-  public <FB> void asyncLog(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+  public <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
     core.asyncLog(level, extraFields, consumer, builder);
   }
 
   @Override
-  public <FB> void asyncLog(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @NotNull Condition condition, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
+  public <FB> void asyncLog(
+      @NotNull Level level,
+      @NotNull Supplier<List<Field>> extraFields,
+      @NotNull Condition condition,
+      @NotNull Consumer<LoggerHandle<FB>> consumer,
+      @NotNull FB builder) {
     core.asyncLog(level, extraFields, condition, consumer, builder);
   }
 }
