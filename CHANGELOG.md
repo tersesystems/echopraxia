@@ -2,11 +2,12 @@
 
 ## 2.3.0
 
-* Add `getCore()` method to `LoggingContext`.
-* Add user defined functions to scripting to expose impure methods and context to Tweakflow.
+* Add `getCore()` method to `LoggingContext` in https://github.com/tersesystems/echopraxia/pull/229
+* Add user defined functions to scripting to expose impure methods and context to Tweakflow in https://github.com/tersesystems/echopraxia/pull/227
+* Path based logback custom converters in https://github.com/tersesystems/echopraxia/pull/223
+* Add delegate core logger in https://github.com/tersesystems/echopraxia/pull/226
 * Remove AsyncLogger from README (too confusing, not needed for most people)
 * Move `LogbackLoggingContext` to Logback module
-* Add `LoggerFieldConverter`
 
 ## 2.2.4
 
