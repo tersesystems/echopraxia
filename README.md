@@ -27,20 +27,19 @@ Although Echopraxia is tied on the backend to an implementation, it is designed 
 
 Please see the [blog posts](https://tersesystems.com/category/logging/) for more background on logging stuff.
 
-## Examples 
+## Examples
 
 For the fastest possible way to try out Echopraxia, download and run the [JBang script](https://github.com/tersesystems/smallest-dynamic-logging-example/blob/main/jbang/Script.java).
 
 Simple examples and integrations with [dropwizard metrics](https://metrics.dropwizard.io/4.2.0/) and [OSHI](https://github.com/oshi/oshi) are available at [echopraxia-examples](https://github.com/tersesystems/echopraxia-examples).
 
-For a web application example,
-see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
+For a web application example, see this [Spring Boot Project](https://github.com/tersesystems/echopraxia-spring-boot-example).
 
 ## Statement of Intent
 
 **Echopraxia is not a replacement for SLF4J**.  It is not an attempt to compete with Log4J2 API, JUL, commons-logging for the title of "one true logging API" and restart the [logging mess](https://techblog.bozho.net/the-logging-mess/).  SLF4J won that fight [a long time ago](https://www.semanticscholar.org/paper/Studying-the-Use-of-Java-Logging-Utilities-in-the-Chen-Jiang/be39720a72f04c92b9aece9548171d5fa3a627e6).
 
-Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application where you've decided to use [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) already. 
+Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application where you've decided to use [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) already.
 
 SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations by anybody.  
 
@@ -92,7 +91,7 @@ There is a Logback implementation based around [logstash-logback-encoder](https:
 
 Maven:
 
-```
+```xml
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logstash</artifactId>
@@ -102,7 +101,7 @@ Maven:
 
 Gradle:
 
-```
+```gradle
 implementation "com.tersesystems.echopraxia:logstash:<VERSION>" 
 ```
 
@@ -114,7 +113,7 @@ There is a Log4J implementation that works with the [JSON Template Layout](https
 
 Maven:
 
-```
+```xml
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>log4j</artifactId>
@@ -124,7 +123,7 @@ Maven:
 
 Gradle:
 
-```
+```gradle
 implementation "com.tersesystems.echopraxia:log4j:<VERSION>" 
 ```
 
@@ -174,23 +173,23 @@ For most, you will be working with the basic logger, which uses a pluggable `Fie
 
 Maven:
 
-```
+```xml
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
   <artifactId>logger</artifactId>
-  <version><VERSION></version>
+  <version>VERSION</version>
 </dependency>
 ```
 
 Gradle:
 
-```
+```gradle
 implementation "com.tersesystems.echopraxia:logger:<VERSION>" 
 ```
 
 Add the import:
 
-```
+```java
 import com.tersesystems.echopraxia.*;
 ```
 
@@ -200,7 +199,7 @@ First you define a logger (usually in a controller or singleton -- `getClass()` 
 final Logger<?> basicLogger = LoggerFactory.getLogger(getClass());
 ```
 
-Logging simple messages and exceptions are done as in SLF4J: 
+Logging simple messages and exceptions are done as in SLF4J:
 
 ```java
 try {
@@ -315,7 +314,7 @@ Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFie
 personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 ```
 
-### Diff Field Builder 
+### Diff Field Builder
 
 Once you have a custom field builder, you can layer in additional functionality like the "diff" field builder.
 
@@ -522,6 +521,8 @@ Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, Value.str
 Condition logins = Condition.numberMatch("logins", v -> v.equals(number(1)));
 ```
 
+The `context` parameter that is passed in is a `LoggingContext` that contains the argument fields, the fields added directly to the logger, and a reference to the `CoreLogger`, which can return useful context like the logger name.
+
 This is only a part of the available functionality in conditions.  You can tie conditions directly to a backend, such as a database or key/value store, or trigger them to work in response to an exception or unusual metrics.  See the [redis example](https://github.com/tersesystems/echopraxia-examples/tree/main/redis), [jmx example](https://github.com/tersesystems/echopraxia-examples/tree/main/jmx), [metrics example](https://github.com/tersesystems/echopraxia-examples/tree/main/metrics), and [timed diagnostic example](https://github.com/tersesystems/echopraxia-examples/tree/main/timed-diagnostic).
 
 ### JSON Path
@@ -603,7 +604,6 @@ class FindException {
 ```
 
 There are many more options available using JSONPath.  You can try out the [online evaluator](https://jsonpath.herokuapp.com/) to test out expressions.
-
 
 ### Logger
 
@@ -695,231 +695,6 @@ or just on the statement.
 loggerWithContextAndCondition.info("some message");
 ```
 
-## Asynchronous Logging
-
-By default, conditions are evaluated in the running thread.  This can be a problem if conditions rely on external elements such as network calls or database lookups, or involve resources with locks.
-
-Echopraxia provides an `AsyncLogger` that will evaluate conditions and log using another executor, so that the main business logic thread is not blocked on execution.  All statements are placed on a work queue and run on a thread specified by the executor at a later time.
-
-### Installation
-
-Maven:
-
-```
-<dependency>
-  <groupId>com.tersesystems.echopraxia</groupId>
-  <artifactId>async</artifactId>
-  <version><VERSION></version>
-</dependency>
-```
-
-Gradle:
-
-```
-implementation "com.tersesystems.echopraxia:async:<VERSION>" 
-```
-
-### Usage
-
-All the usual logging statements are available in `AsyncLogger`, i.e. `logger.debug` will log as usual.  
-
-However, there are no `isLogging*` methods in the `AsyncLogger`. Instead, a `Consumer` of `LoggerHandle` is used, which serves the same purpose as the `if (isLogging*()) { .. }` block.
-
-```java
-import com.tersesystems.echopraxia.async.*;
-
-AsyncLogger<?> logger = AsyncLoggerFactory.getLogger().withExecutor(loggingExecutor);
-logger.info(handle -> {
-  // do conditional logic that would normally happen in an if block
-  // this may be expensive or blocking because it runs asynchronously
-  handle.log("Message template {}", fb -> fb.string("foo", "bar");
-});
-```
-
-In the unfortunate event of an exception, the underlying  logger will be called at `error` level from the relevant core logger:
-
-```java
-// only happens if uncaught exception from consumer
-slf4jLogger.error("Uncaught exception when running asyncLog", cause);
-```
-
-One important detail is that the logging executor should be a daemon thread, so that it does not block JVM exit:
-
-```java
-private static final Executor loggingExecutor =
-  Executors.newSingleThreadExecutor(
-      r -> {
-        Thread t = new Thread(r);
-        t.setDaemon(true); // daemon means the thread won't stop JVM from exiting
-        t.setName("logging-thread");
-        return t;
-      });
-```
-
-Using a single thread executor is nice because you can keep ordering of your logging statements, but it may not scale up in production.  Generally speaking, if you are CPU bound and want to distribute load over several cores, you should use `ForkJoinPool.commonPool()` or a bounded fork-join work stealing pool as your executor.  If your conditions involve blocking, or work is IO bound, you should configure a thread pool executor.  
-
-Likewise, if your conditions involve calls to external services (for example, calling Consul or a remote HTTP service), you should consider using a failure handling library like [failsafe](https://failsafe.dev/) to set up appropriate circuit breakers, bulkheads, timeouts, and rate limiters to manage interactions.
-
-Because of parallelism and concurrency, your logging statements may not appear in order if you have multiple threads running in your executor.  You can add extra fields to ensure you can reorder statements appropriately.
-
-Putting it all together:
-
-```java
-public class Async {
-  private static final ExecutorService loggingExecutor =
-      Executors.newSingleThreadExecutor(
-          r -> {
-            Thread t = new Thread(r);
-            t.setDaemon(true); // daemon means the thread won't stop JVM from exiting
-            t.setName("echopraxia-logging-thread");
-            return t;
-          });
-
-  private static final Condition expensiveCondition = new Condition() {
-    @Override
-    public boolean test(Level level, LoggingContext context) {
-      try {
-        Thread.sleep(1000L);
-        return true;
-      } catch (InterruptedException e) {
-        return false;
-      }
-    };
-  };
-
-  private static final AsyncLogger<?> logger = AsyncLoggerFactory.getLogger()
-    .withExecutor(loggingExecutor)
-    .withCondition(expensiveCondition);
-
-  public static void main(String[] args) throws InterruptedException {
-    System.out.println("BEFORE logging block");
-    for (int i = 0; i < 10; i++) {
-      // This should take no time on the rendering thread :-)
-      logger.info("Prints out after expensive condition");
-    }
-    System.out.println("AFTER logging block");
-    System.out.println("Sleeping so that the JVM stays up");
-    Thread.sleep(1001L * 10L);
-  }
-}
-```
-
-Please see the [async example](https://github.com/tersesystems/echopraxia-examples/tree/main/async) for more details.
-
-### Managing Thread Local State 
-
-Note that because logging is asynchronous, you must be very careful when accessing thread local state.  Thread local state associated with logging, i.e. MDC / ThreadContext is automatically carried through, but in some cases you may need to do additional work.
-
-For example, if you are using Spring Boot and are using `RequestContextHolder.getRequestAttributes()` when constructing context fields, you must call `RequestContextHolder.setRequestAttributes(requestAttributes)` so that the attributes are available to the thread.
-
-You can add hooks into the logger to get and set thread local state appropriately using the `withThreadLocal` method, which returns a `Supplier<Runnable>`, where the `Supplier` is the "get" and the `Runnable` is the "set".  For example, in the [echopraxia-spring-boot-example](https://github.com/tersesystems/echopraxia-spring-boot-example), request attributes are thread local and must be carried across to the logging executor:
-
-```java
-class GreetingController {
-  private static final AsyncLogger<?> asyncLogger =
-    AsyncLoggerFactory.getLogger()
-      .withFieldBuilder(HttpRequestFieldBuilder.class)
-      .withThreadLocal(
-        () -> {
-          // get the request attributes in rendering thread...
-          final RequestAttributes requestAttributes =
-            RequestContextHolder.currentRequestAttributes();
-          // ...and the "set" in the runnable will be called in the logging executor's thread
-          return () -> RequestContextHolder.setRequestAttributes(requestAttributes);
-        })
-      .withFields(fb -> fb.requestFields(httpServletRequest()));
-
-  private HttpServletRequest httpServletRequest() {
-    return ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes())
-      .getRequest();
-  }
-}
-```
-
-You can call `withThreadLocal` multiple times, and it will compose with earlier blocks.
-
-### Managing Caller Info
-
-Caller information -- the caller class, method, and line number -- is typically implemented in frameworks by processing a stacktrace.  This is a problem for asynchronous logging, because the caller information is in a different ~~castle~~thread.
-
-Echopraxia can fix this by capturing the caller information just before starting the async thread, but it must do so on request.  Crucially, although the throwable is created, the processing of stack trace elements still happens on the executor thread, ameliorating the [cost of caller information](https://ionutbalosin.com/2018/06/an-even-faster-way-than-stackwalker-api-for-asynchronously-processing-the-stack-frames/).
-
-You must specifically configure the implementation to capture async caller data.
-
-#### Log4J
-
-For Log4J, you must set `includeLocation=true` on the logger you want to capture caller data, and configure the appender to render caller data:
-
-```xml
-<Configuration packages="...">
-  <Appenders>
-    <Console name="Console" target="SYSTEM_OUT">
-        <!-- must have location info enabled to get caller data -->
-        <JsonTemplateLayout 
-          eventTemplateUri="classpath:JsonLayout.json" 
-          locationInfoEnabled="true">
-            
-        </JsonTemplateLayout>
-    </Console>
-  </Appenders>
-    
-  <Loggers>
-    <!-- Must set includeLocation=true specifically for async caller info -->
-    <Root level="debug" includeLocation="true">
-      <AppenderRef ref="Console"/>
-    </Root>
-</Loggers>
-</Configuration>      
-```
-
-#### Logback
-
-Logback is a little more complicated, because there is no direct way to get the logging event from a logger.  Instead, a special `caller` marker is added, and an appender is used to extract caller data from the marker and set it on the event, 
-
-To enable it, you must set the context property `echopraxia.async.caller` to `true`, and wrap your appenders with `com.tersesystems.echopraxia.logback.CallerDataAppender`:
-
-```xml
-<configuration>
-    
-    <property scope="context" name="echopraxia.async.caller" value="true"/>
-
-    <!-- loosen the rule so appenders use appender-refs -->
-    <newRule pattern="*/appender/appender-ref"
-             actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
-
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <!-- https://logback.qos.ch/manual/layouts.html#caller -->
-        <encoder>
-            <pattern>%date{H:mm:ss.SSS} %highlight(%-5level) [%thread]: %message%n%ex%caller{2}</pattern>
-        </encoder>
-    </appender>
-    
-    <appender name="JSON" class="net.logstash.logback.appender.LoggingEventAsyncDisruptorAppender">
-      <appender class="ch.qos.logback.core.FileAppender">
-        <filename>application.log</filename>
-        <!-- Or https://github.com/logfellow/logstash-logback-encoder#caller-info-fields -->
-        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
-          <providers>
-            <!-- must add caller data to see method / line info in json -->
-            <callerData/>
-          </providers>
-        </encoder>
-      </appender>
-    </appender>
-
-    <root level="INFO">
-        <!--
-           CallerDataAppender sets the caller data on event from marker.
-           Note this depends on setting the newRule above!
-         -->
-        <appender class="com.tersesystems.echopraxia.logback.CallerDataAppender">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="JSON"/>
-        </appender>
-    </root>
-</configuration>
-```
-
 ## Dynamic Conditions with Scripts
 
 One of the limitations of logging is that it's not that easy to change logging levels in an application at run-time.  In modern applications, you typically have complex inputs and may want to enable logging for some very specific inputs without turning on your logging globally.
@@ -929,6 +704,26 @@ Script Conditions lets you tie your conditions to scripts that you can change an
 The security concerns surrounding Groovy or Javascript make them unsuitable in a logging environment.  Fortunately, Echopraxia provides a [Tweakflow](https://twineworks.github.io/tweakflow) script integration that lets you evaluate logging statements **safely**.  
 
 Tweakflow comes with a [VS Code integration](https://marketplace.visualstudio.com/items?itemName=twineworks.tweakflow), a [reference guide](https://twineworks.github.io/tweakflow/reference.html), and a [standard library](https://twineworks.github.io/tweakflow/modules/std.html) that contains useful regular expression and date manipulation logic.
+
+### Installation
+
+Because Scripting has a dependency on Tweakflow, it is broken out into a distinct library that you must add to your build.
+
+Maven:
+
+```xml
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>scripting</artifactId>
+  <version><VERSION></version>
+</dependency>
+```
+
+Gradle:
+
+```gradle
+implementation "com.tersesystems.echopraxia:scripting:<VERSION>" 
+```
 
 ### Script Syntax
 
@@ -947,7 +742,7 @@ Methods in the context are snake case, separated by underscores. For example, to
 
 You can use the `let` construct in Tweakflow to make this clearer:
 
-```
+```tweakflow
 library echopraxia {
   function evaluate: (string level, dict ctx) ->
     let {
@@ -959,7 +754,7 @@ library echopraxia {
 
 Using `find_object` or `find_list` returns the appropriate type of `dict` or `list` respectively.  
 
-```
+```tweakflow
 library echopraxia {
   function evaluate: (string level, dict ctx) ->
     let {
@@ -972,7 +767,7 @@ library echopraxia {
 
 And you can use the Tweakflow [standard library](https://twineworks.github.io/tweakflow/modules/std.html) to allow for more advanced functionality, i.e.
 
-```
+```tweakflow
 import * as std from "std";
 alias std.strings as str;
 library echopraxia {
@@ -986,7 +781,7 @@ library echopraxia {
 
 The context method also has functionality to access "impure" methods such as the current instant, using `ctx[:now]`:
 
-```
+```tweakflow
 import * as std from "std";
 alias std.time as time;
 library echopraxia {
@@ -1044,7 +839,6 @@ You also have the option to store scripts in a key-value store or in a database.
 
 ### User Defined Functions
 
-
 You have the option of passing in user defined functions into the script, in addition to the built-in scripts.
 
 ```java
@@ -1074,7 +868,7 @@ class NowFunction {
 
 This will allow you to access `Instant.now()` whenever you call the function attached to `ctx[:now]`:
 
-```
+```tweakflow
 import * as std from "std";
 alias std.time as time;
 library echopraxia {
@@ -1146,26 +940,6 @@ watchService.close();
 ```
 
 Please see the [scripting example](https://github.com/tersesystems/echopraxia-examples/blob/main/script) for more details.
-
-### Installation
-
-Because Scripting has a dependency on Tweakflow, it is broken out into a distinct library that you must add to your build.
-
-Maven:
-
-```
-<dependency>
-  <groupId>com.tersesystems.echopraxia</groupId>
-  <artifactId>scripting</artifactId>
-  <version><VERSION></version>
-</dependency>
-```
-
-Gradle:
-
-```
-implementation "com.tersesystems.echopraxia:scripting:<VERSION>" 
-```
 
 ## Semantic Logging
 
@@ -1464,7 +1238,6 @@ Then you can use `%fields{$.book}` to extract the `book` field from the event an
 ```
 
 ## Direct API
-
 
 ### Direct Logback / SLF4J API
 
