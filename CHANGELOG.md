@@ -1,8 +1,14 @@
 ## Changelog
 
+## 2.3.0
+
+* Add `getCore()` method to `LoggingContext`.
+* Add user defined functions to scripting to expose impure methods and context to Tweakflow.
+* Remove AsyncLogger from README (too confusing)
+
 ## 2.2.3
 
-Allow filters to be instantiated from a context classloader.
+* Allow filters to be instantiated from a context classloader.
 
 ## 2.2.2
 
