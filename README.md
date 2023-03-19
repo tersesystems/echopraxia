@@ -984,6 +984,18 @@ library echopraxia {
 }
 ```
 
+The context method also has functionality to access "impure" methods such as the current instant, using `ctx[:now]`:
+
+```
+import * as std from "std";
+alias std.time as time;
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+    let { now: ctx[:now]; }
+    time.unix_timestamp(now()) > 0;
+}
+```
+
 ### Creating Script Conditions
 
 The simplest way to handle a script is to pass it in directly as a string:
@@ -1027,6 +1039,46 @@ library echopraxia {
     str.lower_case(find_string("$.person.name")) == "will";   
 }
 ```
+
+You have the option of passing in user defined functions into the script, in addition to the built-in scripts.
+
+```java
+import com.tersesystems.echopraxia.scripting.*;
+import com.twineworks.tweakflow.lang.types.Type;
+import com.twineworks.tweakflow.lang.types.Types;
+import com.twineworks.tweakflow.lang.values.*;
+
+class NowFunction {
+  private UserFunctionValue nowFunction() {
+    return ScriptFunction.builder()
+            .supplier(() -> Values.make(Instant.now()))
+            .result(Types.DATETIME)
+            .build();
+  }
+  
+  public final List<ValueMapEntry> userFunctions = 
+      Collections.singletonList(new ValueMapEntry("now", Values.make(nowFunction())));
+  
+  public void logWithNow() {
+    Path path = Paths.get("src/test/tweakflow/condition.tf");
+    Condition condition = ScriptCondition.create(ctx -> userFunctions, false, path, Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+  }
+}
+```
+
+This will allow you to access `Instant.now()` whenever you call the function attached to `ctx[:now]`:
+
+```
+import * as std from "std";
+alias std.time as time;
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+     let { now: ctx[:now]; }
+     time.unix_timestamp(now()) > 0;
+  }
+```
+
 
 You also have the option to store scripts in a key-value store or in a database.  See the [sqlite condition store example](https://github.com/tersesystems/echopraxia-examples/tree/main/conditionstore) for details.
 

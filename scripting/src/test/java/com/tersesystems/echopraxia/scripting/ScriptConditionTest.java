@@ -10,8 +10,12 @@ import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
+import com.twineworks.tweakflow.lang.types.Types;
+import com.twineworks.tweakflow.lang.values.Values;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,6 +58,38 @@ public class ScriptConditionTest {
     List<ILoggingEvent> list = listAppender.list;
     ILoggingEvent event = list.get(0);
     assertThat(event.getMessage()).isEqualTo("data of interest found");
+  }
+
+  @Test
+  public void testUserDefinedCondition() {
+    List<ValueMapEntry> userFunctions =
+        Collections.singletonList(
+            new ValueMapEntry(
+                "now",
+                Values.make(
+                    ScriptFunction.builder()
+                        .supplier(() -> Values.make(Instant.now()))
+                        .result(Types.DATETIME)
+                        .build())));
+    Condition condition =
+        ScriptCondition.create(
+            ctx -> userFunctions,
+            false,
+            "import * as std from \"std\";\n"
+                + "alias std.time as time;\n"
+                + "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    let { now: ctx[\"now\"]; }"
+                + "    time.unix_timestamp(now()) > 0;"
+                + "}",
+            Throwable::printStackTrace);
+    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    logger.info("time is good");
+
+    ListAppender<ILoggingEvent> listAppender = getListAppender();
+    List<ILoggingEvent> list = listAppender.list;
+    ILoggingEvent event = list.get(0);
+    assertThat(event.getMessage()).isEqualTo("time is good");
   }
 
   @Test
