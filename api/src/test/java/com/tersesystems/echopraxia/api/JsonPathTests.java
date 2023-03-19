@@ -7,12 +7,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
+import com.tersesystems.echopraxia.fake.FakeCoreLogger;
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 public class JsonPathTests {
+
+  private final FakeCoreLogger core = new FakeCoreLogger("");
 
   final JsonProvider jsonProvider = new EchopraxiaJsonProvider();
   final MappingProvider mappingProvider = new EchopraxiaMappingProvider();
@@ -34,7 +37,7 @@ public class JsonPathTests {
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating"));
 
-    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    LoggingContext context = FakeLoggingContext.single(core, builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     final List interests = documentContext.read("$.person.father.interests", List.class);
     final String s = (String) interests.get(0);
@@ -49,7 +52,7 @@ public class JsonPathTests {
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
 
-    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    LoggingContext context = FakeLoggingContext.single(core, builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     String interest = documentContext.read("$.person.mother.interests[1]", String.class);
     assertThat(interest).isEqualTo("hockey");
@@ -63,7 +66,7 @@ public class JsonPathTests {
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
 
-    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    LoggingContext context = FakeLoggingContext.single(core, builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     List interests = documentContext.read("$.person.mother.interests[1,2]", List.class);
     assertThat(interests.get(0)).isEqualTo("hockey");
@@ -78,7 +81,7 @@ public class JsonPathTests {
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
 
-    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    LoggingContext context = FakeLoggingContext.single(core, builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     List<?> interests = documentContext.read("$..interests", List.class);
     assertThat(interests).size().isEqualTo(4);
@@ -95,7 +98,7 @@ public class JsonPathTests {
     Person abe = new Person("Abe", 1, "yodelling");
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
-    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    LoggingContext context = FakeLoggingContext.single(core, builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     List<Value<?>> results = documentContext.read("$.person.mother[?(@.age <= 30)]");
     assertThat(results.get(0)).isExactlyInstanceOf(Value.ObjectValue.class);
@@ -109,7 +112,7 @@ public class JsonPathTests {
     Person abe = new Person("Abe", 1, "yodelling");
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
-    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    LoggingContext context = FakeLoggingContext.single(core, builder.person("person", abe));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     List<Value<?>> results = documentContext.read("$.person.father[?(@.age <= 30)]");
     assertThat(results).isEmpty();
@@ -123,7 +126,7 @@ public class JsonPathTests {
     Person abe = new Person("Abe", 1, "yodelling");
     abe.setFather(new Person("Bert", 35, "keyboards"));
     abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
-    LoggingContext context = FakeLoggingContext.single(builder.person("person", abe));
+    LoggingContext context = FakeLoggingContext.single(core, builder.person("person", abe));
 
     Filter iceskatingFilter = filter(where("interests").contains("iceskating"));
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
@@ -135,7 +138,7 @@ public class JsonPathTests {
   public void testExceptionMessage() {
     final FieldBuilder fb = FieldBuilder.instance();
     LoggingContext context =
-        FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
+        FakeLoggingContext.single(core, fb.exception(new RuntimeException("some message")));
 
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     String message = documentContext.read("$.exception.message", String.class);
@@ -147,7 +150,7 @@ public class JsonPathTests {
     final FieldBuilder fb = FieldBuilder.instance();
     final RuntimeException cause = new RuntimeException("some other message");
     LoggingContext context =
-        FakeLoggingContext.single(fb.exception(new RuntimeException("some message", cause)));
+        FakeLoggingContext.single(core, fb.exception(new RuntimeException("some message", cause)));
 
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     String message = documentContext.read("$.exception.cause.message", String.class);
@@ -158,7 +161,7 @@ public class JsonPathTests {
   public void testExceptionStackTrace() {
     final FieldBuilder fb = FieldBuilder.instance();
     LoggingContext context =
-        FakeLoggingContext.single(fb.exception(new RuntimeException("some message")));
+        FakeLoggingContext.single(core, fb.exception(new RuntimeException("some message")));
 
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     String methodName = documentContext.read("$.exception.stackTrace[0].methodName", String.class);
@@ -167,7 +170,7 @@ public class JsonPathTests {
 
   @Test
   public void testExceptionStackTraceMissing() {
-    LoggingContext context = FakeLoggingContext.empty();
+    LoggingContext context = FakeLoggingContext.empty(core);
 
     final DocumentContext documentContext = JsonPath.parse(context, configuration());
     String methodName = documentContext.read("$.exception.stackTrace[0].methodName", String.class);

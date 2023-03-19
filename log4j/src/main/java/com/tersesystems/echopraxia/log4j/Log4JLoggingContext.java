@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.api.Utilities.joinFields;
 import static com.tersesystems.echopraxia.api.Utilities.memoize;
 
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
+import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.Collections;
@@ -17,17 +18,20 @@ public class Log4JLoggingContext extends AbstractJsonPathFinder implements Loggi
   private final Supplier<List<Field>> loggerFields;
   private final Supplier<List<Field>> joinedFields;
   private final Log4JCoreLogger.Context context;
+  private final CoreLogger core;
 
-  public Log4JLoggingContext(Log4JCoreLogger.Context context, Supplier<List<Field>> arguments) {
+  public Log4JLoggingContext(
+      CoreLogger core, Log4JCoreLogger.Context context, Supplier<List<Field>> arguments) {
     // Defers and memoizes the arguments and context fields for a single logging statement.
+    this.core = core;
     this.context = context;
     this.argumentFields = memoize(arguments);
     this.loggerFields = memoize(context::getLoggerFields);
     this.joinedFields = memoize(joinFields(this.loggerFields, this.argumentFields));
   }
 
-  public Log4JLoggingContext(Log4JCoreLogger.Context context) {
-    this(context, Collections::emptyList);
+  public Log4JLoggingContext(CoreLogger core, Log4JCoreLogger.Context context) {
+    this(core, context, Collections::emptyList);
   }
 
   @Override
@@ -47,5 +51,10 @@ public class Log4JLoggingContext extends AbstractJsonPathFinder implements Loggi
 
   public @NotNull Marker getMarker() {
     return context.getMarker();
+  }
+
+  @Override
+  public CoreLogger getCore() {
+    return core;
   }
 }

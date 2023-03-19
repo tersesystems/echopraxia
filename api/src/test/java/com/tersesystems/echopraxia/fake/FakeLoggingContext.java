@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.fake;
 
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
+import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.Arrays;
@@ -12,27 +13,28 @@ import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
 public class FakeLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
-  private static final FakeLoggingContext EMPTY =
-      new FakeLoggingContext(Collections::emptyList, Collections::emptyList);
   protected final Supplier<List<Field>> loggerFields;
   protected final Supplier<List<Field>> argumentFields;
+  private final CoreLogger core;
 
   protected FakeLoggingContext(
-      Supplier<List<Field>> loggerFields, Supplier<List<Field>> argumentFields) {
+      CoreLogger core, Supplier<List<Field>> loggerFields, Supplier<List<Field>> argumentFields) {
+    this.core = core;
     this.loggerFields = loggerFields;
     this.argumentFields = argumentFields;
   }
 
-  public static FakeLoggingContext single(Field field) {
-    return new FakeLoggingContext(() -> Collections.singletonList(field), Collections::emptyList);
+  public static FakeLoggingContext single(CoreLogger core, Field field) {
+    return new FakeLoggingContext(
+        core, () -> Collections.singletonList(field), Collections::emptyList);
   }
 
-  public static FakeLoggingContext of(Field... fields) {
-    return new FakeLoggingContext(() -> Arrays.asList(fields), Collections::emptyList);
+  public static FakeLoggingContext of(CoreLogger core, Field... fields) {
+    return new FakeLoggingContext(core, () -> Arrays.asList(fields), Collections::emptyList);
   }
 
-  public static FakeLoggingContext empty() {
-    return EMPTY;
+  public static FakeLoggingContext empty(CoreLogger core) {
+    return new FakeLoggingContext(core, Collections::emptyList, Collections::emptyList);
   }
 
   @Override
@@ -60,7 +62,7 @@ public class FakeLoggingContext extends AbstractJsonPathFinder implements Loggin
         joinFields(FakeLoggingContext.this::getLoggerFields, context::getLoggerFields);
     Supplier<List<Field>> afields =
         joinFields(FakeLoggingContext.this::getArgumentFields, context::getArgumentFields);
-    return new FakeLoggingContext(lfields, afields);
+    return new FakeLoggingContext(this.core, lfields, afields);
   }
 
   private Supplier<List<Field>> joinFields(
@@ -85,6 +87,11 @@ public class FakeLoggingContext extends AbstractJsonPathFinder implements Loggin
   public LoggingContext withFields(Supplier<List<Field>> extraFields) {
     Supplier<List<Field>> lfields =
         joinFields(FakeLoggingContext.this::getLoggerFields, extraFields);
-    return new FakeLoggingContext(lfields, this::getArgumentFields);
+    return new FakeLoggingContext(this.core, lfields, this::getArgumentFields);
+  }
+
+  @Override
+  public CoreLogger getCore() {
+    return core;
   }
 }

@@ -3,17 +3,27 @@ package com.tersesystems.echopraxia.logstash;
 import static com.tersesystems.echopraxia.api.Utilities.memoize;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.logback.AbstractEventLoggingContext;
 import java.util.*;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class ArgumentLoggingContext extends AbstractEventLoggingContext {
 
   private final Supplier<List<Field>> argumentFields;
+  private final CoreLogger core;
 
-  public ArgumentLoggingContext(@NotNull ILoggingEvent event) {
+  public ArgumentLoggingContext(@Nullable CoreLogger core, @NotNull ILoggingEvent event) {
+    this.core = core;
     this.argumentFields = memoize(() -> fieldArguments(event));
+  }
+
+  @Override
+  public CoreLogger getCore() {
+    return core;
   }
 
   @Override

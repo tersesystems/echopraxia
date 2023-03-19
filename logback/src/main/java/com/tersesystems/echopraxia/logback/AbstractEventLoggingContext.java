@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.logback;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
@@ -11,7 +11,7 @@ import java.util.stream.StreamSupport;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
-abstract class AbstractEventLoggingContext extends AbstractJsonPathFinder
+public abstract class AbstractEventLoggingContext extends AbstractJsonPathFinder
     implements LoggingContext {
 
   protected List<Field> fieldArguments(@NotNull ILoggingEvent event) {

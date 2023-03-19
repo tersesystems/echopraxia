@@ -12,6 +12,9 @@ import org.slf4j.Marker;
  * A filter that looks for a ConditionMarker, and evaluates the condition based on a logging context
  * constructed from the logging event.
  *
+ * <p>Note that there is a null core logger passed into the context, as the context is created
+ * outside the usual flow.
+ *
  * <p>If the condition passes, returns NEUTRAL, otherwise DENY.
  */
 public class ConditionTurboFilter extends TurboFilter {
@@ -65,7 +68,7 @@ public class ConditionTurboFilter extends TurboFilter {
 
   private LoggingContext loggingContext(Marker marker, Object[] arguments) {
     FilterMarkerContext markerContext = new FilterMarkerContext(marker);
-    return new LogbackLoggingContext(markerContext, () -> getFields(arguments));
+    return new LogbackLoggingContext(null, markerContext, () -> getFields(arguments));
   }
 
   @NotNull

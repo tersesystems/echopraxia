@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.api.Utilities.joinFields;
 import static com.tersesystems.echopraxia.api.Utilities.memoize;
 
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
+import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.Collections;
@@ -21,18 +22,26 @@ public class LogbackLoggingContext extends AbstractJsonPathFinder implements Log
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
 
-  private final LogbackLoggerContext context;
+  private final LogbackLoggerContext loggerContext;
   private final Supplier<List<Field>> fields;
+  private final CoreLogger core;
 
-  public LogbackLoggingContext(LogbackLoggerContext context) {
-    this(context, Collections::emptyList);
+  public LogbackLoggingContext(CoreLogger core, LogbackLoggerContext loggerContext) {
+    this(core, loggerContext, Collections::emptyList);
   }
 
-  public LogbackLoggingContext(LogbackLoggerContext context, Supplier<List<Field>> arguments) {
-    this.context = context;
+  public LogbackLoggingContext(
+      CoreLogger core, LogbackLoggerContext loggerContext, Supplier<List<Field>> arguments) {
+    this.core = core;
+    this.loggerContext = loggerContext;
     this.argumentFields = memoize(arguments);
-    this.loggerFields = memoize(context::getLoggerFields);
+    this.loggerFields = memoize(loggerContext::getLoggerFields);
     this.fields = memoize(joinFields(this.loggerFields, this.argumentFields));
+  }
+
+  @Override
+  public CoreLogger getCore() {
+    return core;
   }
 
   @Override
@@ -51,6 +60,6 @@ public class LogbackLoggingContext extends AbstractJsonPathFinder implements Log
   }
 
   public List<Marker> getMarkers() {
-    return context.getMarkers();
+    return loggerContext.getMarkers();
   }
 }
