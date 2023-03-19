@@ -11,7 +11,6 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.logstash.LogstashCoreLogger;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.FunctionParameter;
@@ -22,7 +21,6 @@ import java.time.Instant;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -98,34 +96,38 @@ public class ScriptConditionTest {
     assertThat(event.getMessage()).isEqualTo("time is good");
   }
 
-
   @Test
   public void testLoggerPropertyCondition() {
-    Function<LoggingContext, List<ValueMapEntry>> userFunctions = ctx ->
-      Collections.singletonList(
-        new ValueMapEntry(
-          "logger_property",
-          Values.make(
-            ScriptFunction.builder()
-              .parameter(new FunctionParameter(0, "property_name", Types.STRING, Values.make("")))
-              .function(propertyName -> {
-                LogstashCoreLogger core = (LogstashCoreLogger) ctx.getCore();
-                LoggerContext loggerContext = core.logger().getLoggerContext();
-                String propertyValue = loggerContext.getProperty(propertyName.string());
-                return Values.make(propertyValue);
-              })
-              .result(Types.STRING)
-              .build())));
+    Function<LoggingContext, List<ValueMapEntry>> userFunctions =
+        ctx ->
+            Collections.singletonList(
+                new ValueMapEntry(
+                    "logger_property",
+                    Values.make(
+                        ScriptFunction.builder()
+                            .parameter(
+                                new FunctionParameter(
+                                    0, "property_name", Types.STRING, Values.make("")))
+                            .function(
+                                propertyName -> {
+                                  LogstashCoreLogger core = (LogstashCoreLogger) ctx.getCore();
+                                  LoggerContext loggerContext = core.logger().getLoggerContext();
+                                  String propertyValue =
+                                      loggerContext.getProperty(propertyName.string());
+                                  return Values.make(propertyValue);
+                                })
+                            .result(Types.STRING)
+                            .build())));
     Condition condition =
-      ScriptCondition.create(
-        userFunctions,
-        false,
-          "library echopraxia {"
-          + "  function evaluate: (string level, dict ctx) ->"
-          + "    let { logger_property: ctx[\"logger_property\"]; }"
-          + "    logger_property(\"herp\") == \"derp\";"
-          + "}",
-        Throwable::printStackTrace);
+        ScriptCondition.create(
+            userFunctions,
+            false,
+            "library echopraxia {"
+                + "  function evaluate: (string level, dict ctx) ->"
+                + "    let { logger_property: ctx[\"logger_property\"]; }"
+                + "    logger_property(\"herp\") == \"derp\";"
+                + "}",
+            Throwable::printStackTrace);
     Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("the logger property is derp!");
 
@@ -134,8 +136,6 @@ public class ScriptConditionTest {
     ILoggingEvent event = list.get(0);
     assertThat(event.getMessage()).isEqualTo("the logger property is derp!");
   }
-
-
 
   @Test
   public void testFindBooleanCondition() {
