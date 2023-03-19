@@ -1,6 +1,6 @@
 ## Changelog
 
-## 2.3.0
+## 2.3.0-RC1
 
 * Add `getCore()` method to `LoggingContext` in https://github.com/tersesystems/echopraxia/pull/229
 * Add user defined functions to scripting to expose impure methods and context to Tweakflow in https://github.com/tersesystems/echopraxia/pull/227
