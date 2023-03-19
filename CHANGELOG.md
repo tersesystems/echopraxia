@@ -4,17 +4,23 @@
 
 * Add `getCore()` method to `LoggingContext`.
 * Add user defined functions to scripting to expose impure methods and context to Tweakflow.
-* Remove AsyncLogger from README (too confusing)
+* Remove AsyncLogger from README (too confusing, not needed for most people)
+* Move `LogbackLoggingContext` to Logback module
+* Add `LoggerFieldConverter`
+
+## 2.2.4
+
+* Delay logback initialization.
 
 ## 2.2.3
 
 * Allow filters to be instantiated from a context classloader.
+* More Logback direct API support with `ConditionTurboFilter`
 
 ## 2.2.2
 
 * Break out the underlying Logback classes from Logstash, so that "direct access" can be used as a fallback.
-* Fix a bug in JSON exception rendering using Logstash
-* StructuredArgument where exception was being rendered a full nested JSON object.
+* Fix a bug in JSON exception rendering using Logstash `StructuredArgument` where exception was being rendered a full nested JSON object.
 
 ## 2.2.1
 
