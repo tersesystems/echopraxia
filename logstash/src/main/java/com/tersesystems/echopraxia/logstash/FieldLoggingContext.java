@@ -3,19 +3,24 @@ package com.tersesystems.echopraxia.logstash;
 import static com.tersesystems.echopraxia.api.Utilities.memoize;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.logback.AbstractEventLoggingContext;
 import java.util.*;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
 public class FieldLoggingContext extends AbstractEventLoggingContext {
 
+  private final CoreLogger core;
+
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> markerFields;
 
   private final Supplier<List<Field>> fields;
 
-  public FieldLoggingContext(@NotNull ILoggingEvent event) {
+  public FieldLoggingContext(CoreLogger core, @NotNull ILoggingEvent event) {
+    this.core = core;
     this.argumentFields = memoize(() -> fieldArguments(event));
     this.markerFields = memoize(() -> fieldMarkers(event));
     this.fields =
@@ -26,6 +31,11 @@ public class FieldLoggingContext extends AbstractEventLoggingContext {
               fields.addAll(getLoggerFields());
               return fields;
             });
+  }
+
+  @Override
+  public CoreLogger getCore() {
+    return this.core;
   }
 
   @Override

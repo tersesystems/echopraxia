@@ -1040,6 +1040,11 @@ library echopraxia {
 }
 ```
 
+You also have the option to store scripts in a key-value store or in a database.  See the [sqlite condition store example](https://github.com/tersesystems/echopraxia-examples/tree/main/conditionstore) for details.
+
+### User Defined Functions
+
+
 You have the option of passing in user defined functions into the script, in addition to the built-in scripts.
 
 ```java
@@ -1079,8 +1084,35 @@ library echopraxia {
   }
 ```
 
+You can access the core logger and the underlying framework logger through the context:
 
-You also have the option to store scripts in a key-value store or in a database.  See the [sqlite condition store example](https://github.com/tersesystems/echopraxia-examples/tree/main/conditionstore) for details.
+```java
+Function<LoggingContext, List<ValueMapEntry>> userFunctions = ctx ->
+  Collections.singletonList(
+    new ValueMapEntry(
+      "logger_property",
+      Values.make(
+        ScriptFunction.builder()
+          .parameter(new FunctionParameter(0, "property_name", Types.STRING, Values.make("")))
+          .function(propertyName -> {
+            LogstashCoreLogger core = (LogstashCoreLogger) ctx.getCore();
+            LoggerContext loggerContext = core.logger().getLoggerContext();
+            String propertyValue = loggerContext.getProperty(propertyName.string());
+            return Values.make(propertyValue);
+          })
+          .result(Types.STRING)
+          .build())));
+```
+
+With this user defined function, you can set a logback property:
+
+```dtd
+<configuration>
+    <property name="herp" value="derp" scope="context"/>
+</configuration>
+```
+
+And then access the property using `ctx[:logger_property]("herp")`.
 
 ### Watched Scripts
 

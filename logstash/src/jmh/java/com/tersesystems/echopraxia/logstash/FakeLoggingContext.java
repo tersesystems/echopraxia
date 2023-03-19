@@ -1,18 +1,25 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.AbstractJsonPathFinder;
+import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class FakeLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
   private final List<Field> loggerFields;
 
   public FakeLoggingContext(Field... loggerFields) {
     this.loggerFields = Arrays.asList(loggerFields);
+  }
+
+  @Override
+  public @Nullable CoreLogger getCore() {
+    return null;
   }
 
   @Override
