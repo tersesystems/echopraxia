@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.scripting;
 
-import static com.tersesystems.echopraxia.scripting.ScriptFunctions.*;
+import static com.tersesystems.echopraxia.scripting.ScriptFunction.*;
 
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
@@ -8,27 +8,56 @@ import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
+import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
-import java.time.Instant;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * ScriptManager class.
  *
  * <p>This does the work of evaluating a Tweakflow script from a ScriptHandle.
+ *
+ * <p>You can add custom and "impure" functions by using addUserFunction.
  */
 public class ScriptManager {
 
-  private static final ValueMapEntry NOW_FUNCTION =
-      addUserFunction("now", () -> Values.make(Instant.now()));
+  public static final Value TRACE_VALUE = Values.make(Level.TRACE.name());
+  public static final Value DEBUG_VALUE = Values.make(Level.DEBUG.name());
+  public static final Value INFO_VALUE = Values.make(Level.INFO.name());
+  public static final Value WARN_VALUE = Values.make(Level.WARN.name());
+  public static final Value ERROR_VALUE = Values.make(Level.ERROR.name());
+
+  private static final List<FunctionParameter> JSON_PARAMETER =
+      Collections.singletonList(new FunctionParameter(0, "jsonPath", Types.STRING, Values.NIL));
+
+  private static final FunctionSignature JSON_PATH_BOOLEAN_FUNCTION_SIGNATURE =
+      new FunctionSignature(JSON_PARAMETER, Types.BOOLEAN);
+
+  private static final FunctionSignature JSON_PATH_LIST_FUNCTION_SIGNATURE =
+      new FunctionSignature(JSON_PARAMETER, Types.LIST);
+
+  private static final FunctionSignature JSON_PATH_ANY_FUNCTION_SIGNATURE =
+      new FunctionSignature(JSON_PARAMETER, Types.ANY);
+
+  // () => Any
+  private static final FunctionSignature SUPPLIER_ANY_SIGNATURE =
+      new FunctionSignature(Collections.emptyList(), Types.ANY);
 
   private final ScriptHandle handle;
   private Arity2CallSite callSite;
 
   private final Object lock = new Object();
 
+  private Function<LoggingContext, List<ValueMapEntry>> userFunctions =
+      ctx -> Collections.emptyList();
+
   public ScriptManager(ScriptHandle handle) {
     this.handle = handle;
+  }
+
+  public void setUserFunctions(Function<LoggingContext, List<ValueMapEntry>> userFunctions) {
+    this.userFunctions = userFunctions;
   }
 
   /*
@@ -44,8 +73,7 @@ public class ScriptManager {
   public boolean execute(boolean df, Level level, LoggingContext context) {
     try {
       Value levelV = getLevelV(level);
-      List<ValueMapEntry> functionMapList = new ArrayList<>();
-      functionMapList.add(NOW_FUNCTION);
+      List<ValueMapEntry> functionMapList = new ArrayList<>(userFunctions.apply(context));
       addContextFunctions(functionMapList, context);
       DictValue dictValue = new DictValue(functionMapList.toArray(new ValueMapEntry[0]));
       Value functionMapValue = Values.make(dictValue);
@@ -82,17 +110,47 @@ public class ScriptManager {
   private void addContextFunctions(List<ValueMapEntry> functionMapList, LoggingContext ctx) {
     functionMapList.add(
         new ValueMapEntry(
-            "fields", arity0FunctionValue(userCtx -> convertFields(ctx.getFields()))));
+            "fields",
+            Values.make(
+                new UserFunctionValue(
+                    SUPPLIER_ANY_SIGNATURE,
+                    (Arity0UserFunction) userCtx -> convertFields(ctx.getFields())))));
     functionMapList.add(
-        new ValueMapEntry("find_number", userFunctionValue(optionalFunction(ctx::findNumber))));
+        new ValueMapEntry(
+            "find_number",
+            Values.make(
+                new UserFunctionValue(
+                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findNumber)))));
     functionMapList.add(
-        new ValueMapEntry("find_string", userFunctionValue(optionalFunction(ctx::findString))));
+        new ValueMapEntry(
+            "find_string",
+            Values.make(
+                new UserFunctionValue(
+                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findString)))));
     functionMapList.add(
-        new ValueMapEntry("find_boolean", userFunctionValue(optionalFunction(ctx::findBoolean))));
+        new ValueMapEntry(
+            "find_boolean",
+            Values.make(
+                new UserFunctionValue(
+                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findBoolean)))));
     functionMapList.add(
-        new ValueMapEntry("find_list", userFunctionValue(listFunction(ctx::findList))));
+        new ValueMapEntry(
+            "find_object",
+            Values.make(
+                new UserFunctionValue(
+                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findObject)))));
     functionMapList.add(
-        new ValueMapEntry("find_null", userFunctionValue(nullFunction(ctx::findNull))));
+        new ValueMapEntry(
+            "find_list",
+            Values.make(
+                new UserFunctionValue(
+                    JSON_PATH_LIST_FUNCTION_SIGNATURE, listFunction(ctx::findList)))));
+    functionMapList.add(
+        new ValueMapEntry(
+            "find_null",
+            Values.make(
+                new UserFunctionValue(
+                    JSON_PATH_BOOLEAN_FUNCTION_SIGNATURE, booleanFunction(ctx::findNull)))));
   }
 
   private Value call(Value level, Value fields) {
@@ -126,5 +184,32 @@ public class ScriptManager {
     LoadPath loadPath = new LoadPath.Builder().addStdLocation().add(memLocation).build();
     Runtime runtime = TweakFlow.compile(loadPath, path);
     return runtime.getModules().get(runtime.unitKey(path));
+  }
+
+  private Arity1UserFunction optionalFunction(Function<String, Optional<?>> contextFunction) {
+    return (context, pathValue) -> {
+      final String path = pathValue.string();
+      final Optional<?> opt = contextFunction.apply(path);
+      if (opt.isPresent()) {
+        return Values.make(opt.get());
+      }
+      return Values.NIL;
+    };
+  }
+
+  private Arity1UserFunction listFunction(Function<String, List<?>> listFunction) {
+    return (context, pathValue) -> {
+      final String path = pathValue.string();
+      final List<?> list = listFunction.apply(path);
+      return Values.makeList(list);
+    };
+  }
+
+  private Arity1UserFunction booleanFunction(Function<String, Boolean> booleanFunction) {
+    return (context, pathValue) -> {
+      final String path = pathValue.string();
+      final Boolean result = booleanFunction.apply(path);
+      return Values.make(result);
+    };
   }
 }

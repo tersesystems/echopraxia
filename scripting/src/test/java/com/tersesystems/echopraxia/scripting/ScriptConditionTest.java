@@ -10,8 +10,12 @@ import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
+import com.twineworks.tweakflow.lang.types.Types;
+import com.twineworks.tweakflow.lang.values.Values;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,9 +61,19 @@ public class ScriptConditionTest {
   }
 
   @Test
-  public void testNowCondition() {
+  public void testUserDefinedCondition() {
+    List<ValueMapEntry> userFunctions =
+        Collections.singletonList(
+            new ValueMapEntry(
+                "now",
+                Values.make(
+                    ScriptFunction.builder()
+                        .supplier(() -> Values.make(Instant.now()))
+                        .result(Types.DATETIME)
+                        .build())));
     Condition condition =
         ScriptCondition.create(
+            ctx -> userFunctions,
             false,
             "import * as std from \"std\";\n"
                 + "alias std.time as time;\n"
