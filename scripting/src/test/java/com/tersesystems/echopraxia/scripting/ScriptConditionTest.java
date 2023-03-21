@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.scripting;
 
+import static com.tersesystems.echopraxia.scripting.ScriptFunction.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 
@@ -68,13 +69,12 @@ public class ScriptConditionTest {
   public void testUserDefinedCondition() {
     List<ValueMapEntry> userFunctions =
         Collections.singletonList(
-            new ValueMapEntry(
+            ValueMapEntry.make(
                 "now",
-                Values.make(
-                    ScriptFunction.builder()
-                        .supplier(() -> Values.make(Instant.now()))
-                        .result(Types.DATETIME)
-                        .build())));
+                builder()
+                    .supplier(() -> Values.make(Instant.now()))
+                    .result(Types.DATETIME)
+                    .build()));
     Condition condition =
         ScriptCondition.create(
             ctx -> userFunctions,
@@ -101,23 +101,22 @@ public class ScriptConditionTest {
     Function<LoggingContext, List<ValueMapEntry>> userFunctions =
         ctx ->
             Collections.singletonList(
-                new ValueMapEntry(
+                ValueMapEntry.make(
                     "logger_property",
-                    Values.make(
-                        ScriptFunction.builder()
-                            .parameter(
-                                new FunctionParameter(
-                                    0, "property_name", Types.STRING, Values.make("")))
-                            .function(
-                                propertyName -> {
-                                  LogstashCoreLogger core = (LogstashCoreLogger) ctx.getCore();
-                                  LoggerContext loggerContext = core.logger().getLoggerContext();
-                                  String propertyValue =
-                                      loggerContext.getProperty(propertyName.string());
-                                  return Values.make(propertyValue);
-                                })
-                            .result(Types.STRING)
-                            .build())));
+                    builder()
+                        .parameter(
+                            new FunctionParameter(
+                                0, "property_name", Types.STRING, Values.make("")))
+                        .function(
+                            propertyName -> {
+                              LogstashCoreLogger core = (LogstashCoreLogger) ctx.getCore();
+                              LoggerContext loggerContext = core.logger().getLoggerContext();
+                              String propertyValue =
+                                  loggerContext.getProperty(propertyName.string());
+                              return Values.make(propertyValue);
+                            })
+                        .result(Types.STRING)
+                        .build()));
     Condition condition =
         ScriptCondition.create(
             userFunctions,
