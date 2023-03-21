@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.scripting;
 
+import com.twineworks.tweakflow.lang.values.UserFunctionValue;
+import com.twineworks.tweakflow.lang.values.Values;
 import java.util.Map;
 import java.util.Objects;
 
@@ -8,9 +10,13 @@ public final class ValueMapEntry
   final String key;
   final com.twineworks.tweakflow.lang.values.Value value;
 
-  ValueMapEntry(String k, com.twineworks.tweakflow.lang.values.Value v) {
+  private ValueMapEntry(String k, com.twineworks.tweakflow.lang.values.Value v) {
     key = Objects.requireNonNull(k);
     value = Objects.requireNonNull(v);
+  }
+
+  public static ValueMapEntry make(String name, UserFunctionValue userFunction) {
+    return new ValueMapEntry(name, Values.make(userFunction));
   }
 
   @Override

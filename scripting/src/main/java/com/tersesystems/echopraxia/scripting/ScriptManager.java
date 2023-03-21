@@ -109,48 +109,40 @@ public class ScriptManager {
 
   private void addContextFunctions(List<ValueMapEntry> functionMapList, LoggingContext ctx) {
     functionMapList.add(
-        new ValueMapEntry(
+        ValueMapEntry.make(
             "fields",
-            Values.make(
-                new UserFunctionValue(
-                    SUPPLIER_ANY_SIGNATURE,
-                    (Arity0UserFunction) userCtx -> convertFields(ctx.getFields())))));
+            new UserFunctionValue(
+                SUPPLIER_ANY_SIGNATURE,
+                (Arity0UserFunction) userCtx -> convertFields(ctx.getFields()))));
     functionMapList.add(
-        new ValueMapEntry(
+        ValueMapEntry.make(
             "find_number",
-            Values.make(
-                new UserFunctionValue(
-                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findNumber)))));
+            new UserFunctionValue(
+                JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findNumber))));
     functionMapList.add(
-        new ValueMapEntry(
+        ValueMapEntry.make(
             "find_string",
-            Values.make(
-                new UserFunctionValue(
-                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findString)))));
+            new UserFunctionValue(
+                JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findString))));
     functionMapList.add(
-        new ValueMapEntry(
+        ValueMapEntry.make(
             "find_boolean",
-            Values.make(
-                new UserFunctionValue(
-                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findBoolean)))));
+            new UserFunctionValue(
+                JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findBoolean))));
     functionMapList.add(
-        new ValueMapEntry(
+        ValueMapEntry.make(
             "find_object",
-            Values.make(
-                new UserFunctionValue(
-                    JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findObject)))));
+            new UserFunctionValue(
+                JSON_PATH_ANY_FUNCTION_SIGNATURE, optionalFunction(ctx::findObject))));
     functionMapList.add(
-        new ValueMapEntry(
+        ValueMapEntry.make(
             "find_list",
-            Values.make(
-                new UserFunctionValue(
-                    JSON_PATH_LIST_FUNCTION_SIGNATURE, listFunction(ctx::findList)))));
+            new UserFunctionValue(JSON_PATH_LIST_FUNCTION_SIGNATURE, listFunction(ctx::findList))));
     functionMapList.add(
-        new ValueMapEntry(
+        ValueMapEntry.make(
             "find_null",
-            Values.make(
-                new UserFunctionValue(
-                    JSON_PATH_BOOLEAN_FUNCTION_SIGNATURE, booleanFunction(ctx::findNull)))));
+            new UserFunctionValue(
+                JSON_PATH_BOOLEAN_FUNCTION_SIGNATURE, booleanFunction(ctx::findNull))));
   }
 
   private Value call(Value level, Value fields) {
