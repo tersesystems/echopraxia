@@ -881,21 +881,21 @@ library echopraxia {
 You can access the core logger and the underlying framework logger through the context:
 
 ```java
-Function<LoggingContext, List<ValueMapEntry>> userFunctions = ctx ->
-  Collections.singletonList(
-    new ValueMapEntry(
-      "logger_property",
-      Values.make(
-        ScriptFunction.builder()
-          .parameter(new FunctionParameter(0, "property_name", Types.STRING, Values.make("")))
-          .function(propertyName -> {
+Function<LoggingContext, List<ValueMapEntry>> userFunctions = ctx -> {
+   UserFunctionValue f = ScriptFunction.builder()
+        .parameter(new FunctionParameter(0, "property_name", Types.STRING, Values.make("")))
+        .function(propertyName -> {
             LogstashCoreLogger core = (LogstashCoreLogger) ctx.getCore();
             LoggerContext loggerContext = core.logger().getLoggerContext();
             String propertyValue = loggerContext.getProperty(propertyName.string());
             return Values.make(propertyValue);
-          })
-          .result(Types.STRING)
-          .build())));
+        })
+        .result(Types.STRING)
+        .build())
+  
+}
+  Collections.singletonList(
+    ValueMapEntry.make("logger_property", f      );
 ```
 
 With this user defined function, you can set a logback property:
