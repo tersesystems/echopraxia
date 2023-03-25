@@ -20,7 +20,7 @@ public class JULCoreLogger implements CoreLogger {
   private final Condition condition;
   private final String fqcn;
 
-  public JULCoreLogger(String fqcn, Logger logger) {
+  public JULCoreLogger(@NotNull String fqcn, @NotNull Logger logger) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = JULLoggerContext.empty();
@@ -161,7 +161,6 @@ public class JULCoreLogger implements CoreLogger {
 
   @Override
   public void log(@NotNull Level level, String message) {
-
     final java.util.logging.Level julLevel = convertLevel(level);
     // the isLoggable check always goes before the condition check, as conditions can be expensive
     if (logger.isLoggable(julLevel)) {
@@ -351,56 +350,6 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
     throw new UnsupportedOperationException();
-  }
-
-  private <FB> Runnable createRunnable(
-      @Nullable StackTraceElement location,
-      Runnable threadLocalRunnable,
-      JULLoggerContext extraContext,
-      Level level,
-      Condition c,
-      Consumer<LoggerHandle<FB>> consumer,
-      FB builder) {
-    return () -> {
-      threadLocalRunnable.run();
-      final LoggerHandle<FB> loggerHandle = newHandle(location, extraContext, level, c, builder);
-      consumer.accept(loggerHandle);
-    };
-  }
-
-  protected <FB> LoggerHandle<FB> newHandle(
-      @Nullable StackTraceElement location,
-      @NotNull JULLoggerContext extraContext,
-      @NotNull Level level,
-      @NotNull Condition c,
-      @NotNull FB builder) {
-    return new LoggerHandle<FB>() {
-      private final java.util.logging.Level julLevel = convertLevel(level);
-
-      @Override
-      public void log(@Nullable String message) {
-        if (logger.isLoggable(julLevel)) {
-          JULLoggingContext ctx = new JULLoggingContext(JULCoreLogger.this, extraContext);
-          if (c.test(level, ctx)) {
-            LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-            logger.log(logRecord);
-          }
-        }
-      }
-
-      @Override
-      public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
-        if (logger.isLoggable(julLevel)) {
-          JULLoggingContext ctx =
-              new JULLoggingContext(
-                  JULCoreLogger.this, extraContext, () -> convertToFields(f.apply(builder)));
-          if (c.test(level, ctx)) {
-            LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-            logger.log(logRecord);
-          }
-        }
-      }
-    };
   }
 
   private List<Field> convertToFields(FieldBuilderResult result) {
