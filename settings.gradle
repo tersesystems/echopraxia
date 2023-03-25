@@ -5,6 +5,7 @@ include('logstash')
 include('logback')
 include('log4j')
 include('jackson')
+include('jul')
 
 include('logger')
 include('async')
