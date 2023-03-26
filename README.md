@@ -892,10 +892,8 @@ Function<LoggingContext, List<ValueMapEntry>> userFunctions = ctx -> {
         })
         .result(Types.STRING)
         .build())
-  
+   return Collections.singletonList(ValueMapEntry.make("logger_property", f); 
 }
-  Collections.singletonList(
-    ValueMapEntry.make("logger_property", f      );
 ```
 
 With this user defined function, you can set a logback property:
