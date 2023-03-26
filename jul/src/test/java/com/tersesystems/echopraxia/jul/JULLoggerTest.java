@@ -40,13 +40,13 @@ class JULLoggerTest extends TestBase {
   void testArguments() {
     Logger<?> logger = getLogger();
     logger.info(
-        "hello {}, you are {}, citizen status {}",
+        "hello {0}, you are {1}, citizen status {2}",
         fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
 
     List<LogRecord> list = ListHandler.list();
     LogRecord logRecord = list.get(0);
     assertThat(logRecord.getLevel()).isEqualTo(Level.INFO);
-    assertThat(logRecord.getMessage()).isEqualTo("hello {}, you are {}, citizen status {}");
+    assertThat(logRecord.getMessage()).isEqualTo("hello {0}, you are {1}, citizen status {2}");
     Field[] parameters = (Field[]) logRecord.getParameters();
     Field nameField = parameters[0];
     assertThat(nameField.name()).isEqualTo("name");

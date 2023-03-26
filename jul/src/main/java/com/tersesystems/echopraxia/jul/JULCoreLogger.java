@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.jul;
 
+import static java.lang.Boolean.parseBoolean;
+
 import com.tersesystems.echopraxia.api.*;
 import java.util.Collections;
 import java.util.List;
@@ -19,6 +21,11 @@ public class JULCoreLogger implements CoreLogger {
   private final JULLoggerContext context;
   private final Condition condition;
   private final String fqcn;
+
+  // Disable infer source, true by default
+  private static final Boolean disableInferSource =
+      parseBoolean(
+          System.getProperty("com.tersesystems.echopraxia.jul.disableInferSource", "true"));
 
   public JULCoreLogger(@NotNull String fqcn, @NotNull Logger logger) {
     this.fqcn = fqcn;
@@ -383,8 +390,10 @@ public class JULCoreLogger implements CoreLogger {
     List<Field> fields = ctx.getFields();
 
     // JUL is really slow and calls sourceClassName lots when serializing.
-    // record.setSourceClassName(null);
-    // record.setSourceMethodName(null);
+    if (disableInferSource) {
+      record.setSourceClassName(null);
+      record.setSourceMethodName(null);
+    }
 
     if (fields.size() == 0) {
       return record;
