@@ -211,8 +211,15 @@ try {
 JSON output is managed using a custom formatter `com.tersesystems.echopraxia.jul.JULJSONFormatter`:
 
 ```properties
-java.util.logging.ConsoleHandler.formatter=com.tersesystems.echopraxia.jul.JULJSONFormatter
+handlers=java.util.logging.ConsoleHandler,java.util.logging.FileHandler
+
+.level=FINEST
+
+java.util.logging.FileHandler.formatter=com.tersesystems.echopraxia.jul.JULJSONFormatter
+java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
 ```
+
+JUL's default class/method inference is disabled as it is not useful here and needlessly slows down logging.
 
 ## Basic Usage
 
