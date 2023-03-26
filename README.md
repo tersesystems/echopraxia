@@ -215,6 +215,8 @@ handlers=java.util.logging.ConsoleHandler,java.util.logging.FileHandler
 
 .level=FINEST
 
+com.tersesystems.echopraxia.jul.JULJSONFormatter.use_slf4j_level_names=true
+
 java.util.logging.FileHandler.formatter=com.tersesystems.echopraxia.jul.JULJSONFormatter
 java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
 ```

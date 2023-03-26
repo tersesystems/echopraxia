@@ -11,12 +11,11 @@ import java.lang.management.ThreadMXBean;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.logging.Formatter;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Shamelessly inspired by <a
@@ -24,7 +23,7 @@ import java.util.logging.LogRecord;
  */
 public class JULJSONFormatter extends Formatter {
 
-  private static final ResourceBundle bundle = ResourceBundle.getBundle("jsonformatter");
+  private static final ResourceBundle bundle = ResourceBundle.getBundle("echopraxia/jsonformatter");
 
   public static final String TIMESTAMP_FORMAT = bundle.getString("timestamp_format");
   public static final String TIMESTAMP_ZONEID = bundle.getString("timestamp_zoneid");
@@ -99,46 +98,29 @@ public class JULJSONFormatter extends Formatter {
       object.put(
           KEY_TIMESTAMP, TIMESTAMP_FORMATTER.format(Instant.ofEpochMilli(record.getMillis())));
       object.put(KEY_LOGGER_NAME, record.getLoggerName());
-      object.put(
-          KEY_LOG_LEVEL,
-          useSlf4jLevelNames
-              ? renameLogLevel(record.getLevel().getName())
-              : record.getLevel().getName());
+      object.put(KEY_LOG_LEVEL, getLogLevel(record));
       object.put(KEY_THREAD_NAME, getThreadName(record.getThreadID()));
 
-      if (null != record.getSourceClassName()) {
+      if (record.getSourceClassName() != null) {
         object.put(KEY_LOGGER_CLASS, record.getSourceClassName());
       }
 
-      if (null != record.getSourceMethodName()) {
+      if (record.getSourceMethodName() != null) {
         object.put(KEY_LOGGER_METHOD, record.getSourceMethodName());
       }
       object.put(KEY_MESSAGE, formatMessage(record));
 
-      // Used an enum map for lighter memory consumption
-      if (null != record.getThrown()) {
-        Map<ExceptionKeys, Object> exceptionInfo = new java.util.EnumMap<>(ExceptionKeys.class);
-        exceptionInfo.put(ExceptionKeys.exception_class, record.getThrown().getClass().getName());
-
-        if (record.getThrown().getMessage() != null) {
-          exceptionInfo.put(ExceptionKeys.exception_message, record.getThrown().getMessage());
-        }
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        record.getThrown().printStackTrace(pw);
-        pw.close();
-        exceptionInfo.put(ExceptionKeys.stack_trace, sw.toString());
-        object.put(KEY_EXCEPTION, exceptionInfo);
+      final Throwable thrown = record.getThrown();
+      if (thrown != null) {
+        object.put(KEY_EXCEPTION, createExceptionInfo(thrown));
       }
 
-      Object[] parameters = record.getParameters();
-      if (parameters != null) {
-        for (Object p : parameters) {
-          if (p instanceof Field) {
-            Field field = (Field) p;
-            object.put(field.name(), field.value());
-          }
+      if (record instanceof EchopraxiaLogRecord) {
+        final EchopraxiaLogRecord er = (EchopraxiaLogRecord) record;
+        JULLoggingContext ctx = er.getLoggingContext();
+        final List<Field> fields = ctx.getFields();
+        for (Field field : fields) {
+          object.put(field.name(), field.value());
         }
       }
 
@@ -146,6 +128,29 @@ public class JULJSONFormatter extends Formatter {
     } catch (JsonProcessingException e) {
       return object.toString();
     }
+  }
+
+  private String getLogLevel(LogRecord record) {
+    return useSlf4jLevelNames
+        ? renameLogLevel(record.getLevel().getName())
+        : record.getLevel().getName();
+  }
+
+  @NotNull
+  private static Map<ExceptionKeys, Object> createExceptionInfo(Throwable thrown) {
+    Map<ExceptionKeys, Object> exceptionInfo = new java.util.EnumMap<>(ExceptionKeys.class);
+    exceptionInfo.put(ExceptionKeys.exception_class, thrown.getClass().getName());
+
+    if (thrown.getMessage() != null) {
+      exceptionInfo.put(ExceptionKeys.exception_message, thrown.getMessage());
+    }
+
+    StringWriter sw = new StringWriter();
+    PrintWriter pw = new PrintWriter(sw);
+    thrown.printStackTrace(pw);
+    pw.close();
+    exceptionInfo.put(ExceptionKeys.stack_trace, sw.toString());
+    return exceptionInfo;
   }
 
   /** Gets the thread name from the threadId present in the logRecord. */

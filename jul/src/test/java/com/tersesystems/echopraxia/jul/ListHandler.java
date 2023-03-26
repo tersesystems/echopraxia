@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.jul;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
@@ -19,6 +20,11 @@ public class ListHandler extends Handler {
 
   @Override
   public void publish(LogRecord record) {
+
+    final Formatter formatter = getFormatter();
+    if (formatter != null) {
+      formatter.format(record);
+    }
     records.add(record);
   }
 

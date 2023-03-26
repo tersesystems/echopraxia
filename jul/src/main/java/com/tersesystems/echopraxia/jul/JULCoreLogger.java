@@ -1,7 +1,5 @@
 package com.tersesystems.echopraxia.jul;
 
-import static java.lang.Boolean.parseBoolean;
-
 import com.tersesystems.echopraxia.api.*;
 import java.util.Collections;
 import java.util.List;
@@ -21,11 +19,6 @@ public class JULCoreLogger implements CoreLogger {
   private final JULLoggerContext context;
   private final Condition condition;
   private final String fqcn;
-
-  // Disable infer source, true by default
-  private static final Boolean disableInferSource =
-      parseBoolean(
-          System.getProperty("com.tersesystems.echopraxia.jul.disableInferSource", "true"));
 
   public JULCoreLogger(@NotNull String fqcn, @NotNull Logger logger) {
     this.fqcn = fqcn;
@@ -383,32 +376,11 @@ public class JULCoreLogger implements CoreLogger {
     throw new IllegalStateException("Unknown level " + level);
   }
 
-  private LogRecord createLogRecord(
-      java.util.logging.Level julLevel, String message, JULLoggingContext ctx) {
-    LogRecord record = new LogRecord(julLevel, message);
+  private EchopraxiaLogRecord createLogRecord(
+      java.util.logging.Level julLevel, String messageTemplate, JULLoggingContext ctx) {
+
+    EchopraxiaLogRecord record = new EchopraxiaLogRecord(julLevel, messageTemplate, ctx);
     record.setLoggerName(getName());
-    List<Field> fields = ctx.getFields();
-
-    // JUL is really slow and calls sourceClassName lots when serializing.
-    if (disableInferSource) {
-      record.setSourceClassName(null);
-      record.setSourceMethodName(null);
-    }
-
-    if (fields.size() == 0) {
-      return record;
-    } else if (fields.size() == 1) {
-      Field field = fields.get(0);
-      Object obj = field.value().raw();
-      if (obj instanceof Throwable) {
-        record.setThrown((Throwable) obj);
-      } else {
-        record.setParameters(new Object[] {field});
-      }
-    } else {
-      Object[] parameters = fields.toArray();
-      record.setParameters(parameters);
-    }
     return record;
   }
 
