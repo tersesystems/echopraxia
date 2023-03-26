@@ -1,11 +1,11 @@
 package com.tersesystems.echopraxia.jul;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import org.junit.jupiter.api.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class LoggerFactoryTest {
 

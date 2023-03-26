@@ -1,18 +1,16 @@
 package com.tersesystems.echopraxia.jul;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
-import com.tersesystems.echopraxia.api.Value;
-import org.junit.jupiter.api.Test;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
 
 class JULLoggerTest extends TestBase {
 
@@ -38,13 +36,12 @@ class JULLoggerTest extends TestBase {
     assertThat(logRecord.getMessage()).isEqualTo("hello");
   }
 
-
   @Test
   void testArguments() {
     Logger<?> logger = getLogger();
     logger.info(
-            "hello {}, you are {}, citizen status {}",
-            fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
+        "hello {}, you are {}, citizen status {}",
+        fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
 
     List<LogRecord> list = ListHandler.list();
     LogRecord logRecord = list.get(0);

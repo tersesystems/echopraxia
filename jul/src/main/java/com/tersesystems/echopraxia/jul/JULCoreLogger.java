@@ -389,11 +389,12 @@ public class JULCoreLogger implements CoreLogger {
     if (fields.size() == 0) {
       return record;
     } else if (fields.size() == 1) {
-      Object obj = fields.get(0);
+      Field field = fields.get(0);
+      Object obj = field.value().raw();
       if (obj instanceof Throwable) {
         record.setThrown((Throwable) obj);
       } else {
-        record.setParameters(new Object[] {obj});
+        record.setParameters(new Object[] {field});
       }
     } else {
       Object[] parameters = fields.toArray();
