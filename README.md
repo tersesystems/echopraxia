@@ -221,6 +221,8 @@ java.util.logging.FileHandler.formatter=com.tersesystems.echopraxia.jul.JULJSONF
 java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
 ```
 
+The `use_slf4j_level_names` property will map from JUL's levels to SLF4J, mapping `FINE` and `FINER` to `DEBUG` and `FINEST` to `TRACE`.
+
 JUL's default class/method inference is disabled as it is not useful here and needlessly slows down logging.
 
 ## Basic Usage
@@ -287,7 +289,7 @@ And `fb.list` can take many inputs as needed, for example a stream:
 String[]
 basicLogger.info("Message name {}", fb -> {
   Stream<Field> fieldStream = ...;
-  fb.list(arrayOfFields);
+  return fb.list(arrayOfFields);
 });
 ```
 

@@ -6,6 +6,9 @@ dependencies {
     api project(":api")
     api project(":jackson")
 
+    // Needs for https://github.com/qos-ch/slf4j/blob/master/jul-to-slf4j/src/main/java/org/slf4j/bridge/SLF4JBridgeHandler.java
+    implementation 'org.slf4j:slf4j-api:1.7.36'
+
     jmhImplementation project(":logger")
     testImplementation project(":logger")
 }
