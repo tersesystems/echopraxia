@@ -1,0 +1,11 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api project(":api")
+    api project(":jackson")
+
+    jmhImplementation project(":logger")
+    testImplementation project(":logger")
+}

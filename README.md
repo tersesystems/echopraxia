@@ -85,7 +85,14 @@ Benchmarks are available at [BENCHMARKS.md](BENCHMARKS.md).
 
 Please be aware that how fast and how much you can log is [dramatically impacted](https://tersesystems.com/blog/2019/06/03/application-logging-in-java-part-6/) by your use of an asynchronous appender, your available I/O, your storage, and your ability to manage and process logs.
 
-## Logstash
+## Core Providers
+
+Echopraxia is divided into two sections: the user logger APIs (`logger`, `fluent`, `semantic`) and an 
+underlying `CoreLogger` implementation which is tied to the logging framework.  You will need to install both.
+
+There are core providers for Logback, Log4J2, and JUL.  We'll go over these very quickly and then go into basic usage.
+
+### Logstash
 
 There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder).  This library does not provide a front end logger API, so you must pick (or create) one yourself, i.e. normal, async, fluent, or semantic.  
 
@@ -107,7 +114,7 @@ implementation "com.tersesystems.echopraxia:logstash:<VERSION>"
 
 There are a couple of features that are Logback specific, such as the [logback converters(#logback-converters) and the direct Logback API.
 
-## Log4J
+### Log4J
 
 There is a Log4J implementation that works with the [JSON Template Layout](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html).  This provides a core logger implementation but does not provide a user visible logging API.
 
@@ -166,6 +173,55 @@ If you want to separate the context fields from the argument fields, you can def
 ```
 
 Unfortunately, I don't know of a way to "flatten" fields so that they show up on the root object instead of under an additional field.  If you know how to do this, let me know!
+
+### JUL (java.util.logging)
+
+There is a JUL implementation.
+
+Maven:
+
+```xml
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>log4j</artifactId>
+  <version><VERSION></version>
+</dependency>
+```
+
+Gradle:
+
+```gradle
+implementation "com.tersesystems.echopraxia:log4j:<VERSION>" 
+```
+
+You will probably want to configure JUL by calling `logManager.readConfiguration`:
+
+```java
+InputStream is;
+try {
+  is = getClass().getClassLoader().getResourceAsStream("logging.properties");
+  LogManager manager = LogManager.getLogManager();
+  manager.reset();
+  manager.readConfiguration(is);
+} finally {
+  if (is != null) is.close();
+}
+```
+
+JSON output is managed using a custom formatter `com.tersesystems.echopraxia.jul.JULJSONFormatter`:
+
+```properties
+handlers=java.util.logging.ConsoleHandler,java.util.logging.FileHandler
+
+.level=FINEST
+
+com.tersesystems.echopraxia.jul.JULJSONFormatter.use_slf4j_level_names=true
+
+java.util.logging.FileHandler.formatter=com.tersesystems.echopraxia.jul.JULJSONFormatter
+java.util.logging.ConsoleHandler.formatter=java.util.logging.SimpleFormatter
+```
+
+JUL's default class/method inference is disabled as it is not useful here and needlessly slows down logging.
 
 ## Basic Usage
 
