@@ -847,6 +847,16 @@ library echopraxia {
 }
 ```
 
+If you want to look at intermediate results, you can use the `debug` function which will print out values to `System.out`:
+
+```tweakflow
+library echopraxia {
+  function evaluate: (string level, dict ctx) ->
+    let { now: ctx[:now]; }
+    debug(now()) && true;
+}
+```
+
 ### Creating Script Conditions
 
 The simplest way to handle a script is to pass it in directly as a string:
