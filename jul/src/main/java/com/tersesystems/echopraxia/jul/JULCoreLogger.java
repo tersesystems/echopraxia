@@ -12,6 +12,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.MDC;
 
 public class JULCoreLogger implements CoreLogger {
 
@@ -19,23 +20,27 @@ public class JULCoreLogger implements CoreLogger {
   private final JULLoggerContext context;
   private final Condition condition;
   private final String fqcn;
+  private final Supplier<Runnable> threadContextFunction;
 
   public JULCoreLogger(@NotNull String fqcn, @NotNull Logger logger) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = JULLoggerContext.empty();
     this.condition = Condition.always();
+    this.threadContextFunction = mdcContext();
   }
 
   protected JULCoreLogger(
       @NotNull String fqcn,
       @NotNull Logger log4jLogger,
       @NotNull JULLoggerContext context,
-      @NotNull Condition condition) {
+      @NotNull Condition condition,
+      @NotNull Supplier<Runnable> threadContextFunction) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
+    this.threadContextFunction = threadContextFunction;
   }
 
   @NotNull
@@ -68,10 +73,11 @@ public class JULCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull CoreLogger withThreadContext(
+  public @NotNull JULCoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     // https://github.com/qos-ch/slf4j/blob/master/slf4j-api/src/main/java/org/slf4j/helpers/BasicMDCAdapter.java
-    return this;
+    JULLoggerContext newContext = context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
+    return newLogger(newContext);
   }
 
   @Override
@@ -100,7 +106,7 @@ public class JULCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull JULCoreLogger withFQCN(@NotNull String fqcn) {
-    return new JULCoreLogger(fqcn, logger, context, condition);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction);
   }
 
   @Override
@@ -387,12 +393,25 @@ public class JULCoreLogger implements CoreLogger {
 
   @NotNull
   private JULCoreLogger newLogger(JULLoggerContext newContext) {
-    return new JULCoreLogger(fqcn, logger, newContext, condition);
+    return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction);
   }
 
   @NotNull
   private JULCoreLogger newLogger(@NotNull Condition condition) {
-    return new JULCoreLogger(fqcn, logger, context, condition);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction);
+  }
+
+  private Supplier<Runnable> mdcContext() {
+    return () -> {
+      // rendering thread (saving context from old thread)
+      final Map<String, String> copyOfContextMap = MDC.getCopyOfContextMap();
+      // function runs in executor thread (applying context to new thread)
+      return () -> {
+        if (copyOfContextMap != null) {
+          MDC.setContextMap(copyOfContextMap);
+        }
+      };
+    };
   }
 
   public String toString() {
