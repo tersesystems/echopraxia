@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.MDC;
+import org.slf4j.Marker;
 
 public class JULCoreLogger implements CoreLogger {
 
@@ -109,12 +110,13 @@ public class JULCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return null;
+    return
+      newLogger(executor);
   }
 
   @Override
   public @NotNull JULCoreLogger withFQCN(@NotNull String fqcn) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction);
+    return newLogger(fqcn);
   }
 
   @Override
@@ -336,7 +338,14 @@ public class JULCoreLogger implements CoreLogger {
   @Override
   public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+        () -> {
+          threadLocalRunnable.run();
+          consumer.accept(newHandle(level, builder, logger));
+        });
+    }
   }
 
   @Override
@@ -345,7 +354,15 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+        () -> {
+          threadLocalRunnable.run();
+          final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, logger);
+          consumer.accept(loggerHandle);
+        });
+    }
   }
 
   @Override
@@ -354,7 +371,15 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Supplier<List<Field>> extraFields,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+        () -> {
+          threadLocalRunnable.run();
+          final LoggerHandle<FB> loggerHandle = newHandle(level, builder, logger);
+          consumer.accept(loggerHandle);
+        });
+    }
   }
 
   @Override
@@ -364,7 +389,15 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+        () -> {
+          threadLocalRunnable.run();
+          final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, logger);
+          consumer.accept(loggerHandle);
+        });
+    }
   }
 
   private List<Field> convertToFields(FieldBuilderResult result) {
