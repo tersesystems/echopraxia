@@ -75,14 +75,22 @@ public class JULCoreLogger implements CoreLogger {
   @Override
   public @NotNull JULCoreLogger withThreadContext(
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
-    // https://github.com/qos-ch/slf4j/blob/master/slf4j-api/src/main/java/org/slf4j/helpers/BasicMDCAdapter.java
     JULLoggerContext newContext = context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
     return newLogger(newContext);
   }
 
   @Override
-  public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newSupplier) {
-    return this;
+  public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newThreadContextFunction) {
+    Supplier<Runnable> joinedThreadContextFunction =
+        () -> {
+          final Runnable r1 = newThreadContextFunction.get();
+          final Runnable r2 = threadContextFunction.get();
+          return () -> {
+            r1.run();
+            r2.run();
+          };
+        };
+    return newLogger(joinedThreadContextFunction);
   }
 
   @Override
@@ -394,6 +402,10 @@ public class JULCoreLogger implements CoreLogger {
   @NotNull
   private JULCoreLogger newLogger(JULLoggerContext newContext) {
     return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction);
+  }
+
+  private JULCoreLogger newLogger(Supplier<Runnable> newThreadContextFunction) {
+    return new JULCoreLogger(fqcn, logger, context, condition, newThreadContextFunction);
   }
 
   @NotNull
