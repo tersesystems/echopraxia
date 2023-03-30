@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import org.junit.jupiter.api.Test;
+import org.slf4j.MDC;
 
 class JULLoggerTest extends TestBase {
 
@@ -51,6 +52,20 @@ class JULLoggerTest extends TestBase {
     Field nameField = parameters[0];
     assertThat(nameField.name()).isEqualTo("name");
     assertThat(nameField.value().raw()).isEqualTo("will");
+  }
+
+  @Test
+  void testWithThreadContext() {
+    Logger<?> logger = getLogger();
+    MDC.put("mdckey", "mdcvalue");
+    logger.withThreadContext().info("hello");
+
+    List<LogRecord> list = ListHandler.list();
+    EchopraxiaLogRecord logRecord = (EchopraxiaLogRecord) list.get(0);
+    List<Field> fields = logRecord.getLoggingContext().getLoggerFields();
+    Field nameField = fields.get(0);
+    assertThat(nameField.name()).isEqualTo("mdckey");
+    assertThat(nameField.value().raw()).isEqualTo("mdcvalue");
   }
 
   @Test
