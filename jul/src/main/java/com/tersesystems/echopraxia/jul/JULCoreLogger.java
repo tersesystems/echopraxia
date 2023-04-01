@@ -4,7 +4,9 @@ import com.tersesystems.echopraxia.api.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.concurrent.ForkJoinPool;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -22,12 +24,15 @@ public class JULCoreLogger implements CoreLogger {
   private final String fqcn;
   private final Supplier<Runnable> threadContextFunction;
 
+  private final Executor executor;
+
   public JULCoreLogger(@NotNull String fqcn, @NotNull Logger logger) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = JULLoggerContext.empty();
     this.condition = Condition.always();
     this.threadContextFunction = mdcContext();
+    this.executor = ForkJoinPool.commonPool();
   }
 
   protected JULCoreLogger(
@@ -35,12 +40,14 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Logger log4jLogger,
       @NotNull JULLoggerContext context,
       @NotNull Condition condition,
-      @NotNull Supplier<Runnable> threadContextFunction) {
+      @NotNull Supplier<Runnable> threadContextFunction,
+      @NotNull Executor executor) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
     this.threadContextFunction = threadContextFunction;
+    this.executor = executor;
   }
 
   @NotNull
@@ -109,12 +116,12 @@ public class JULCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return null;
+    return newLogger(executor);
   }
 
   @Override
   public @NotNull JULCoreLogger withFQCN(@NotNull String fqcn) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction);
+    return newLogger(fqcn);
   }
 
   @Override
@@ -336,7 +343,14 @@ public class JULCoreLogger implements CoreLogger {
   @Override
   public <FB> void asyncLog(
       @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+          () -> {
+            threadLocalRunnable.run();
+            consumer.accept(newHandle(level, builder, this));
+          });
+    }
   }
 
   @Override
@@ -345,7 +359,15 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+          () -> {
+            threadLocalRunnable.run();
+            final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, this);
+            consumer.accept(loggerHandle);
+          });
+    }
   }
 
   @Override
@@ -354,7 +376,15 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Supplier<List<Field>> extraFields,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+          () -> {
+            threadLocalRunnable.run();
+            final LoggerHandle<FB> loggerHandle = newHandle(level, builder, this);
+            consumer.accept(loggerHandle);
+          });
+    }
   }
 
   @Override
@@ -364,7 +394,69 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Condition c,
       @NotNull Consumer<LoggerHandle<FB>> consumer,
       @NotNull FB builder) {
-    throw new UnsupportedOperationException();
+    if (logger.isLoggable(convertLevel(level))) {
+      Runnable threadLocalRunnable = threadContextFunction.get();
+      runAsyncLog(
+          () -> {
+            threadLocalRunnable.run();
+            final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, this);
+            consumer.accept(loggerHandle);
+          });
+    }
+  }
+
+  protected void runAsyncLog(Runnable runnable) {
+    // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
+    CompletableFuture.runAsync(runnable, executor)
+        .exceptionally(
+            e -> {
+              // Usually we get to this point when you have thread local dependent code in your
+              // logger.withContext() block, and your executor doesn't have those thread locals
+              // so you NPE.
+              //
+              // We need to log this error, but since it could be part of the logger context
+              // that is causing this error, we can't log the error with the same logger.
+              //
+              // Fallback to the underlying SLF4J logger to render it.
+              final Throwable cause = e.getCause(); // strip the CompletionException
+              logger.log(
+                  java.util.logging.Level.SEVERE,
+                  "Uncaught exception when running asyncLog",
+                  cause);
+              return null;
+            });
+  }
+
+  @NotNull
+  private <FB> LoggerHandle<FB> newHandle(
+      @NotNull Level level, @NotNull FB builder, JULCoreLogger callerLogger) {
+    return new LoggerHandle<FB>() {
+      @Override
+      public void log(@Nullable String message) {
+        callerLogger.log(level, message);
+      }
+
+      @Override
+      public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        callerLogger.log(level, message, f, builder);
+      }
+    };
+  }
+
+  protected <FB> LoggerHandle<FB> newHandle(
+      @NotNull Level level, @NotNull Condition c, @NotNull FB builder, JULCoreLogger callerLogger) {
+    return new LoggerHandle<FB>() {
+      @Override
+      public void log(@Nullable String message) {
+        callerLogger.log(level, c, message);
+      }
+
+      @Override
+      public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
+        // conditions involve argument fields, so we can't short circuit allocation in this chain...
+        callerLogger.log(level, c, message, f, builder);
+      }
+    };
   }
 
   private List<Field> convertToFields(FieldBuilderResult result) {
@@ -401,16 +493,24 @@ public class JULCoreLogger implements CoreLogger {
 
   @NotNull
   private JULCoreLogger newLogger(JULLoggerContext newContext) {
-    return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction);
+    return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction, executor);
   }
 
   private JULCoreLogger newLogger(Supplier<Runnable> newThreadContextFunction) {
-    return new JULCoreLogger(fqcn, logger, context, condition, newThreadContextFunction);
+    return new JULCoreLogger(fqcn, logger, context, condition, newThreadContextFunction, executor);
   }
 
   @NotNull
   private JULCoreLogger newLogger(@NotNull Condition condition) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
+  }
+
+  private CoreLogger newLogger(Executor executor) {
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
+  }
+
+  private JULCoreLogger newLogger(String fqcn) {
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
   }
 
   private Supplier<Runnable> mdcContext() {
