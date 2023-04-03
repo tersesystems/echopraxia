@@ -44,6 +44,45 @@ public abstract class Value<V> {
   @NotNull
   public abstract Value.Type type();
 
+  /** @return this value as an object value. */
+  @NotNull
+  public ObjectValue asObject() {
+    return (ObjectValue) this;
+  }
+
+  /** @return this value as an array value */
+  @NotNull
+  public ArrayValue asArray() {
+    return (ArrayValue) this;
+  }
+
+  /** @return this value as a string value */
+  @NotNull
+  public StringValue asString() {
+    return (StringValue) this;
+  }
+
+  /** @return this value as a number value */
+  @NotNull
+  public <T extends Number & Comparable<T>> NumberValue<T> asNumber() {
+    return (NumberValue<T>) this;
+  }
+
+  /** @return this value as an exception value */
+  public ExceptionValue asException() {
+    return (ExceptionValue) this;
+  }
+
+  /** @return this value as a null value */
+  public NullValue asNull() {
+    return (NullValue) this;
+  }
+
+  /** @return this value as a boolean value */
+  public BooleanValue asBoolean() {
+    return (BooleanValue) this;
+  }
+
   @NotNull
   public String toString() {
     final Object raw = raw();
@@ -685,6 +724,18 @@ public abstract class Value<V> {
       return Type.ARRAY;
     }
 
+    public ArrayValue add(Value<?> value) {
+      ArrayList<Value<?>> values = new ArrayList<>(this.raw);
+      values.add(value);
+      return new ArrayValue(values);
+    }
+
+    public ArrayValue addAll(Collection<Value<?>> values) {
+      ArrayList<Value<?>> joinedValues = new ArrayList<>(this.raw);
+      joinedValues.addAll(values);
+      return new ArrayValue(joinedValues);
+    }
+
     @Override
     public boolean equals(Object o) {
       if (this == o) return true;
@@ -716,6 +767,18 @@ public abstract class Value<V> {
     @Override
     public List<Field> raw() {
       return raw;
+    }
+
+    public ObjectValue add(Field field) {
+      ArrayList<Field> fields = new ArrayList<>(this.raw);
+      fields.add(field);
+      return new ObjectValue(fields);
+    }
+
+    public ObjectValue addAll(Collection<Field> fields) {
+      ArrayList<Field> joinedFields = new ArrayList<>(this.raw);
+      joinedFields.addAll(fields);
+      return new ObjectValue(joinedFields);
     }
 
     @Override
