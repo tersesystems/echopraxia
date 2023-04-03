@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.api;
 
-import org.junit.jupiter.api.Test;
-
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
 
 public class ValueTests {
 
@@ -44,5 +44,4 @@ public class ValueTests {
     Value.ArrayValue arrayPlus = arrayValue.addAll(singleton(numberValue));
     assertThat(arrayPlus.raw().size()).isEqualTo(2);
   }
-
 }
