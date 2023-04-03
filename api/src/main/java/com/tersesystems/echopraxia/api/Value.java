@@ -63,8 +63,19 @@ public abstract class Value<V> {
   }
 
   /** @return this value as a number value */
-  public NumberValue<?> asNumber() {
-    return (NumberValue<?>) this;
+  @NotNull
+  public <T extends Number & Comparable<T>> NumberValue<T> asNumber() {
+    return (NumberValue<T>) this;
+  }
+
+  /** @return this value as an exception value */
+  public ExceptionValue asException() {
+    return (ExceptionValue) this;
+  }
+
+  /** @return this value as a null value */
+  public NullValue asNull() {
+    return (NullValue) this;
   }
 
   /** @return this value as a boolean value */
