@@ -4,5 +4,5 @@ plugins {
 
 dependencies {
     // https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path
-    implementation 'com.jayway.jsonpath:json-path:2.7.0'
+    implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
 }
