@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.logback;
 
 import static com.tersesystems.echopraxia.api.Utilities.memoize;
 
@@ -9,43 +9,31 @@ import com.tersesystems.echopraxia.logback.AbstractEventLoggingContext;
 import java.util.*;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-public class FieldLoggingContext extends AbstractEventLoggingContext {
-
-  private final CoreLogger core;
+public class ArgumentLoggingContext extends AbstractEventLoggingContext {
 
   private final Supplier<List<Field>> argumentFields;
-  private final Supplier<List<Field>> markerFields;
+  private final CoreLogger core;
 
-  private final Supplier<List<Field>> fields;
-
-  public FieldLoggingContext(CoreLogger core, @NotNull ILoggingEvent event) {
+  public ArgumentLoggingContext(@Nullable CoreLogger core, @NotNull ILoggingEvent event) {
     this.core = core;
     this.argumentFields = memoize(() -> fieldArguments(event));
-    this.markerFields = memoize(() -> fieldMarkers(event));
-    this.fields =
-        memoize(
-            () -> {
-              List<Field> fields = new ArrayList<>();
-              fields.addAll(getArgumentFields()); // argument fields should take precedence
-              fields.addAll(getLoggerFields());
-              return fields;
-            });
   }
 
   @Override
   public CoreLogger getCore() {
-    return this.core;
+    return core;
   }
 
   @Override
   public @NotNull List<Field> getFields() {
-    return fields.get();
+    return argumentFields.get();
   }
 
   @Override
   public @NotNull List<Field> getLoggerFields() {
-    return markerFields.get();
+    return Collections.emptyList();
   }
 
   @Override

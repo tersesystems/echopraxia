@@ -1,8 +1,7 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.logback;
 
 import ch.qos.logback.classic.pattern.ClassicConverter;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import com.tersesystems.echopraxia.logback.AbstractEventLoggingContext;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
