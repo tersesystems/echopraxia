@@ -5,6 +5,6 @@ plugins {
 dependencies {
     // intentionally no dependency on project(":api")
 
-    implementation "io.methvin:directory-watcher:0.15.0"
+    implementation "io.methvin:directory-watcher:$directoryWatcherVersion"
     testImplementation project(":logstash")
 }

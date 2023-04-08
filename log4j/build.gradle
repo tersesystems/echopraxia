@@ -6,9 +6,9 @@ dependencies {
     api project(":api")
     api project(":jackson")
 
-    implementation "org.apache.logging.log4j:log4j-core:2.18.0"
-    implementation 'org.apache.logging.log4j:log4j-api:2.18.0'
-    implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.18.0'
+    implementation "org.apache.logging.log4j:log4j-core:$log4j2Version"
+    implementation "org.apache.logging.log4j:log4j-api:$log4j2Version"
+    implementation "org.apache.logging.log4j:log4j-layout-template-json:$log4j2Version"
 
     jmhImplementation project(":logger")
     testImplementation project(":logger")
