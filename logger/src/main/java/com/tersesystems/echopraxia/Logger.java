@@ -87,7 +87,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
       return this;
     }
 
-    /** @return true if the logger level is TRACE or higher. */
+    /**
+     * @return true if the logger level is TRACE or higher.
+     */
     public boolean isTraceEnabled() {
       return false;
     }
@@ -134,7 +136,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
       // do nothing
     }
 
-    /** @return true if the logger level is DEBUG or higher. */
+    /**
+     * @return true if the logger level is DEBUG or higher.
+     */
     public boolean isDebugEnabled() {
       return false;
     }
@@ -181,7 +185,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
       // do nothing
     }
 
-    /** @return true if the logger level is INFO or higher. */
+    /**
+     * @return true if the logger level is INFO or higher.
+     */
     public boolean isInfoEnabled() {
       return false;
     }
@@ -227,7 +233,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
       // do nothing
     }
 
-    /** @return true if the logger level is WARN or higher. */
+    /**
+     * @return true if the logger level is WARN or higher.
+     */
     public boolean isWarnEnabled() {
       return false;
     }
@@ -268,7 +276,9 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
       // do nothing
     }
 
-    /** @return true if the logger level is ERROR or higher. */
+    /**
+     * @return true if the logger level is ERROR or higher.
+     */
     public boolean isErrorEnabled() {
       return false;
     }

@@ -3,10 +3,14 @@ package com.tersesystems.echopraxia.scripting;
 /** A script handle returns the script source, and can say if the script is invalid. */
 public interface ScriptHandle extends AutoCloseable {
 
-  /** @return true if the script is invalid and should be re-evaluated, false otherwise. */
+  /**
+   * @return true if the script is invalid and should be re-evaluated, false otherwise.
+   */
   boolean isInvalid();
 
-  /** @return the code of the script. */
+  /**
+   * @return the code of the script.
+   */
   String script();
 
   /**

@@ -19,13 +19,19 @@ public interface LoggingContext extends FindPathMethods {
   @Nullable
   CoreLogger getCore();
 
-  /** @return both context and argument fields, in that order. */
+  /**
+   * @return both context and argument fields, in that order.
+   */
   @NotNull
   List<Field> getFields();
 
-  /** @return the fields passed in as arguments to the logger. */
+  /**
+   * @return the fields passed in as arguments to the logger.
+   */
   List<Field> getArgumentFields();
 
-  /** @return the list of fields that are part of logger's context. */
+  /**
+   * @return the list of fields that are part of logger's context.
+   */
   List<Field> getLoggerFields();
 }

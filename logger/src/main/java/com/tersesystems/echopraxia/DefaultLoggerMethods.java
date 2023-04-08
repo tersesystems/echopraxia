@@ -23,7 +23,9 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   // ------------------------------------------------------------------------
   // TRACE
 
-  /** @return true if the logger level is TRACE or higher. */
+  /**
+   * @return true if the logger level is TRACE or higher.
+   */
   default boolean isTraceEnabled() {
     return core().isEnabled(TRACE);
   }
@@ -109,7 +111,9 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   // ------------------------------------------------------------------------
   // DEBUG
 
-  /** @return true if the logger level is DEBUG or higher. */
+  /**
+   * @return true if the logger level is DEBUG or higher.
+   */
   default boolean isDebugEnabled() {
     return core().isEnabled(DEBUG);
   }
@@ -195,7 +199,9 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   // ------------------------------------------------------------------------
   // INFO
 
-  /** @return true if the logger level is INFO or higher. */
+  /**
+   * @return true if the logger level is INFO or higher.
+   */
   default boolean isInfoEnabled() {
     return core().isEnabled(INFO);
   }
@@ -281,7 +287,9 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   // ------------------------------------------------------------------------
   // WARN
 
-  /** @return true if the logger level is WARN or higher. */
+  /**
+   * @return true if the logger level is WARN or higher.
+   */
   default boolean isWarnEnabled() {
     return core().isEnabled(WARN);
   }
@@ -367,7 +375,9 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   // ------------------------------------------------------------------------
   // ERROR
 
-  /** @return true if the logger level is ERROR or higher. */
+  /**
+   * @return true if the logger level is ERROR or higher.
+   */
   default boolean isErrorEnabled() {
     return core().isEnabled(ERROR);
   }

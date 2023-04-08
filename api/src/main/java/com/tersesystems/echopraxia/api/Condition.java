@@ -87,12 +87,16 @@ public interface Condition {
     return (level, context) -> level.isEqual(exactLevel);
   }
 
-  /** @return A condition that matches if the level is diagnostic: DEBUG or TRACE. */
+  /**
+   * @return A condition that matches if the level is diagnostic: DEBUG or TRACE.
+   */
   static Condition diagnostic() {
     return (level, context) -> level.isLessOrEqual(Level.DEBUG);
   }
 
-  /** @return A condition that matches if the level is operational: INFO, WARN, or ERROR. */
+  /**
+   * @return A condition that matches if the level is operational: INFO, WARN, or ERROR.
+   */
   static Condition operational() {
     return (level, context) -> level.isGreaterOrEqual(Level.INFO);
   }

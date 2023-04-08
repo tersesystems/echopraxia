@@ -13,7 +13,9 @@ import org.jetbrains.annotations.Nullable;
  */
 public interface LoggerMethods<FB> {
 
-  /** @return true if the logger level is TRACE or higher. */
+  /**
+   * @return true if the logger level is TRACE or higher.
+   */
   boolean isTraceEnabled();
 
   /**
@@ -22,7 +24,9 @@ public interface LoggerMethods<FB> {
    */
   boolean isTraceEnabled(@NotNull Condition condition);
 
-  /** @return true if the logger level is DEBUG or higher. */
+  /**
+   * @return true if the logger level is DEBUG or higher.
+   */
   boolean isDebugEnabled();
 
   /**
@@ -31,7 +35,9 @@ public interface LoggerMethods<FB> {
    */
   boolean isDebugEnabled(@NotNull Condition condition);
 
-  /** @return true if the logger level is INFO or higher. */
+  /**
+   * @return true if the logger level is INFO or higher.
+   */
   boolean isInfoEnabled();
 
   /**
@@ -40,7 +46,9 @@ public interface LoggerMethods<FB> {
    */
   boolean isInfoEnabled(@NotNull Condition condition);
 
-  /** @return true if the logger level is WARN or higher. */
+  /**
+   * @return true if the logger level is WARN or higher.
+   */
   boolean isWarnEnabled();
 
   /**
@@ -49,7 +57,9 @@ public interface LoggerMethods<FB> {
    */
   boolean isWarnEnabled(@NotNull Condition condition);
 
-  /** @return true if the logger level is ERROR or higher. */
+  /**
+   * @return true if the logger level is ERROR or higher.
+   */
   boolean isErrorEnabled();
 
   /**
