@@ -62,10 +62,10 @@ subprojects { subproj ->
         }
     }
 
-    compileJava {
-        // Make sure we can release JDK 1.8 code
-        options.release = 8
-    }
+    //    compileJava {
+    //        // Make sure we can release JDK 1.8 code
+    //        options.release = 8
+    //    }
 
     dependencies {
         // https://docs.gradle.org/6.7.1/release-notes.html
