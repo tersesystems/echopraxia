@@ -1283,13 +1283,13 @@ Then you can use `%fields{$.book}` to extract the `book` field from the event an
 <configuration>
 
     <!-- Search both arguments and context, arguments takes precedence -->
-    <conversionRule conversionWord="fields" converterClass="com.tersesystems.echopraxia.logstash.FieldConverter"/>
+    <conversionRule conversionWord="fields" converterClass="com.tersesystems.echopraxia.logback.FieldConverter"/>
     
     <!-- Search fields defined as arguments logger.info("{}", fb -> ...) -->
-    <conversionRule conversionWord="argctx" converterClass="com.tersesystems.echopraxia.logstash.ArgumentFieldConverter"/>
+    <conversionRule conversionWord="argctx" converterClass="com.tersesystems.echopraxia.logback.ArgumentFieldConverter"/>
     
     <!-- Search fields defined in logger.withFields(...) -->
-    <conversionRule conversionWord="loggerctx" converterClass="com.tersesystems.echopraxia.logstash.LoggerFieldConverter"/>
+    <conversionRule conversionWord="loggerctx" converterClass="com.tersesystems.echopraxia.logback.LoggerFieldConverter"/>
     
     <root>
         <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">

@@ -1,11 +1,10 @@
-package com.tersesystems.echopraxia.logstash;
+package com.tersesystems.echopraxia.logback;
 
 import static com.tersesystems.echopraxia.api.Utilities.memoize;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.logback.AbstractEventLoggingContext;
 import java.util.*;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
