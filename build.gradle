@@ -12,13 +12,6 @@ repositories {
     mavenCentral()
 }
 
-spotless {
-    freshmark {
-        target 'README.md'
-        propertiesFile('gradle.properties')
-    }
-}
-
 subprojects { subproj ->
     apply plugin: 'java-library'
     apply plugin: 'com.diffplug.spotless'
