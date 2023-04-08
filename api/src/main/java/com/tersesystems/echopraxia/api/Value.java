@@ -44,41 +44,55 @@ public abstract class Value<V> {
   @NotNull
   public abstract Value.Type type();
 
-  /** @return this value as an object value. */
+  /**
+   * @return this value as an object value.
+   */
   @NotNull
   public ObjectValue asObject() {
     return (ObjectValue) this;
   }
 
-  /** @return this value as an array value */
+  /**
+   * @return this value as an array value
+   */
   @NotNull
   public ArrayValue asArray() {
     return (ArrayValue) this;
   }
 
-  /** @return this value as a string value */
+  /**
+   * @return this value as a string value
+   */
   @NotNull
   public StringValue asString() {
     return (StringValue) this;
   }
 
-  /** @return this value as a number value */
+  /**
+   * @return this value as a number value
+   */
   @NotNull
   public <T extends Number & Comparable<T>> NumberValue<T> asNumber() {
     return (NumberValue<T>) this;
   }
 
-  /** @return this value as an exception value */
+  /**
+   * @return this value as an exception value
+   */
   public ExceptionValue asException() {
     return (ExceptionValue) this;
   }
 
-  /** @return this value as a null value */
+  /**
+   * @return this value as a null value
+   */
   public NullValue asNull() {
     return (NullValue) this;
   }
 
-  /** @return this value as a boolean value */
+  /**
+   * @return this value as a boolean value
+   */
   public BooleanValue asBoolean() {
     return (BooleanValue) this;
   }

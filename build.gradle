@@ -1,7 +1,7 @@
 // https://xvik.github.io/gradle-mkdocs-plugin/latest/
 plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
-    id 'com.diffplug.spotless'  version '6.1.0'
+    id 'com.diffplug.spotless'  version '6.18.0'
     id "maven-publish"
 }
 
@@ -10,13 +10,6 @@ apply from: "gradle/release.gradle"
 repositories {
     mavenLocal()
     mavenCentral()
-}
-
-spotless {
-    freshmark {
-        target 'README.md'
-        propertiesFile('gradle.properties')
-    }
 }
 
 subprojects { subproj ->
