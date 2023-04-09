@@ -3,6 +3,12 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
     id 'com.diffplug.spotless'  version '6.18.0'
     id "maven-publish"
+
+    // https://michaelbfullan.com/the-state-of-the-jpms-in-2022/
+    // https://github.com/gradlex-org/extra-java-module-info
+    id("org.gradlex.java-module-dependencies")
+    id("org.gradlex.java-module-testing")
+    id("org.gradlex.extra-java-module-info")
 }
 
 apply from: "gradle/release.gradle"
