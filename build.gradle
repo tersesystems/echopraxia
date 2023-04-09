@@ -58,8 +58,13 @@ subprojects { subproj ->
 
     java {
         toolchain {
-            languageVersion = JavaLanguageVersion.of(8)
+            languageVersion = JavaLanguageVersion.of(17)
         }
+    }
+
+    compileJava {
+        // Make sure we can release JDK 1.8 code
+        options.release = 8
     }
 
     dependencies {

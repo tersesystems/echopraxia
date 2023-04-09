@@ -1,3 +1,2 @@
-# Enable auto-env through the sdkman_auto_env config
-# Add key=value pairs of SDKs to use below
-java=11.0.18-amzn  
+# run `sdk env` to set the java version
+java=17.0.6-amzn
