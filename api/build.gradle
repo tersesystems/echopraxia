@@ -6,3 +6,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path
     implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
 }
+
+tasks.jar {
+    manifest {
+        attributes["Automatic-Module-Name"] = "com.tersesystems.echopraxia.api"
+    }
+}

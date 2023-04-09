@@ -18,3 +18,4 @@ dependencies {
     testImplementation project(":logstash")
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 }
+

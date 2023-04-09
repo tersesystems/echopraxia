@@ -12,3 +12,10 @@ dependencies {
     testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
     testImplementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
 }
+
+
+tasks.jar {
+    manifest {
+        attributes["Automatic-Module-Name"] = "com.tersesystems.echopraxia.async"
+    }
+}
