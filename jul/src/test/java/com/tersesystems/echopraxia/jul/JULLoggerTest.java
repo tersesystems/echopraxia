@@ -48,8 +48,8 @@ class JULLoggerTest extends TestBase {
     LogRecord logRecord = list.get(0);
     assertThat(logRecord.getLevel()).isEqualTo(Level.INFO);
     assertThat(logRecord.getMessage()).isEqualTo("hello {0}, you are {1}, citizen status {2}");
-    Field[] parameters = (Field[]) logRecord.getParameters();
-    Field nameField = parameters[0];
+    Object[] parameters = logRecord.getParameters();
+    Field nameField = (Field) parameters[0];
     assertThat(nameField.name()).isEqualTo("name");
     assertThat(nameField.value().raw()).isEqualTo("will");
   }
