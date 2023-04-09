@@ -1,5 +1,6 @@
 module com.tersesystems.echopraxia.api {
-  requires json.path;
-  requires org.jetbrains.annotations;
+  requires static transitive org.jetbrains.annotations;
+  requires com.jayway.jsonpath;
+
   exports com.tersesystems.echopraxia.api;
 }

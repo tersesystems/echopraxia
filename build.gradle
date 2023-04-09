@@ -4,11 +4,12 @@ plugins {
     id 'com.diffplug.spotless'  version '6.18.0'
     id "maven-publish"
 
+    //id 'org.javamodularity.moduleplugin' version '1.8.12' apply false
     // https://michaelbfullan.com/the-state-of-the-jpms-in-2022/
     // https://github.com/gradlex-org/extra-java-module-info
-    id("org.gradlex.java-module-dependencies")
-    id("org.gradlex.java-module-testing")
-    id("org.gradlex.extra-java-module-info")
+    //id("org.gradlex.java-module-dependencies")
+    //id("org.gradlex.java-module-testing")
+    //id("org.gradlex.extra-java-module-info")
 }
 
 apply from: "gradle/release.gradle"
@@ -75,10 +76,10 @@ subprojects { subproj ->
 
     dependencies {
         // https://docs.gradle.org/6.7.1/release-notes.html
-        compileOnlyApi 'org.jetbrains:annotations:23.0.0'
+        compileOnly 'org.jetbrains:annotations:24.0.1'
 
         // Fix a dependency in log4jbenchmarks
-        jmhImplementation 'org.jetbrains:annotations:23.0.0'
+        jmhImplementation 'org.jetbrains:annotations:24.0.1'
 
         jmhImplementation 'org.openjdk.jmh:jmh-core:1.35'
         jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.35'
