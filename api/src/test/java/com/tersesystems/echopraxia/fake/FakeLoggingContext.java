@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import org.jetbrains.annotations.NotNull;
 
 public class FakeLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
   protected final Supplier<List<Field>> loggerFields;
@@ -38,7 +37,7 @@ public class FakeLoggingContext extends AbstractJsonPathFinder implements Loggin
   }
 
   @Override
-  public @NotNull List<Field> getFields() {
+  public  List<Field> getFields() {
     return Stream.concat(loggerFields.get().stream(), argumentFields.get().stream())
         .collect(Collectors.toList());
   }
