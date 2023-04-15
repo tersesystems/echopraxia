@@ -699,7 +699,7 @@ public class LogstashCoreLogger
   }
 
   /** A logging context that stores fields belonging to the logger. */
-  protected static class LogstashMarkerContext implements LogbackLoggerContext {
+  public static class LogstashMarkerContext implements LogbackLoggerContext {
 
     private static final LogstashMarkerContext EMPTY =
         new LogstashMarkerContext(Collections::emptyList, Collections::emptyList);
@@ -709,7 +709,7 @@ public class LogstashCoreLogger
 
     private final Supplier<Marker> markersResult;
 
-    protected LogstashMarkerContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
+    public LogstashMarkerContext(Supplier<List<Field>> f, Supplier<List<Marker>> m) {
       this.fieldsSupplier = f;
       this.markersSupplier = m;
       this.markersResult =

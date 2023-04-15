@@ -91,7 +91,7 @@ public class ConditionTurboFilter extends TurboFilter {
     return fields;
   }
 
-  static class FilterMarkerContext implements LogbackLoggerContext {
+  public static class FilterMarkerContext implements LogbackLoggerContext {
     private final Marker marker;
     private final List<Field> fields;
 
