@@ -13,7 +13,7 @@ public class JULLoggerContext {
 
   private static final JULLoggerContext EMPTY = new JULLoggerContext();
 
-  static JULLoggerContext empty() {
+  public static JULLoggerContext empty() {
     return EMPTY;
   }
 
