@@ -9,6 +9,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import com.tersesystems.echopraxia.api.Value;
 import java.util.List;
@@ -75,16 +76,11 @@ class Person {
   }
 }
 
-class PersonFieldBuilder implements DiffFieldBuilder {
+class PersonFieldBuilder implements DiffFieldBuilder, FieldBuilder {
 
   private PersonFieldBuilder() {}
 
   public static final PersonFieldBuilder instance = new PersonFieldBuilder();
-
-  // Renders a `Person` as an object field.
-  public Field keyValue(String fieldName, Person p) {
-    return keyValue(fieldName, personValue(p));
-  }
 
   public FieldBuilderResult diff(String name, Person before, Person after) {
     return diff(name, personValue(before), personValue(after));
