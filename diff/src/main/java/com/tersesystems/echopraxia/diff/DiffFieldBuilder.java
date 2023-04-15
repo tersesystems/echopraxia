@@ -1,11 +1,7 @@
 package com.tersesystems.echopraxia.diff;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.flipkart.zjsonpatch.JsonDiff;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.FieldBuilder;
-import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.jackson.ObjectMapperProvider;
 
@@ -24,13 +20,8 @@ public interface DiffFieldBuilder extends ObjectMapperProvider {
    * @return the field representing the diff between the two values, in RFC 6902.
    */
   default Field diff(String fieldName, Value<?> before, Value<?> after) {
-    ObjectMapper m = _objectMapper();
-    JsonNode beforeNode = m.valueToTree(before);
-    JsonNode afterNode = m.valueToTree(after);
-
-    JsonNode patch = JsonDiff.asJson(beforeNode, afterNode);
-    Value<?> value = m.convertValue(patch, Value.class);
-
+    ObjectMapper om = _objectMapper();
+    Value<?> value = Diff.diff(om, before, after);
     return Field.keyValue(fieldName, value);
   }
 }
