@@ -19,6 +19,15 @@ public class JULLoggingContext extends AbstractJsonPathFinder implements Logging
   private final JULLoggerContext context;
   private final CoreLogger core;
 
+  public JULLoggingContext(CoreLogger core) {
+    // Defers and memoizes the arguments and context fields for a single logging statement.
+    this.core = core;
+    this.context = JULLoggerContext.empty();
+    this.argumentFields = Collections::emptyList;
+    this.loggerFields = memoize(context::getLoggerFields);
+    this.joinedFields = memoize(joinFields(this.loggerFields, this.argumentFields));
+  }
+
   public JULLoggingContext(
       CoreLogger core, JULLoggerContext context, Supplier<List<Field>> arguments) {
     // Defers and memoizes the arguments and context fields for a single logging statement.
