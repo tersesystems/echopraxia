@@ -1,8 +1,23 @@
 plugins {
     id 'java-library'
+    id 'extra-java-module-info'
 }
 
 dependencies {
     // https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path
     implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
+}
+
+// https://docs.gradle.org/current/samples/sample_java_modules_with_transform.html
+extraJavaModuleInfo {
+    module("json-path-$jsonPathVersion" + '.jar', 'com.jayway.jsonpath', jsonPathVersion) {
+        requires("org.slf4j.slf4j-api")
+        requires("net.minidev.json-smart")
+
+        exports('com.jayway.jsonpath')
+        exports('com.jayway.jsonpath.spi.json')
+        exports('com.jayway.jsonpath.spi.mapper')
+    }
+    module('slf4j-api-1.7.36.jar', 'org.slf4j.slf4j-api', '1.7.36')
+    module('json-smart-2.4.10.jar', 'net.minidev.json-smart', '2.4.10')
 }

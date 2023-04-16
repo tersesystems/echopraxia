@@ -3,6 +3,8 @@ plugins {
     id "io.github.gradle-nexus.publish-plugin" version "1.1.0"
     id 'com.diffplug.spotless'  version '6.18.0'
     id "maven-publish"
+
+    id 'extra-java-module-info'
 }
 
 apply from: "gradle/release.gradle"
@@ -62,26 +64,31 @@ subprojects { subproj ->
         }
     }
 
-    compileJava {
-        // Make sure we can release JDK 1.8 code
-        options.release = 8
-    }
+    //    compileJava {
+    //        // Make sure we can release JDK 1.8 code
+    //        options.release = 8
+    //    }
 
     dependencies {
         // https://docs.gradle.org/6.7.1/release-notes.html
-        compileOnlyApi 'org.jetbrains:annotations:23.0.0'
+        compileOnly 'org.jetbrains:annotations:24.0.1'
 
         // Fix a dependency in log4jbenchmarks
-        jmhImplementation 'org.jetbrains:annotations:23.0.0'
+        jmhImplementation 'org.jetbrains:annotations:24.0.1'
 
         jmhImplementation 'org.openjdk.jmh:jmh-core:1.35'
-        jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.35'
+        jmhAnnotationProcessor "org.openjdk.jmh:jmh-generator-annprocess:1.35"
 
         // Use JUnit Jupiter for testing.
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-        testImplementation 'org.assertj:assertj-core:3.21.0'
-        testImplementation 'org.awaitility:awaitility:4.1.1'
+        testImplementation "org.junit.jupiter:junit-jupiter:5.9.2"
+        testImplementation "org.assertj:assertj-core:3.24.2"
+        //testImplementation 'org.awaitility:awaitility:4.1.1'
     }
+
+    // https://docs.gradle.org/current/samples/sample_java_modules_with_transform.html
+    //extraJavaModuleInfo {
+        //automaticModule("annotations-24.0.1.jar", 'org.jetbrains.annotations')
+    //}
 
     tasks.named('test') {
         // Use JUnit Platform for unit tests.
