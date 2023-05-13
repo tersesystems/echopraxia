@@ -19,6 +19,7 @@ public class FakeCoreLogger implements CoreLogger {
   private final String fqcn;
 
   private final Supplier<Runnable> tlsSupplier;
+  private final FieldConverter fieldConverter;
 
   public FakeCoreLogger(String fqcn) {
     this.fqcn = fqcn;
@@ -26,6 +27,17 @@ public class FakeCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.tlsSupplier = () -> (Runnable) () -> {};
+    this.fieldConverter = new FieldConverter() {
+      @Override
+      public @NotNull Object convertArgumentField(@NotNull Field field) {
+        return field;
+      }
+
+      @Override
+      public @NotNull Object convertLoggerField(@NotNull Field field) {
+        return field;
+      }
+    };
   }
 
   public FakeCoreLogger(
@@ -33,12 +45,14 @@ public class FakeCoreLogger implements CoreLogger {
       FakeLoggingContext context,
       Condition condition,
       Executor executor,
-      Supplier<Runnable> tlsSupplier) {
+      Supplier<Runnable> tlsSupplier,
+      FieldConverter fieldConverter) {
     this.fqcn = fqcn;
     this.context = context;
     this.condition = condition;
     this.executor = executor;
     this.tlsSupplier = tlsSupplier;
+    this.fieldConverter = fieldConverter;
   }
 
   @Override
@@ -84,7 +98,7 @@ public class FakeCoreLogger implements CoreLogger {
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     FakeLoggingContext ctx =
         new FakeLoggingContext(this, context::getLoggerFields, () -> convert(f.apply(builder)));
-    return new FakeCoreLogger(fqcn, ctx, this.condition.and(condition), executor, tlsSupplier);
+    return new FakeCoreLogger(fqcn, ctx, this.condition.and(condition), executor, tlsSupplier, fieldConverter);
   }
 
   private List<Field> convert(FieldBuilderResult input) {
@@ -99,22 +113,27 @@ public class FakeCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newSupplier) {
-    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor, newSupplier);
+    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor, newSupplier, fieldConverter);
   }
 
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
-    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor, tlsSupplier);
+    return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor, tlsSupplier, fieldConverter);
   }
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier);
+    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier, fieldConverter);
+  }
+
+  @Override
+  public @NotNull CoreLogger withFieldConverter(FieldConverter fieldConverter) {
+    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier, fieldConverter);
   }
 
   @Override
   public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
-    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier);
+    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier, fieldConverter);
   }
 
   // -----------------------------------------------------------------------

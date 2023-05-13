@@ -119,7 +119,7 @@ public abstract class Value<V> {
     }
 
     final StringBuilder b = new StringBuilder(255);
-    Internals.ValueFormatter.formatToBuffer(b, this);
+    ValueFormatter.formatToBuffer(b, this);
     return b.toString();
   }
 

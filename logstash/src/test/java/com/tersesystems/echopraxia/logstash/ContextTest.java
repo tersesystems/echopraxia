@@ -52,7 +52,7 @@ public class ContextTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("This has a marker");
     final List<Marker> markers = getMarkers(event);
 
-    testMarker(markers.get(0), "key", "value");
+    testMarker(markers.get(0), Field.value("key", Value.string("value")));
     final Marker shouldBeSecurityMarker = markers.get(1);
     assertThat(shouldBeSecurityMarker).isSameAs(securityMarker);
   }
@@ -101,7 +101,7 @@ public class ContextTest extends TestBase {
     final ObjectAppendingMarker marker = (ObjectAppendingMarker) markers.get(0);
 
     // toStringSelf calls the "logfmt" version that is fed into formatted message
-    final String actual = (String) marker.toStringSelf();
+    final String actual = marker.toStringSelf();
     assertThat(actual).isEqualTo("person={will, 13, toys=[binkie]}");
 
     final StringWriter sw = new StringWriter();
@@ -164,8 +164,8 @@ public class ContextTest extends TestBase {
     final ObjectAppendingMarker m1 = (ObjectAppendingMarker) markers.get(0);
     final ObjectAppendingMarker m2 = (ObjectAppendingMarker) markers.get(1);
 
-    testMarker(m1, "key", "value");
-    testMarker(m2, "key2", "value2");
+    testMarker(m1, Field.value("key", Value.string("value")));
+    testMarker(m2, Field.value("key2", Value.string("value2")));
   }
 
   @Test
@@ -180,7 +180,7 @@ public class ContextTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("some message");
 
     final List<Marker> markers = getMarkers(event);
-    testMarker(markers.get(0), "mdckey", "mdcvalue");
+    testMarker(markers.get(0), Field.keyValue("mdckey", Value.string("mdcvalue")));
   }
 
   @Test
@@ -319,9 +319,9 @@ public class ContextTest extends TestBase {
   @Test
   void testListOfElement() {
     Logger<?> logger = getLogger();
-    final Condition nestedCondition = (level, ctx) -> ctx.findList("$..notalist").size() > 0;
+    final Condition nestedCondition = (level, ctx) -> !ctx.findList("$..notalist").isEmpty();
 
-    // property is present but we need to return a list containing the single element.
+    // property is present, but we need to return a list containing the single element.
     logger.info(nestedCondition, "log element", fb -> fb.bool("notalist", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -339,7 +339,7 @@ public class ContextTest extends TestBase {
           return (Boolean) first.get();
         };
 
-    // property is present but we need to return a list containing the single element.
+    // property is present, but we need to return a list containing the single element.
     logger.info(findBooleanAsList, "log boolean", fb -> fb.bool("boolean", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -354,7 +354,7 @@ public class ContextTest extends TestBase {
     final Condition noFindException =
         (level, ctx) -> {
           final Optional<?> first = ctx.findList("$.exception").stream().findFirst();
-          return !first.isPresent();
+          return first.isEmpty();
         };
 
     // we didn't find any .exception at all, so good.
@@ -389,7 +389,7 @@ public class ContextTest extends TestBase {
     Condition c =
         (level, ctx) -> {
           List<?> trace = ctx.findList("$.exception.stackTrace");
-          return trace.size() > 0;
+          return !trace.isEmpty();
         };
     RuntimeException e = new RuntimeException("test message");
     logger.info(c, "Matches on exception", e);
@@ -433,7 +433,7 @@ public class ContextTest extends TestBase {
   @Test
   void testNullInNestedArray() {
     Logger<?> logger = getLogger();
-    Condition c = (level, ctx) -> ctx.findList("$..interests").size() > 0;
+    Condition c = (level, ctx) -> !ctx.findList("$..interests").isEmpty();
     logger.info(
         c,
         "Can manage null in array",
@@ -466,12 +466,12 @@ public class ContextTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("complex objects");
   }
 
-  private void testMarker(Marker marker, String key, Object value) {
+  private void testMarker(Marker marker, Field field) {
     final ObjectAppendingMarker m = (ObjectAppendingMarker) marker;
 
     // You can't use ObjectAppendingMarker.equals because it wants instance equality.
-    assertThat(m.getFieldName()).isEqualTo(key);
-    assertThat(m.toStringSelf()).isEqualTo(key + "=" + value);
+    assertThat(m.getFieldName()).isEqualTo(field.name());
+    assertThat(m.toStringSelf()).isEqualTo(field.toString());
   }
 
   // we can't use the result of Markers.aggregate, as an EmptyLogstashMarker ONLY CHECKS THE NAME.

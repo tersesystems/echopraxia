@@ -25,6 +25,7 @@ public class JULCoreLogger implements CoreLogger {
   private final Supplier<Runnable> threadContextFunction;
 
   private final Executor executor;
+  private final FieldConverter fieldConverter;
 
   public JULCoreLogger(@NotNull String fqcn, @NotNull Logger logger) {
     this.fqcn = fqcn;
@@ -33,6 +34,7 @@ public class JULCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.threadContextFunction = mdcContext();
     this.executor = ForkJoinPool.commonPool();
+    this.fieldConverter = JULFieldConverter.instance();
   }
 
   protected JULCoreLogger(
@@ -41,13 +43,15 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull JULLoggerContext context,
       @NotNull Condition condition,
       @NotNull Supplier<Runnable> threadContextFunction,
-      @NotNull Executor executor) {
+      @NotNull Executor executor,
+      @NotNull FieldConverter fieldConverter) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
     this.threadContextFunction = threadContextFunction;
     this.executor = executor;
+    this.fieldConverter = fieldConverter;
   }
 
   @NotNull
@@ -117,6 +121,11 @@ public class JULCoreLogger implements CoreLogger {
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
     return newLogger(executor);
+  }
+
+  @Override
+  public @NotNull CoreLogger withFieldConverter(FieldConverter fieldConverter) {
+    return newLogger(fieldConverter);
   }
 
   @Override
@@ -485,32 +494,52 @@ public class JULCoreLogger implements CoreLogger {
 
   private EchopraxiaLogRecord createLogRecord(
       java.util.logging.Level julLevel, String messageTemplate, JULLoggingContext ctx) {
+    final List<Field> argumentFields = ctx.getArgumentFields();
+    final Field[] arguments = new Field[argumentFields.size()];
+    int i = 0;
+    Throwable thrown = null;
+    for (Field f : argumentFields) {
+      arguments[i++] = (Field) this.fieldConverter.convertArgumentField(f);
+      if (f.value() instanceof Value.ExceptionValue) {
+        thrown = (Throwable) f.value().raw();
+        break;
+      }
+    }
 
-    EchopraxiaLogRecord record = new EchopraxiaLogRecord(julLevel, messageTemplate, ctx);
-    record.setLoggerName(getName());
-    return record;
+    i = 0;
+    List<Field> loggerFields = ctx.getLoggerFields();
+    final Field[] fields = new Field[loggerFields.size()];
+    for (Field f : loggerFields) {
+      fields[i++] = (Field) this.fieldConverter.convertLoggerField(f);
+    }
+    return new EchopraxiaLogRecord(getName(), julLevel, messageTemplate, arguments, fields, thrown);
   }
 
   @NotNull
   private JULCoreLogger newLogger(JULLoggerContext newContext) {
-    return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction, executor);
+    return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction, executor, fieldConverter);
   }
 
   private JULCoreLogger newLogger(Supplier<Runnable> newThreadContextFunction) {
-    return new JULCoreLogger(fqcn, logger, context, condition, newThreadContextFunction, executor);
+    return new JULCoreLogger(fqcn, logger, context, condition, newThreadContextFunction, executor, fieldConverter);
   }
 
   @NotNull
   private JULCoreLogger newLogger(@NotNull Condition condition) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
   private CoreLogger newLogger(Executor executor) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
+  private CoreLogger newLogger(FieldConverter fieldConverter) {
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
+  }
+
+
   private JULCoreLogger newLogger(String fqcn) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
   private Supplier<Runnable> mdcContext() {

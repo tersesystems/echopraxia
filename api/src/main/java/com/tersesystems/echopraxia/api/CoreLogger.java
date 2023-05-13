@@ -107,6 +107,12 @@ public interface CoreLogger {
   CoreLogger withExecutor(@NotNull Executor executor);
 
   /**
+   * Returns a logger with the given field converter.
+   */
+  @NotNull
+  CoreLogger withFieldConverter(FieldConverter fieldConverter);
+
+  /**
    * Returns a logger with the given fully qualified caller name.
    *
    * @param fqcn the fully qualified class name, or null.

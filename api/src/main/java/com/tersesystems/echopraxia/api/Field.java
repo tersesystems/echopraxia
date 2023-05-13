@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
+import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -10,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  * <p>The field builder interface and custom field builders go a long way to building up more
  * complex structures, please see documentation for how to use them.
  */
-public interface Field extends FieldBuilderResult {
+public interface Field extends FieldBuilderResult, FieldAttributesAware {
 
   /**
    * The field name.
@@ -28,32 +29,25 @@ public interface Field extends FieldBuilderResult {
   @NotNull
   Value<?> value();
 
+  /** Attributes */
   @NotNull
-  static Field.ValueField value(@NotNull String name, @NotNull Value<?> value) {
-    return new Internals.DefaultValueField(name, value);
+  Attributes attributes();
+
+  @NotNull
+  static Field value(@NotNull String name, @NotNull Value<?> value) {
+    return new DefaultField(name, value, FieldAttributes.valueOnly());
   }
 
   @NotNull
-  static Field.KeyValueField keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return new Internals.DefaultKeyValueField(name, value);
+  static Field keyValue(@NotNull String name, @NotNull Value<?> value) {
+    return new DefaultField(name, value, Attributes.empty());
   }
 
-  /**
-   * Marker interface for key values.
-   *
-   * <p>Indicates that the plain value should be rendered in message template.
-   *
-   * <p>This marker interface is used internally.
-   */
-  interface ValueField extends Field {}
+  <A> Field withAttribute(Attribute<A> attr);
 
-  /**
-   * Marker interface for key values.
-   *
-   * <p>Indicates that we want `key=value` in the message template.
-   *
-   * <p>This marker interface is used internally, but you typically won't need to use it directly.
-   * You can call `Field.Builder.keyValue` to get a instance of a field with this.
-   */
-  interface KeyValueField extends Field {}
+  Field withAttributes(Attributes attrs);
+
+  <A> Field withoutAttribute(AttributeKey<A> key);
+
+  Field withoutAttributes(Collection<AttributeKey<?>> keys);
 }

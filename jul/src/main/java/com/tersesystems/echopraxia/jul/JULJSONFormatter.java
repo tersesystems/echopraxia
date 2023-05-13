@@ -117,8 +117,15 @@ public class JULJSONFormatter extends Formatter {
 
       if (record instanceof EchopraxiaLogRecord) {
         final EchopraxiaLogRecord er = (EchopraxiaLogRecord) record;
-        JULLoggingContext ctx = er.getLoggingContext();
-        final List<Field> fields = ctx.getFields();
+
+        // render the logger fields first
+        Field[] loggerFields = er.getLoggerFields();
+        for (Field field : loggerFields) {
+          object.put(field.name(), field.value());
+        }
+
+        // render the argument fields after logger fields
+        final Field[] fields = (Field[]) record.getParameters();
         for (Field field : fields) {
           object.put(field.name(), field.value());
         }

@@ -28,8 +28,7 @@ import org.slf4j.MDC;
 import org.slf4j.Marker;
 
 /** The Logstash implementation of CoreLogger. */
-public class LogstashCoreLogger
-    implements CoreLogger, FieldToArgumentConverter, FieldToMarkerConverter {
+public class LogstashCoreLogger implements CoreLogger {
 
   // The logger context property used to set up caller info for async logging.
   public static final String ECHOPRAXIA_ASYNC_CALLER_PROPERTY = "echopraxia.async.caller";
@@ -40,6 +39,7 @@ public class LogstashCoreLogger
   private final Executor executor;
   private final String fqcn;
   private final Supplier<Runnable> threadContextFunction;
+  private final FieldConverter fieldConverter;
 
   public LogstashCoreLogger(@NotNull String fqcn, @NotNull ch.qos.logback.classic.Logger logger) {
     this.fqcn = fqcn;
@@ -48,6 +48,7 @@ public class LogstashCoreLogger
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = mdcContext();
+    this.fieldConverter = LogstashFieldConverter.singleton();
   }
 
   public LogstashCoreLogger(
@@ -56,13 +57,15 @@ public class LogstashCoreLogger
       @NotNull LogstashCoreLogger.LogstashMarkerContext context,
       @NotNull Condition condition,
       @NotNull Executor executor,
-      @NotNull Supplier<Runnable> threadContextSupplier) {
+      @NotNull Supplier<Runnable> threadContextSupplier,
+      @NotNull FieldConverter fieldConverter) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = context;
     this.condition = condition;
     this.executor = executor;
     this.threadContextFunction = threadContextSupplier;
+    this.fieldConverter = fieldConverter;
   }
 
   private Supplier<Runnable> mdcContext() {
@@ -108,20 +111,38 @@ public class LogstashCoreLogger
     return fqcn;
   }
 
+  // Logstash specific, not part of CoreLogger API
+  public CoreLogger withMarkers(Marker... markers) {
+    final LogstashMarkerContext contextWithMarkers =
+        this.context.withMarkers(() -> Arrays.asList(markers));
+    return new LogstashCoreLogger(
+        fqcn,
+        logger,
+        contextWithMarkers,
+        condition,
+        executor,
+        threadContextFunction,
+        fieldConverter);
+  }
+
+  public @NotNull CoreLogger withFieldConverter(FieldConverter fieldConverter) {
+    return new LogstashCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+  }
+
   @Override
   public <FB> @NotNull CoreLogger withFields(
       @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     final LogstashMarkerContext contextWithFields =
         this.context.withFields(() -> convertToFields(f.apply(builder)));
     return new LogstashCoreLogger(
-        fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
-  }
-
-  public CoreLogger withMarkers(Marker... markers) {
-    final LogstashMarkerContext contextWithMarkers =
-        this.context.withMarkers(() -> Arrays.asList(markers));
-    return new LogstashCoreLogger(
-        fqcn, logger, contextWithMarkers, condition, executor, threadContextFunction);
+        fqcn,
+        logger,
+        contextWithFields,
+        condition,
+        executor,
+        threadContextFunction,
+        fieldConverter);
   }
 
   @Override
@@ -130,7 +151,7 @@ public class LogstashCoreLogger
     LogstashMarkerContext newContext =
         context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
     return new LogstashCoreLogger(
-        fqcn, logger, newContext, condition, executor, threadContextFunction);
+        fqcn, logger, newContext, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @Override
@@ -145,7 +166,7 @@ public class LogstashCoreLogger
           };
         };
     return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, joinedThreadContextFunction);
+        fqcn, logger, context, condition, executor, joinedThreadContextFunction, fieldConverter);
   }
 
   @Override
@@ -158,22 +179,28 @@ public class LogstashCoreLogger
         return this;
       }
       return new LogstashCoreLogger(
-          fqcn, logger, context, condition, executor, threadContextFunction);
+          fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
     }
     return new LogstashCoreLogger(
-        fqcn, logger, context, this.condition.and(condition), executor, threadContextFunction);
+        fqcn,
+        logger,
+        context,
+        this.condition.and(condition),
+        executor,
+        threadContextFunction,
+        fieldConverter);
   }
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
     return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, threadContextFunction);
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @Override
   public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
     return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, threadContextFunction);
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @Override
@@ -540,7 +567,7 @@ public class LogstashCoreLogger
       if (value.type() == Value.Type.EXCEPTION) {
         throwable = ((Value.ExceptionValue) value).raw();
       }
-      StructuredArgument arg = convertArgument(field);
+      Object arg = fieldConverter.convertArgumentField(field);
       arguments.add(arg);
     }
 
@@ -631,7 +658,7 @@ public class LogstashCoreLogger
 
   protected LogstashCoreLogger newLogger(LogstashMarkerContext newContext) {
     return new LogstashCoreLogger(
-        fqcn, logger, newContext, condition, executor, threadContextFunction);
+        fqcn, logger, newContext, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @NotNull
@@ -676,7 +703,7 @@ public class LogstashCoreLogger
     } else {
       final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
       for (Field field : fields) {
-        LogstashMarker append = convertMarker(field);
+        FieldMarker append = (FieldMarker) fieldConverter.convertLoggerField(field);
         markerList.add(append);
       }
       if (ctxMarker != null) {

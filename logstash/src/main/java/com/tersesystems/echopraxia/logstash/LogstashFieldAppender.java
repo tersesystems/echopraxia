@@ -4,6 +4,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldConverter;
 import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.logback.FieldMarker;
 import com.tersesystems.echopraxia.logback.TransformingAppender;
@@ -19,8 +20,18 @@ import org.slf4j.Marker;
  *
  * <p>This should only really be used if you are working with SLF4J directly, as it's a hack.
  */
-public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent>
-    implements FieldToArgumentConverter, FieldToMarkerConverter {
+public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
+
+  private FieldConverter fieldConverter = LogstashFieldConverter.singleton();
+
+  public FieldConverter getFieldConverter() {
+    return fieldConverter;
+  }
+
+  public void setFieldConverter(FieldConverter fieldConverter) {
+    this.fieldConverter = fieldConverter;
+  }
+
   @Override
   protected ILoggingEvent decorateEvent(ILoggingEvent eventObject) {
     // Run through the markers and convert FieldMarker to LogstashMarker
@@ -30,7 +41,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent>
       if (marker instanceof FieldMarker) {
         final List<Field> fields = ((FieldMarker) marker).getFields();
         for (Field field : fields) {
-          markers.add(convertMarker(field));
+          markers.add((Marker) fieldConverter.convertLoggerField(field));
         }
       }
       final Iterator<Marker> iterator = marker.iterator();
@@ -39,7 +50,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent>
         if (m instanceof FieldMarker) {
           final List<Field> fields = ((FieldMarker) m).getFields();
           for (Field field : fields) {
-            markers.add(convertMarker(field));
+            markers.add((Marker) fieldConverter.convertLoggerField(field));
           }
         }
       }
@@ -54,7 +65,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent>
         final Object arg = argumentArray[i];
         if (arg instanceof Field) {
           Field field = (Field) arg;
-          argumentArray[i] = convertArgument(field);
+          argumentArray[i] = fieldConverter.convertArgumentField(field);
 
           // swap out the throwable if one is found
           if (eventObject.getThrowableProxy() == null) {

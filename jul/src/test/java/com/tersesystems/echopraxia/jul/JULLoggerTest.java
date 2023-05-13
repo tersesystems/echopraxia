@@ -62,8 +62,8 @@ class JULLoggerTest extends TestBase {
 
     List<LogRecord> list = ListHandler.list();
     EchopraxiaLogRecord logRecord = (EchopraxiaLogRecord) list.get(0);
-    List<Field> fields = logRecord.getLoggingContext().getLoggerFields();
-    Field nameField = fields.get(0);
+    Field[] fields = logRecord.getLoggerFields();
+    Field nameField = fields[0];
     assertThat(nameField.name()).isEqualTo("mdckey");
     assertThat(nameField.value().raw()).isEqualTo("mdcvalue");
   }
