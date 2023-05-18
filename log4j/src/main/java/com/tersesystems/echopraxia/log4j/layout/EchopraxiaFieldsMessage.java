@@ -10,14 +10,14 @@ import org.apache.logging.log4j.message.ParameterizedMessage;
 /** Create the simplest possible message for Log4J. */
 public class EchopraxiaFieldsMessage implements Message {
 
-  private final String message;
+  private final String format;
   private final List<Field> argumentFields;
   private final List<Field> loggerFields;
   private final String formattedMessage;
 
   public EchopraxiaFieldsMessage(
-      String message, List<Field> loggerFields, List<Field> argumentFields) {
-    this.message = message;
+      String format, List<Field> loggerFields, List<Field> argumentFields) {
+    this.format = format;
     this.argumentFields = argumentFields;
     this.loggerFields = loggerFields;
     this.formattedMessage = ParameterizedMessage.format(getFormat(), getParameters());
@@ -30,7 +30,7 @@ public class EchopraxiaFieldsMessage implements Message {
 
   @Override
   public String getFormat() {
-    return message;
+    return format;
   }
 
   @Override
