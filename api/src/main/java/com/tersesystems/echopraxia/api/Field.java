@@ -33,6 +33,32 @@ public interface Field extends FieldBuilderResult, FieldAttributesAware {
   @NotNull
   Attributes attributes();
 
+  /**
+   *
+   */
+  <A> Field withAttribute(Attribute<A> attr);
+
+  /**
+   *
+   */
+  Field withAttributes(Attributes attrs);
+
+
+  /**
+   *
+   */
+  <A> Field withoutAttribute(AttributeKey<A> key);
+
+  /**
+   *
+   */
+  Field withoutAttributes(Collection<AttributeKey<?>> keys);
+
+  /**
+   *
+   */
+  Field clearAttributes();
+
   @NotNull
   static Field value(@NotNull String name, @NotNull Value<?> value) {
     return new DefaultField(name, value, FieldAttributes.valueOnly());
@@ -43,11 +69,4 @@ public interface Field extends FieldBuilderResult, FieldAttributesAware {
     return new DefaultField(name, value, Attributes.empty());
   }
 
-  <A> Field withAttribute(Attribute<A> attr);
-
-  Field withAttributes(Attributes attrs);
-
-  <A> Field withoutAttribute(AttributeKey<A> key);
-
-  Field withoutAttributes(Collection<AttributeKey<?>> keys);
 }

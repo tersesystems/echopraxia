@@ -49,6 +49,11 @@ public class DefaultField implements Field {
   }
 
   @Override
+  public Field clearAttributes() {
+    return new DefaultField(name, value, Attributes.empty());
+  }
+
+  @Override
   public @NotNull String name() {
     return name;
   }

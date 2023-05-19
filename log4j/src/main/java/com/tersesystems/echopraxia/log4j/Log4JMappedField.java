@@ -16,6 +16,14 @@ public class Log4JMappedField implements Field {
         this.structuredField = structuredField;
     }
 
+    public Field getTextField() {
+        return this.textField;
+    }
+
+    public Field getStructuredField() {
+        return this.structuredField;
+    }
+
     @Override
     public @NotNull String name() {
         return structuredField.name();
@@ -33,22 +41,27 @@ public class Log4JMappedField implements Field {
 
     @Override
     public <A> Field withAttribute(Attribute<A> attr) {
-        return textField.withAttribute(attr);
+        return new Log4JMappedField(textField.withAttribute(attr), structuredField);
     }
 
     @Override
     public Field withAttributes(Attributes attrs) {
-        return textField.withAttributes(attrs);
+        return new Log4JMappedField(textField.withAttributes(attrs), structuredField);
     }
 
     @Override
     public <A> Field withoutAttribute(AttributeKey<A> key) {
-        return textField.withoutAttribute(key);
+        return new Log4JMappedField(textField.withoutAttribute(key), structuredField);
     }
 
     @Override
     public Field withoutAttributes(Collection<AttributeKey<?>> keys) {
-        return textField.withoutAttributes(keys);
+        return new Log4JMappedField(textField.withoutAttributes(keys), structuredField);
+    }
+
+    @Override
+    public Field clearAttributes() {
+        return new Log4JMappedField(textField.clearAttributes(), structuredField);
     }
 
     @Override

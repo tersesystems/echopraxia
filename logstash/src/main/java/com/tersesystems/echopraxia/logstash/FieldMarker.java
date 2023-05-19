@@ -57,6 +57,11 @@ public class FieldMarker extends ObjectAppendingMarker implements Field {
   }
 
   @Override
+  public Field clearAttributes() {
+    return new FieldMarker(field.clearAttributes());
+  }
+
+  @Override
   public String toStringSelf() {
     final String fieldValueString = field.value().toString();
     return isValueOnly() ? fieldValueString : field.name() + "=" + fieldValueString;

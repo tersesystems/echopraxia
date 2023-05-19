@@ -1,8 +1,11 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.api.Attributes;
-import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.*;
+import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This marker produces different text output than JSON output, and is used for arguments that are
@@ -10,27 +13,73 @@ import org.jetbrains.annotations.NotNull;
  *
  * <p>The attributes of the original field are always used.
  */
-public class MappedFieldMarker extends FieldMarker {
+public class MappedFieldMarker extends ObjectAppendingMarker implements Field {
 
-  private final Field originalField;
+  private final Field textField;
+  private final Field structuredField;
 
   public MappedFieldMarker(Field originalField, Field structuredField) {
-    super(structuredField);
-    this.originalField = originalField;
+    super(structuredField.name(), structuredField.value());
+    this.textField = originalField;
+    this.structuredField = structuredField;
   }
 
-  public Field getOriginalField() {
-    return originalField;
+  public Field getTextField() {
+    return textField;
+  }
+
+  public Field getStructuredField() {
+    return structuredField;
+  }
+
+  @Override
+  public @NotNull String name() {
+    return structuredField.name();
+  }
+
+  @Override
+  public @NotNull Value<?> value() {
+    return structuredField.value();
+  }
+
+  @Override
+  public @NotNull List<Field> fields() {
+    return structuredField.fields();
   }
 
   @Override
   public @NotNull Attributes attributes() {
-    return originalField.attributes();
+    return textField.attributes();
+  }
+
+  @Override
+  public <A> Field withAttribute(Attribute<A> attr) {
+    return new MappedFieldMarker(textField.withAttribute(attr), structuredField);
+  }
+
+  @Override
+  public Field withAttributes(Attributes attrs) {
+    return new MappedFieldMarker(textField.withAttributes(attrs), structuredField);
+  }
+
+  @Override
+  public <A> Field withoutAttribute(AttributeKey<A> key) {
+    return new MappedFieldMarker(textField.withoutAttribute(key), structuredField);
+  }
+
+  @Override
+  public Field withoutAttributes(Collection<AttributeKey<?>> keys) {
+    return new MappedFieldMarker(textField.withoutAttributes(keys), structuredField);
+  }
+
+  @Override
+  public Field clearAttributes() {
+    return new MappedFieldMarker(textField.clearAttributes(), structuredField);
   }
 
   @Override
   public String toStringSelf() {
-    final String fieldValueString = originalField.value().toString();
-    return isValueOnly() ? fieldValueString : originalField.name() + "=" + fieldValueString;
+    final String fieldValueString = textField.value().toString();
+    return isValueOnly() ? fieldValueString : textField.name() + "=" + fieldValueString;
   }
 }
