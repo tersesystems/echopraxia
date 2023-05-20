@@ -2,9 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * These are common field attributes used for rendering.
- */
+/** These are common field attributes used for rendering. */
 public class FieldAttributes {
   public static final AttributeKey<Boolean> VALUE_ONLY = AttributeKey.create("valueOnly");
 

@@ -19,8 +19,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import net.logstash.logback.argument.StructuredArgument;
-import net.logstash.logback.marker.LogstashMarker;
 import net.logstash.logback.marker.Markers;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

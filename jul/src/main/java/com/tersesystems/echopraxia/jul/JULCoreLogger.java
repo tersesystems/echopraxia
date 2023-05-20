@@ -517,29 +517,34 @@ public class JULCoreLogger implements CoreLogger {
 
   @NotNull
   private JULCoreLogger newLogger(JULLoggerContext newContext) {
-    return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction, executor, fieldConverter);
+    return new JULCoreLogger(
+        fqcn, logger, newContext, condition, threadContextFunction, executor, fieldConverter);
   }
 
   private JULCoreLogger newLogger(Supplier<Runnable> newThreadContextFunction) {
-    return new JULCoreLogger(fqcn, logger, context, condition, newThreadContextFunction, executor, fieldConverter);
+    return new JULCoreLogger(
+        fqcn, logger, context, condition, newThreadContextFunction, executor, fieldConverter);
   }
 
   @NotNull
   private JULCoreLogger newLogger(@NotNull Condition condition) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
+    return new JULCoreLogger(
+        fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
   private JULCoreLogger newLogger(Executor executor) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
+    return new JULCoreLogger(
+        fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
   private JULCoreLogger newLogger(FieldConverter fieldConverter) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
+    return new JULCoreLogger(
+        fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
-
   private JULCoreLogger newLogger(String fqcn) {
-    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
+    return new JULCoreLogger(
+        fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
   private Supplier<Runnable> mdcContext() {

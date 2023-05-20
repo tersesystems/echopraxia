@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.*;
-import net.logstash.logback.marker.ObjectAppendingMarker;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Collection;
 import java.util.List;
+import net.logstash.logback.marker.ObjectAppendingMarker;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * This marker produces different text output than JSON output, and is used for arguments that are

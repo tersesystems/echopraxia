@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
  * object.
  *
  * <p>The attributes in the field are used to determine additional metadata and details on how to
- * render the field.  Fields are immutable, and so adding and removing attributes creates a new
- * field and does not modify the existing field.
+ * render the field. Fields are immutable, and so adding and removing attributes creates a new field
+ * and does not modify the existing field.
  *
  * <p>The field builder interface and custom field builders go a long way to building up more
  * complex structures, please see documentation for how to use them.
@@ -53,7 +53,6 @@ public interface Field extends FieldBuilderResult, FieldAttributesAware {
   @NotNull
   Field withAttributes(@NotNull Attributes attrs);
 
-
   /**
    * @return a field without the attribute with the given key.
    */
@@ -63,7 +62,7 @@ public interface Field extends FieldBuilderResult, FieldAttributesAware {
   /**
    * @return a field without the attributes with the given keys.
    */
-   @NotNull
+  @NotNull
   Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys);
 
   /**
@@ -87,5 +86,4 @@ public interface Field extends FieldBuilderResult, FieldAttributesAware {
   static Field keyValue(@NotNull String name, @NotNull Value<?> value) {
     return new DefaultField(name, value, Attributes.empty());
   }
-
 }

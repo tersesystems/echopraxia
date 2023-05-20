@@ -6,23 +6,23 @@ import org.jetbrains.annotations.NotNull;
 
 public class JULFieldConverter implements FieldConverter {
 
-    private static final JULFieldConverter SINGLETON = new JULFieldConverter();
+  private static final JULFieldConverter SINGLETON = new JULFieldConverter();
 
-    public static FieldConverter instance() {
-        return SINGLETON;
-    }
+  public static FieldConverter instance() {
+    return SINGLETON;
+  }
 
-    @Override
-    public @NotNull Object convertArgumentField(@NotNull Field field) {
-        return convertField(field);
-    }
+  @Override
+  public @NotNull Object convertArgumentField(@NotNull Field field) {
+    return convertField(field);
+  }
 
-    @Override
-    public @NotNull Object convertLoggerField(@NotNull Field field) {
-        return convertField(field);
-    }
+  @Override
+  public @NotNull Object convertLoggerField(@NotNull Field field) {
+    return convertField(field);
+  }
 
-    private Object convertField(Field field) {
-        return field;
-    }
+  private Object convertField(Field field) {
+    return field;
+  }
 }

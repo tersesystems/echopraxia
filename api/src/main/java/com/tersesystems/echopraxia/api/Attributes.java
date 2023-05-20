@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pcollections.Empty;
@@ -18,42 +17,55 @@ import org.pcollections.PMap;
  */
 public interface Attributes {
 
-  @Nullable <A> A get(@NotNull AttributeKey<A> key);
+  @Nullable
+  <A> A get(@NotNull AttributeKey<A> key);
 
   @NotNull
   <A> Optional<A> getOptional(@NotNull AttributeKey<A> key);
 
   boolean containsKey(@NotNull AttributeKey<?> key);
 
-  @NotNull <A> Attributes plus(@NotNull AttributeKey<A> key, A value);
+  @NotNull
+  <A> Attributes plus(@NotNull AttributeKey<A> key, A value);
 
-  @NotNull <A> Attributes plus(@NotNull Attribute<A> attr);
+  @NotNull
+  <A> Attributes plus(@NotNull Attribute<A> attr);
 
-  @NotNull  Attributes plusAll(@NotNull Attributes attrs);
+  @NotNull
+  Attributes plusAll(@NotNull Attributes attrs);
 
-  @NotNull Attributes plusAll(@NotNull Attribute<?> a1, @NotNull Attribute<?> a2);
+  @NotNull
+  Attributes plusAll(@NotNull Attribute<?> a1, @NotNull Attribute<?> a2);
 
-  @NotNull  Attributes plusAll(@NotNull Collection<Attribute<?>> attrs);
+  @NotNull
+  Attributes plusAll(@NotNull Collection<Attribute<?>> attrs);
 
-  @NotNull  Attributes plusAll(@NotNull Map<AttributeKey<?>, ?> attrs);
+  @NotNull
+  Attributes plusAll(@NotNull Map<AttributeKey<?>, ?> attrs);
 
-  @NotNull Attributes minus(@NotNull AttributeKey<?> k1);
+  @NotNull
+  Attributes minus(@NotNull AttributeKey<?> k1);
 
-  @NotNull Attributes minusAll(@NotNull Collection<AttributeKey<?>> keys);
+  @NotNull
+  Attributes minusAll(@NotNull Collection<AttributeKey<?>> keys);
 
-  @NotNull static Attributes empty() {
+  @NotNull
+  static Attributes empty() {
     return AttributesImpl.EMPTY;
   }
 
-  @NotNull static <A> Attributes create(@NotNull Attribute<A> attribute) {
+  @NotNull
+  static <A> Attributes create(@NotNull Attribute<A> attribute) {
     return empty().plus(attribute.key(), attribute.value());
   }
 
-  @NotNull static Attributes create(@NotNull Attribute<?> a1, Attribute<?> a2) {
+  @NotNull
+  static Attributes create(@NotNull Attribute<?> a1, Attribute<?> a2) {
     return empty().plusAll(a1, a2);
   }
 
-  @NotNull static Attributes create(@NotNull Collection<Attribute<?>> attrs) {
+  @NotNull
+  static Attributes create(@NotNull Collection<Attribute<?>> attrs) {
     return empty().plusAll(attrs);
   }
 }

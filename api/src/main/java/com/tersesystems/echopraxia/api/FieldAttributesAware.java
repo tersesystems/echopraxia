@@ -2,9 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-/**
- * This interface wraps some components to facilitate rendering.
- */
+/** This interface wraps some components to facilitate rendering. */
 interface FieldAttributesAware {
 
   /**

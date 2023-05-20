@@ -12,7 +12,6 @@ public class EncodedListHandler extends Handler {
   private static final List<String> linesList = new ArrayList<>();
   private static final List<LogRecord> records = new ArrayList<>();
 
-
   public static List<LogRecord> records() {
     return records;
   }
@@ -33,15 +32,10 @@ public class EncodedListHandler extends Handler {
   }
 
   @Override
-  public void flush() {
-
-  }
+  public void flush() {}
 
   @Override
-  public void close() throws SecurityException {
-
-  }
-
+  public void close() throws SecurityException {}
 
   public static void clear() throws SecurityException {
     records.clear();

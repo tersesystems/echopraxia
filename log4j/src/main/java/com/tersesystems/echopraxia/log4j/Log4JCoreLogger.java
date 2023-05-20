@@ -126,17 +126,20 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull Log4JCoreLogger withExecutor(@NotNull Executor executor) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @Override
   public @NotNull CoreLogger withFieldConverter(FieldConverter fieldConverter) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @Override
   public @NotNull Log4JCoreLogger withFQCN(@NotNull String fqcn) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @NotNull
@@ -611,12 +614,14 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @NotNull
   private Log4JCoreLogger newLogger(Supplier<Runnable> threadContextFunction) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @NotNull
   private Log4JCoreLogger newLogger(@NotNull Condition condition) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   public String toString() {

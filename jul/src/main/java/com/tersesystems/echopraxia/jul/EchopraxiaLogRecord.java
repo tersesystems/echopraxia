@@ -3,8 +3,6 @@ package com.tersesystems.echopraxia.jul;
 import static java.lang.Boolean.parseBoolean;
 
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Value;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -17,7 +15,13 @@ public class EchopraxiaLogRecord extends LogRecord {
 
   private Field[] loggerFields;
 
-  public EchopraxiaLogRecord(String name, Level level, String msg, Field[] parameters, Field[] loggerFields, Throwable thrown) {
+  public EchopraxiaLogRecord(
+      String name,
+      Level level,
+      String msg,
+      Field[] parameters,
+      Field[] loggerFields,
+      Throwable thrown) {
     super(level, msg);
     this.setLoggerName(name);
 

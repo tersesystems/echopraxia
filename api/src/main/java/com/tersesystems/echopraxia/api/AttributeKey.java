@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.api;
 
+import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Optional;
-
 /**
- * A typed attribute key.  Can be used with a display name argument for better visibility.
+ * A typed attribute key. Can be used with a display name argument for better visibility.
  *
  * @param <A> The type of the attribute.
  */

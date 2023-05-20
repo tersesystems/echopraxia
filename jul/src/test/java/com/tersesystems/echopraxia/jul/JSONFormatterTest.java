@@ -6,10 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tersesystems.echopraxia.Logger;
-import java.io.IOException;
 import java.util.List;
-import java.util.logging.LogManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class JSONFormatterTest extends TestBase {

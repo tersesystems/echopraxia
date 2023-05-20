@@ -106,9 +106,7 @@ public interface CoreLogger {
   @NotNull
   CoreLogger withExecutor(@NotNull Executor executor);
 
-  /**
-   * Returns a logger with the given field converter.
-   */
+  /** Returns a logger with the given field converter. */
   @NotNull
   CoreLogger withFieldConverter(FieldConverter fieldConverter);
 
