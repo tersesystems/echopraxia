@@ -37,27 +37,27 @@ public class FieldMarker extends ObjectAppendingMarker implements Field {
   }
 
   @Override
-  public <A> Field withAttribute(Attribute<A> attr) {
+  public <A> @NotNull Field withAttribute(@NotNull Attribute<A> attr) {
     return new FieldMarker(field.withAttribute(attr));
   }
 
   @Override
-  public Field withAttributes(Attributes attrs) {
+  public @NotNull Field withAttributes(@NotNull Attributes attrs) {
     return new FieldMarker(field.withAttributes(attrs));
   }
 
   @Override
-  public <A> Field withoutAttribute(AttributeKey<A> key) {
+  public <A> @NotNull Field withoutAttribute(@NotNull AttributeKey<A> key) {
     return new FieldMarker(field.withoutAttribute(key));
   }
 
   @Override
-  public Field withoutAttributes(Collection<AttributeKey<?>> keys) {
+  public @NotNull Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
     return new FieldMarker(field.withoutAttributes(keys));
   }
 
   @Override
-  public Field clearAttributes() {
+  public @NotNull Field clearAttributes() {
     return new FieldMarker(field.clearAttributes());
   }
 

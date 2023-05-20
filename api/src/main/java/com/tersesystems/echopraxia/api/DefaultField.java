@@ -29,27 +29,27 @@ public class DefaultField implements Field {
   }
 
   @Override
-  public <A> Field withAttribute(Attribute<A> attr) {
+  public <A> @NotNull Field withAttribute(@NotNull Attribute<A> attr) {
     return new DefaultField(name, value, attributes.plus(attr));
   }
 
   @Override
-  public Field withAttributes(Attributes attrs) {
+  public @NotNull Field withAttributes(@NotNull Attributes attrs) {
     return new DefaultField(name, value, attributes.plusAll(attrs));
   }
 
   @Override
-  public <A> Field withoutAttribute(AttributeKey<A> key) {
+  public <A> @NotNull Field withoutAttribute(@NotNull AttributeKey<A> key) {
     return new DefaultField(name, value, attributes.minus(key));
   }
 
   @Override
-  public Field withoutAttributes(Collection<AttributeKey<?>> keys) {
+  public @NotNull Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
     return new DefaultField(name, value, attributes.minusAll(keys));
   }
 
   @Override
-  public Field clearAttributes() {
+  public @NotNull Field clearAttributes() {
     return new DefaultField(name, value, Attributes.empty());
   }
 

@@ -40,27 +40,27 @@ public class Log4JMappedField implements Field {
     }
 
     @Override
-    public <A> Field withAttribute(Attribute<A> attr) {
+    public <A> @NotNull Field withAttribute(@NotNull Attribute<A> attr) {
         return new Log4JMappedField(textField.withAttribute(attr), structuredField);
     }
 
     @Override
-    public Field withAttributes(Attributes attrs) {
+    public @NotNull Field withAttributes(@NotNull Attributes attrs) {
         return new Log4JMappedField(textField.withAttributes(attrs), structuredField);
     }
 
     @Override
-    public <A> Field withoutAttribute(AttributeKey<A> key) {
+    public <A> @NotNull Field withoutAttribute(@NotNull AttributeKey<A> key) {
         return new Log4JMappedField(textField.withoutAttribute(key), structuredField);
     }
 
     @Override
-    public Field withoutAttributes(Collection<AttributeKey<?>> keys) {
+    public @NotNull Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
         return new Log4JMappedField(textField.withoutAttributes(keys), structuredField);
     }
 
     @Override
-    public Field clearAttributes() {
+    public @NotNull Field clearAttributes() {
         return new Log4JMappedField(textField.clearAttributes(), structuredField);
     }
 

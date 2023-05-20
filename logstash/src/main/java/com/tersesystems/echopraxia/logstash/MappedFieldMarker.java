@@ -53,27 +53,27 @@ public class MappedFieldMarker extends ObjectAppendingMarker implements Field {
   }
 
   @Override
-  public <A> Field withAttribute(Attribute<A> attr) {
+  public <A> @NotNull Field withAttribute(@NotNull Attribute<A> attr) {
     return new MappedFieldMarker(textField.withAttribute(attr), structuredField);
   }
 
   @Override
-  public Field withAttributes(Attributes attrs) {
+  public @NotNull Field withAttributes(@NotNull Attributes attrs) {
     return new MappedFieldMarker(textField.withAttributes(attrs), structuredField);
   }
 
   @Override
-  public <A> Field withoutAttribute(AttributeKey<A> key) {
+  public <A> @NotNull Field withoutAttribute(@NotNull AttributeKey<A> key) {
     return new MappedFieldMarker(textField.withoutAttribute(key), structuredField);
   }
 
   @Override
-  public Field withoutAttributes(Collection<AttributeKey<?>> keys) {
+  public @NotNull Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
     return new MappedFieldMarker(textField.withoutAttributes(keys), structuredField);
   }
 
   @Override
-  public Field clearAttributes() {
+  public @NotNull Field clearAttributes() {
     return new MappedFieldMarker(textField.clearAttributes(), structuredField);
   }
 
