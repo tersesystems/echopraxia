@@ -14,19 +14,19 @@ public class FluentBenchmarks {
 
   @Benchmark
   public void info() {
-    // FluentBenchmarks.info                     avgt   25  103.478 ±  2.631  ns/op
+    // FluentBenchmarks.info                     avgt   25  103.478 +/-  2.631  ns/op
     logger.atInfo().message("Message").log();
   }
 
   @Benchmark
   public void infoWithArgument() {
-    // FluentBenchmarks.infoWithArgument         avgt   25  196.968 ±  4.884  ns/op
+    // FluentBenchmarks.infoWithArgument         avgt   25  196.968  +/-  4.884  ns/op
     logger.atInfo().message("Message {}").argument(fb -> fb.string("foo", "bar")).log();
   }
 
   @Benchmark
   public void infoWithArgAndException() {
-    // FluentBenchmarks.infoWithArgAndException  avgt   25  331.651 ± 15.591  ns/op
+    // FluentBenchmarks.infoWithArgAndException  avgt   25  331.651  +/- 15.591  ns/op
     logger
         .atInfo()
         .message("Message {}")
@@ -37,7 +37,7 @@ public class FluentBenchmarks {
 
   @Benchmark
   public void infoWithException() {
-    // FluentBenchmarks.infoWithException        avgt   25  351.918 ±  7.124  ns/op
+    // FluentBenchmarks.infoWithException        avgt   25  351.918 +/-  7.124  ns/op
     logger.atInfo().message("Message").exception(exception).log();
   }
 }

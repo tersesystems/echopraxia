@@ -31,6 +31,7 @@ public class Log4JCoreLogger implements CoreLogger {
   private final String fqcn;
 
   private final Supplier<Runnable> threadContextFunction;
+  private final FieldConverter fieldConverter;
 
   public Log4JCoreLogger(@NotNull String fqcn, @NotNull ExtendedLogger log4jLogger) {
     this.fqcn = fqcn;
@@ -39,6 +40,7 @@ public class Log4JCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = threadContext();
+    this.fieldConverter = Log4JFieldConverter.instance();
   }
 
   protected Log4JCoreLogger(
@@ -47,13 +49,15 @@ public class Log4JCoreLogger implements CoreLogger {
       @NotNull Log4JCoreLogger.Context context,
       @NotNull Condition condition,
       @NotNull Executor executor,
-      @NotNull Supplier<Runnable> threadContextSupplier) {
+      @NotNull Supplier<Runnable> threadContextSupplier,
+      @NotNull FieldConverter fieldConverter) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
     this.executor = executor;
     this.threadContextFunction = threadContextSupplier;
+    this.fieldConverter = fieldConverter;
   }
 
   @NotNull
@@ -122,12 +126,20 @@ public class Log4JCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull Log4JCoreLogger withExecutor(@NotNull Executor executor) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+  }
+
+  @Override
+  public @NotNull CoreLogger withFieldConverter(FieldConverter fieldConverter) {
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @Override
   public @NotNull Log4JCoreLogger withFQCN(@NotNull String fqcn) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @NotNull
@@ -502,7 +514,20 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   protected Message createMessage(String template, Log4JLoggingContext ctx) {
-    return new EchopraxiaFieldsMessage(template, ctx.getLoggerFields(), ctx.getArgumentFields());
+    List<Field> loggerFields = ctx.getLoggerFields();
+    List<Field> input = new ArrayList<>(loggerFields.size());
+    for (Field loggerField : loggerFields) {
+      Field f = (Field) fieldConverter.convertLoggerField(loggerField);
+      input.add(f);
+    }
+
+    List<Field> argumentFields = ctx.getArgumentFields();
+    List<Field> args = new ArrayList<>(argumentFields.size());
+    for (Field argumentField : argumentFields) {
+      Field f = (Field) fieldConverter.convertArgumentField(argumentField);
+      args.add(f);
+    }
+    return new EchopraxiaFieldsMessage(template, input, args);
   }
 
   protected org.apache.logging.log4j.Level convertLevel(Level level) {
@@ -584,17 +609,19 @@ public class Log4JCoreLogger implements CoreLogger {
   @NotNull
   private Log4JCoreLogger newLogger(Context newContext) {
     return new Log4JCoreLogger(
-        fqcn, logger, newContext, condition, executor, threadContextFunction);
+        fqcn, logger, newContext, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @NotNull
-  private Log4JCoreLogger newLogger(Supplier<Runnable> supplier) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, supplier);
+  private Log4JCoreLogger newLogger(Supplier<Runnable> threadContextFunction) {
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   @NotNull
   private Log4JCoreLogger newLogger(@NotNull Condition condition) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
+    return new Log4JCoreLogger(
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
   }
 
   public String toString() {

@@ -36,7 +36,7 @@ public interface FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default Field.ValueField value(@NotNull String name, @NotNull Value<?> value) {
+  default Field value(@NotNull String name, @NotNull Value<?> value) {
     return Field.value(name, value);
   }
 
@@ -50,7 +50,7 @@ public interface FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default Field.KeyValueField keyValue(@NotNull String name, @NotNull Value<?> value) {
+  default Field keyValue(@NotNull String name, @NotNull Value<?> value) {
     return Field.keyValue(name, value);
   }
 

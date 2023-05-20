@@ -17,7 +17,7 @@ public class SemanticLoggerBenchmarks {
 
   @Benchmark
   public void info() {
-    // SemanticLoggerBenchmarks.info  avgt   25  97.199 ± 3.323  ns/op
+    // SemanticLoggerBenchmarks.info  avgt   25  97.199 +/- 3.323  ns/op
     logger.info("string");
   }
 

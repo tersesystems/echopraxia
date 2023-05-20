@@ -3,8 +3,6 @@ package com.tersesystems.echopraxia.jul;
 import static java.lang.Boolean.parseBoolean;
 
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Value;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -15,11 +13,17 @@ public class EchopraxiaLogRecord extends LogRecord {
       parseBoolean(
           System.getProperty("com.tersesystems.echopraxia.jul.disableInferSource", "true"));
 
-  private final JULLoggingContext ctx;
+  private Field[] loggerFields;
 
-  public EchopraxiaLogRecord(Level level, String msg, JULLoggingContext ctx) {
+  public EchopraxiaLogRecord(
+      String name,
+      Level level,
+      String msg,
+      Field[] parameters,
+      Field[] loggerFields,
+      Throwable thrown) {
     super(level, msg);
-    this.ctx = ctx;
+    this.setLoggerName(name);
 
     // JUL is really slow and calls sourceClassName lots when serializing.
     if (disableInferSource) {
@@ -27,17 +31,16 @@ public class EchopraxiaLogRecord extends LogRecord {
       setSourceMethodName(null);
     }
 
-    final List<Field> argumentFields = ctx.getArgumentFields();
-    this.setParameters(argumentFields.toArray());
-    for (Field f : argumentFields) {
-      if (f.value() instanceof Value.ExceptionValue) {
-        this.setThrown((Throwable) f.value().raw());
-        break;
-      }
-    }
+    this.setParameters(parameters);
+    this.setLoggerFields(loggerFields);
+    this.setThrown(thrown);
   }
 
-  public JULLoggingContext getLoggingContext() {
-    return this.ctx;
+  public void setLoggerFields(Field[] loggerFields) {
+    this.loggerFields = loggerFields;
+  }
+
+  public Field[] getLoggerFields() {
+    return loggerFields;
   }
 }
