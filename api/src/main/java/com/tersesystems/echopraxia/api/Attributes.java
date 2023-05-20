@@ -4,6 +4,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.pcollections.Empty;
 import org.pcollections.PMap;
 
@@ -11,45 +14,46 @@ import org.pcollections.PMap;
  * An immutable map containing typed values.
  *
  * <p>The elements inside Attributes cannot be enumerated -- It's not possible to access a value in
- * a TypedMap without holding the corresponding key.
+ * Attributes without holding the corresponding key.
  */
 public interface Attributes {
 
-  <A> A get(AttributeKey<A> key);
+  @Nullable <A> A get(@NotNull AttributeKey<A> key);
 
-  <A> Optional<A> getOptional(AttributeKey<A> key);
+  @NotNull
+  <A> Optional<A> getOptional(@NotNull AttributeKey<A> key);
 
-  boolean containsKey(AttributeKey<?> key);
+  boolean containsKey(@NotNull AttributeKey<?> key);
 
-  <A> Attributes plus(AttributeKey<A> key, A value);
+  @NotNull <A> Attributes plus(@NotNull AttributeKey<A> key, A value);
 
-  <A> Attributes plus(Attribute<A> attr);
+  @NotNull <A> Attributes plus(@NotNull Attribute<A> attr);
 
-  Attributes plusAll(Attributes attrs);
+  @NotNull  Attributes plusAll(@NotNull Attributes attrs);
 
-  Attributes plusAll(Attribute<?> a1, Attribute<?> a2);
+  @NotNull Attributes plusAll(@NotNull Attribute<?> a1, @NotNull Attribute<?> a2);
 
-  Attributes plusAll(Collection<Attribute<?>> attrs);
+  @NotNull  Attributes plusAll(@NotNull Collection<Attribute<?>> attrs);
 
-  Attributes plusAll(Map<AttributeKey<?>, ?> attrs);
+  @NotNull  Attributes plusAll(@NotNull Map<AttributeKey<?>, ?> attrs);
 
-  Attributes minus(AttributeKey<?> k1);
+  @NotNull Attributes minus(@NotNull AttributeKey<?> k1);
 
-  Attributes minusAll(Collection<AttributeKey<?>> keys);
+  @NotNull Attributes minusAll(@NotNull Collection<AttributeKey<?>> keys);
 
-  static Attributes empty() {
+  @NotNull static Attributes empty() {
     return AttributesImpl.EMPTY;
   }
 
-  static <A> Attributes create(Attribute<A> attribute) {
+  @NotNull static <A> Attributes create(@NotNull Attribute<A> attribute) {
     return empty().plus(attribute.key(), attribute.value());
   }
 
-  static Attributes create(Attribute<?> a1, Attribute<?> a2) {
+  @NotNull static Attributes create(@NotNull Attribute<?> a1, Attribute<?> a2) {
     return empty().plusAll(a1, a2);
   }
 
-  static Attributes create(Collection<Attribute<?>> attrs) {
+  @NotNull static Attributes create(@NotNull Collection<Attribute<?>> attrs) {
     return empty().plusAll(attrs);
   }
 }
@@ -63,28 +67,30 @@ final class AttributesImpl implements Attributes {
     this._map = map;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public <A> A get(AttributeKey<A> key) {
+  public <A> A get(@NotNull AttributeKey<A> key) {
     return (A) _map.get(key);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-  public <A> Optional<A> getOptional(AttributeKey<A> key) {
+  public @NotNull <A> Optional<A> getOptional(@NotNull AttributeKey<A> key) {
     return (Optional<A>) Optional.ofNullable(_map.get(key));
   }
 
   @Override
-  public boolean containsKey(AttributeKey<?> key) {
+  public boolean containsKey(@NotNull AttributeKey<?> key) {
     return _map.containsKey(key);
   }
 
   @Override
-  public <A> Attributes plus(AttributeKey<A> key, A value) {
+  public <A> Attributes plus(@NotNull AttributeKey<A> key, A value) {
     return new AttributesImpl(_map.plus(key, value));
   }
 
   @Override
-  public <A> Attributes plus(Attribute<A> attr) {
+  public <A> Attributes plus(@NotNull Attribute<A> attr) {
     return plus(attr.key(), attr.value());
   }
 

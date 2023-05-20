@@ -20,7 +20,7 @@ class JULLoggerTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.debug("hello");
 
-    List<LogRecord> list = ListHandler.list();
+    List<LogRecord> list = EncodedListHandler.records();
     LogRecord logRecord = list.get(0);
     assertThat(logRecord.getLevel()).isEqualTo(Level.FINE);
     assertThat(logRecord.getMessage()).isEqualTo("hello");
@@ -31,7 +31,7 @@ class JULLoggerTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.info("hello");
 
-    List<LogRecord> list = ListHandler.list();
+    List<LogRecord> list = EncodedListHandler.records();
     LogRecord logRecord = list.get(0);
     assertThat(logRecord.getLevel()).isEqualTo(Level.INFO);
     assertThat(logRecord.getMessage()).isEqualTo("hello");
@@ -44,7 +44,7 @@ class JULLoggerTest extends TestBase {
         "hello {0}, you are {1}, citizen status {2}",
         fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
 
-    List<LogRecord> list = ListHandler.list();
+    List<LogRecord> list = EncodedListHandler.records();
     LogRecord logRecord = list.get(0);
     assertThat(logRecord.getLevel()).isEqualTo(Level.INFO);
     assertThat(logRecord.getMessage()).isEqualTo("hello {0}, you are {1}, citizen status {2}");
@@ -60,7 +60,7 @@ class JULLoggerTest extends TestBase {
     MDC.put("mdckey", "mdcvalue");
     logger.withThreadContext().info("hello");
 
-    List<LogRecord> list = ListHandler.list();
+    List<LogRecord> list = EncodedListHandler.records();
     EchopraxiaLogRecord logRecord = (EchopraxiaLogRecord) list.get(0);
     Field[] fields = logRecord.getLoggerFields();
     Field nameField = fields[0];
@@ -74,7 +74,7 @@ class JULLoggerTest extends TestBase {
     Throwable expected = new IllegalStateException("oh noes");
     logger.error("Error", expected);
 
-    List<LogRecord> list = ListHandler.list();
+    List<LogRecord> list = EncodedListHandler.records();
     LogRecord logRecord = list.get(0);
     Throwable actual = logRecord.getThrown();
     assertThat(actual).hasSameClassAs(expected);

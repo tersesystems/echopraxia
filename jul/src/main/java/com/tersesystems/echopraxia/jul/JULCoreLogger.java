@@ -119,12 +119,12 @@ public class JULCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
+  public @NotNull JULCoreLogger withExecutor(@NotNull Executor executor) {
     return newLogger(executor);
   }
 
   @Override
-  public @NotNull CoreLogger withFieldConverter(FieldConverter fieldConverter) {
+  public @NotNull JULCoreLogger withFieldConverter(FieldConverter fieldConverter) {
     return newLogger(fieldConverter);
   }
 
@@ -529,11 +529,11 @@ public class JULCoreLogger implements CoreLogger {
     return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
-  private CoreLogger newLogger(Executor executor) {
+  private JULCoreLogger newLogger(Executor executor) {
     return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 
-  private CoreLogger newLogger(FieldConverter fieldConverter) {
+  private JULCoreLogger newLogger(FieldConverter fieldConverter) {
     return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor, fieldConverter);
   }
 

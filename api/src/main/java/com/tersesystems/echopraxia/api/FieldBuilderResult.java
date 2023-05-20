@@ -6,6 +6,10 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This interface is the result end of the FieldBuilder -> FieldBuilderResult function used for arguments
+ * in loggers.  It abstracts away the "list of fields" vs "single field" result issue we'd have otherwise.
+ */
 public interface FieldBuilderResult {
 
   @NotNull

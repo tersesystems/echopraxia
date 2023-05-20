@@ -14,21 +14,12 @@ import org.junit.jupiter.api.Test;
 
 public class JSONFormatterTest extends TestBase {
 
-  @Override
-  @BeforeEach
-  public void before() throws IOException {
-    LogManager manager = LogManager.getLogManager();
-    manager.reset();
-    manager.readConfiguration(
-        getClass().getClassLoader().getResourceAsStream("encoded-logging.properties"));
-  }
-
   @Test
   void testDebug() throws JsonProcessingException {
     Logger<?> logger = getLogger();
     logger.debug("hello");
 
-    List<String> list = EncodedListHandler.list();
+    List<String> list = EncodedListHandler.ndjson();
     String logRecord = list.get(0);
 
     final ObjectMapper mapper = new ObjectMapper();
@@ -43,7 +34,7 @@ public class JSONFormatterTest extends TestBase {
     Logger<?> logger = getLogger();
     logger.info("hello");
 
-    List<String> list = EncodedListHandler.list();
+    List<String> list = EncodedListHandler.ndjson();
     String logRecord = list.get(0);
 
     final ObjectMapper mapper = new ObjectMapper();
@@ -60,7 +51,7 @@ public class JSONFormatterTest extends TestBase {
         "hello {0}, you are {1}, citizen status {2}",
         fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
 
-    List<String> list = EncodedListHandler.list();
+    List<String> list = EncodedListHandler.ndjson();
     String logRecord = list.get(0);
 
     final ObjectMapper mapper = new ObjectMapper();
@@ -77,7 +68,7 @@ public class JSONFormatterTest extends TestBase {
     Throwable expected = new IllegalStateException("oh noes");
     logger.error("Error", expected);
 
-    List<String> list = EncodedListHandler.list();
+    List<String> list = EncodedListHandler.ndjson();
     String logRecord = list.get(0);
 
     final ObjectMapper mapper = new ObjectMapper();

@@ -91,6 +91,10 @@ public class JULJSONFormatter extends Formatter {
     useSlf4jLevelNames = Boolean.parseBoolean(value);
   }
 
+  public JULJSONFormatter(boolean useSlf4jLevelNames) {
+    this.useSlf4jLevelNames = useSlf4jLevelNames;
+  }
+
   @Override
   public String format(LogRecord record) {
     Map<String, Object> object = new LinkedHashMap<>();
