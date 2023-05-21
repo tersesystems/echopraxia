@@ -135,42 +135,57 @@ public class JULCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(@NotNull Level level) {
-    if (condition == Condition.always()) {
-      return logger.isLoggable(convertLevel(level));
-    }
-    if (condition == Condition.never()) {
+    try {
+      if (condition == Condition.always()) {
+        return logger.isLoggable(convertLevel(level));
+      }
+      if (condition == Condition.never()) {
+        return false;
+      }
+      if (logger.isLoggable(convertLevel(level))) {
+        JULLoggingContext snapshotContext = new JULLoggingContext(this, context);
+        return condition.test(level, snapshotContext);
+      }
+      return false;
+    } catch (Exception e) {
+      handleException(e);
       return false;
     }
-    if (logger.isLoggable(convertLevel(level))) {
-      JULLoggingContext snapshotContext = new JULLoggingContext(this, context);
-      return condition.test(level, snapshotContext);
-    }
-    return false;
   }
 
   @Override
   public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
-    final Condition bothConditions = this.condition.and(condition);
-    if (bothConditions == Condition.always()) {
-      return logger.isLoggable(convertLevel(level));
-    }
-    if (bothConditions == Condition.never()) {
+    try {
+      final Condition bothConditions = this.condition.and(condition);
+      if (bothConditions == Condition.always()) {
+        return logger.isLoggable(convertLevel(level));
+      }
+      if (bothConditions == Condition.never()) {
+        return false;
+      }
+      if (logger.isLoggable(convertLevel(level))) {
+        JULLoggingContext snapshotContext = new JULLoggingContext(this, context);
+        return bothConditions.test(level, snapshotContext);
+      }
+      return false;
+    } catch (Exception e) {
+      handleException(e);
       return false;
     }
-    if (logger.isLoggable(convertLevel(level))) {
-      JULLoggingContext snapshotContext = new JULLoggingContext(this, context);
-      return bothConditions.test(level, snapshotContext);
-    }
-    return false;
   }
 
   @Override
   public boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields) {
-    java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
-      return condition.test(level, ctx);
-    } else {
+    try {
+      java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
+        return condition.test(level, ctx);
+      } else {
+        return false;
+      }
+    } catch (Exception e) {
+      handleException(e);
       return false;
     }
   }
@@ -180,12 +195,16 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Level level,
       @NotNull Condition condition,
       @NotNull Supplier<List<Field>> extraFields) {
-
-    final java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
-      return this.condition.and(condition).test(level, ctx);
-    } else {
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
+        return this.condition.and(condition).test(level, ctx);
+      } else {
+        return false;
+      }
+    } catch (Exception e) {
+      handleException(e);
       return false;
     }
   }
@@ -194,27 +213,34 @@ public class JULCoreLogger implements CoreLogger {
   public void log(@NotNull Level level, String message) {
     final java.util.logging.Level julLevel = convertLevel(level);
     // the isLoggable check always goes before the condition check, as conditions can be expensive
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx = new JULLoggingContext(this, context);
-      if (condition.test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx = new JULLoggingContext(this, context);
+        if (condition.test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
   @Override
   public void log(
       @NotNull Level level, @NotNull Supplier<List<Field>> extraFields, @Nullable String message) {
-
-    final java.util.logging.Level julLevel = convertLevel(level);
-    // the isLoggable check always goes before the condition check, as conditions can be expensive
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
-      if (condition.test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      // the isLoggable check always goes before the condition check, as conditions can be expensive
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
+        if (condition.test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
@@ -224,14 +250,18 @@ public class JULCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
-    final java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx =
-          new JULLoggingContext(this, context, () -> convertToFields(f.apply(builder)));
-      if (condition.test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx =
+            new JULLoggingContext(this, context, () -> convertToFields(f.apply(builder)));
+        if (condition.test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
@@ -242,30 +272,36 @@ public class JULCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
-
-    final java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx =
-          new JULLoggingContext(
-              this, context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
-      if (condition.test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx =
+            new JULLoggingContext(
+                this, context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
+        if (condition.test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
   @Override
   public void log(@NotNull Level level, @NotNull Condition condition, @Nullable String message) {
-
-    final java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      // We want to memoize context fields even if no argument...
-      JULLoggingContext ctx = new JULLoggingContext(this, context);
-      if (this.condition.and(condition).test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        // We want to memoize context fields even if no argument...
+        JULLoggingContext ctx = new JULLoggingContext(this, context);
+        if (this.condition.and(condition).test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
@@ -275,15 +311,18 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull Supplier<List<Field>> extraFields,
       @NotNull Condition condition,
       @Nullable String message) {
-
-    final java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      // We want to memoize context fields even if no argument...
-      JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
-      if (this.condition.and(condition).test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        // We want to memoize context fields even if no argument...
+        JULLoggingContext ctx = new JULLoggingContext(this, context.withFields(extraFields));
+        if (this.condition.and(condition).test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
@@ -294,14 +333,18 @@ public class JULCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
-    final java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx =
-          new JULLoggingContext(this, context, () -> convertToFields(f.apply(builder)));
-      if (this.condition.and(condition).test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx =
+            new JULLoggingContext(this, context, () -> convertToFields(f.apply(builder)));
+        if (this.condition.and(condition).test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
@@ -313,16 +356,19 @@ public class JULCoreLogger implements CoreLogger {
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f,
       @NotNull FB builder) {
-
-    final java.util.logging.Level julLevel = convertLevel(level);
-    if (logger.isLoggable(julLevel)) {
-      JULLoggingContext ctx =
-          new JULLoggingContext(
-              this, context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
-      if (this.condition.and(condition).test(level, ctx)) {
-        LogRecord logRecord = createLogRecord(julLevel, message, ctx);
-        logger.log(logRecord);
+    try {
+      final java.util.logging.Level julLevel = convertLevel(level);
+      if (logger.isLoggable(julLevel)) {
+        JULLoggingContext ctx =
+            new JULLoggingContext(
+                this, context.withFields(extraFields), () -> convertToFields(f.apply(builder)));
+        if (this.condition.and(condition).test(level, ctx)) {
+          LogRecord logRecord = createLogRecord(julLevel, message, ctx);
+          logger.log(logRecord);
+        }
       }
+    } catch (Exception e) {
+      handleException(e);
     }
   }
 
@@ -333,18 +379,26 @@ public class JULCoreLogger implements CoreLogger {
 
       @Override
       public void log(@Nullable String message) {
-        JULLoggingContext ctx = new JULLoggingContext(JULCoreLogger.this, context);
-        LogRecord logRecord = createLogRecord(log4jLevel, message, ctx);
-        logger.log(logRecord);
+        try {
+          JULLoggingContext ctx = new JULLoggingContext(JULCoreLogger.this, context);
+          LogRecord logRecord = createLogRecord(log4jLevel, message, ctx);
+          logger.log(logRecord);
+        } catch (Exception e) {
+          handleException(e);
+        }
       }
 
       @Override
       public void log(@Nullable String message, @NotNull Function<FB, FieldBuilderResult> f) {
-        JULLoggingContext ctx =
-            new JULLoggingContext(
-                JULCoreLogger.this, context, () -> convertToFields(f.apply(builder)));
-        LogRecord logRecord = createLogRecord(log4jLevel, message, ctx);
-        logger.log(logRecord);
+        try {
+          JULLoggingContext ctx =
+              new JULLoggingContext(
+                  JULCoreLogger.this, context, () -> convertToFields(f.apply(builder)));
+          LogRecord logRecord = createLogRecord(log4jLevel, message, ctx);
+          logger.log(logRecord);
+        } catch (Exception e) {
+          handleException(e);
+        }
       }
     };
   }
@@ -562,5 +616,9 @@ public class JULCoreLogger implements CoreLogger {
 
   public String toString() {
     return "JULCoreLogger[" + logger.getName() + "]";
+  }
+
+  private static void handleException(Throwable e) {
+    CoreLoggerFactory.getExceptionHandler().handleException(e);
   }
 }
