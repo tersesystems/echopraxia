@@ -1,5 +1,10 @@
 ## Changelog
 
+## 3.0.0
+
+* Add field attributes and FieldTransformer and change value only to be attribute based
+* Add exception handler
+
 ## 2.3.0-RC1
 
 * Add `getCore()` method to `LoggingContext` in https://github.com/tersesystems/echopraxia/pull/229
