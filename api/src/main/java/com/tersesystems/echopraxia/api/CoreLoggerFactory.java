@@ -29,7 +29,10 @@ public class CoreLoggerFactory {
     if (iterator.hasNext()) {
       exceptionHandler = iterator.next().getExceptionHandler();
     } else {
-      exceptionHandler = Throwable::printStackTrace;
+      exceptionHandler =
+          e -> {
+            e.printStackTrace();
+          };
     }
 
     try {

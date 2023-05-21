@@ -163,15 +163,18 @@ public class ConditionTest extends TestBase {
         });
 
     await().atLeast(100, MILLISECONDS).until(logged::get);
-    JsonNode entry = getEntry();
-    String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    String exceptionMessage = entry.path("thrown").path("message").asText();
+
+    final ListAppender listAppender = getListAppender("ListAppender");
+    final List<String> messages = listAppender.getMessages();
+    assertThat(messages).isEmpty();
+
+    Throwable throwable = StaticExceptionHandlerProvider.head();
+    String exceptionMessage = throwable.getMessage();
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 
   @Test
-  void testFailedLogging() {
+  void testFailedAsyncLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
     AsyncLogger<?> loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
@@ -188,10 +191,13 @@ public class ConditionTest extends TestBase {
         });
 
     await().atLeast(100, MILLISECONDS).until(logged::get);
-    JsonNode entry = getEntry();
-    String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    String exceptionMessage = entry.path("thrown").path("message").asText();
+
+    final ListAppender listAppender = getListAppender("ListAppender");
+    final List<String> messages = listAppender.getMessages();
+    assertThat(messages).isEmpty();
+
+    Throwable throwable = StaticExceptionHandlerProvider.head();
+    String exceptionMessage = throwable.getMessage();
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 }

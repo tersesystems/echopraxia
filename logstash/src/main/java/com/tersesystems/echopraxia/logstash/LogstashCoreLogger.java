@@ -522,9 +522,13 @@ public class LogstashCoreLogger implements CoreLogger {
         Runnable threadLocalRunnable = threadContextFunction.get();
         runAsyncLog(
             () -> {
-              threadLocalRunnable.run();
-              LogstashCoreLogger callerLogger = newLogger(newContext(callerMarker));
-              consumer.accept(newHandle(level, builder, callerLogger));
+              try {
+                threadLocalRunnable.run();
+                LogstashCoreLogger callerLogger = newLogger(newContext(callerMarker));
+                consumer.accept(newHandle(level, builder, callerLogger));
+              } catch (Exception e) {
+                handleException(e);
+              }
             });
       }
     } catch (Exception e) {
