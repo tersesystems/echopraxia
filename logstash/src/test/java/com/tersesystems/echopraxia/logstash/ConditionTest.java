@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
@@ -202,17 +201,14 @@ public class ConditionTest extends TestBase {
 
     await().atLeast(100, MILLISECONDS).until(logged::get);
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
-    assertThat(listAppender.list).isNotEmpty();
+    assertThat(listAppender.list).isEmpty();
 
-    final ILoggingEvent event = listAppender.list.get(0);
-    String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    Throwable actualException = ((ThrowableProxy) event.getThrowableProxy()).getThrowable();
+    Throwable actualException = StaticExceptionHandlerProvider.head();
     assertThat(actualException.getMessage()).isEqualTo("oh noes!");
   }
 
   @Test
-  void testFailedLogging() {
+  void testFailedAsyncLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
     AsyncLogger<?> loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
@@ -231,11 +227,7 @@ public class ConditionTest extends TestBase {
     await().atLeast(100, MILLISECONDS).until(logged::get);
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
-    assertThat(listAppender.list).isNotEmpty();
-    final ILoggingEvent event = listAppender.list.get(0);
-    String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("Uncaught exception when running asyncLog");
-    Throwable actualException = ((ThrowableProxy) event.getThrowableProxy()).getThrowable();
-    assertThat(actualException.getMessage()).isEqualTo("oh noes!");
+    assertThat(listAppender.list.size()).isEqualTo(0);
+    assertThat(StaticExceptionHandlerProvider.head().getMessage()).isEqualTo("oh noes!");
   }
 }

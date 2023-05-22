@@ -17,6 +17,7 @@ public class TestBase {
 
   @BeforeEach
   void beforeEach() {
+    StaticExceptionHandlerProvider.clear();
     final ListAppender listAppender = getListAppender("ListAppender");
     listAppender.clear();
   }

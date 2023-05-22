@@ -20,15 +20,37 @@ public class CoreLoggerFactory {
 
   private static Filters filters;
 
+  private static final ExceptionHandler exceptionHandler;
+
   static {
+    ServiceLoader<ExceptionHandlerProvider> loader =
+        ServiceLoader.load(ExceptionHandlerProvider.class);
+    Iterator<ExceptionHandlerProvider> iterator = loader.iterator();
+    if (iterator.hasNext()) {
+      exceptionHandler = iterator.next().getExceptionHandler();
+    } else {
+      exceptionHandler =
+          e -> {
+            e.printStackTrace();
+          };
+    }
+
     try {
       filters = new Filters(classLoaders);
     } catch (Exception e) {
-      // If we get to this point, something has gone horribly wrong, print to STDERR.
-      e.printStackTrace();
+      // If we get to this point, something has gone horribly wrong.
+      exceptionHandler.handleException(e);
       // Keep going with no filters.
       filters = new Filters(Collections.emptyList());
     }
+  }
+
+  /**
+   * @return the exception handler for internal exceptions.
+   */
+  @NotNull
+  public static ExceptionHandler getExceptionHandler() {
+    return exceptionHandler;
   }
 
   @NotNull

@@ -11,4 +11,5 @@ dependencies {
 
     jmhImplementation project(":logger")
     testImplementation project(":logger")
+    testImplementation project(":async")
 }
