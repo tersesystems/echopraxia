@@ -2,6 +2,8 @@ package com.tersesystems.echopraxia.jul;
 
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.async.AsyncLogger;
+import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -12,6 +14,7 @@ public class TestBase {
 
   @BeforeEach
   public void before() throws IOException {
+    StaticExceptionHandlerProvider.clear();
     LogManager manager = LogManager.getLogManager();
     manager.reset();
 
@@ -32,6 +35,10 @@ public class TestBase {
 
   Logger<?> getLogger() {
     return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
+  }
+
+  AsyncLogger<?> getAsyncLogger() {
+    return AsyncLoggerFactory.getLogger();
   }
 
   JULCoreLogger getCoreLogger() {
