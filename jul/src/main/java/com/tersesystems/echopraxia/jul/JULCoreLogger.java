@@ -524,7 +524,7 @@ public class JULCoreLogger implements CoreLogger {
 
   private List<Field> convertToFields(FieldBuilderResult result) {
     if (result == null) {
-      // XXX log an error
+      handleException(new NullPointerException("Null result!"));
       return Collections.emptyList();
     }
     return result.fields();
