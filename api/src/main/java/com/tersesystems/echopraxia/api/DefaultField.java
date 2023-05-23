@@ -10,13 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class DefaultField implements Field {
 
   public static final String ECHOPRAXIA_UNKNOWN = "echopraxia-unknown-";
-
-  private static final int DEFAULT_STRING_BUILDER_SIZE = 255;
-
   public static final LongAdder unknownFieldAdder = new LongAdder();
-
-  // Cut down on allocation pressure by reusing stringbuilder
-  private static final ThreadLocal<StringBuilder> threadLocalStringBuilder = new ThreadLocal<>();
 
   protected final String name;
   protected final Value<?> value;
@@ -110,49 +104,6 @@ public class DefaultField implements Field {
   }
 
   public String toString() {
-    Boolean valueOnly = isValueOnly();
-    if (valueOnly) {
-      final Object raw = value.raw();
-      final Value.Type type = value.type();
-      if (raw == null || type == Value.Type.NULL) {
-        return "null";
-      }
-      if (type == Value.Type.STRING) {
-        return ((String) raw);
-      }
-
-      if (type == Value.Type.BOOLEAN) {
-        return ((Boolean) raw) ? Boolean.TRUE.toString() : Boolean.FALSE.toString();
-      }
-
-      if (type == Value.Type.NUMBER) {
-        return raw.toString();
-      }
-    }
-
-    final StringBuilder builder = getThreadLocalStringBuilder();
-    if (!valueOnly) {
-      builder.append(name).append("=");
-    }
-    ValueFormatter.formatToBuffer(builder, value);
-    return builder.toString();
-  }
-
-  public void formatToBuffer(StringBuilder b) {
-    Boolean valueOnly = isValueOnly();
-    if (!valueOnly) {
-      b.append(name).append("=");
-    }
-    ValueFormatter.formatToBuffer(b, value);
-  }
-
-  private static StringBuilder getThreadLocalStringBuilder() {
-    StringBuilder buffer = threadLocalStringBuilder.get();
-    if (buffer == null) {
-      buffer = new StringBuilder(DEFAULT_STRING_BUILDER_SIZE);
-      threadLocalStringBuilder.set(buffer);
-    }
-    buffer.setLength(0);
-    return buffer;
+    return CoreLoggerFactory.getFieldFormatter().formatField(this);
   }
 }

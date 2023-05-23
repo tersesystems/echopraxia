@@ -22,6 +22,8 @@ public class CoreLoggerFactory {
 
   private static final ExceptionHandler exceptionHandler;
 
+  private static final FieldFormatter fieldFormatter = new DefaultFieldFormatter();
+
   static {
     ServiceLoader<ExceptionHandlerProvider> loader =
         ServiceLoader.load(ExceptionHandlerProvider.class);
@@ -68,6 +70,10 @@ public class CoreLoggerFactory {
   @NotNull
   private static CoreLogger processFilters(@NotNull CoreLogger core) {
     return filters.apply(core);
+  }
+
+  public static FieldFormatter getFieldFormatter() {
+    return fieldFormatter;
   }
 
   private static class LazyHolder {

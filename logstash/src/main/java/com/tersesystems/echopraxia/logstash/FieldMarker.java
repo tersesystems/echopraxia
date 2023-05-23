@@ -63,7 +63,6 @@ public class FieldMarker extends ObjectAppendingMarker implements Field {
 
   @Override
   public String toStringSelf() {
-    final String fieldValueString = field.value().toString();
-    return isValueOnly() ? fieldValueString : field.name() + "=" + fieldValueString;
+    return CoreLoggerFactory.getFieldFormatter().formatField(this);
   }
 }

@@ -99,28 +99,7 @@ public abstract class Value<V> {
 
   @NotNull
   public String toString() {
-    final Object raw = raw();
-    final Type type = type();
-    if (raw == null
-        || type == Type.NULL) { // if null value or a raw value was set to null, keep going.
-      return "null";
-    }
-
-    if (type == Type.STRING) {
-      return ((String) raw);
-    }
-
-    if (type == Type.BOOLEAN) {
-      return Boolean.toString((Boolean) raw);
-    }
-
-    if (type == Type.NUMBER) {
-      return raw.toString();
-    }
-
-    final StringBuilder b = new StringBuilder(255);
-    ValueFormatter.formatToBuffer(b, this);
-    return b.toString();
+    return CoreLoggerFactory.getFieldFormatter().formatValue(this);
   }
 
   /**
