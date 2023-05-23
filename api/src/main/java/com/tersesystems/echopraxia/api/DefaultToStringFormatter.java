@@ -12,14 +12,12 @@ public class DefaultToStringFormatter implements ToStringFormatter {
   @Override
   @NotNull
   public String formatField(@NotNull Field field) {
-    if (isValueOnly(field)) {
-      return formatValue(field.value());
-    } else {
-      StringBuilder builder = new StringBuilder();
-      formatName(builder, field.name());
-      formatValue(builder, field.value(), field.attributes());
-      return builder.toString();
+    StringBuilder builder = new StringBuilder();
+    if (!isValueOnly(field)) {
+      formatName(builder, field.name(), field.attributes());
     }
+    formatValue(builder, field.value(), field.attributes());
+    return builder.toString();
   }
 
   @NotNull
@@ -91,7 +89,7 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     for (int i = 0; i < fieldList.size(); i++) {
       Field field = fieldList.get(i);
       if (!isValueOnly(field)) {
-        formatName(b, field.name());
+        formatName(b, field.name(), field.attributes());
       }
       formatValue(b, field.value(), field.attributes());
       if (i < fieldList.size() - 1) {
@@ -101,8 +99,15 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     b.append("}");
   }
 
-  private void formatName(@NotNull StringBuilder builder, @NotNull String name) {
-    builder.append(name).append("=");
+  private void formatName(
+      @NotNull StringBuilder builder, @NotNull String name, @NotNull Attributes attributes) {
+    if (attributes.containsKey(FieldAttributes.DISPLAY_NAME)) {
+      String displayName = attributes.get(FieldAttributes.DISPLAY_NAME);
+      builder.append("\"").append(displayName).append("\"");
+    } else {
+      builder.append(name);
+    }
+    builder.append("=");
   }
 
   private boolean isValueOnly(Field field) {
