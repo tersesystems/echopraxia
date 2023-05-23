@@ -1,11 +1,11 @@
 package com.tersesystems.echopraxia.api;
 
+import static com.tersesystems.echopraxia.api.FieldAttributes.ABBREVIATE_AFTER;
+import static com.tersesystems.echopraxia.api.FieldAttributes.AS_CARDINAL;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-
-import static com.tersesystems.echopraxia.api.FieldAttributes.ABBREVIATE_AFTER;
-import static com.tersesystems.echopraxia.api.FieldAttributes.AS_CARDINAL;
 
 public class DefaultToStringFormatter implements ToStringFormatter {
 

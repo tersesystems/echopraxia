@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.api;
 
-import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
-
 import static com.tersesystems.echopraxia.api.FieldAttributes.asCardinal;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.UUID;
+import org.junit.jupiter.api.Test;
 
 public class CardinalTests {
 

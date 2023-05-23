@@ -21,7 +21,8 @@ public class FieldAttributes {
   }
 
   /**
-   * Tells the formatter that the field should be rendered with the value only, i.e. "value" and not "name=value".
+   * Tells the formatter that the field should be rendered with the value only, i.e. "value" and not
+   * "name=value".
    *
    * @return valueOnly attribute
    */
