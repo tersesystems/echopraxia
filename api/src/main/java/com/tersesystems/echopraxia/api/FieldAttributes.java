@@ -8,6 +8,10 @@ public class FieldAttributes {
   public static final AttributeKey<Integer> ABBREVIATE_AFTER =
       AttributeKey.create("abbreviateAfter");
 
+  public static final AttributeKey<Boolean> AS_CARDINAL = AttributeKey.create("asCardinal");
+
+  private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
+
   private static final Attribute<Boolean> VALUE_ONLY_ATTR = VALUE_ONLY.bindValue(true);
   private static final Attributes VALUE_ONLY_ATTRS = Attributes.create(FieldAttributes.valueOnly());
 
@@ -16,11 +20,32 @@ public class FieldAttributes {
     return VALUE_ONLY_ATTRS;
   }
 
+  /**
+   * Tells the formatter that the field should be rendered with the value only, i.e. "value" and not "name=value".
+   *
+   * @return valueOnly attribute
+   */
   @NotNull
   public static Attribute<Boolean> valueOnly() {
     return VALUE_ONLY_ATTR;
   }
 
+  /**
+   * Tells the formatter that the array value should be represented as a cardinal number in text.
+   *
+   * @return asCardinal attribute
+   */
+  public static Attribute<Boolean> asCardinal() {
+    return AS_CARDINAL_ATTR;
+  }
+
+  /**
+   * Tells the formatter that the string value or array value should be abbreviated after the given
+   * number of elements.
+   *
+   * @param after the maximum number of elements to render
+   * @return abbreviateAfter attribute
+   */
   public static Attribute<Integer> abbreviateAfter(Integer after) {
     return ABBREVIATE_AFTER.bindValue(after);
   }
