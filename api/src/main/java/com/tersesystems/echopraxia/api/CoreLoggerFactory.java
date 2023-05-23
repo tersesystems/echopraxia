@@ -22,7 +22,7 @@ public class CoreLoggerFactory {
 
   private static final ExceptionHandler exceptionHandler;
 
-  private static final Formatter FORMATTER = new DefaultFieldFormatter();
+  private static final Formatter FORMATTER = new DefaultFormatter();
 
   static {
     ServiceLoader<ExceptionHandlerProvider> loader =

@@ -1,15 +1,19 @@
 package com.tersesystems.echopraxia.api;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface Formatter {
 
   /**
    * @return a field formatted in text format.
    */
-  String formatField(Field field);
+  @NotNull
+  String formatField(@NotNull Field field);
 
   /**
    * @return a value formatted in text format.
    */
-  String formatValue(Value<?> value);
+  @NotNull
+  String formatValue(@NotNull Value<?> value);
 
 }
