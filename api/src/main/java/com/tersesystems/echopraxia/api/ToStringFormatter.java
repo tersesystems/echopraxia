@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface Formatter {
+public interface ToStringFormatter {
 
   /**
    * @return a field formatted in text format.

@@ -78,6 +78,6 @@ public class MappedFieldMarker extends ObjectAppendingMarker implements Field {
 
   @Override
   public String toStringSelf() {
-    return CoreLoggerFactory.getFieldFormatter().formatField(textField);
+    return CoreLoggerFactory.getToStringFormatter().formatField(textField);
   }
 }

@@ -99,7 +99,7 @@ public abstract class Value<V> {
 
   @NotNull
   public String toString() {
-    return CoreLoggerFactory.getFieldFormatter().formatValue(this);
+    return CoreLoggerFactory.getToStringFormatter().formatValue(this);
   }
 
   /**

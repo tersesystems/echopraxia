@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.api;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class DefaultFormatter implements Formatter {
+public class DefaultToStringFormatter implements ToStringFormatter {
 
   @Override
   @NotNull

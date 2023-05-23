@@ -20,23 +20,39 @@ public class CoreLoggerFactory {
 
   private static Filters filters;
 
-  private static final ExceptionHandler exceptionHandler;
+  private static ExceptionHandler exceptionHandler;
 
-  private static final Formatter FORMATTER = new DefaultFormatter();
+  private static ToStringFormatter toStringFormatter;
 
   static {
+    initializeExceptionHandler();
+    initializeFormatter();
+    initializeFilters();
+  }
+
+  private static void initializeExceptionHandler() {
     ServiceLoader<ExceptionHandlerProvider> loader =
-        ServiceLoader.load(ExceptionHandlerProvider.class);
+            ServiceLoader.load(ExceptionHandlerProvider.class);
     Iterator<ExceptionHandlerProvider> iterator = loader.iterator();
     if (iterator.hasNext()) {
       exceptionHandler = iterator.next().getExceptionHandler();
     } else {
-      exceptionHandler =
-          e -> {
-            e.printStackTrace();
-          };
+      exceptionHandler = Throwable::printStackTrace;
     }
+  }
 
+  private static void initializeFormatter() {
+    ServiceLoader<ToStringFormatterProvider> loader =
+            ServiceLoader.load(ToStringFormatterProvider.class);
+    Iterator<ToStringFormatterProvider> iterator = loader.iterator();
+    if (iterator.hasNext()) {
+      toStringFormatter = iterator.next().getToStringFormatter();
+    } else {
+      toStringFormatter = new DefaultToStringFormatter();
+    }
+  }
+
+  private static void initializeFilters() {
     try {
       filters = new Filters(classLoaders);
     } catch (Exception e) {
@@ -68,12 +84,12 @@ public class CoreLoggerFactory {
   }
 
   @NotNull
-  private static CoreLogger processFilters(@NotNull CoreLogger core) {
+  private static CoreLogger processFilters(@NotNull CoreLogger core)   {
     return filters.apply(core);
   }
 
-  public static Formatter getFieldFormatter() {
-    return FORMATTER;
+  public static ToStringFormatter getToStringFormatter() {
+    return toStringFormatter;
   }
 
   private static class LazyHolder {

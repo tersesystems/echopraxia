@@ -104,6 +104,6 @@ public class DefaultField implements Field {
   }
 
   public String toString() {
-    return CoreLoggerFactory.getFieldFormatter().formatField(this);
+    return CoreLoggerFactory.getToStringFormatter().formatField(this);
   }
 }
