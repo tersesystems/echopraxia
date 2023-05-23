@@ -76,7 +76,7 @@ public interface Field extends FieldBuilderResult {
    */
   @NotNull
   static Field value(@NotNull String name, @NotNull Value<?> value) {
-    return new DefaultField(name, value, FieldAttributes.valueOnly());
+    return new DefaultField(name, value, FieldAttributes.valueOnlyAttributes());
   }
 
   /**

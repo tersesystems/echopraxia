@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 public class DefaultToStringFormatter implements ToStringFormatter {
@@ -13,7 +14,7 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     } else {
       StringBuilder builder = new StringBuilder();
       formatName(builder, field.name());
-      formatValue(builder, field.value());
+      formatValue(builder, field.value(), field.attributes());
       return builder.toString();
     }
   }
@@ -30,11 +31,48 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     return String.valueOf(value.raw());
   }
 
-  private void formatValue(@NotNull StringBuilder b, @NotNull Value<?> v) {
+  private void formatValue(
+      @NotNull StringBuilder b, @NotNull Value<?> v, @NotNull Attributes attributes) {
     if (v.type() == Value.Type.OBJECT) {
       formatObject(b, v.asObject());
     } else {
-      b.append(v.raw());
+      if (attributes.containsKey(FieldAttributes.ABBREVIATE_AFTER)) {
+        String abbreviated = abbreviateValue(v, attributes.get(FieldAttributes.ABBREVIATE_AFTER));
+        b.append(abbreviated);
+      } else {
+        b.append(v.raw());
+      }
+    }
+  }
+
+  private String abbreviateValue(Value<?> v, Integer maxWidth) {
+    switch (v.type()) {
+      case STRING:
+        String s = v.asString().raw();
+        if (s.length() > maxWidth) {
+          // handle unicode codepoints
+          int correctedMaxWidth =
+              (Character.isLowSurrogate(s.charAt(maxWidth))) && maxWidth > 0
+                  ? maxWidth - 1
+                  : maxWidth;
+          return s.substring(0, correctedMaxWidth) + "...";
+        } else {
+          return s;
+        }
+      case ARRAY:
+        List<Value<?>> elements = v.asArray().raw();
+        if (elements.size() > maxWidth) {
+          String limited =
+              elements.stream()
+                  .limit(maxWidth)
+                  .map(Value::toString)
+                  .collect(Collectors.joining(", "));
+          return "[" + limited + "...]";
+        } else {
+          return elements.toString();
+        }
+      default:
+        return v.raw().toString();
     }
   }
 
@@ -47,7 +85,7 @@ public class DefaultToStringFormatter implements ToStringFormatter {
       if (!isValueOnly(field)) {
         formatName(b, field.name());
       }
-      formatValue(b, field.value());
+      formatValue(b, field.value(), field.attributes());
       if (i < fieldList.size() - 1) {
         b.append(", ");
       }
