@@ -15,5 +15,4 @@ public interface ToStringFormatter {
    */
   @NotNull
   String formatValue(@NotNull Value<?> value);
-
 }

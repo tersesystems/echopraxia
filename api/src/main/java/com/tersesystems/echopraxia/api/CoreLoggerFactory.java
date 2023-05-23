@@ -32,7 +32,7 @@ public class CoreLoggerFactory {
 
   private static void initializeExceptionHandler() {
     ServiceLoader<ExceptionHandlerProvider> loader =
-            ServiceLoader.load(ExceptionHandlerProvider.class);
+        ServiceLoader.load(ExceptionHandlerProvider.class);
     Iterator<ExceptionHandlerProvider> iterator = loader.iterator();
     if (iterator.hasNext()) {
       exceptionHandler = iterator.next().getExceptionHandler();
@@ -43,7 +43,7 @@ public class CoreLoggerFactory {
 
   private static void initializeFormatter() {
     ServiceLoader<ToStringFormatterProvider> loader =
-            ServiceLoader.load(ToStringFormatterProvider.class);
+        ServiceLoader.load(ToStringFormatterProvider.class);
     Iterator<ToStringFormatterProvider> iterator = loader.iterator();
     if (iterator.hasNext()) {
       toStringFormatter = iterator.next().getToStringFormatter();
@@ -84,7 +84,7 @@ public class CoreLoggerFactory {
   }
 
   @NotNull
-  private static CoreLogger processFilters(@NotNull CoreLogger core)   {
+  private static CoreLogger processFilters(@NotNull CoreLogger core) {
     return filters.apply(core);
   }
 
