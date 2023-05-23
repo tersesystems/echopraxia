@@ -1,5 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
+import static com.tersesystems.echopraxia.api.FieldAttributes.ABBREVIATE_AFTER;
+import static com.tersesystems.echopraxia.api.FieldAttributes.AS_CARDINAL;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -36,8 +39,13 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     if (v.type() == Value.Type.OBJECT) {
       formatObject(b, v.asObject());
     } else {
-      if (attributes.containsKey(FieldAttributes.ABBREVIATE_AFTER)) {
-        String abbreviated = abbreviateValue(v, attributes.get(FieldAttributes.ABBREVIATE_AFTER));
+      // asCardinal takes priority over abbreviateAfter
+      if (attributes.containsKey(AS_CARDINAL) && v.type() == Value.Type.ARRAY) {
+        b.append("|").append(v.asArray().raw().size()).append("|");
+      } else if (attributes.containsKey(AS_CARDINAL) && v.type() == Value.Type.STRING) {
+        b.append("|").append(v.asString().raw().length()).append("|");
+      } else if (attributes.containsKey(ABBREVIATE_AFTER)) {
+        String abbreviated = abbreviateValue(v, attributes.get(ABBREVIATE_AFTER));
         b.append(abbreviated);
       } else {
         b.append(v.raw());
