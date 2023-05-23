@@ -9,6 +9,7 @@ public class FieldAttributes {
       AttributeKey.create("abbreviateAfter");
 
   public static final AttributeKey<Boolean> AS_CARDINAL = AttributeKey.create("asCardinal");
+  public static final AttributeKey<String> DISPLAY_NAME = AttributeKey.create("displayName");
 
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
@@ -38,6 +39,10 @@ public class FieldAttributes {
    */
   public static Attribute<Boolean> asCardinal() {
     return AS_CARDINAL_ATTR;
+  }
+
+  public static Attribute<String> displayName(String displayName) {
+    return DISPLAY_NAME.bindValue(displayName);
   }
 
   /**
