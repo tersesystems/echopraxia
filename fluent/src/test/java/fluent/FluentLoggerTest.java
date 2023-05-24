@@ -32,7 +32,7 @@ public class FluentLoggerTest {
 
     logger
         .atInfo()
-        .message("name = {}, age = {}")
+        .message("{}, {}")
         .argument(b -> b.string("name", person.name))
         .argument(b -> b.number("age", person.age))
         .log();
@@ -40,7 +40,7 @@ public class FluentLoggerTest {
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
     ILoggingEvent event = list.get(0);
-    assertThat(event.getFormattedMessage()).isEqualTo("name = Eloise, age = 1");
+    assertThat(event.getFormattedMessage()).isEqualTo("name=Eloise, age=1");
   }
 
   @BeforeEach

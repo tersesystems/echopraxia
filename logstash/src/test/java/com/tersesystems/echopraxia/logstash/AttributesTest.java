@@ -90,44 +90,6 @@ public class AttributesTest extends TestBase {
     assertThat(json).contains("@type");
   }
 
-  @Test
-  public void testComplexObjectConversion() {
-    FieldConverter fieldConverter =
-      new LogstashFieldConverter() {
-        @Override
-        public @NotNull Object convertField(@NotNull Field field) {
-          // https://www.baeldung.com/java-visitor-pattern
-          FieldVisitor visitor = new FieldVisitor() {
-            void visit() {
-              if (field.attributes().containsKey(CHRONOUNIT)) {
-                ChronoUnit chronoUnit = field.attributes().get(CHRONOUNIT);
-                String name = field.name() + "_" + chronoUnit.toString().toLowerCase();
-                MyFieldBuilder fb = MyFieldBuilder.instance();
-                Field mappedField = fb.keyValue(name, field.value());
-                return new MappedFieldMarker(field, mappedField);
-              }
-            }
-          };
-          return super.convertField(field);
-        }
-      };
-    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldConverter);
-    Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
-
-    Person abe = new Person("Abe", 1, "yodelling");
-    abe.setFather(new Person("Bert", 35, "keyboards"));
-    abe.setMother(new Person("Candace", 30, "iceskating", "hockey", "macrame"));
-
-    logger.info("this is {}", fb -> fb.person("person", abe));
-
-    final ListAppender<ILoggingEvent> listAppender = getListAppender();
-    assertThat(listAppender.list).isNotEmpty();
-
-    final ILoggingEvent event = listAppender.list.get(0);
-    String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("this is person=foo");
-  }
-
   static class MyFieldBuilder implements FieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder() {};
@@ -147,7 +109,9 @@ public class AttributesTest extends TestBase {
 
     private Value.ObjectValue personValue(Person p) {
       Field name = keyValue("name", Value.string(p.name()));
-      Field age = keyValue("age", Value.number(p.age())).withAttribute(CHRONOUNIT.bindValue(ChronoUnit.YEARS));
+      Field age =
+          keyValue("age", Value.number(p.age()))
+              .withAttribute(CHRONOUNIT.bindValue(ChronoUnit.YEARS));
       Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
       Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
       Field interests = array("interests", p.interests());

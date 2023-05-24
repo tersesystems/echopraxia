@@ -11,7 +11,7 @@ public class FormatTests {
   public void testNull() {
     final FieldBuilder fb = FieldBuilder.instance();
     final Field f = fb.nullField("foo");
-    assertThat(f.toString()).isEqualTo("null");
+    assertThat(f.toString()).isEqualTo("foo=null");
   }
 
   @Test
@@ -19,21 +19,21 @@ public class FormatTests {
     final FieldBuilder fb = FieldBuilder.instance();
     final Field f = fb.string("foo", "bar");
 
-    assertThat(f.toString()).isEqualTo("bar");
+    assertThat(f.toString()).isEqualTo("foo=bar");
   }
 
   @Test
   public void testNumber() {
     final FieldBuilder fb = FieldBuilder.instance();
     final Field f = fb.number("foo", 1);
-    assertThat(f.toString()).isEqualTo("1");
+    assertThat(f.toString()).isEqualTo("foo=1");
   }
 
   @Test
   public void testBoolean() {
     final FieldBuilder fb = FieldBuilder.instance();
     final Field f = fb.bool("foo", true);
-    assertThat(f.toString()).isEqualTo("true");
+    assertThat(f.toString()).isEqualTo("foo=true");
   }
 
   @Test
@@ -76,6 +76,8 @@ public class FormatTests {
                 fb.bool("boolName", true),
                 fb.array("arrayName", array(string("a"), nullValue())),
                 fb.nullField("nullName")));
-    assertThat(f.toString()).isEqualTo("foo={value, 43, true, arrayName=[a, null], null}");
+    assertThat(f.toString())
+        .isEqualTo(
+            "foo={stringName=value, numName=43, boolName=true, arrayName=[a, null], nullName=null}");
   }
 }

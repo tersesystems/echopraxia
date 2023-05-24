@@ -66,7 +66,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field string(@NotNull String name, @NotNull String value) {
-    return value(name, Value.string(value));
+    return keyValue(name, Value.string(value));
   }
 
   /**
@@ -78,7 +78,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field string(@NotNull String name, @NotNull Value.StringValue value) {
-    return value(name, value);
+    return keyValue(name, value);
   }
 
   // ---------------------------------------------------------
@@ -93,35 +93,35 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field number(@NotNull String name, @NotNull Byte value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   default Field number(@NotNull String name, @NotNull Short value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   default Field number(@NotNull String name, @NotNull Integer value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   default Field number(@NotNull String name, @NotNull Long value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   default Field number(@NotNull String name, @NotNull Float value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   default Field number(@NotNull String name, @NotNull Double value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   default Field number(@NotNull String name, @NotNull BigInteger value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   default Field number(@NotNull String name, @NotNull BigDecimal value) {
-    return value(name, Value.number(value));
+    return keyValue(name, Value.number(value));
   }
 
   /**
@@ -135,7 +135,7 @@ public interface FieldBuilder {
   @NotNull
   default <N extends Number & Comparable<N>> Field number(
       @NotNull String name, @NotNull Value.NumberValue<N> value) {
-    return value(name, value);
+    return keyValue(name, value);
   }
 
   // ---------------------------------------------------------
@@ -150,7 +150,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field bool(@NotNull String name, @NotNull Boolean value) {
-    return value(name, Value.bool(value));
+    return keyValue(name, Value.bool(value));
   }
 
   /**
@@ -162,7 +162,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field bool(@NotNull String name, @NotNull Value.BooleanValue value) {
-    return value(name, value);
+    return keyValue(name, value);
   }
 
   // ---------------------------------------------------------
@@ -360,7 +360,7 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field nullField(@NotNull String name) {
-    return value(name, Value.nullValue());
+    return keyValue(name, Value.nullValue());
   }
 }
 

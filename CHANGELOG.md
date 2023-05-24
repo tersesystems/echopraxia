@@ -1,9 +1,13 @@
-## Changelog
+# Changelog
 
-## 3.0.0
+## 3.0.0-SNAPSHOT
 
-* Add field attributes and FieldTransformer and change value only to be attribute based
+* Add field attributes
+* Add `ToStringFormatter` and wire `field.toString` and `value.toString` to it
+* Add `valueOnly`, `abbreviateAfter`, `displayName` as attributes that change toString formatting
+* Add `FieldTransformer` for changing field structure in JSON
 * Add exception handler
+* Make all fields (`fb.string`, `fb.number`, `fb.nullValue`) use `keyValue` by default.
 
 ## 2.3.0-RC1
 

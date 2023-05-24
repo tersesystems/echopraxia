@@ -69,7 +69,7 @@ public class DirectTest {
     final List<String> jsonList = getStringAppender().list;
 
     final ILoggingEvent event = eventList.get(0);
-    assertThat(event.getFormattedMessage()).isEqualTo("message with argument bar");
+    assertThat(event.getFormattedMessage()).isEqualTo("message with argument foo=bar");
     final String json = jsonList.get(0);
     assertThat(json).contains("\"foo\" : \"bar\"");
   }
@@ -161,7 +161,7 @@ public class DirectTest {
     final List<String> jsonList = getStringAppender().list;
 
     final ILoggingEvent event = eventList.get(0);
-    assertThat(event.getFormattedMessage()).isEqualTo("message with argument bar");
+    assertThat(event.getFormattedMessage()).isEqualTo("message with argument foo=bar");
     final String json = jsonList.get(0);
     assertThat(json).contains("\"foo\" : \"bar\"");
     assertThat(json).contains("\"someNumber\" : 1");

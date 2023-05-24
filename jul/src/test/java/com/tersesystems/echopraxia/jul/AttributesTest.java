@@ -26,7 +26,7 @@ public class AttributesTest extends TestBase {
 
     List<String> list = EncodedListHandler.lines();
     String line = list.get(0);
-    assertThat(line).isEqualTo("hello world");
+    assertThat(line).isEqualTo("hello name=world");
   }
 
   @Test

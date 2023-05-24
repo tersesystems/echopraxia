@@ -33,7 +33,7 @@ public class SemanticLoggerTest {
         SemanticLoggerFactory.getLogger(
             getClass(),
             Person.class,
-            person -> "person.name = {}, person.age = {}",
+            person -> "{}, {}",
             p -> b -> b.list(b.string("name", p.name), b.number("age", p.age)));
 
     Person eloise = new Person("Eloise", 1);
@@ -42,7 +42,7 @@ public class SemanticLoggerTest {
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
     ILoggingEvent event = list.get(0);
-    assertThat(event.getFormattedMessage()).isEqualTo("person.name = Eloise, person.age = 1");
+    assertThat(event.getFormattedMessage()).isEqualTo("name=Eloise, age=1");
   }
 
   @Test
@@ -54,7 +54,7 @@ public class SemanticLoggerTest {
         SemanticLoggerFactory.getLogger(
             coreLogger.withMarkers(MarkerFactory.getMarker("SECURITY")),
             Person.class,
-            person -> "person.name = {}, person.age = {}",
+            person -> "{}, {}",
             p -> b -> b.list(b.string("name", p.name), b.number("age", p.age)),
             FieldBuilder.instance());
 
@@ -64,7 +64,7 @@ public class SemanticLoggerTest {
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
     ILoggingEvent event = list.get(0);
-    assertThat(event.getFormattedMessage()).isEqualTo("person.name = Eloise, person.age = 1");
+    assertThat(event.getFormattedMessage()).isEqualTo("name=Eloise, age=1");
   }
 
   @BeforeEach
