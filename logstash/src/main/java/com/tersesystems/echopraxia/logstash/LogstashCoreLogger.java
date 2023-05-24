@@ -885,6 +885,6 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   private static void handleException(Exception e) {
-    CoreLoggerFactory.getExceptionHandler().handleException(e);
+    EchopraxiaService.getInstance().getExceptionHandler().handleException(e);
   }
 }

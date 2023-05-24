@@ -78,6 +78,6 @@ public class MappedFieldMarker extends ObjectAppendingMarker implements Field {
 
   @Override
   public String toStringSelf() {
-    return CoreLoggerFactory.getToStringFormatter().formatField(textField);
+    return EchopraxiaService.getInstance().getToStringFormatter().formatField(textField);
   }
 }

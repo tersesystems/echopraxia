@@ -1,12 +1,11 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.ExceptionHandler;
-import com.tersesystems.echopraxia.api.ExceptionHandlerProvider;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class StaticExceptionHandlerProvider implements ExceptionHandlerProvider {
+public class StaticExceptionHandlerProvider {
 
   private static final List<Throwable> exceptions = new ArrayList<>();
 
@@ -20,7 +19,6 @@ public class StaticExceptionHandlerProvider implements ExceptionHandlerProvider 
     exceptions.clear();
   }
 
-  @Override
   public @NotNull ExceptionHandler getExceptionHandler() {
     return EXCEPTION_HANDLER;
   }

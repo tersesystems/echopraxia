@@ -63,6 +63,6 @@ public class FieldMarker extends ObjectAppendingMarker implements Field {
 
   @Override
   public String toStringSelf() {
-    return CoreLoggerFactory.getToStringFormatter().formatField(this);
+    return EchopraxiaService.getInstance().getToStringFormatter().formatField(this);
   }
 }

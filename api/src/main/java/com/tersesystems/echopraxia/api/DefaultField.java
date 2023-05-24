@@ -104,6 +104,6 @@ public class DefaultField implements Field {
   }
 
   public String toString() {
-    return CoreLoggerFactory.getToStringFormatter().formatField(this);
+    return EchopraxiaService.getInstance().getToStringFormatter().formatField(this);
   }
 }

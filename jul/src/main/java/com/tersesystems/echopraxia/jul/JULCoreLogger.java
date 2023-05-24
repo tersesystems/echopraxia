@@ -619,6 +619,6 @@ public class JULCoreLogger implements CoreLogger {
   }
 
   private static void handleException(Throwable e) {
-    CoreLoggerFactory.getExceptionHandler().handleException(e);
+    EchopraxiaService.getInstance().getExceptionHandler().handleException(e);
   }
 }
