@@ -8,6 +8,7 @@ import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.*;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -98,18 +99,69 @@ public class AttributesTest extends TestBase {
       return value("instant", Value.string(instant.toString()))
           .withAttribute(CLASS_TYPE_ATTR.bindValue(instant.getClass()));
     }
-  }
 
-  public static final class UserID {
-    private final String id;
-
-    public UserID(String id) {
-      this.id = id;
+    // Renders a `Person` as an object field.
+    // Note that properties must be broken down to the basic JSON types,
+    // i.e. a primitive string/number/boolean/null or object/array.
+    public Field person(String fieldName, Person p) {
+      return object(fieldName, personValue(p));
     }
 
-    @Override
-    public String toString() {
-      return this.id;
+    private Value.ObjectValue personValue(Person p) {
+      Field name = keyValue("name", Value.string(p.name()));
+      Field age =
+          keyValue("age", Value.number(p.age()))
+              .withAttribute(CHRONOUNIT.bindValue(ChronoUnit.YEARS));
+      Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
+      Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
+      Field interests = array("interests", p.interests());
+      return Value.object(name, age, father, mother, interests);
+    }
+  }
+
+  private static final AttributeKey<ChronoUnit> CHRONOUNIT = AttributeKey.create("chronoUnit");
+
+  static class Person {
+
+    private final String name;
+    private final int age;
+    private final String[] interests;
+
+    private Person father;
+    private Person mother;
+
+    Person(String name, int age, String... interests) {
+      this.name = name;
+      this.age = age;
+      this.interests = interests;
+    }
+
+    public String name() {
+      return name;
+    }
+
+    public int age() {
+      return age;
+    }
+
+    public String[] interests() {
+      return interests;
+    }
+
+    public void setFather(Person father) {
+      this.father = father;
+    }
+
+    public Optional<Person> getFather() {
+      return Optional.ofNullable(father);
+    }
+
+    public void setMother(Person mother) {
+      this.mother = mother;
+    }
+
+    public Optional<Person> getMother() {
+      return Optional.ofNullable(mother);
     }
   }
 }

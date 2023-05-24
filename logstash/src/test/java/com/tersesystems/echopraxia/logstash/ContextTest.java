@@ -52,7 +52,7 @@ public class ContextTest extends TestBase {
     assertThat(formattedMessage).isEqualTo("This has a marker");
     final List<Marker> markers = getMarkers(event);
 
-    testMarker(markers.get(0), Field.value("key", Value.string("value")));
+    testMarker(markers.get(0), Field.keyValue("key", Value.string("value")));
     final Marker shouldBeSecurityMarker = markers.get(1);
     assertThat(shouldBeSecurityMarker).isSameAs(securityMarker);
   }
@@ -102,7 +102,7 @@ public class ContextTest extends TestBase {
 
     // toStringSelf calls the "logfmt" version that is fed into formatted message
     final String actual = marker.toStringSelf();
-    assertThat(actual).isEqualTo("person={will, 13, toys=[binkie]}");
+    assertThat(actual).isEqualTo("person={name=will, age=13, toys=[binkie]}");
 
     final StringWriter sw = new StringWriter();
     final JsonGenerator generator = mapper.createGenerator(sw);
@@ -164,8 +164,8 @@ public class ContextTest extends TestBase {
     final ObjectAppendingMarker m1 = (ObjectAppendingMarker) markers.get(0);
     final ObjectAppendingMarker m2 = (ObjectAppendingMarker) markers.get(1);
 
-    testMarker(m1, Field.value("key", Value.string("value")));
-    testMarker(m2, Field.value("key2", Value.string("value2")));
+    testMarker(m1, Field.keyValue("key", Value.string("value")));
+    testMarker(m2, Field.keyValue("key2", Value.string("value2")));
   }
 
   @Test

@@ -31,7 +31,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("hello null");
+    assertThat(message).isEqualTo("hello name=null");
   }
 
   @Test
@@ -53,7 +53,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("number is 0");
+    assertThat(message).isEqualTo("number is name=0");
   }
 
   @Test
@@ -63,7 +63,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("boolean is false");
+    assertThat(message).isEqualTo("boolean is name=false");
   }
 
   @Test
@@ -95,7 +95,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("my argument is random_value");
+    assertThat(message).isEqualTo("my argument is random_key=random_value");
 
     final JsonNode fields = entry.path("fields");
     assertThat(fields.path("random_key").asText()).isEqualTo("random_value");
@@ -148,7 +148,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("my argument is random_object={value1, value2}");
+    assertThat(message).isEqualTo("my argument is random_object={key1=value1, key2=value2}");
 
     final JsonNode fields = entry.path("fields");
     final JsonNode randomObject = fields.path("random_object");
@@ -174,7 +174,8 @@ public class Log4JLoggerTest extends TestBase {
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
     assertThat(message)
-        .isEqualTo("my arguments are object1={value1, value2} object2={value3, value4}");
+        .isEqualTo(
+            "my arguments are object1={key1=value1, key2=value2} object2={key3=value3, key4=value4}");
 
     final JsonNode fields = entry.path("fields");
 
@@ -260,7 +261,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("Message arg_field");
+    assertThat(message).isEqualTo("Message arg_name=arg_field");
 
     final JsonNode fields = entry.path("fields");
     assertThat(fields.path("arg_name").asText()).isEqualTo("arg_field");

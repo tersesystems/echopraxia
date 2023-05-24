@@ -79,13 +79,13 @@ class LogstashLoggerTest extends TestBase {
   void testArguments() {
     Logger<?> logger = getLogger();
     logger.debug(
-        "hello {}, you are {}, citizen status {}",
-        fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
+        "hello {}, you are {}, {}",
+        fb -> fb.list(fb.string("name", "PERSON"), fb.number("age", 13), fb.bool("citizen", true)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello will, you are 13, citizen status true");
+    assertThat(formattedMessage).isEqualTo("hello name=PERSON, you are age=13, citizen=true");
   }
 
   @Test
@@ -107,7 +107,7 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello null");
+    assertThat(formattedMessage).isEqualTo("hello nothing=null");
   }
 
   @Test
@@ -119,7 +119,7 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello null");
+    assertThat(formattedMessage).isEqualTo("hello name=null");
   }
 
   @Test
@@ -131,7 +131,7 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello value");
+    assertThat(formattedMessage).isEqualTo("hello echopraxia-unknown-1=value");
   }
 
   @Test
@@ -143,7 +143,7 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello 0");
+    assertThat(formattedMessage).isEqualTo("hello name=0");
   }
 
   @Test
@@ -154,7 +154,7 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("boolean is false");
+    assertThat(message).isEqualTo("boolean is name=false");
   }
 
   @Test
@@ -196,7 +196,8 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("hello person={will, 13, toys=[binkie, dotty]}");
+    assertThat(formattedMessage)
+        .isEqualTo("hello person={name=will, age=13, toys=[binkie, dotty]}");
   }
 
   @Test
@@ -225,7 +226,7 @@ class LogstashLoggerTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String formattedMessage = event.getFormattedMessage();
-    assertThat(formattedMessage).isEqualTo("Error MyOperation");
+    assertThat(formattedMessage).isEqualTo("Error operation=MyOperation");
     final IThrowableProxy throwableProxy = event.getThrowableProxy();
     assertThat(throwableProxy).isNotNull();
   }
@@ -241,15 +242,15 @@ class LogstashLoggerTest extends TestBase {
     Logger<UUIDFieldBuilder> logger = getLogger().withFieldBuilder(new UUIDFieldBuilder() {});
 
     UUID uuid = UUID.randomUUID();
-    logger.error("user id {}", fb -> fb.uuid("user_id", uuid));
+    logger.error("{}", fb -> fb.uuid("user_id", uuid));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
     final String message = event.getMessage();
-    assertThat(message).isEqualTo("user id {}");
+    assertThat(message).isEqualTo("{}");
     final Object[] args = event.getArgumentArray();
     final ObjectAppendingMarker actual = (ObjectAppendingMarker) args[0];
-    assertThat(actual.toStringSelf()).isEqualTo(uuid.toString());
+    assertThat(actual.toStringSelf()).isEqualTo("user_id=" + uuid);
   }
 
   @Test
@@ -265,9 +266,9 @@ class LogstashLoggerTest extends TestBase {
     final String message = event.getFormattedMessage();
     assertThat(message)
         .isEqualTo(
-            "hi there person={Abe, 1,"
-                + " father={Bert, 35, null, null, interests=[keyboards]},"
-                + " mother={Candace, 30, null, null, interests=[iceskating]}, interests=[yodelling]}");
+            "hi there person={name=Abe, age=1,"
+                + " father={name=Bert, age=35, father=null, mother=null, interests=[keyboards]},"
+                + " mother={name=Candace, age=30, father=null, mother=null, interests=[iceskating]}, interests=[yodelling]}");
 
     String json = toJson(event);
     assertThat(json)
@@ -339,17 +340,20 @@ class LogstashLoggerTest extends TestBase {
 
     public MyFieldBuilder() {}
 
-    // Renders a `Person` as an object field.
-    // Note that properties must be broken down to the basic JSON types,
-    // i.e. a primitive string/number/boolean/null or object/array.
     public Field person(String fieldName, Person p) {
+      return keyValue(fieldName, personValue(p));
+    }
+
+    private Value<?> personValue(Person p) {
+      if (p == null) {
+        return Value.nullValue();
+      }
       Field name = string("name", p.name());
       Field age = number("age", p.age());
-      Field father = p.getFather().map(f -> person("father", f)).orElse(nullField("father"));
-      Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullField("mother"));
+      Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
+      Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
       Field interests = array("interests", p.interests());
-      Field[] fields = {name, age, father, mother, interests};
-      return object(fieldName, fields);
+      return Value.object(name, age, father, mother, interests);
     }
   }
 }

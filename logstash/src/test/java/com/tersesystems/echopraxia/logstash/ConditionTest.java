@@ -63,7 +63,7 @@ public class ConditionTest extends TestBase {
 
     final ILoggingEvent event = listAppender.list.get(0);
     String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("1");
+    assertThat(message).isEqualTo("logins=1");
   }
 
   @Test
@@ -77,7 +77,7 @@ public class ConditionTest extends TestBase {
 
     final ILoggingEvent event = listAppender.list.get(0);
     String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("true");
+    assertThat(message).isEqualTo("isAwesome=true");
   }
 
   @Test
@@ -92,7 +92,7 @@ public class ConditionTest extends TestBase {
 
     final ILoggingEvent event = listAppender.list.get(0);
     String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("myObject={bar}");
+    assertThat(message).isEqualTo("myObject={foo=bar}");
   }
 
   @Test

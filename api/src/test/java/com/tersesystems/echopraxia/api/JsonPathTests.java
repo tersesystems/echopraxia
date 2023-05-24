@@ -230,13 +230,16 @@ public class JsonPathTests {
     // Note that properties must be broken down to the basic JSON types,
     // i.e. a primitive string/number/boolean/null or object/array.
     public Field person(String fieldName, Person p) {
-      Field name = string("name", p.name());
-      Field age = number("age", p.age());
-      Field father = p.getFather().map(f -> person("father", f)).orElse(nullField("father"));
-      Field mother = p.getMother().map(m -> person("mother", m)).orElse(nullField("mother"));
+      return object(fieldName, personValue(p));
+    }
+
+    private Value.ObjectValue personValue(Person p) {
+      Field name = keyValue("name", Value.string(p.name()));
+      Field age = keyValue("age", Value.number(p.age()));
+      Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
+      Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
       Field interests = array("interests", p.interests());
-      Field[] fields = {name, age, father, mother, interests};
-      return object(fieldName, fields);
+      return Value.object(name, age, father, mother, interests);
     }
   }
 }

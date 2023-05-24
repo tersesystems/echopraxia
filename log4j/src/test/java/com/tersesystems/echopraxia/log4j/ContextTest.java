@@ -34,7 +34,7 @@ public class ContextTest extends TestBase {
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("Message field_value");
+    assertThat(message).isEqualTo("Message field_name=field_value");
     final String actual = entry.path("marker").asText();
     assertThat(actual).isEqualTo("SECURITY");
   }
