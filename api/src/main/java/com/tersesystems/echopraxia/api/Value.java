@@ -99,7 +99,7 @@ public abstract class Value<V> {
 
   @NotNull
   public String toString() {
-    return CoreLoggerFactory.getToStringFormatter().formatValue(this);
+    return EchopraxiaService.getInstance().getToStringFormatter().formatValue(this);
   }
 
   /**

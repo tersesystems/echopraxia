@@ -1,16 +1,12 @@
 package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.api.ExceptionHandler;
-import com.tersesystems.echopraxia.api.ExceptionHandlerProvider;
 import java.util.ArrayList;
 import java.util.List;
-import org.jetbrains.annotations.NotNull;
 
-public class StaticExceptionHandlerProvider implements ExceptionHandlerProvider {
+public class StaticExceptionHandler implements ExceptionHandler {
 
   private static final List<Throwable> exceptions = new ArrayList<>();
-
-  private static final ExceptionHandler EXCEPTION_HANDLER = exceptions::add;
 
   public static Throwable head() {
     return exceptions.get(0);
@@ -21,7 +17,7 @@ public class StaticExceptionHandlerProvider implements ExceptionHandlerProvider 
   }
 
   @Override
-  public @NotNull ExceptionHandler getExceptionHandler() {
-    return EXCEPTION_HANDLER;
+  public void handleException(Throwable e) {
+    exceptions.add(e);
   }
 }

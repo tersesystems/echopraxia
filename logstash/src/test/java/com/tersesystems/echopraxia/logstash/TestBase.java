@@ -22,7 +22,7 @@ public class TestBase {
   @BeforeEach
   public void before() {
     try {
-      StaticExceptionHandlerProvider.clear();
+      StaticExceptionHandler.clear();
       LoggerContext factory = new LoggerContext();
       JoranConfigurator joran = new JoranConfigurator();
       joran.setContext(factory);

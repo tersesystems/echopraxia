@@ -19,7 +19,7 @@ public class ExceptionHandlerTests extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -32,7 +32,7 @@ public class ExceptionHandlerTests extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -48,7 +48,7 @@ public class ExceptionHandlerTests extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -65,7 +65,7 @@ public class ExceptionHandlerTests extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -79,7 +79,7 @@ public class ExceptionHandlerTests extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -96,7 +96,7 @@ public class ExceptionHandlerTests extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -108,9 +108,9 @@ public class ExceptionHandlerTests extends TestBase {
         handle -> {
           handle.log("bad argument", fb -> fb.number("nullNumber", number.intValue()));
         });
-    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandlerProvider.head() != null);
+    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandler.head() != null);
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -124,9 +124,9 @@ public class ExceptionHandlerTests extends TestBase {
             handle -> {
               handle.log("no argument");
             });
-    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandlerProvider.head() != null);
+    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandler.head() != null);
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 }

@@ -168,7 +168,7 @@ public class ConditionTest extends TestBase {
     final List<String> messages = listAppender.getMessages();
     assertThat(messages).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     String exceptionMessage = throwable.getMessage();
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
@@ -196,7 +196,7 @@ public class ConditionTest extends TestBase {
     final List<String> messages = listAppender.getMessages();
     assertThat(messages).isEmpty();
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     String exceptionMessage = throwable.getMessage();
     assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
