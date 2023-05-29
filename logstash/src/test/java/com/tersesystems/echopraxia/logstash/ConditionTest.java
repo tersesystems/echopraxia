@@ -203,7 +203,7 @@ public class ConditionTest extends TestBase {
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list).isEmpty();
 
-    Throwable actualException = StaticExceptionHandlerProvider.head();
+    Throwable actualException = StaticExceptionHandler.head();
     assertThat(actualException.getMessage()).isEqualTo("oh noes!");
   }
 
@@ -228,6 +228,6 @@ public class ConditionTest extends TestBase {
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list.size()).isEqualTo(0);
-    assertThat(StaticExceptionHandlerProvider.head().getMessage()).isEqualTo("oh noes!");
+    assertThat(StaticExceptionHandler.head().getMessage()).isEqualTo("oh noes!");
   }
 }

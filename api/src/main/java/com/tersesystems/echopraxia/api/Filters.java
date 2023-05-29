@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-class Filters {
+public class Filters {
 
   private final List<CoreLoggerFilter> filterList;
 

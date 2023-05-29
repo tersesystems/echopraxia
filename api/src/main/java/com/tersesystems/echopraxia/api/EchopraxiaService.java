@@ -3,24 +3,19 @@ package com.tersesystems.echopraxia.api;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;
 
+/** The main SPI interface. Call getInstance() to get the service from service provider. */
 public interface EchopraxiaService {
   @NotNull
   ExceptionHandler getExceptionHandler();
 
   @NotNull
-  default Filters getFilters() {
-    return FiltersLazyHolder.INSTANCE;
-  }
+  Filters getFilters();
 
   @NotNull
-  default CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull Class<?> clazz) {
-    return CoreLoggerLazyHolder.INSTANCE.getLogger(fqcn, clazz);
-  }
+  CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull Class<?> clazz);
 
   @NotNull
-  default CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull String name) {
-    return CoreLoggerLazyHolder.INSTANCE.getLogger(fqcn, name);
-  }
+  CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull String name);
 
   ToStringFormatter getToStringFormatter();
 
@@ -37,42 +32,9 @@ class EchopraxiaServiceLazyHolder {
     if (iterator.hasNext()) {
       return iterator.next().getEchopraxiaService();
     } else {
-      return new DefaultEchopraxiaService();
+      throw new ServiceConfigurationError("No EchopraxiaService implementation found!");
     }
   }
 
   static final EchopraxiaService INSTANCE = init();
-}
-
-class CoreLoggerLazyHolder {
-  private static CoreLoggerProvider init() {
-    ServiceLoader<CoreLoggerProvider> loader = ServiceLoader.load(CoreLoggerProvider.class);
-    Iterator<CoreLoggerProvider> iterator = loader.iterator();
-    if (iterator.hasNext()) {
-      return iterator.next();
-    } else {
-      String msg = "No CoreLoggerProvider implementation found in classpath!";
-      throw new ServiceConfigurationError(msg);
-    }
-  }
-
-  static final CoreLoggerProvider INSTANCE = init();
-}
-
-class FiltersLazyHolder {
-
-  private static final ClassLoader[] classLoaders = {ClassLoader.getSystemClassLoader()};
-
-  static final Filters INSTANCE = init();
-
-  private static Filters init() {
-    try {
-      return new Filters(classLoaders);
-    } catch (Exception e) {
-      // If we get to this point, something has gone horribly wrong.
-      EchopraxiaService.getInstance().getExceptionHandler().handleException(e);
-      // Keep going with no filters.
-      return new Filters(Collections.emptyList());
-    }
-  }
 }

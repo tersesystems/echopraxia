@@ -14,7 +14,7 @@ public class TestBase {
 
   @BeforeEach
   public void before() throws IOException {
-    StaticExceptionHandlerProvider.clear();
+    StaticExceptionHandler.clear();
     LogManager manager = LogManager.getLogManager();
     manager.reset();
 

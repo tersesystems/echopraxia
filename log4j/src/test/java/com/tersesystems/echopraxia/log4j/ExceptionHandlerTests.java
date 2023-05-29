@@ -15,7 +15,7 @@ public class ExceptionHandlerTests extends TestBase {
     Integer number = null;
     logger.debug("this has a null value", fb -> fb.number("nullNumber", number.intValue()));
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -26,7 +26,7 @@ public class ExceptionHandlerTests extends TestBase {
     Logger<?> badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
     badLogger.debug("this has a null value");
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -40,7 +40,7 @@ public class ExceptionHandlerTests extends TestBase {
     Logger<?> badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
     badLogger.debug(condition, "I have a bad logger field and a good condition");
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -55,7 +55,7 @@ public class ExceptionHandlerTests extends TestBase {
     Logger<?> badLogger = logger.withCondition(badCondition);
     badLogger.debug("I am passing in {}", fb -> fb.number("testing", 5));
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -67,7 +67,7 @@ public class ExceptionHandlerTests extends TestBase {
 
     logger.debug(badCondition, "I am passing in {}");
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -82,7 +82,7 @@ public class ExceptionHandlerTests extends TestBase {
     logger.debug(
         badCondition, "I am passing in {}", fb -> fb.number("nullNumber", number.intValue()));
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -94,9 +94,9 @@ public class ExceptionHandlerTests extends TestBase {
         handle -> {
           handle.log("bad argument", fb -> fb.number("nullNumber", number.intValue()));
         });
-    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandlerProvider.head() != null);
+    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandler.head() != null);
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 
@@ -110,9 +110,9 @@ public class ExceptionHandlerTests extends TestBase {
             handle -> {
               handle.log("no argument");
             });
-    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandlerProvider.head() != null);
+    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandler.head() != null);
 
-    Throwable throwable = StaticExceptionHandlerProvider.head();
+    Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
 }
