@@ -72,18 +72,18 @@ public interface Field extends FieldBuilderResult {
   Field clearAttributes();
 
   /**
-   * @return a field with the given name and value, with the VALUE_ONLY attribute set.
+   * @return a field with the given name and value, displayed as value only.
    */
   @NotNull
   static Field value(@NotNull String name, @NotNull Value<?> value) {
-    return new DefaultField(name, value, FieldAttributes.valueOnlyAttributes());
+    return EchopraxiaService.getInstance().getFieldCreator().value(name, value);
   }
 
   /**
-   * @return a field with the given name and value and no attributes set.
+   * @return a field with the given name and value displayed as key=value
    */
   @NotNull
   static Field keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return new DefaultField(name, value, Attributes.empty());
+    return EchopraxiaService.getInstance().getFieldCreator().keyValue(name, value);
   }
 }
