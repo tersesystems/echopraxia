@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractEchopraxiaService implements EchopraxiaService {
 
   private static final ClassLoader[] classLoaders = {ClassLoader.getSystemClassLoader()};
+  protected FieldCreator fieldCreator;
 
   protected Filters filters;
   protected ToStringFormatter toStringFormatter;
@@ -15,6 +16,7 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
   public AbstractEchopraxiaService() {
     this.exceptionHandler = Throwable::printStackTrace;
     this.toStringFormatter = new DefaultToStringFormatter();
+    this.fieldCreator = new DefaultFieldCreator();
     this.filters = initFilters();
   }
 
@@ -41,7 +43,11 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
   }
 
   @Override
-  public ToStringFormatter getToStringFormatter() {
+  public @NotNull ToStringFormatter getToStringFormatter() {
     return toStringFormatter;
+  }
+
+  public @NotNull FieldCreator getFieldCreator() {
+    return fieldCreator;
   }
 }

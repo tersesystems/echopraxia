@@ -17,8 +17,13 @@ public interface EchopraxiaService {
   @NotNull
   CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull String name);
 
+  @NotNull
   ToStringFormatter getToStringFormatter();
 
+  @NotNull
+  FieldCreator getFieldCreator();
+
+  @NotNull
   static EchopraxiaService getInstance() {
     return EchopraxiaServiceLazyHolder.INSTANCE;
   }
