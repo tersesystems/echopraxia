@@ -16,7 +16,7 @@ public class DefaultField implements Field {
   protected final Value<?> value;
   protected final Attributes attributes;
 
-  DefaultField(String name, Value<?> value, Attributes attributes) {
+  protected DefaultField(String name, Value<?> value, Attributes attributes) {
     this.name = requireName(name);
     this.value = requireValue(value);
     this.attributes = attributes;
