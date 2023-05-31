@@ -80,10 +80,24 @@ public interface Field extends FieldBuilderResult {
   }
 
   /**
+   * @return a field with the given name and value, displayed as value only.
+   */
+  @NotNull
+  static <F extends Field> F value(
+      @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
+    return EchopraxiaService.getInstance().getFieldCreator().value(name, value, fieldClass);
+  }
+
+  /**
    * @return a field with the given name and value displayed as key=value
    */
   @NotNull
   static Field keyValue(@NotNull String name, @NotNull Value<?> value) {
     return EchopraxiaService.getInstance().getFieldCreator().keyValue(name, value);
+  }
+
+  static <F extends Field> F keyValue(
+      @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
+    return EchopraxiaService.getInstance().getFieldCreator().keyValue(name, value, fieldClass);
   }
 }
