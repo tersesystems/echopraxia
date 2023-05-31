@@ -26,8 +26,8 @@ public final class ExtendedField implements Field {
     return this.withAttribute(FieldAttributes.asCardinal());
   }
 
-  public Field displayName(String myDisplayName) {
-    return this.withAttribute(FieldAttributes.displayName(myDisplayName));
+  public ExtendedField withDisplayName(String displayName) {
+    return this.withAttribute(FieldAttributes.displayName(displayName));
   }
 
   @Override

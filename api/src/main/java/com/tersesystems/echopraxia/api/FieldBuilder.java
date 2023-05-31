@@ -40,12 +40,6 @@ public interface FieldBuilder {
     return Field.value(name, value);
   }
 
-  @NotNull
-  default <F extends Field> F value(
-      @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
-    return Field.value(name, value, fieldClass);
-  }
-
   /**
    * Creates a key value field that renders in message template as key=value.
    *
@@ -58,12 +52,6 @@ public interface FieldBuilder {
   @NotNull
   default Field keyValue(@NotNull String name, @NotNull Value<?> value) {
     return Field.keyValue(name, value);
-  }
-
-  @NotNull
-  default <F extends Field> F keyValue(
-      @NotNull String name, @NotNull Value<?> value, Class<F> clazz) {
-    return Field.keyValue(name, value, clazz);
   }
 
   // ---------------------------------------------------------
