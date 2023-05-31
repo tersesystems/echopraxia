@@ -6,41 +6,53 @@ import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
-public final class DefaultField implements Field {
+public final class ExtendedField implements Field {
 
   private final String name;
   private final Value<?> value;
   private final Attributes attributes;
 
-  public DefaultField(String name, Value<?> value, Attributes attributes) {
+  public ExtendedField(String name, Value<?> value, Attributes attributes) {
     this.name = Field.requireName(name);
     this.value = Field.requireValue(value);
     this.attributes = attributes;
   }
 
-  @Override
-  public <A> @NotNull Field withAttribute(@NotNull Attribute<A> attr) {
-    return new DefaultField(name, value, attributes.plus(attr));
+  public ExtendedField abbreviateAfter(int after) {
+    return this.withAttribute(FieldAttributes.abbreviateAfter(after));
+  }
+
+  public ExtendedField asCardinal() {
+    return this.withAttribute(FieldAttributes.asCardinal());
+  }
+
+  public Field displayName(String myDisplayName) {
+    return this.withAttribute(FieldAttributes.displayName(myDisplayName));
   }
 
   @Override
-  public @NotNull Field withAttributes(@NotNull Attributes attrs) {
-    return new DefaultField(name, value, attributes.plusAll(attrs));
+  public <A> @NotNull ExtendedField withAttribute(@NotNull Attribute<A> attr) {
+    return new ExtendedField(name, value, attributes.plus(attr));
   }
 
   @Override
-  public <A> @NotNull Field withoutAttribute(@NotNull AttributeKey<A> key) {
-    return new DefaultField(name, value, attributes.minus(key));
+  public @NotNull ExtendedField withAttributes(@NotNull Attributes attrs) {
+    return new ExtendedField(name, value, attributes.plusAll(attrs));
   }
 
   @Override
-  public @NotNull Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
-    return new DefaultField(name, value, attributes.minusAll(keys));
+  public <A> @NotNull ExtendedField withoutAttribute(@NotNull AttributeKey<A> key) {
+    return new ExtendedField(name, value, attributes.minus(key));
   }
 
   @Override
-  public @NotNull Field clearAttributes() {
-    return new DefaultField(name, value, Attributes.empty());
+  public @NotNull ExtendedField withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+    return new ExtendedField(name, value, attributes.minusAll(keys));
+  }
+
+  @Override
+  public @NotNull ExtendedField clearAttributes() {
+    return new ExtendedField(name, value, Attributes.empty());
   }
 
   @Override
@@ -67,10 +79,10 @@ public final class DefaultField implements Field {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof Field)) return false;
+    if (!(o instanceof ExtendedField)) return false;
 
     // key/value fields are comparable against value fields.
-    Field that = (Field) o;
+    ExtendedField that = (ExtendedField) o;
 
     if (!Objects.equals(name, that.name())) return false;
     return Objects.equals(value, that.value());

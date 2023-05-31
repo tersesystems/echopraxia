@@ -21,7 +21,7 @@ public interface EchopraxiaService {
   ToStringFormatter getToStringFormatter();
 
   @NotNull
-  FieldCreator getFieldCreator();
+  <F extends Field> FieldCreator<F> getFieldCreator(Class<F> fieldClass);
 
   @NotNull
   static EchopraxiaService getInstance() {

@@ -1,12 +1,10 @@
 package com.tersesystems.echopraxia.api;
 
-public interface FieldCreator {
+public interface FieldCreator<F extends Field> {
 
-  Field keyValue(String name, Value<?> value);
+  F keyValue(String name, Value<?> value);
 
-  <F extends Field> F keyValue(String name, Value<?> value, Class<F> fieldClass);
+  F value(String name, Value<?> value);
 
-  Field value(String name, Value<?> value);
-
-  <F extends Field> F value(String name, Value<?> value, Class<F> fieldClass);
+  boolean canServe(Class<?> t);
 }
