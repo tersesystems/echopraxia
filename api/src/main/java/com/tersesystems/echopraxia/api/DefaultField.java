@@ -69,7 +69,9 @@ public final class DefaultField implements Field {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     DefaultField that = (DefaultField) o;
-    return Objects.equals(name, that.name) && Objects.equals(value, that.value) && Objects.equals(attributes, that.attributes);
+    return Objects.equals(name, that.name)
+        && Objects.equals(value, that.value)
+        && Objects.equals(attributes, that.attributes);
   }
 
   @Override

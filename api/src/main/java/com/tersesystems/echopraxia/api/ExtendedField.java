@@ -85,7 +85,9 @@ public final class ExtendedField implements Field {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ExtendedField that = (ExtendedField) o;
-    return Objects.equals(name, that.name) && Objects.equals(value, that.value) && Objects.equals(attributes, that.attributes);
+    return Objects.equals(name, that.name)
+        && Objects.equals(value, that.value)
+        && Objects.equals(attributes, that.attributes);
   }
 
   @Override
