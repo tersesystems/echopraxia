@@ -1,9 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.pcollections.Empty;
@@ -143,5 +140,18 @@ final class AttributesImpl implements Attributes {
   @Override
   public String toString() {
     return _map.toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    AttributesImpl that = (AttributesImpl) o;
+    return Objects.equals(_map, that._map);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(_map);
   }
 }
