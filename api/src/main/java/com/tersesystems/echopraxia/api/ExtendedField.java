@@ -30,29 +30,33 @@ public final class ExtendedField implements Field {
     return this.withAttribute(FieldAttributes.displayName(displayName));
   }
 
+  protected @NotNull ExtendedField newAttributes(@NotNull Attributes attrs) {
+    return new ExtendedField(name, value, attrs);
+  }
+
   @Override
   public <A> @NotNull ExtendedField withAttribute(@NotNull Attribute<A> attr) {
-    return new ExtendedField(name, value, attributes.plus(attr));
+    return newAttributes(attributes.plus(attr));
   }
 
   @Override
   public @NotNull ExtendedField withAttributes(@NotNull Attributes attrs) {
-    return new ExtendedField(name, value, attributes.plusAll(attrs));
+    return newAttributes(attributes.plusAll(attrs));
   }
 
   @Override
   public <A> @NotNull ExtendedField withoutAttribute(@NotNull AttributeKey<A> key) {
-    return new ExtendedField(name, value, attributes.minus(key));
+    return newAttributes(attributes.minus(key));
   }
 
   @Override
   public @NotNull ExtendedField withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
-    return new ExtendedField(name, value, attributes.minusAll(keys));
+    return newAttributes(attributes.minusAll(keys));
   }
 
   @Override
   public @NotNull ExtendedField clearAttributes() {
-    return new ExtendedField(name, value, Attributes.empty());
+    return newAttributes(Attributes.empty());
   }
 
   @Override
@@ -79,20 +83,14 @@ public final class ExtendedField implements Field {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof ExtendedField)) return false;
-
-    // key/value fields are comparable against value fields.
+    if (o == null || getClass() != o.getClass()) return false;
     ExtendedField that = (ExtendedField) o;
-
-    if (!Objects.equals(name, that.name())) return false;
-    return Objects.equals(value, that.value());
+    return Objects.equals(name, that.name) && Objects.equals(value, that.value) && Objects.equals(attributes, that.attributes);
   }
 
   @Override
   public int hashCode() {
-    int result = name != null ? name.hashCode() : 0;
-    result = 31 * result + (value != null ? value.hashCode() : 0);
-    return result;
+    return Objects.hash(name, value, attributes);
   }
 
   public String toString() {

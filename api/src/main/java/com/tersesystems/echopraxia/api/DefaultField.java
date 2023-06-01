@@ -67,20 +67,14 @@ public final class DefaultField implements Field {
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
-    if (!(o instanceof Field)) return false;
-
-    // key/value fields are comparable against value fields.
-    Field that = (Field) o;
-
-    if (!Objects.equals(name, that.name())) return false;
-    return Objects.equals(value, that.value());
+    if (o == null || getClass() != o.getClass()) return false;
+    DefaultField that = (DefaultField) o;
+    return Objects.equals(name, that.name) && Objects.equals(value, that.value) && Objects.equals(attributes, that.attributes);
   }
 
   @Override
   public int hashCode() {
-    int result = name != null ? name.hashCode() : 0;
-    result = 31 * result + (value != null ? value.hashCode() : 0);
-    return result;
+    return Objects.hash(name, value, attributes);
   }
 
   public String toString() {
