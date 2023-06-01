@@ -15,6 +15,14 @@ public class AbbreviationTests {
   }
 
   @Test
+  public void abbreviateStringWithExtended() {
+    Value<String> value = Value.string("123456789");
+    ExtendedField field =
+        Field.keyValue("longString", value, ExtendedField.class).abbreviateAfter(5);
+    assertThat(field.toString()).isEqualTo("longString=12345...");
+  }
+
+  @Test
   public void abbreviateStringWithValueOnly() {
     Value<String> value = Value.string("123456789");
     Field field = Field.value("longString", value).withAttribute(abbreviateAfter(5));

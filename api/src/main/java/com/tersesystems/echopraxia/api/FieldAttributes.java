@@ -17,7 +17,7 @@ public class FieldAttributes {
   private static final Attributes VALUE_ONLY_ATTRS = Attributes.create(FieldAttributes.valueOnly());
 
   // package-private static, we only use this in Field.value as a shortcut
-  static Attributes valueOnlyAttributes() {
+  public static Attributes valueOnlyAttributes() {
     return VALUE_ONLY_ATTRS;
   }
 
