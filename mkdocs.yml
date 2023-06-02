@@ -1,0 +1,59 @@
+site_name: Echopraxia
+
+# Meta tags (placed in header)
+site_description: "Echopraxia - Structured logging for Java"
+
+site_author: "Will Sargent"
+site_url: "https://tersesystems.github.io/echopraxia"
+
+# Repository (add link to repository on each page)
+repo_name: echopraxia
+
+repo_url: "https://github.com/tersesystems/echopraxia"
+edit_uri: "edit/master/docs/"
+
+#Copyright (shown at the footer)
+#copyright: 'Copyright &copy; 2017 Your Name'
+
+# Meterial theme
+# https://github.com/squidfunk/mkdocs-material
+# pip install mkdocs-material
+theme: 'material'
+
+extra:
+  version:
+    provider: mike
+
+  palette:
+    primary: 'indigo'
+    accent: 'indigo'
+
+  social:
+    - icon: fontawesome/brands/mastodon
+      link: 'https://mastodon.xyz/web/@will_sargent'
+
+
+# Google Analytics
+#google_analytics:
+#  - 'UA-111111111-1'
+#  - 'auto'
+
+# Extensions
+markdown_extensions:
+  - admonition
+  - codehilite:
+      guess_lang: false
+  - footnotes
+  - meta
+  - toc:
+      permalink: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md
