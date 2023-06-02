@@ -56,4 +56,22 @@ markdown_extensions:
   - pymdownx.superfences
 
 nav:
-  - Home: index.md
+  - Home: index.md  
+  - Installation: installation.md
+  - Usage:
+    - Basics: usage/basics.md
+    - Conditions: usage/conditions.md
+    - Context: usage/context.md          
+    - Field Builders: usage/fieldbuilder.md      
+    - Filters: usage/filters.md      
+    - Scripting: usage/scripting.md
+  - Frameworks:      
+    - Logback Features: frameworks/logback.md
+    - Log4J2 Features: frameworks/log4j2.md
+  - Additional Features:
+    - Diff Field Builder: additional/diff.md
+    - Fluent Logger: additional/fluent.md
+    - Semantic Logger: additional/semantic.md    
+  - Extending:
+    - Extending Logger: extending/logger.md    
+  - FAQ: faq.md
