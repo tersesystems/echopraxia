@@ -55,22 +55,9 @@ And print out the internal state of the `Person` in both logfmt and JSON.
 INFO 13.223 abe={Abe, 1, father={Bert, 35, father=null, mother=null, interests=[keyboards]}, mother={Candace, 30, father=null, mother=null, interests=[iceskating]}, interests=[yodelling]}
 ```
 
-## Overview
+## Documentation
 
-There are Logback, Log4J2 and JUL implementations, but Echopraxia's API is dependency-free, making it easy for you to switch implementations if necessary.
-
-Because Echopraxia is built around structured logging and structured logging is composable, there are two features that can be added naturally:
-
-* Contextual Logging (composing structured logging context in the logger itself)
-* Conditional Logging (application specific functions that check against structured logging fields and values)
-
-And then there are more advanced features that build on structured logging:
-
-* Scripting (dynamic configuration of conditions without restarts)
-* Filters (pipeline for adding fields and conditions to loggers)
-* Transformation (modifying fields for presentation before rendering to logfmt or JSON, i.e. for abbreviation of long strings)
-
-Echopraxia is also built for extensibility -- it has fluent and semantic loggers built in, and allows you to extend the `Logger` class with your own methods.
+Please see the [online documentation](https://tersesystems.github.io/echopraxia).
 
 ## Examples
 
