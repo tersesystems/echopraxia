@@ -18,7 +18,7 @@ public class DisplayNameTests {
   public void testDisplayNameWithExtended() {
     Value<?> value = Value.string("derp");
     Field field =
-        Field.keyValue("longArray", value, ExtendedField.class).withDisplayName("My Display Name");
+        Field.keyValue("longArray", value, DefaultField.class).withDisplayName("My Display Name");
     assertThat(field.toString()).isEqualTo("\"My Display Name\"=derp");
   }
 }

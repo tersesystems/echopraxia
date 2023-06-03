@@ -18,29 +18,49 @@ public final class DefaultField implements Field {
     this.attributes = attributes;
   }
 
-  @Override
-  public <A> @NotNull Field withAttribute(@NotNull Attribute<A> attr) {
-    return new DefaultField(name, value, attributes.plus(attr));
+  public DefaultField asValueOnly() {
+    return this.withAttribute(FieldAttributes.valueOnly());
+  }
+
+  public DefaultField abbreviateAfter(int after) {
+    return this.withAttribute(FieldAttributes.abbreviateAfter(after));
+  }
+
+  public DefaultField asCardinal() {
+    return this.withAttribute(FieldAttributes.asCardinal());
+  }
+
+  public DefaultField withDisplayName(String displayName) {
+    return this.withAttribute(FieldAttributes.displayName(displayName));
+  }
+
+  protected @NotNull DefaultField newAttributes(@NotNull Attributes attrs) {
+    return new DefaultField(name, value, attrs);
   }
 
   @Override
-  public @NotNull Field withAttributes(@NotNull Attributes attrs) {
-    return new DefaultField(name, value, attributes.plusAll(attrs));
+  public <A> @NotNull DefaultField withAttribute(@NotNull Attribute<A> attr) {
+    return newAttributes(attributes.plus(attr));
   }
 
   @Override
-  public <A> @NotNull Field withoutAttribute(@NotNull AttributeKey<A> key) {
-    return new DefaultField(name, value, attributes.minus(key));
+  public @NotNull DefaultField withAttributes(@NotNull Attributes attrs) {
+    return newAttributes(attributes.plusAll(attrs));
   }
 
   @Override
-  public @NotNull Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
-    return new DefaultField(name, value, attributes.minusAll(keys));
+  public <A> @NotNull DefaultField withoutAttribute(@NotNull AttributeKey<A> key) {
+    return newAttributes(attributes.minus(key));
   }
 
   @Override
-  public @NotNull Field clearAttributes() {
-    return new DefaultField(name, value, Attributes.empty());
+  public @NotNull DefaultField withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+    return newAttributes(attributes.minusAll(keys));
+  }
+
+  @Override
+  public @NotNull DefaultField clearAttributes() {
+    return newAttributes(Attributes.empty());
   }
 
   @Override

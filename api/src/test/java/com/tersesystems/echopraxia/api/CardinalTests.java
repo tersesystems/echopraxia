@@ -18,7 +18,7 @@ public class CardinalTests {
   @Test
   public void testCardinalArrayWithExtended() {
     Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-    Field field = Field.keyValue("longArray", value, ExtendedField.class).asCardinal();
+    Field field = Field.keyValue("longArray", value, DefaultField.class).asCardinal();
     assertThat(field.toString()).isEqualTo("longArray=|9|");
   }
 

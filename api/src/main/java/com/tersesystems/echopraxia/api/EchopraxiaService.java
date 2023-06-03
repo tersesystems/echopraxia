@@ -20,6 +20,13 @@ public interface EchopraxiaService {
   @NotNull
   ToStringFormatter getToStringFormatter();
 
+  /**
+   * Gets the field creator.
+   *
+   * @param <F> the field type
+   * @param fieldClass the field class.
+   * @return the field creator matching the field class.
+   */
   @NotNull
   <F extends Field> FieldCreator<F> getFieldCreator(Class<F> fieldClass);
 

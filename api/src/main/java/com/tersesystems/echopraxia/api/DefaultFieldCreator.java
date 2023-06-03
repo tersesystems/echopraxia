@@ -1,14 +1,10 @@
 package com.tersesystems.echopraxia.api;
 
-public class DefaultFieldCreator implements FieldCreator<Field> {
+/** The default field creator. */
+public class DefaultFieldCreator implements FieldCreator<DefaultField> {
   @Override
-  public Field keyValue(String name, Value<?> value) {
-    return new DefaultField(name, value, Attributes.empty());
-  }
-
-  @Override
-  public Field value(String name, Value<?> value) {
-    return new DefaultField(name, value, FieldAttributes.valueOnlyAttributes());
+  public DefaultField create(String name, Value<?> value, Attributes attributes) {
+    return new DefaultField(name, value, attributes);
   }
 
   @Override
