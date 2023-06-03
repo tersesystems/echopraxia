@@ -37,7 +37,24 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field value(@NotNull String name, @NotNull Value<?> value) {
-    return Field.value(name, value);
+    return value(name, value, DefaultField.class);
+  }
+
+  /**
+   * Creates a field that renders in message template as value.
+   *
+   * <p>This method is intentionally value blind so any value, including null value, will work here.
+   *
+   * @param name the field name
+   * @param value the field value
+   * @param fieldClass the field class
+   * @return the field.
+   * @since 3.0
+   */
+  @NotNull
+  default <F extends Field> F value(
+      @NotNull String name, @NotNull Value<?> value, @NotNull Class<F> fieldClass) {
+    return Field.value(name, value, fieldClass);
   }
 
   /**
@@ -51,7 +68,24 @@ public interface FieldBuilder {
    */
   @NotNull
   default Field keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return Field.keyValue(name, value);
+    return keyValue(name, value, DefaultField.class);
+  }
+
+  /**
+   * Creates a key value field that renders in message template as key=value.
+   *
+   * <p>This method is intentionally value blind so any value, including null value, will work here.
+   *
+   * @param name the field name
+   * @param value the field value
+   * @param fieldClass the field class
+   * @return the field.
+   * @since 3.0
+   */
+  @NotNull
+  default <F extends Field> F keyValue(
+      @NotNull String name, @NotNull Value<?> value, @NotNull Class<F> fieldClass) {
+    return Field.keyValue(name, value, fieldClass);
   }
 
   // ---------------------------------------------------------

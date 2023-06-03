@@ -1,6 +1,8 @@
 # Field Builders
 
-Echopraxia lets you specify field builders whenever you want to log domain objects:
+Echopraxia lets you specify field builders whenever you want to log domain objects.
+
+You do this by defining your own implementation of `FieldBuilder` and then pass that field builder into your `Logger` using `withFieldBuilder`.
 
 ```java
 import com.tersesystems.echopraxia.api.*;
@@ -20,10 +22,15 @@ public class BuilderWithDate implements FieldBuilder {
 }
 ```
 
+And then create a `Logger<BuilderWithDate>`:
+
+```
+Logger<BuilderWithDate> dateLogger = basicLogger.withFieldBuilder(BuilderWithDate.instance);
+```
+
 And now you can render a date automatically:
 
 ```java
-Logger<BuilderWithDate> dateLogger = basicLogger.withFieldBuilder(BuilderWithDate.instance);
 dateLogger.info("Date {}", fb -> fb.date("creation_date", new Date()));
 ```
 
@@ -62,9 +69,56 @@ Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFie
 personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 ```
 
-## Nulls and Exceptions
+## Field Presentation
 
-By default, values are `@NotNull`, and passing in `null` to values is not recommended.  If you want to handle nulls, you can extend the field builder as necessary:
+ There are times when the default field presentation is awkward, and you'd like to cut down on the amount of information displayed in the message.  You can do this by adding presentation hints to the field.
+
+The `FieldBuilder` interface provides some convenience methods around `Field` and `Value`.  In particular, there are two methods, `keyValue` and `value` that are used to create fields.  The `DefaultField` class implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
+
+You can access these methods by passing in `DefaultField.class` to either `value` or `keyValue`, and then calling the extension methods -- this provides an easy way to construct fields while hiding the implementation outside the field builder.
+
+### asValueOnly
+
+The `asValueOnly` method has the effect of turning a "key=value" field into a "value" field in text format, just like the value method:
+
+```java
+// same as Field valueField = value(name, value);
+Field valueField = keyValue("onlyValue", Value.string("someText"), DefaultField.class).asValueOnly();
+valueField.toString() // renders someText
+```
+
+### asCardinal
+
+The `asCardinal` method, when used on a field with an array value or on a string, displays the number of elements in the array bracketed by "|" characters in text format:
+
+```java
+Field cardinalField = keyValue("elements", Value.array(1,2,3), DefaultField.class).asCardinal();
+cardinalField.toString(); // renders elements=|3|
+```
+
+### withDisplayName
+
+The `withDisplayName` method shows a human readable string in text format bracketed in quotes:
+
+```
+Field readableField = keyValue("json_field", Value.number(1), DefaultField.class).withDisplayName("human readable name");
+readableField.toString() // renders "human readable name"=1
+```
+
+### abbreviateAfter
+
+The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
+
+```
+Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), DefaultField.class).abbreviateAfter(5);
+abbrField.toString() // renders abbreviatedField=12345...
+```
+
+## Nulls
+
+By default, values are `@NotNull`, and passing in `null` to values is not recommended.  It's recommended to use `Value.optional` over null, if possible.
+
+If you want to handle nulls explicitly, you can extend the field builder as necessary:
 
 ```java
 public interface NullableFieldBuilder extends FieldBuilder {
