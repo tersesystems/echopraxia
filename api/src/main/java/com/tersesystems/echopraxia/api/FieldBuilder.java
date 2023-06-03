@@ -245,7 +245,7 @@ public interface FieldBuilder {
   }
 
   /**
-   * Takes an array value as an array field. This is good for hetrogenous elements.
+   * Takes an array value as an array field. This is good for heterogeneous elements.
    *
    * <p>{@code array(name, Value.array(1, "a", true))}
    *
