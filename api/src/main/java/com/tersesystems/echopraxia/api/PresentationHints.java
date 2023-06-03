@@ -3,11 +3,11 @@ package com.tersesystems.echopraxia.api;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * These are common field attributes used for rendering.
+ * These are common field attributes used for presentation hints.
  *
  * @since 3.0
  */
-public class FieldAttributes {
+public class PresentationHints {
   public static final AttributeKey<Boolean> VALUE_ONLY = AttributeKey.create("valueOnly");
   public static final AttributeKey<Integer> ABBREVIATE_AFTER =
       AttributeKey.create("abbreviateAfter");
@@ -23,7 +23,7 @@ public class FieldAttributes {
   private static final Attribute<Boolean> ELIDE_ATTR = ELIDE.bindValue(true);
 
   private static final Attributes VALUE_ONLY_ATTRS =
-      Attributes.create(FieldAttributes.asValueOnly());
+      Attributes.create(PresentationHints.asValueOnly());
 
   // package-private static, we only use this in Field.value as a shortcut
   static Attributes valueOnlyAttributes() {

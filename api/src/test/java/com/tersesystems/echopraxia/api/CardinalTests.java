@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.api.FieldAttributes.asCardinal;
+import static com.tersesystems.echopraxia.api.PresentationHints.asCardinal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.UUID;

@@ -3,11 +3,11 @@ package com.tersesystems.echopraxia.api;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A field that has convenience methods for applying attributes.
+ * An interface for fields that know about presentation hint attributes.
  *
  * @since 3.0
  */
-public interface FieldAttributesAware<F extends Field> {
+public interface PresentationHintsAware<F extends Field> {
 
   /**
    * Tells the formatter that the field should be rendered with the value only, i.e. "value" and not

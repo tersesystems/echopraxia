@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 3.0
  */
-public final class DefaultField implements Field, FieldAttributesAware<DefaultField> {
+public final class DefaultField implements Field, PresentationHintsAware<DefaultField> {
 
   private final String name;
   private final Value<?> value;
@@ -26,27 +26,27 @@ public final class DefaultField implements Field, FieldAttributesAware<DefaultFi
 
   @Override
   public @NotNull DefaultField asValueOnly() {
-    return this.withAttribute(FieldAttributes.asValueOnly());
+    return this.withAttribute(PresentationHints.asValueOnly());
   }
 
   @Override
   public @NotNull DefaultField abbreviateAfter(int after) {
-    return this.withAttribute(FieldAttributes.abbreviateAfter(after));
+    return this.withAttribute(PresentationHints.abbreviateAfter(after));
   }
 
   @Override
   public @NotNull DefaultField asCardinal() {
-    return this.withAttribute(FieldAttributes.asCardinal());
+    return this.withAttribute(PresentationHints.asCardinal());
   }
 
   @Override
   public @NotNull DefaultField asElided() {
-    return this.withAttribute(FieldAttributes.asElided());
+    return this.withAttribute(PresentationHints.asElided());
   }
 
   @Override
   public @NotNull DefaultField withDisplayName(@NotNull String displayName) {
-    return this.withAttribute(FieldAttributes.withDisplayName(displayName));
+    return this.withAttribute(PresentationHints.withDisplayName(displayName));
   }
 
   @Override

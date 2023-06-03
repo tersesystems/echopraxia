@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.api.FieldAttributes.withDisplayName;
+import static com.tersesystems.echopraxia.api.PresentationHints.withDisplayName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
