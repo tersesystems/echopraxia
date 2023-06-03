@@ -2,7 +2,11 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-/** These are common field attributes used for rendering. */
+/**
+ * These are common field attributes used for rendering.
+ *
+ * @since 3.0
+ */
 public class FieldAttributes {
   public static final AttributeKey<Boolean> VALUE_ONLY = AttributeKey.create("valueOnly");
   public static final AttributeKey<Integer> ABBREVIATE_AFTER =
@@ -17,7 +21,7 @@ public class FieldAttributes {
   private static final Attributes VALUE_ONLY_ATTRS = Attributes.create(FieldAttributes.valueOnly());
 
   // package-private static, we only use this in Field.value as a shortcut
-  public static Attributes valueOnlyAttributes() {
+  static Attributes valueOnlyAttributes() {
     return VALUE_ONLY_ATTRS;
   }
 
@@ -41,7 +45,12 @@ public class FieldAttributes {
     return AS_CARDINAL_ATTR;
   }
 
-  public static Attribute<String> displayName(String displayName) {
+  /**
+   * Tells the formatter to render a display name in text.
+   *
+   * @return displayName attribute
+   */
+  public static Attribute<String> withDisplayName(String displayName) {
     return DISPLAY_NAME.bindValue(displayName);
   }
 

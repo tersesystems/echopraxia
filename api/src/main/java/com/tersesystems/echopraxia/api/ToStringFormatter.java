@@ -2,7 +2,11 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-/** This interface handles the "logfmt" like text serialization of fields and values. */
+/**
+ * This interface handles the "logfmt" like text serialization of fields and values.
+ *
+ * @since 3.0
+ */
 public interface ToStringFormatter {
 
   /**

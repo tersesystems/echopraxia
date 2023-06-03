@@ -1,10 +1,11 @@
 package com.tersesystems.echopraxia.api;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface FieldCreator<F extends Field> {
 
-  F keyValue(String name, Value<?> value);
+  @NotNull
+  F create(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes);
 
-  F value(String name, Value<?> value);
-
-  boolean canServe(Class<?> t);
+  boolean canServe(@NotNull Class<?> t);
 }

@@ -11,6 +11,8 @@ import org.pcollections.PMap;
  *
  * <p>The elements inside Attributes cannot be enumerated -- It's not possible to access a value in
  * Attributes without holding the corresponding key.
+ *
+ * @since 3.0
  */
 public interface Attributes {
 
@@ -94,32 +96,32 @@ final class AttributesImpl implements Attributes {
   }
 
   @Override
-  public <A> Attributes plus(@NotNull AttributeKey<A> key, A value) {
+  public <A> @NotNull Attributes plus(@NotNull AttributeKey<A> key, A value) {
     return new AttributesImpl(_map.plus(key, value));
   }
 
   @Override
-  public <A> Attributes plus(@NotNull Attribute<A> attr) {
+  public <A> @NotNull Attributes plus(@NotNull Attribute<A> attr) {
     return plus(attr.key(), attr.value());
   }
 
   @Override
-  public Attributes plusAll(Attributes attrs) {
+  public @NotNull Attributes plusAll(@NotNull Attributes attrs) {
     return new AttributesImpl(_map.plusAll(((AttributesImpl) attrs)._map));
   }
 
   @Override
-  public Attributes plusAll(Attribute<?> a1, Attribute<?> a2) {
+  public @NotNull Attributes plusAll(@NotNull Attribute<?> a1, @NotNull Attribute<?> a2) {
     return plus(a1).plus(a2);
   }
 
   @Override
-  public Attributes plusAll(Map<AttributeKey<?>, ?> attrs) {
+  public @NotNull Attributes plusAll(@NotNull Map<AttributeKey<?>, ?> attrs) {
     return new AttributesImpl(_map.plusAll(attrs));
   }
 
   @Override
-  public Attributes plusAll(Collection<Attribute<?>> attrs) {
+  public @NotNull Attributes plusAll(@NotNull Collection<Attribute<?>> attrs) {
     Map<AttributeKey<?>, Object> attrsMap = new HashMap<>();
     for (Attribute<?> attr : attrs) {
       attrsMap.put(attr.key(), attr.value());
@@ -128,18 +130,18 @@ final class AttributesImpl implements Attributes {
   }
 
   @Override
-  public Attributes minus(AttributeKey<?> key) {
+  public @NotNull Attributes minus(@NotNull AttributeKey<?> key) {
     return new AttributesImpl(_map.minus(key));
   }
 
   @Override
-  public Attributes minusAll(Collection<AttributeKey<?>> keys) {
+  public @NotNull Attributes minusAll(@NotNull Collection<AttributeKey<?>> keys) {
     return new AttributesImpl(_map.minusAll(keys));
   }
 
   @Override
   public String toString() {
-    return _map.toString();
+    return "AttributesImpl{" + "_map=" + _map + '}';
   }
 
   @Override

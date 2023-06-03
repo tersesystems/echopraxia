@@ -1,18 +1,21 @@
 package com.tersesystems.echopraxia.api;
 
-public class DefaultFieldCreator implements FieldCreator<Field> {
+import org.jetbrains.annotations.NotNull;
+
+/**
+ * The default field creator.
+ *
+ * @since 3.0
+ */
+public class DefaultFieldCreator implements FieldCreator<DefaultField> {
   @Override
-  public Field keyValue(String name, Value<?> value) {
-    return new DefaultField(name, value, Attributes.empty());
+  public @NotNull DefaultField create(
+      @NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
+    return new DefaultField(name, value, attributes);
   }
 
   @Override
-  public Field value(String name, Value<?> value) {
-    return new DefaultField(name, value, FieldAttributes.valueOnlyAttributes());
-  }
-
-  @Override
-  public boolean canServe(Class<?> t) {
+  public boolean canServe(@NotNull Class<?> t) {
     return t.isAssignableFrom(DefaultField.class);
   }
 }

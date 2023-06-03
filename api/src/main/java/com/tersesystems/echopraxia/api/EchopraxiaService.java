@@ -3,7 +3,11 @@ package com.tersesystems.echopraxia.api;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;
 
-/** The main SPI interface. Call getInstance() to get the service from service provider. */
+/**
+ * The main SPI interface. Call getInstance() to get the service from service provider.
+ *
+ * @since 3.0
+ */
 public interface EchopraxiaService {
   @NotNull
   ExceptionHandler getExceptionHandler();
@@ -20,8 +24,15 @@ public interface EchopraxiaService {
   @NotNull
   ToStringFormatter getToStringFormatter();
 
+  /**
+   * Gets the field creator.
+   *
+   * @param <F> the field type
+   * @param fieldClass the field class.
+   * @return the field creator matching the field class.
+   */
   @NotNull
-  <F extends Field> FieldCreator<F> getFieldCreator(Class<F> fieldClass);
+  <F extends Field> FieldCreator<F> getFieldCreator(@NotNull Class<F> fieldClass);
 
   @NotNull
   static EchopraxiaService getInstance() {
