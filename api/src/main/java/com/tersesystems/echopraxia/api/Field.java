@@ -99,7 +99,7 @@ public interface Field extends FieldBuilderResult {
       @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
     return EchopraxiaService.getInstance()
         .getFieldCreator(fieldClass)
-        .create(name, value, FieldAttributes.valueOnlyAttributes());
+        .create(name, value, PresentationHints.valueOnlyAttributes());
   }
 
   /**
