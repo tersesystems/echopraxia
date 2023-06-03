@@ -174,8 +174,12 @@ public class EqualityTests {
   void testObjectWithEqualFieldsWithDiffAttributeValues() {
     AttributeKey<Integer> myKey = AttributeKey.create("myKey");
 
-    Field name1 = Field.value("name", Value.string("foo")).withAttribute(myKey.bindValue(2));
-    Field name2 = Field.value("name", Value.string("foo")).withAttribute(myKey.bindValue(1));
+    Field name1 =
+        Field.value("name", Value.string("foo"), DefaultField.class)
+            .withAttribute(myKey.bindValue(2));
+    Field name2 =
+        Field.value("name", Value.string("foo"), DefaultField.class)
+            .withAttribute(myKey.bindValue(1));
     Value<?> o1 = Value.object(name1);
     Value<?> o2 = Value.object(name2);
 
@@ -186,8 +190,12 @@ public class EqualityTests {
   void testObjectWithEqualFieldsWithSameAttributeValues() {
     AttributeKey<Integer> myKey = AttributeKey.create("myKey");
 
-    Field name1 = Field.value("name", Value.string("foo")).withAttribute(myKey.bindValue(1));
-    Field name2 = Field.value("name", Value.string("foo")).withAttribute(myKey.bindValue(1));
+    Field name1 =
+        Field.value("name", Value.string("foo"), DefaultField.class)
+            .withAttribute(myKey.bindValue(1));
+    Field name2 =
+        Field.value("name", Value.string("foo"), DefaultField.class)
+            .withAttribute(myKey.bindValue(1));
     Value<?> o1 = Value.object(name1);
     Value<?> o2 = Value.object(name2);
 

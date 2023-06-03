@@ -437,7 +437,7 @@ public class ContextTest extends TestBase {
     logger.info(
         c,
         "Can manage null in array",
-        fb -> fb.object("foo", fb.array("interests", "foo", null, null)));
+        fb -> fb.object("foo", List.of(fb.array("interests", "foo", null, null))));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);

@@ -46,7 +46,7 @@ public class LogstashCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = mdcContext();
-    this.fieldConverter = LogstashFieldConverter.singleton();
+    this.fieldConverter = FieldConverter.identity();
   }
 
   public LogstashCoreLogger(
@@ -651,8 +651,8 @@ public class LogstashCoreLogger implements CoreLogger {
       if (value.type() == Value.Type.EXCEPTION) {
         throwable = ((Value.ExceptionValue) value).raw();
       }
-      Object arg = fieldConverter.convertArgumentField(field);
-      arguments.add(arg);
+      Field arg = fieldConverter.convertArgumentField(field);
+      arguments.add(new FieldMarker(arg));
     }
 
     // If the exception exists, it must be raw and at the end of the array.
@@ -787,8 +787,8 @@ public class LogstashCoreLogger implements CoreLogger {
     } else {
       final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
       for (Field field : fields) {
-        FieldMarker append = (FieldMarker) fieldConverter.convertLoggerField(field);
-        markerList.add(append);
+        Field loggerField = fieldConverter.convertLoggerField(field);
+        markerList.add(new FieldMarker(loggerField));
       }
       if (ctxMarker != null) {
         markerList.add(ctxMarker);

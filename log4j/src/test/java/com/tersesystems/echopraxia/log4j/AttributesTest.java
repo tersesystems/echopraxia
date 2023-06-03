@@ -28,21 +28,20 @@ public class AttributesTest extends TestBase {
   @Test
   public void testSimpleField() {
     FieldConverter fieldConverter =
-        new Log4JFieldConverter() {
+        new FieldConverter() {
           @Override
-          public @NotNull Object convertArgumentField(@NotNull Field field) {
+          public @NotNull Field convertArgumentField(@NotNull Field field) {
             Boolean inBed = field.attributes().getOptional(IN_BED_ATTR_KEY).orElse(false);
             boolean isString = field.value().type() == Value.Type.STRING;
             if (inBed && isString) {
               Value<String> inBedValue = Value.string(field.value().asString() + " IN BED");
-              Field inBedField = Field.value(field.name(), inBedValue);
-              return super.convertArgumentField(inBedField);
+              return Field.value(field.name(), inBedValue);
             }
-            return super.convertArgumentField(field);
+            return field;
           }
         };
     CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldConverter);
-    Logger<?> logger = LoggerFactory.getLogger(coreLogger, FieldBuilder.instance());
+    Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
 
     logger.info("message {}", fb -> fb.string("foo", "bar").withAttribute(IN_BED_ATTR));
 
@@ -57,9 +56,9 @@ public class AttributesTest extends TestBase {
   @Test
   public void testInstantToObject() {
     FieldConverter fieldConverter =
-        new Log4JFieldConverter() {
+        new FieldConverter() {
           @Override
-          public @NotNull Object convertArgumentField(@NotNull Field field) {
+          public @NotNull Field convertArgumentField(@NotNull Field field) {
             Optional<Class<?>> optClass = field.attributes().getOptional(CLASS_TYPE_ATTR);
             boolean isString = field.value().type() == Value.Type.STRING;
             if (optClass.isPresent()
@@ -70,9 +69,9 @@ public class AttributesTest extends TestBase {
               Field valueField = fb.keyValue("@value", field.value());
               Field structuredField = fb.object(field.name(), typeField, valueField);
 
-              return new Log4JMappedField(field, structuredField);
+              return new MappedField(field, structuredField);
             }
-            return super.convertArgumentField(field);
+            return field;
           }
         };
     CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldConverter);
@@ -88,7 +87,7 @@ public class AttributesTest extends TestBase {
     assertThat(message).isEqualTo("date shows 1970-01-01T00:00:00Z");
   }
 
-  static class MyFieldBuilder implements FieldBuilder {
+  static class MyFieldBuilder implements DefaultFieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder() {};
     }

@@ -13,6 +13,7 @@ import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.async.AsyncLogger;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
@@ -85,7 +86,7 @@ public class ConditionTest extends TestBase {
     Field field = Field.keyValue("foo", Value.string("bar"));
     Condition logins = Condition.objectMatch("myObject", v -> v.equals(Value.object(field)));
     Logger<?> logger = getLogger();
-    logger.info(logins, "{}", fb -> fb.object("myObject", fb.string("foo", "bar")));
+    logger.info(logins, "{}", fb -> fb.object("myObject", List.of(fb.string("foo", "bar"))));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     assertThat(listAppender.list.size()).isEqualTo(1);

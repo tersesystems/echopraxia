@@ -388,7 +388,7 @@ public abstract class Value<V> {
    * @return the Value.
    */
   @NotNull
-  public static ObjectValue object(@NotNull List<Field> fields) {
+  public static ObjectValue object(@NotNull List<? extends Field> fields) {
     if (fields == null || fields.size() == 0) {
       return ObjectValue.EMPTY;
     }

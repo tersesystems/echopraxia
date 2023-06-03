@@ -22,21 +22,29 @@ public class AttributesTest extends TestBase {
   @Test
   public void testSimpleField() {
     FieldConverter fieldConverter =
-        new LogstashFieldConverter() {
-          @Override
-          public @NotNull Object convertField(@NotNull Field field) {
+        new FieldConverter() {
+          public @NotNull Field convertField(@NotNull Field field) {
             Boolean inBed = field.attributes().getOptional(IN_BED_ATTR_KEY).orElse(false);
             boolean isString = field.value().type() == Value.Type.STRING;
             if (inBed && isString) {
               Value<String> inBedValue = Value.string(field.value().asString() + " IN BED");
-              Field inBedField = Field.value(field.name(), inBedValue);
-              return super.convertField(inBedField);
+              return Field.value(field.name(), inBedValue);
             }
-            return super.convertField(field);
+            return field;
+          }
+
+          @Override
+          public @NotNull Field convertArgumentField(@NotNull Field field) {
+            return convertField(field);
+          }
+
+          @Override
+          public @NotNull Field convertLoggerField(@NotNull Field field) {
+            return convertField(field);
           }
         };
     CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldConverter);
-    Logger<?> logger = LoggerFactory.getLogger(coreLogger, FieldBuilder.instance());
+    Logger<DefaultFieldBuilder> logger = LoggerFactory.getLogger(coreLogger);
 
     String cookieSaying = "you will have a long and illustrious career";
     logger.info(
@@ -55,9 +63,8 @@ public class AttributesTest extends TestBase {
   @Test
   public void testInstantToObject() {
     FieldConverter fieldConverter =
-        new LogstashFieldConverter() {
-          @Override
-          public @NotNull Object convertField(@NotNull Field field) {
+        new FieldConverter() {
+          public @NotNull Field convertField(@NotNull Field field) {
             Optional<Class<?>> optClass = field.attributes().getOptional(CLASS_TYPE_ATTR);
             boolean isString = field.value().type() == Value.Type.STRING;
             if (optClass.isPresent()
@@ -68,9 +75,19 @@ public class AttributesTest extends TestBase {
               Field valueField = fb.keyValue("@value", field.value());
 
               Field objectField = fb.object(field.name(), typeField, valueField);
-              return new MappedFieldMarker(field, objectField);
+              return new MappedField(field, objectField);
             }
-            return super.convertField(field);
+            return field;
+          }
+
+          @Override
+          public @NotNull Field convertLoggerField(@NotNull Field field) {
+            return convertField(field);
+          }
+
+          @Override
+          public @NotNull Field convertArgumentField(@NotNull Field field) {
+            return convertField(field);
           }
         };
     CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldConverter);
@@ -90,7 +107,7 @@ public class AttributesTest extends TestBase {
     assertThat(json).contains("@type");
   }
 
-  static class MyFieldBuilder implements FieldBuilder {
+  static class MyFieldBuilder implements DefaultFieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder() {};
     }
