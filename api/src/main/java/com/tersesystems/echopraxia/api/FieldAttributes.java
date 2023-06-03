@@ -41,7 +41,12 @@ public class FieldAttributes {
     return AS_CARDINAL_ATTR;
   }
 
-  public static Attribute<String> displayName(String displayName) {
+  /**
+   * Tells the formatter to render a display name in text.
+   *
+   * @return displayName attribute
+   */
+  public static Attribute<String> withDisplayName(String displayName) {
     return DISPLAY_NAME.bindValue(displayName);
   }
 

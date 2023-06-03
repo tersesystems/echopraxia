@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
-public final class DefaultField implements Field {
+public final class DefaultField implements Field, FieldAttributesAware<DefaultField> {
 
   private final String name;
   private final Value<?> value;
@@ -18,24 +18,24 @@ public final class DefaultField implements Field {
     this.attributes = attributes;
   }
 
-  public DefaultField asValueOnly() {
+  @Override
+  public @NotNull DefaultField asValueOnly() {
     return this.withAttribute(FieldAttributes.valueOnly());
   }
 
-  public DefaultField abbreviateAfter(int after) {
+  @Override
+  public @NotNull DefaultField abbreviateAfter(int after) {
     return this.withAttribute(FieldAttributes.abbreviateAfter(after));
   }
 
-  public DefaultField asCardinal() {
+  @Override
+  public @NotNull DefaultField asCardinal() {
     return this.withAttribute(FieldAttributes.asCardinal());
   }
 
-  public DefaultField withDisplayName(String displayName) {
-    return this.withAttribute(FieldAttributes.displayName(displayName));
-  }
-
-  protected @NotNull DefaultField newAttributes(@NotNull Attributes attrs) {
-    return new DefaultField(name, value, attrs);
+  @Override
+  public @NotNull DefaultField withDisplayName(String displayName) {
+    return this.withAttribute(FieldAttributes.withDisplayName(displayName));
   }
 
   @Override
@@ -101,5 +101,9 @@ public final class DefaultField implements Field {
 
   public String toString() {
     return EchopraxiaService.getInstance().getToStringFormatter().formatField(this);
+  }
+
+  private @NotNull DefaultField newAttributes(@NotNull Attributes attrs) {
+    return new DefaultField(name, value, attrs);
   }
 }
