@@ -12,7 +12,7 @@ public final class DefaultField implements Field, FieldAttributesAware<DefaultFi
   private final Value<?> value;
   private final Attributes attributes;
 
-  public DefaultField(String name, Value<?> value, Attributes attributes) {
+  public DefaultField(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
     this.name = Field.requireName(name);
     this.value = Field.requireValue(value);
     this.attributes = attributes;
@@ -34,7 +34,7 @@ public final class DefaultField implements Field, FieldAttributesAware<DefaultFi
   }
 
   @Override
-  public @NotNull DefaultField withDisplayName(String displayName) {
+  public @NotNull DefaultField withDisplayName(@NotNull String displayName) {
     return this.withAttribute(FieldAttributes.withDisplayName(displayName));
   }
 

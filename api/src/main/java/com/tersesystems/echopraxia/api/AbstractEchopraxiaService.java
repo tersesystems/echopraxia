@@ -5,7 +5,10 @@ import java.util.ServiceLoader;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 
-/** Abstract service with default implementations of exception handler and toString formatter. */
+/**
+ * Abstract service with default implementations of exception handler and toString formatter.
+ * @since 3.0
+ */
 public abstract class AbstractEchopraxiaService implements EchopraxiaService {
 
   private static final ClassLoader[] classLoaders = {ClassLoader.getSystemClassLoader()};
@@ -14,7 +17,7 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
   protected ToStringFormatter toStringFormatter;
   protected ExceptionHandler exceptionHandler;
 
-  private ConcurrentHashMap<Class<?>, FieldCreator<?>> fieldCreatorMap;
+  private final ConcurrentHashMap<Class<?>, FieldCreator<?>> fieldCreatorMap;
 
   public AbstractEchopraxiaService() {
     this.exceptionHandler = Throwable::printStackTrace;
@@ -50,7 +53,7 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
     return toStringFormatter;
   }
 
-  public <F extends Field> FieldCreator<F> getFieldCreator(Class<F> fieldClass) {
+  public <F extends Field> @NotNull FieldCreator<F> getFieldCreator(Class<F> fieldClass) {
     //noinspection unchecked
     return (FieldCreator<F>)
         fieldCreatorMap.computeIfAbsent(fieldClass, AbstractEchopraxiaService::loadFieldCreator);

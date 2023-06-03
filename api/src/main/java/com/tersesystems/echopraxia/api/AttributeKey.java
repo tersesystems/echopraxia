@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
  * A typed attribute key. Can be used with a display name argument for better visibility.
  *
  * @param <A> The type of the attribute.
+ * @since 3.0
  */
 public final class AttributeKey<A> {
 

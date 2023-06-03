@@ -6,6 +6,7 @@ import java.util.Objects;
  * A typed attribute with a key and value.
  *
  * @param <A> the type of the attribute value.
+ * @since 3.0
  */
 public final class Attribute<A> {
   private final AttributeKey<A> key;

@@ -11,6 +11,8 @@ import org.pcollections.PMap;
  *
  * <p>The elements inside Attributes cannot be enumerated -- It's not possible to access a value in
  * Attributes without holding the corresponding key.
+ *
+ * @since 3.0
  */
 public interface Attributes {
 

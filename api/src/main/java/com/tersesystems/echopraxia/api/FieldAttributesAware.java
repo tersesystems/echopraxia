@@ -2,7 +2,11 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-/** A field that has convenience methods for applying attributes. */
+/**
+ * A field that has convenience methods for applying attributes.
+ *
+ * @since 3.0
+ */
 public interface FieldAttributesAware<F extends Field> {
 
   /**
@@ -38,5 +42,5 @@ public interface FieldAttributesAware<F extends Field> {
    * @return displayName field
    */
   @NotNull
-  F withDisplayName(String displayName);
+  F withDisplayName(@NotNull String displayName);
 }
