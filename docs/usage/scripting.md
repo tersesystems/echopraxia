@@ -1,4 +1,4 @@
-## Dynamic Conditions with Scripts
+# Dynamic Conditions with Scripts
 
 One of the limitations of logging is that it's not that easy to change logging levels in an application at run-time.  In modern applications, you typically have complex inputs and may want to enable logging for some very specific inputs without turning on your logging globally.
 
@@ -28,7 +28,7 @@ Gradle:
 implementation "com.tersesystems.echopraxia:scripting:<VERSION>" 
 ```
 
-### Script Syntax
+## Script Syntax
 
 The call site for a script is the function `evaluate` inside a library called `echopraxia`.  The level and context are
 passed through as `(string level, dict ctx)`, where `ctx` is a dictionary of functions that connect back to the logging context.
@@ -104,7 +104,7 @@ library echopraxia {
 }
 ```
 
-### Creating Script Conditions
+## Creating Script Conditions
 
 The simplest way to handle a script is to pass it in directly as a string:
 
@@ -150,7 +150,7 @@ library echopraxia {
 
 You also have the option to store scripts in a key-value store or in a database.  See the [sqlite condition store example](https://github.com/tersesystems/echopraxia-examples/tree/main/conditionstore) for details.
 
-### User Defined Functions
+## User Defined Functions
 
 You have the option of passing in user defined functions into the script, in addition to the built-in scripts.
 
@@ -219,7 +219,7 @@ With this user defined function, you can set a logback property:
 
 And then access the property using `ctx[:logger_property]("herp")`.
 
-### Watched Scripts
+## Watched Scripts
 
 You can change file based scripts while the application is running, if they are in a directory watched by `ScriptWatchService`.
 

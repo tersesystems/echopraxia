@@ -1,7 +1,6 @@
+# Log4J2 Framework
 
-### Log4J
-
-Similar to Logstash, you can get access to Log4J specific features.
+Similar to Logstash, you can get access to Log4J specific features by casting to the underlying `Log4JCoreLogger` class.
 
 ```java
 import com.tersesystems.echopraxia.log4j.*;
@@ -9,6 +8,8 @@ import com.tersesystems.echopraxia.api.*;
 
 Log4JCoreLogger core = (Log4JCoreLogger) CoreLoggerFactory.getLogger();
 ```
+
+## Marker Access
 
 The `Log4JCoreLogger` has a `withMarker` method that takes a Log4J marker:
 
@@ -36,9 +37,7 @@ Log4JCoreLogger core = (Log4JCoreLogger) baseLogger.core();
 org.apache.logging.log4j.Logger log4jLogger = core.logger();
 ```
 
-
-
-### Direct Log4J API
+## Direct Log4J API
 
 In the event that the Log4J2 API must be used directly, an `EchopraxiaFieldsMessage` can be sent in for JSON rendering.
 

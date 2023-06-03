@@ -1,8 +1,4 @@
-
-
-
-
-## Conditions
+# Conditions
 
 Logging conditions can be handled gracefully using `Condition` functions.  A `Condition` will take a `Level` and a `LoggingContext` which will return the fields of the logger.
 
@@ -65,7 +61,7 @@ The `context` parameter that is passed in is a `LoggingContext` that contains th
 
 This is only a part of the available functionality in conditions.  You can tie conditions directly to a backend, such as a database or key/value store, or trigger them to work in response to an exception or unusual metrics.  See the [redis example](https://github.com/tersesystems/echopraxia-examples/tree/main/redis), [jmx example](https://github.com/tersesystems/echopraxia-examples/tree/main/jmx), [metrics example](https://github.com/tersesystems/echopraxia-examples/tree/main/metrics), and [timed diagnostic example](https://github.com/tersesystems/echopraxia-examples/tree/main/timed-diagnostic).
 
-### JSON Path
+## JSON Path
 
 In situations where you're looking through fields for a condition, you can use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
 
@@ -145,7 +141,7 @@ class FindException {
 
 There are many more options available using JSONPath.  You can try out the [online evaluator](https://jsonpath.herokuapp.com/) to test out expressions.
 
-### Logger
+## Logger
 
 You can use conditions in a logger, and statements will only log if the condition is met:
 
@@ -174,7 +170,7 @@ Condition cond = (level, ctx) -> ctx.findString("somename").isPresent();
 logger.withCondition(cond).info("some message", fb -> fb.string("somename", "somevalue")); // matches argument
 ```
 
-### Statement
+## Statement
 
 You can also use conditions in an individual statement:
 
@@ -182,7 +178,7 @@ You can also use conditions in an individual statement:
 logger.info(mustHaveFoo, "Only log if foo is present");
 ```
 
-### Predicates
+## Predicates
 
 Conditions can also be used in predicate blocks for expensive objects.
 

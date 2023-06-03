@@ -1,5 +1,7 @@
 
-## Basic Usage
+# Basic Usage
+
+Echopraxia is simple and easy to use, and looks very similar to SLF4J.
 
 Add the import:
 

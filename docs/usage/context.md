@@ -1,5 +1,4 @@
-
-## Context
+# Context
 
 You can also add fields directly to the logger using `logger.withFields` for contextual logging:
 
@@ -41,7 +40,7 @@ boolean enabled = logger.isInfoEnabled();
 
 The way that context works in conjunction with conditions is more involved, and is covered in the conditions section.
 
-### Thread Context
+## Thread Context
 
 You can also resolve any fields in Mapped Diagnostic Context (MDC) into fields, using `logger.withThreadContext()`.  This method provides a pre-built function that calls `fb.string` for each entry in the map.
 
@@ -54,7 +53,7 @@ myLogger.withThreadContext().info("This statement has MDC values in context");
 
 This method is call by name, and so will provide the MDC state as fields at the time the logging statement is evaluated.
 
-### Thread Safety
+## Thread Safety
 
 Thread safety is something to be aware of when using context fields.  While fields are thread-safe and using a context is far more convenient than using MDC, you do still have to be aware when you are accessing non-thread safe state.
 

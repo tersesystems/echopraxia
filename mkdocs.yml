@@ -10,7 +10,7 @@ site_url: "https://tersesystems.github.io/echopraxia"
 repo_name: echopraxia
 
 repo_url: "https://github.com/tersesystems/echopraxia"
-edit_uri: "edit/master/docs/"
+edit_uri: "edit/main/docs/"
 
 #Copyright (shown at the footer)
 #copyright: 'Copyright &copy; 2017 Your Name'
@@ -59,10 +59,11 @@ nav:
   - Home: index.md  
   - Installation: installation.md
   - Usage:
-    - Basics: usage/basics.md
+    - Basics: usage/basics.md    
+    - Field Builders: usage/fieldbuilder.md    
+    - Context: usage/context.md      
     - Conditions: usage/conditions.md
-    - Context: usage/context.md          
-    - Field Builders: usage/fieldbuilder.md      
+    - Custom Logger: usage/logger.md
     - Filters: usage/filters.md      
     - Scripting: usage/scripting.md
   - Frameworks:      
@@ -72,6 +73,4 @@ nav:
     - Diff Field Builder: additional/diff.md
     - Fluent Logger: additional/fluent.md
     - Semantic Logger: additional/semantic.md    
-  - Extending:
-    - Extending Logger: extending/logger.md    
   - FAQ: faq.md

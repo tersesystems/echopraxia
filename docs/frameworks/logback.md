@@ -1,4 +1,6 @@
-### Logstash API
+# Logstash Framework
+
+You can get access to the Logback and Logstash features by casting.
 
 First, import the `logstash` package.  This gets you access to the `CoreLoggerFactory` and  `CoreLogger`, which can be cast to `LogstashCoreLogger`:
 
@@ -8,6 +10,8 @@ import com.tersesystems.echopraxia.api.*;
 
 LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
 ```
+
+## Markers
 
 The `LogstashCoreLogger` has a `withMarkers` method that takes an SLF4J marker:
 
@@ -34,7 +38,7 @@ LogstashCoreLogger core = (LogstashCoreLogger) baseLogger.core();
 org.slf4j.Logger slf4jLogger = core.logger();
 ```
 
-### Direct Logback / SLF4J API
+## Direct Logback / SLF4J API
 
 There will be times when the application uses an SLF4J logger, and it's not feasible to use an Echopraxia Logger.  This is not a problem: you can pass Echopraxia fields directly as arguments through SLF4J, and they will be rendered as expected.  You'll need to have a field builder in scope:
 
@@ -106,8 +110,6 @@ To integrate this with Logback, you will need to have a `ConditionTurboFilter` w
     </root>
 </configuration>
 ```
-
-
 
 ## Logback Converters
 

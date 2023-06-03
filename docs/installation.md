@@ -3,13 +3,26 @@
 Echopraxia is divided into two sections: the user logger APIs (`logger`, `fluent`, `semantic`) and an 
 underlying `CoreLogger` implementation which is tied to the logging framework.  
 
-You will need to install both, although in 99% of cases you will want `logger`.
+You will need to install both, although in 99% of cases you will want `logger`:
+Maven:
 
-## Core Loggers
+```xml
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>logger</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+Gradle:
+
+```gradle
+implementation "com.tersesystems.echopraxia:logger:<VERSION>" 
+```
 
 There are core loggers for Logback, Log4J2, and JUL.
 
-### Logstash Core Logger
+## Logstash Core Logger
 
 There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder).  This library does not provide a front end logger API, so you must pick (or create) one yourself, i.e. normal, async, fluent, or semantic.  
 
@@ -31,7 +44,7 @@ implementation "com.tersesystems.echopraxia:logstash:<VERSION>"
 
 There are a couple of features that are Logback specific, such as the [logback converters(#logback-converters) and the direct Logback API.
 
-### Log4J Core Logger
+## Log4J Core Logger
 
 There is a Log4J implementation that works with the [JSON Template Layout](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html).  This provides a core logger implementation but does not provide a user visible logging API.
 
@@ -91,7 +104,7 @@ If you want to separate the context fields from the argument fields, you can def
 
 Unfortunately, I don't know of a way to "flatten" fields so that they show up on the root object instead of under an additional field.  If you know how to do this, let me know!
 
-### JUL (java.util.logging) Core Logger
+## JUL (java.util.logging) Core Logger
 
 There is a JUL implementation.
 
@@ -100,7 +113,7 @@ Maven:
 ```xml
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
-  <artifactId>log4j</artifactId>
+  <artifactId>jul</artifactId>
   <version><VERSION></version>
 </dependency>
 ```
@@ -108,7 +121,7 @@ Maven:
 Gradle:
 
 ```gradle
-implementation "com.tersesystems.echopraxia:log4j:<VERSION>" 
+implementation "com.tersesystems.echopraxia:jul:<VERSION>" 
 ```
 
 You will probably want to configure JUL by calling `logManager.readConfiguration`:
@@ -142,21 +155,3 @@ The `use_slf4j_level_names` property will map from JUL's levels to SLF4J, mappin
 
 JUL's default class/method inference is disabled as it is not useful here and needlessly slows down logging.
 
-
-For most, you will be working with the basic logger, which uses a pluggable `FieldBuilder`.  The logger API is a separate dependency -- if you want, you can easily create your own custom logger, so the logger is not packaged with the API.
-
-Maven:
-
-```xml
-<dependency>
-  <groupId>com.tersesystems.echopraxia</groupId>
-  <artifactId>logger</artifactId>
-  <version>VERSION</version>
-</dependency>
-```
-
-Gradle:
-
-```gradle
-implementation "com.tersesystems.echopraxia:logger:<VERSION>" 
-```

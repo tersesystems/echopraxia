@@ -1,5 +1,5 @@
 
-## Custom Logger Factories
+# Custom Logger
 
 If you are using a particular set of field builders for your domain and want them available by default, it's easy to create your own logger with your own field builder, using the support classes and interfaces.  
 

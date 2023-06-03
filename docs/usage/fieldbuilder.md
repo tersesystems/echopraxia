@@ -1,7 +1,6 @@
+# Field Builders
 
-### Custom Field Builders
-
-Echopraxia lets you specify custom field builders whenever you want to log domain objects:
+Echopraxia lets you specify field builders whenever you want to log domain objects:
 
 ```java
 import com.tersesystems.echopraxia.api.*;
@@ -63,7 +62,7 @@ Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFie
 personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 ```
 
-### Nulls and Exceptions
+## Nulls and Exceptions
 
 By default, values are `@NotNull`, and passing in `null` to values is not recommended.  If you want to handle nulls, you can extend the field builder as necessary:
 
@@ -85,7 +84,9 @@ logger.info("Message name {}", fb ->
 );
 ```
 
-Because a field builder function runs in a closure, if an exception occurs it will be caught by the default thread exception handler.  If it's the main thread, it will print to console and terminate the JVM, but other threads [will swallow the exception whole](https://stackoverflow.com/questions/24834702/do-errors-thrown-within-uncaughtexceptionhandler-get-swallowed).  Consider setting a [default thread exception handler](https://www.logicbig.com/tutorials/core-java-tutorial/java-se-api/default-uncaught-exception-handler.html) that additionally logs, and avoid uncaught exceptions in field builder closures:
+## Exceptions
+
+Avoid throwing exceptions in a field builder function.  Because a field builder function runs in a closure, if an exception is thrown it will be caught by Echopraxia's error handler which writes the exception to `System.err` by default.  
 
 ```java
 logger.info("Message name {}", fb -> {

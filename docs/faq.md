@@ -1,9 +1,10 @@
+# Freqently Asked Questions
 
-## Statement of Intent
+## Is this a replacement for SLF4J and/or Log4J?
 
 **Echopraxia is not a replacement for SLF4J**.  It is not an attempt to compete with Log4J2 API, JUL, commons-logging for the title of "one true logging API" and restart the [logging mess](https://techblog.bozho.net/the-logging-mess/).  SLF4J won that fight [a long time ago](https://www.semanticscholar.org/paper/Studying-the-Use-of-Java-Logging-Utilities-in-the-Chen-Jiang/be39720a72f04c92b9aece9548171d5fa3a627e6).
 
-Echopraxia is a structured logging API.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging, e.g. a web application where you've decided to use [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder) already.
+Echopraxia is a structured logging API -- it gives the user the ability to provide structured input directly from the application.  It is an appropriate solution **when you control the logging implementation** and have decided you're going to do structured logging output, e.g. a web application where you've decided to use [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder).
 
 SLF4J is an appropriate solution **when you do not control the logging output**, e.g. in an open-source library that could be used in arbitrary situations by anybody.  
 
@@ -11,7 +12,7 @@ SLF4J is an appropriate solution **when you do not control the logging output**,
 
 Echopraxia is best described as a specialization or augmentation for application code -- as you're building framework support code for your application and build up your domain objects, you can write custom field builders, then log everywhere in your application with a consistent schema.
 
-### Why Structured Logging?
+## Why Structured Logging?
 
 Structured logging enables logs to be queried as [semi-structured data](https://en.wikipedia.org/wiki/Semi-structured_data).  There are other structured logging frameworks, like [Structlog](https://www.structlog.org/en/stable/) (Python), [Ruby-Cabin](https://github.com/jordansissel/ruby-cabin) (Ruby), [Logrus](https://github.com/sirupsen/logrus) (Go), and [Serilog](https://serilog.net/) (C#).
 
@@ -21,7 +22,7 @@ Structured logging enables logs to be queried as [semi-structured data](https://
 
 From a logging API perspective, structured logging is interesting because it is [composable](https://en.wikipedia.org/wiki/Composability) -- structured data can be added to a logger and build up context. You can read more about structured logging [here](https://tersesystems.com/blog/2020/03/10/a-taxonomy-of-logging/).
 
-### Why Conditions?
+## Why Conditions?
 
 Conditions address the challenge of "whether-to-log", which concerns with dynamically adjusting the degree of logging in response to the runtime requirements.  A statement is only logged if it passes the condition associated with it.
 
