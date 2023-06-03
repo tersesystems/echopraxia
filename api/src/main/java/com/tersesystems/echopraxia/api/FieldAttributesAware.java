@@ -37,6 +37,14 @@ public interface FieldAttributesAware<F extends Field> {
   F asCardinal();
 
   /**
+   * Tells the formatter that this field should be elided in text.
+   *
+   * @return field with elide attribute
+   */
+  @NotNull
+  F asElided();
+
+  /**
    * Tells the formatter to render a display name in text.
    *
    * @return displayName field

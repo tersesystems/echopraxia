@@ -15,10 +15,15 @@ public class FieldAttributes {
   public static final AttributeKey<Boolean> AS_CARDINAL = AttributeKey.create("asCardinal");
   public static final AttributeKey<String> DISPLAY_NAME = AttributeKey.create("displayName");
 
+  public static final AttributeKey<Boolean> ELIDE = AttributeKey.create("elide");
+
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
   private static final Attribute<Boolean> VALUE_ONLY_ATTR = VALUE_ONLY.bindValue(true);
-  private static final Attributes VALUE_ONLY_ATTRS = Attributes.create(FieldAttributes.valueOnly());
+  private static final Attribute<Boolean> ELIDE_ATTR = ELIDE.bindValue(true);
+
+  private static final Attributes VALUE_ONLY_ATTRS =
+      Attributes.create(FieldAttributes.asValueOnly());
 
   // package-private static, we only use this in Field.value as a shortcut
   static Attributes valueOnlyAttributes() {
@@ -32,7 +37,7 @@ public class FieldAttributes {
    * @return valueOnly attribute
    */
   @NotNull
-  public static Attribute<Boolean> valueOnly() {
+  public static Attribute<Boolean> asValueOnly() {
     return VALUE_ONLY_ATTR;
   }
 
@@ -63,5 +68,14 @@ public class FieldAttributes {
    */
   public static Attribute<Integer> abbreviateAfter(Integer after) {
     return ABBREVIATE_AFTER.bindValue(after);
+  }
+
+  /**
+   * Tells the formatter to render nothing in text.
+   *
+   * @return elide attribute
+   */
+  public static Attribute<Boolean> asElided() {
+    return ELIDE_ATTR;
   }
 }

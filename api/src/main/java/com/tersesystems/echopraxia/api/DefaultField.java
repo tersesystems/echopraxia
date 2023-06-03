@@ -26,7 +26,7 @@ public final class DefaultField implements Field, FieldAttributesAware<DefaultFi
 
   @Override
   public @NotNull DefaultField asValueOnly() {
-    return this.withAttribute(FieldAttributes.valueOnly());
+    return this.withAttribute(FieldAttributes.asValueOnly());
   }
 
   @Override
@@ -37,6 +37,11 @@ public final class DefaultField implements Field, FieldAttributesAware<DefaultFi
   @Override
   public @NotNull DefaultField asCardinal() {
     return this.withAttribute(FieldAttributes.asCardinal());
+  }
+
+  @Override
+  public @NotNull DefaultField asElided() {
+    return this.withAttribute(FieldAttributes.asElided());
   }
 
   @Override
