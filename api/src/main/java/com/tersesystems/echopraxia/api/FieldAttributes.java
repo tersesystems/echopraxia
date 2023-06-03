@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * These are common field attributes used for rendering.
+ *
  * @since 3.0
  */
 public class FieldAttributes {

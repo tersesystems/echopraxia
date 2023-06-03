@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * Abstract service with default implementations of exception handler and toString formatter.
+ *
  * @since 3.0
  */
 public abstract class AbstractEchopraxiaService implements EchopraxiaService {

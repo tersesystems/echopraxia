@@ -12,7 +12,8 @@ public final class DefaultField implements Field, FieldAttributesAware<DefaultFi
   private final Value<?> value;
   private final Attributes attributes;
 
-  public DefaultField(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
+  public DefaultField(
+      @NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
     this.name = Field.requireName(name);
     this.value = Field.requireValue(value);
     this.attributes = attributes;

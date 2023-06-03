@@ -18,7 +18,7 @@ public abstract class AbstractLoggerSupport<SELF extends AbstractLoggerSupport<S
 
   @SuppressWarnings("unchecked")
   protected AbstractLoggerSupport(
-      @NotNull CoreLogger core, @NotNull FB fieldBuilder, Class<?> selfType) {
+      @NotNull CoreLogger core, @NotNull FB fieldBuilder, @NotNull Class<?> selfType) {
     myself = (SELF) selfType.cast(this);
     this.core = core;
     this.fieldBuilder = fieldBuilder;
