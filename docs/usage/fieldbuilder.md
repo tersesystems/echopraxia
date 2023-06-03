@@ -100,7 +100,7 @@ cardinalField.toString(); // renders elements=|3|
 
 The `withDisplayName` method shows a human readable string in text format bracketed in quotes:
 
-```
+```java
 Field readableField = keyValue("json_field", Value.number(1), DefaultField.class).withDisplayName("human readable name");
 readableField.toString() // renders "human readable name"=1
 ```
@@ -109,10 +109,31 @@ readableField.toString() // renders "human readable name"=1
 
 The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
 
-```
+```java
 Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), DefaultField.class).abbreviateAfter(5);
 abbrField.toString() // renders abbreviatedField=12345...
 ```
+
+## asElided
+
+The `asElided` method will elide the field so that it is passed over and does not show in text format:
+
+```java
+Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), DefaultField.class).asElided();
+abbrField.toString() // renders ""
+```
+
+This is particularly useful in objects that have elided children that you don't need to see in the message:
+
+```java
+Field first = keyValue("first", string("bar"), DefaultField.class).asElided();
+Field second = keyValue("second", string("bar"), DefaultField.class);
+Field third = keyValue("third", string("bar"), DefaultField.class).asElided();
+List<Field> fields = List.of(first, second, third);
+Field object = keyValue("object", Value.object(fields), DefaultField.class);
+assertThat(object.toString()).isEqualTo("object={second=bar}");
+```
+
 
 ## Nulls
 
