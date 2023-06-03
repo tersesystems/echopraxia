@@ -25,12 +25,52 @@ public class ElidedTests {
   }
 
   @Test
-  public void elideMiddle() {
+  public void elideFirstAndLast() {
     Field first = keyValue("first", string("bar"), DefaultField.class).asElided();
     Field second = keyValue("second", string("bar"), DefaultField.class);
     Field third = keyValue("third", string("bar"), DefaultField.class).asElided();
     List<Field> fields = List.of(first, second, third);
     Field object = keyValue("object", Value.object(fields), DefaultField.class);
     assertThat(object.toString()).isEqualTo("object={second=bar}");
+  }
+
+  @Test
+  public void elideMiddle() {
+    Field first = keyValue("first", string("bar"), DefaultField.class);
+    Field second = keyValue("second", string("bar"), DefaultField.class).asElided();
+    Field third = keyValue("third", string("bar"), DefaultField.class);
+    List<Field> fields = List.of(first, second, third);
+    Field object = keyValue("object", Value.object(fields), DefaultField.class);
+    assertThat(object.toString()).isEqualTo("object={first=bar, third=bar}");
+  }
+
+  @Test
+  public void elideFirstAndSecond() {
+    Field first = keyValue("first", string("bar"), DefaultField.class).asElided();
+    Field second = keyValue("second", string("bar"), DefaultField.class).asElided();
+    Field third = keyValue("third", string("bar"), DefaultField.class);
+    List<Field> fields = List.of(first, second, third);
+    Field object = keyValue("object", Value.object(fields), DefaultField.class);
+    assertThat(object.toString()).isEqualTo("object={third=bar}");
+  }
+
+  @Test
+  public void elideSecondAndThird() {
+    Field first = keyValue("first", string("bar"), DefaultField.class);
+    Field second = keyValue("second", string("bar"), DefaultField.class).asElided();
+    Field third = keyValue("third", string("bar"), DefaultField.class).asElided();
+    List<Field> fields = List.of(first, second, third);
+    Field object = keyValue("object", Value.object(fields), DefaultField.class);
+    assertThat(object.toString()).isEqualTo("object={first=bar}");
+  }
+
+  @Test
+  public void elideAll() {
+    Field first = keyValue("first", string("bar"), DefaultField.class).asElided();
+    Field second = keyValue("second", string("bar"), DefaultField.class).asElided();
+    Field third = keyValue("third", string("bar"), DefaultField.class).asElided();
+    List<Field> fields = List.of(first, second, third);
+    Field object = keyValue("object", Value.object(fields), DefaultField.class);
+    assertThat(object.toString()).isEqualTo("object={}");
   }
 }

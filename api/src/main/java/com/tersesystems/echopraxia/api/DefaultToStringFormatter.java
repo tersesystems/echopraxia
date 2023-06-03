@@ -91,19 +91,18 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     // render an object with curly braces to distinguish from array.
     final List<Field> fieldList = v.raw();
     b.append("{");
-    int elements = fieldList.size() - 1;
+    boolean displayComma = false;
     for (int i = 0; i < fieldList.size(); i++) {
       Field field = fieldList.get(i);
-      if (isElided(field)) {
-        elements -= 1;
-      } else {
+      if (!isElided(field)) {
+        if (displayComma) {
+          b.append(", ");
+        }
         if (!isValueOnly(field)) {
           formatName(b, field.name(), field.attributes());
         }
         formatValue(b, field.value(), field.attributes());
-        if (i < elements) {
-          b.append(", ");
-        }
+        displayComma = i < fieldList.size();
       }
     }
     b.append("}");

@@ -134,7 +134,6 @@ Field object = keyValue("object", Value.object(fields), DefaultField.class);
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
-
 ## Nulls
 
 By default, values are `@NotNull`, and passing in `null` to values is not recommended.  It's recommended to use `Value.optional` over null, if possible.
