@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * The default field implementation.
+ *
+ * @since 3.0
+ */
 public final class DefaultField implements Field, FieldAttributesAware<DefaultField> {
 
   private final String name;
