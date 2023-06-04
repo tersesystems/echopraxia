@@ -553,7 +553,7 @@ public class JULCoreLogger implements CoreLogger {
     int i = 0;
     Throwable thrown = null;
     for (Field f : argumentFields) {
-      arguments[i++] = (Field) this.fieldTransformer.convertArgumentField(f);
+      arguments[i++] = (Field) this.fieldTransformer.tranformArgumentField(f);
       if (f.value() instanceof Value.ExceptionValue) {
         thrown = (Throwable) f.value().raw();
         break;
@@ -564,7 +564,7 @@ public class JULCoreLogger implements CoreLogger {
     List<Field> loggerFields = ctx.getLoggerFields();
     final Field[] fields = new Field[loggerFields.size()];
     for (Field f : loggerFields) {
-      fields[i++] = (Field) this.fieldTransformer.convertLoggerField(f);
+      fields[i++] = (Field) this.fieldTransformer.transformLoggerField(f);
     }
     return new EchopraxiaLogRecord(getName(), julLevel, messageTemplate, arguments, fields, thrown);
   }

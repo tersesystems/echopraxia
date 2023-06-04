@@ -651,7 +651,7 @@ public class LogstashCoreLogger implements CoreLogger {
       if (value.type() == Value.Type.EXCEPTION) {
         throwable = ((Value.ExceptionValue) value).raw();
       }
-      Field arg = fieldTransformer.convertArgumentField(field);
+      Field arg = fieldTransformer.tranformArgumentField(field);
       arguments.add(new FieldMarker(arg));
     }
 
@@ -787,7 +787,7 @@ public class LogstashCoreLogger implements CoreLogger {
     } else {
       final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
       for (Field field : fields) {
-        Field loggerField = fieldTransformer.convertLoggerField(field);
+        Field loggerField = fieldTransformer.transformLoggerField(field);
         markerList.add(new FieldMarker(loggerField));
       }
       if (ctxMarker != null) {

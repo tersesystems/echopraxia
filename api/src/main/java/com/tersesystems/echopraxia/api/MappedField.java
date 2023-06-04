@@ -3,6 +3,11 @@ package com.tersesystems.echopraxia.api;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A field that has different representations for text (logfmt) vs structured (JSON) output.
+ *
+ * @since 3.0
+ */
 public class MappedField implements Field {
 
   private final Field textField;

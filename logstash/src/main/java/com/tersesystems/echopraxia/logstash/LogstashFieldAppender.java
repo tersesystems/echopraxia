@@ -41,7 +41,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
       if (marker instanceof DirectFieldMarker) {
         final List<Field> fields = ((DirectFieldMarker) marker).getFields();
         for (Field field : fields) {
-          Field loggerField = fieldTransformer.convertLoggerField(field);
+          Field loggerField = fieldTransformer.transformLoggerField(field);
           markers.add(new FieldMarker(loggerField));
         }
       }
@@ -51,7 +51,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
         if (m instanceof DirectFieldMarker) {
           final List<Field> fields = ((DirectFieldMarker) m).getFields();
           for (Field field : fields) {
-            Field loggerField = fieldTransformer.convertLoggerField(field);
+            Field loggerField = fieldTransformer.transformLoggerField(field);
             markers.add(new FieldMarker(loggerField));
           }
         }
@@ -67,7 +67,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
         final Object arg = argumentArray[i];
         if (arg instanceof Field) {
           Field field = (Field) arg;
-          Field converted = fieldTransformer.convertArgumentField(field);
+          Field converted = fieldTransformer.tranformArgumentField(field);
           argumentArray[i] = new FieldMarker(converted);
 
           // swap out the throwable if one is found

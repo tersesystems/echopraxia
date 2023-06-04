@@ -3,6 +3,11 @@ package com.tersesystems.echopraxia.api;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A field transformer that dispatches the field to a FieldVisitor.
+ *
+ * @since 3.0
+ */
 public class DispatchFieldTransformer implements FieldTransformer {
 
   private final FieldVisitor visitor;
@@ -12,12 +17,12 @@ public class DispatchFieldTransformer implements FieldTransformer {
   }
 
   @Override
-  public @NotNull Field convertArgumentField(@NotNull Field field) {
+  public @NotNull Field tranformArgumentField(@NotNull Field field) {
     return dispatch(field, visitor);
   }
 
   @Override
-  public @NotNull Field convertLoggerField(@NotNull Field field) {
+  public @NotNull Field transformLoggerField(@NotNull Field field) {
     return dispatch(field, visitor);
   }
 
@@ -36,7 +41,8 @@ public class DispatchFieldTransformer implements FieldTransformer {
       case OBJECT:
         FieldVisitor.ObjectVisitor objectVisitor = visitor.visitObject();
         for (Field child : f.value().asObject().raw()) {
-          objectVisitor.visit(child);
+          FieldVisitor subVisitor = objectVisitor.visitChild();
+          objectVisitor.visit(dispatch(child, subVisitor));
         }
         return objectVisitor.done();
 

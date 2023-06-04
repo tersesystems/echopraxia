@@ -30,5 +30,7 @@ public interface FieldVisitor {
     Field done();
 
     void visit(Field child);
+
+    FieldVisitor visitChild();
   }
 }
