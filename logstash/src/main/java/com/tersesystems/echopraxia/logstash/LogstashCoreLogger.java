@@ -37,7 +37,7 @@ public class LogstashCoreLogger implements CoreLogger {
   private final Executor executor;
   private final String fqcn;
   private final Supplier<Runnable> threadContextFunction;
-  private final FieldConverter fieldConverter;
+  private final FieldTransformer fieldTransformer;
 
   public LogstashCoreLogger(@NotNull String fqcn, @NotNull ch.qos.logback.classic.Logger logger) {
     this.fqcn = fqcn;
@@ -46,7 +46,7 @@ public class LogstashCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = mdcContext();
-    this.fieldConverter = FieldConverter.identity();
+    this.fieldTransformer = FieldTransformer.identity();
   }
 
   public LogstashCoreLogger(
@@ -56,14 +56,14 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Condition condition,
       @NotNull Executor executor,
       @NotNull Supplier<Runnable> threadContextSupplier,
-      @NotNull FieldConverter fieldConverter) {
+      @NotNull FieldTransformer fieldTransformer) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = context;
     this.condition = condition;
     this.executor = executor;
     this.threadContextFunction = threadContextSupplier;
-    this.fieldConverter = fieldConverter;
+    this.fieldTransformer = fieldTransformer;
   }
 
   private Supplier<Runnable> mdcContext() {
@@ -120,12 +120,12 @@ public class LogstashCoreLogger implements CoreLogger {
         condition,
         executor,
         threadContextFunction,
-        fieldConverter);
+        fieldTransformer);
   }
 
-  public @NotNull CoreLogger withFieldConverter(FieldConverter fieldConverter) {
+  public @NotNull CoreLogger withFieldTransformer(FieldTransformer fieldTransformer) {
     return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldTransformer);
   }
 
   @Override
@@ -140,7 +140,7 @@ public class LogstashCoreLogger implements CoreLogger {
         condition,
         executor,
         threadContextFunction,
-        fieldConverter);
+        fieldTransformer);
   }
 
   @Override
@@ -149,7 +149,7 @@ public class LogstashCoreLogger implements CoreLogger {
     LogstashMarkerContext newContext =
         context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
     return new LogstashCoreLogger(
-        fqcn, logger, newContext, condition, executor, threadContextFunction, fieldConverter);
+        fqcn, logger, newContext, condition, executor, threadContextFunction, fieldTransformer);
   }
 
   @Override
@@ -168,7 +168,7 @@ public class LogstashCoreLogger implements CoreLogger {
           };
         };
     return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, joinedThreadContextFunction, fieldConverter);
+        fqcn, logger, context, condition, executor, joinedThreadContextFunction, fieldTransformer);
   }
 
   @Override
@@ -181,7 +181,7 @@ public class LogstashCoreLogger implements CoreLogger {
         return this;
       }
       return new LogstashCoreLogger(
-          fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+          fqcn, logger, context, condition, executor, threadContextFunction, fieldTransformer);
     }
     return new LogstashCoreLogger(
         fqcn,
@@ -190,19 +190,19 @@ public class LogstashCoreLogger implements CoreLogger {
         this.condition.and(condition),
         executor,
         threadContextFunction,
-        fieldConverter);
+        fieldTransformer);
   }
 
   @Override
   public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
     return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldTransformer);
   }
 
   @Override
   public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
     return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, threadContextFunction, fieldConverter);
+        fqcn, logger, context, condition, executor, threadContextFunction, fieldTransformer);
   }
 
   @Override
@@ -651,7 +651,7 @@ public class LogstashCoreLogger implements CoreLogger {
       if (value.type() == Value.Type.EXCEPTION) {
         throwable = ((Value.ExceptionValue) value).raw();
       }
-      Field arg = fieldConverter.convertArgumentField(field);
+      Field arg = fieldTransformer.convertArgumentField(field);
       arguments.add(new FieldMarker(arg));
     }
 
@@ -742,7 +742,7 @@ public class LogstashCoreLogger implements CoreLogger {
 
   protected LogstashCoreLogger newLogger(LogstashMarkerContext newContext) {
     return new LogstashCoreLogger(
-        fqcn, logger, newContext, condition, executor, threadContextFunction, fieldConverter);
+        fqcn, logger, newContext, condition, executor, threadContextFunction, fieldTransformer);
   }
 
   @NotNull
@@ -787,7 +787,7 @@ public class LogstashCoreLogger implements CoreLogger {
     } else {
       final List<Marker> markerList = new ArrayList<>(fields.size() + 1);
       for (Field field : fields) {
-        Field loggerField = fieldConverter.convertLoggerField(field);
+        Field loggerField = fieldTransformer.convertLoggerField(field);
         markerList.add(new FieldMarker(loggerField));
       }
       if (ctxMarker != null) {
