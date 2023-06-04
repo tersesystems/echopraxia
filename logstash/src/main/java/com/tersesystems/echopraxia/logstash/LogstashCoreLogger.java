@@ -120,7 +120,7 @@ public class LogstashCoreLogger implements CoreLogger {
         condition,
         executor,
         threadContextFunction,
-            fieldTransformer);
+        fieldTransformer);
   }
 
   public @NotNull CoreLogger withFieldConverter(FieldTransformer fieldTransformer) {
@@ -140,7 +140,7 @@ public class LogstashCoreLogger implements CoreLogger {
         condition,
         executor,
         threadContextFunction,
-            fieldTransformer);
+        fieldTransformer);
   }
 
   @Override
@@ -190,7 +190,7 @@ public class LogstashCoreLogger implements CoreLogger {
         this.condition.and(condition),
         executor,
         threadContextFunction,
-            fieldTransformer);
+        fieldTransformer);
   }
 
   @Override
