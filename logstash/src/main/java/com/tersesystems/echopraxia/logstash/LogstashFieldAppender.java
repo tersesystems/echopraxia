@@ -6,7 +6,7 @@ import ch.qos.logback.classic.spi.ThrowableProxy;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldConverter;
 import com.tersesystems.echopraxia.api.Value;
-import com.tersesystems.echopraxia.logback.FieldMarker;
+import com.tersesystems.echopraxia.logback.DirectFieldMarker;
 import com.tersesystems.echopraxia.logback.TransformingAppender;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,21 +38,21 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
     final Marker marker = eventObject.getMarker();
     if (marker != null) {
       List<Marker> markers = new ArrayList<>();
-      if (marker instanceof FieldMarker) {
-        final List<Field> fields = ((FieldMarker) marker).getFields();
+      if (marker instanceof DirectFieldMarker) {
+        final List<Field> fields = ((DirectFieldMarker) marker).getFields();
         for (Field field : fields) {
           Field loggerField = fieldConverter.convertLoggerField(field);
-          markers.add(new com.tersesystems.echopraxia.logstash.FieldMarker(loggerField));
+          markers.add(new FieldMarker(loggerField));
         }
       }
       final Iterator<Marker> iterator = marker.iterator();
       for (Marker m; iterator.hasNext(); ) {
         m = iterator.next();
-        if (m instanceof FieldMarker) {
-          final List<Field> fields = ((FieldMarker) m).getFields();
+        if (m instanceof DirectFieldMarker) {
+          final List<Field> fields = ((DirectFieldMarker) m).getFields();
           for (Field field : fields) {
             Field loggerField = fieldConverter.convertLoggerField(field);
-            markers.add(new com.tersesystems.echopraxia.logstash.FieldMarker(loggerField));
+            markers.add(new FieldMarker(loggerField));
           }
         }
       }
@@ -68,7 +68,7 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
         if (arg instanceof Field) {
           Field field = (Field) arg;
           Field converted = fieldConverter.convertArgumentField(field);
-          argumentArray[i] = new com.tersesystems.echopraxia.logstash.FieldMarker(converted);
+          argumentArray[i] = new FieldMarker(converted);
 
           // swap out the throwable if one is found
           if (eventObject.getThrowableProxy() == null) {

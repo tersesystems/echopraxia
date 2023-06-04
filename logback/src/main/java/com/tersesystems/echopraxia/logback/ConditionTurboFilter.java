@@ -104,16 +104,16 @@ public class ConditionTurboFilter extends TurboFilter {
       if (marker == null) {
         return Collections.emptyList();
       }
-      if (marker instanceof FieldMarker) {
-        return ((FieldMarker) marker).getFields();
+      if (marker instanceof DirectFieldMarker) {
+        return ((DirectFieldMarker) marker).getFields();
       }
       if (marker.hasReferences()) {
         List<Field> list = new ArrayList<>();
         Iterator<Marker> iterator = marker.iterator();
         while (iterator.hasNext()) {
           Marker m = iterator.next();
-          if (m instanceof FieldMarker) {
-            list.addAll(((FieldMarker) m).getFields());
+          if (m instanceof DirectFieldMarker) {
+            list.addAll(((DirectFieldMarker) m).getFields());
           }
         }
         return list;
