@@ -40,7 +40,7 @@ public class AttributesTest extends TestBase {
             return field;
           }
         };
-    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldTransformer);
+    CoreLogger coreLogger = getCoreLogger().withFieldTransformer(fieldTransformer);
     Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
 
     logger.info("message {}", fb -> fb.string("foo", "bar").withAttribute(IN_BED_ATTR));
@@ -74,7 +74,7 @@ public class AttributesTest extends TestBase {
             return field;
           }
         };
-    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldTransformer);
+    CoreLogger coreLogger = getCoreLogger().withFieldTransformer(fieldTransformer);
     Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
     logger.info("date shows {}", fb -> fb.instant(Instant.ofEpochMilli(0)));
 

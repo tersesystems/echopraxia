@@ -135,7 +135,7 @@ public class Log4JCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull CoreLogger withFieldConverter(FieldTransformer fieldTransformer) {
+  public @NotNull CoreLogger withFieldTransformer(FieldTransformer fieldTransformer) {
     return new Log4JCoreLogger(
         fqcn, logger, context, condition, executor, threadContextFunction, fieldTransformer);
   }

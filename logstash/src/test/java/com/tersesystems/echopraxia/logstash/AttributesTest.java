@@ -43,7 +43,7 @@ public class AttributesTest extends TestBase {
             return convertField(field);
           }
         };
-    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldTransformer);
+    CoreLogger coreLogger = getCoreLogger().withFieldTransformer(fieldTransformer);
     Logger<DefaultFieldBuilder> logger = LoggerFactory.getLogger(coreLogger);
 
     String cookieSaying = "you will have a long and illustrious career";
@@ -90,7 +90,7 @@ public class AttributesTest extends TestBase {
             return convertField(field);
           }
         };
-    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldTransformer);
+    CoreLogger coreLogger = getCoreLogger().withFieldTransformer(fieldTransformer);
     Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
     logger.info("date shows {}", fb -> fb.instant(Instant.ofEpochMilli(0)));
 

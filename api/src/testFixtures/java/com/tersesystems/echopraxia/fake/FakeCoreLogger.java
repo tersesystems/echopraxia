@@ -120,7 +120,7 @@ public class FakeCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull CoreLogger withFieldConverter(FieldTransformer fieldTransformer) {
+  public @NotNull CoreLogger withFieldTransformer(FieldTransformer fieldTransformer) {
     return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier, fieldTransformer);
   }
 

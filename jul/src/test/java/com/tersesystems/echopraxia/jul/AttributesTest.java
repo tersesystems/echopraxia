@@ -44,7 +44,7 @@ public class AttributesTest extends TestBase {
     var converter = new InstantFieldTransformer();
     java.util.logging.Logger julLogger = java.util.logging.Logger.getLogger(getClass().getName());
     JULCoreLogger coreLogger =
-        new JULCoreLogger(Logger.FQCN, julLogger).withFieldConverter(converter);
+        new JULCoreLogger(Logger.FQCN, julLogger).withFieldTransformer(converter);
     Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.INSTANCE);
     logger.debug("hello {0}", fb -> fb.instant("name", Instant.ofEpochMilli(0)));
 

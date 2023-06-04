@@ -124,7 +124,7 @@ public class JULCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull JULCoreLogger withFieldConverter(FieldTransformer fieldTransformer) {
+  public @NotNull JULCoreLogger withFieldTransformer(FieldTransformer fieldTransformer) {
     return newLogger(fieldTransformer);
   }
 

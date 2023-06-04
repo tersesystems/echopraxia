@@ -123,7 +123,7 @@ public class LogstashCoreLogger implements CoreLogger {
         fieldTransformer);
   }
 
-  public @NotNull CoreLogger withFieldConverter(FieldTransformer fieldTransformer) {
+  public @NotNull CoreLogger withFieldTransformer(FieldTransformer fieldTransformer) {
     return new LogstashCoreLogger(
         fqcn, logger, context, condition, executor, threadContextFunction, fieldTransformer);
   }
