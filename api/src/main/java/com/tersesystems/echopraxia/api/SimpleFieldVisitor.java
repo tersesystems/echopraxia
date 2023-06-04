@@ -24,6 +24,48 @@ public class SimpleFieldVisitor implements FieldVisitor {
   }
 
   @Override
+  public Field visit(Field f) {
+    visitAttributes(f.attributes());
+    visitName(f.name());
+    switch (f.value().type()) {
+      case ARRAY:
+        FieldVisitor.ArrayVisitor arrayVisitor = visitArray();
+        List<Value<?>> raw = f.value().asArray().raw();
+        for (Value<?> value : raw) {
+          // XXX How do we map this back through dispatch?
+          arrayVisitor.visit(value);
+        }
+        return arrayVisitor.done();
+
+      case OBJECT:
+        FieldVisitor.ObjectVisitor objectVisitor = visitObject();
+        for (Field child : f.value().asObject().raw()) {
+          FieldVisitor subVisitor = objectVisitor.visitChild();
+          objectVisitor.visit(subVisitor.visit(child));
+        }
+        return objectVisitor.done();
+
+      case STRING:
+        return visitString(f.value().asString());
+
+      case NUMBER:
+        return visitNumber(f.value().asNumber());
+
+      case BOOLEAN:
+        return visitBoolean(f.value().asBoolean());
+
+      case EXCEPTION:
+        return visitException(f.value().asException());
+
+      case NULL:
+        return visitNull();
+
+      default:
+        throw new IllegalStateException("Unknown value type!");
+    }
+  }
+
+  @Override
   public void visitAttributes(Attributes attributes) {
     this.attributes = attributes;
   }

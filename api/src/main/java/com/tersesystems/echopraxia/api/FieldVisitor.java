@@ -2,6 +2,8 @@ package com.tersesystems.echopraxia.api;
 
 public interface FieldVisitor {
 
+  Field visit(Field field);
+
   void visitAttributes(Attributes attributes);
 
   void visitName(String name);

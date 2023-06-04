@@ -11,15 +11,14 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 3.0
  */
-public final class DefaultField
+public class DefaultField
     implements Field, PresentationHintsAware<DefaultField>, AttributesAware<DefaultField> {
 
-  private final String name;
-  private final Value<?> value;
-  private final Attributes attributes;
+  protected final String name;
+  protected final Value<?> value;
+  protected final Attributes attributes;
 
-  // Please use DefaultFieldCreator to instantiate objects
-  DefaultField(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
+  protected DefaultField(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
     this.name = Field.requireName(name);
     this.value = Field.requireValue(value);
     this.attributes = attributes;
