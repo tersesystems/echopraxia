@@ -4,9 +4,21 @@ import org.jetbrains.annotations.NotNull;
 
 public interface FieldConverter {
 
-  @NotNull
-  Object convertArgumentField(@NotNull Field field);
+  static FieldConverter identity() {
+    return FieldConverterInstance.IDENTITY;
+  }
 
   @NotNull
-  Object convertLoggerField(@NotNull Field field);
+  default Field convertArgumentField(@NotNull Field field) {
+    return field;
+  }
+
+  @NotNull
+  default Field convertLoggerField(@NotNull Field field) {
+    return field;
+  }
+}
+
+class FieldConverterInstance {
+  static final FieldConverter IDENTITY = new FieldConverter() {};
 }

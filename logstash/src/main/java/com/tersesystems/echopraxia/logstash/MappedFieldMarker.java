@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.*;
-import java.util.Collection;
 import java.util.List;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.jetbrains.annotations.NotNull;
@@ -49,31 +48,6 @@ public class MappedFieldMarker extends ObjectAppendingMarker implements Field {
   @Override
   public @NotNull Attributes attributes() {
     return textField.attributes();
-  }
-
-  @Override
-  public <A> @NotNull Field withAttribute(@NotNull Attribute<A> attr) {
-    return new MappedFieldMarker(textField.withAttribute(attr), structuredField);
-  }
-
-  @Override
-  public @NotNull Field withAttributes(@NotNull Attributes attrs) {
-    return new MappedFieldMarker(textField.withAttributes(attrs), structuredField);
-  }
-
-  @Override
-  public <A> @NotNull Field withoutAttribute(@NotNull AttributeKey<A> key) {
-    return new MappedFieldMarker(textField.withoutAttribute(key), structuredField);
-  }
-
-  @Override
-  public @NotNull Field withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
-    return new MappedFieldMarker(textField.withoutAttributes(keys), structuredField);
-  }
-
-  @Override
-  public @NotNull Field clearAttributes() {
-    return new MappedFieldMarker(textField.clearAttributes(), structuredField);
   }
 
   @Override

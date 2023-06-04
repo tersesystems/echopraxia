@@ -34,7 +34,7 @@ public class JULCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.threadContextFunction = mdcContext();
     this.executor = ForkJoinPool.commonPool();
-    this.fieldConverter = JULFieldConverter.instance();
+    this.fieldConverter = FieldConverter.identity();
   }
 
   protected JULCoreLogger(

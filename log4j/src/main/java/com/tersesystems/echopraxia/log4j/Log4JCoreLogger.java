@@ -40,7 +40,7 @@ public class Log4JCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = threadContext();
-    this.fieldConverter = Log4JFieldConverter.instance();
+    this.fieldConverter = FieldConverter.identity();
   }
 
   protected Log4JCoreLogger(

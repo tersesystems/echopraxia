@@ -22,7 +22,7 @@ import org.slf4j.Marker;
  */
 public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
 
-  private FieldConverter fieldConverter = LogstashFieldConverter.singleton();
+  private FieldConverter fieldConverter = FieldConverter.identity();
 
   public FieldConverter getFieldConverter() {
     return fieldConverter;
@@ -41,7 +41,8 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
       if (marker instanceof FieldMarker) {
         final List<Field> fields = ((FieldMarker) marker).getFields();
         for (Field field : fields) {
-          markers.add((Marker) fieldConverter.convertLoggerField(field));
+          Field loggerField = fieldConverter.convertLoggerField(field);
+          markers.add(new com.tersesystems.echopraxia.logstash.FieldMarker(loggerField));
         }
       }
       final Iterator<Marker> iterator = marker.iterator();
@@ -50,7 +51,8 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
         if (m instanceof FieldMarker) {
           final List<Field> fields = ((FieldMarker) m).getFields();
           for (Field field : fields) {
-            markers.add((Marker) fieldConverter.convertLoggerField(field));
+            Field loggerField = fieldConverter.convertLoggerField(field);
+            markers.add(new com.tersesystems.echopraxia.logstash.FieldMarker(loggerField));
           }
         }
       }
@@ -65,7 +67,8 @@ public class LogstashFieldAppender extends TransformingAppender<ILoggingEvent> {
         final Object arg = argumentArray[i];
         if (arg instanceof Field) {
           Field field = (Field) arg;
-          argumentArray[i] = fieldConverter.convertArgumentField(field);
+          Field converted = fieldConverter.convertArgumentField(field);
+          argumentArray[i] = new com.tersesystems.echopraxia.logstash.FieldMarker(converted);
 
           // swap out the throwable if one is found
           if (eventObject.getThrowableProxy() == null) {

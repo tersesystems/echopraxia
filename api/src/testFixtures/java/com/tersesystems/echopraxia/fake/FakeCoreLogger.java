@@ -27,18 +27,7 @@ public class FakeCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.executor = ForkJoinPool.commonPool();
     this.tlsSupplier = () -> (Runnable) () -> {};
-    this.fieldConverter =
-        new FieldConverter() {
-          @Override
-          public @NotNull Object convertArgumentField(@NotNull Field field) {
-            return field;
-          }
-
-          @Override
-          public @NotNull Object convertLoggerField(@NotNull Field field) {
-            return field;
-          }
-        };
+    this.fieldConverter = FieldConverter.identity();
   }
 
   public FakeCoreLogger(
@@ -63,17 +52,17 @@ public class FakeCoreLogger implements CoreLogger {
 
   @Override
   public boolean isEnabled(@NotNull Level level) {
-    return false;
+    return this.condition.test(level, context);
   }
 
   @Override
   public boolean isEnabled(@NotNull Level level, @NotNull Condition condition) {
-    return false;
+    return this.condition.and(condition).test(level, context);
   }
 
   @Override
   public boolean isEnabled(@NotNull Level level, @NotNull Supplier<List<Field>> extraFields) {
-    return false;
+    return this.condition.test(level, context.withFields(extraFields));
   }
 
   @Override
@@ -81,7 +70,7 @@ public class FakeCoreLogger implements CoreLogger {
       @NotNull Level level,
       @NotNull Condition condition,
       @NotNull Supplier<List<Field>> extraFields) {
-    return false;
+    return this.condition.and(condition).test(level, context.withFields(extraFields));
   }
 
   @Override

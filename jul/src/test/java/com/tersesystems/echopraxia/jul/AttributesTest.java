@@ -56,7 +56,7 @@ public class AttributesTest extends TestBase {
   static class MyFieldBuilder implements FieldBuilder {
 
     public Field instant(String name, Instant value) {
-      return Field.keyValue(name, Value.string(value.toString()))
+      return Field.keyValue(name, Value.string(value.toString()), DefaultField.class)
           .withAttribute(INSTANT_ATTR_KEY.bindValue(true));
     }
 
@@ -65,12 +65,12 @@ public class AttributesTest extends TestBase {
 
   static class InstantFieldConverter implements FieldConverter {
     @Override
-    public @NotNull Object convertArgumentField(@NotNull Field field) {
+    public @NotNull Field convertArgumentField(@NotNull Field field) {
       return field;
     }
 
     @Override
-    public @NotNull Object convertLoggerField(@NotNull Field field) {
+    public @NotNull Field convertLoggerField(@NotNull Field field) {
       Boolean isInstant = field.attributes().getOptional(INSTANT_ATTR_KEY).orElse(false);
       if (isInstant) {
         MyFieldBuilder fb = MyFieldBuilder.INSTANCE;
@@ -78,7 +78,7 @@ public class AttributesTest extends TestBase {
         Field valueField = fb.keyValue("@value", field.value());
 
         Field mappedField = fb.object(field.name(), typeField, valueField);
-        return new JULMappedField(field, mappedField);
+        return new MappedField(field, mappedField);
       } else {
         return field;
       }

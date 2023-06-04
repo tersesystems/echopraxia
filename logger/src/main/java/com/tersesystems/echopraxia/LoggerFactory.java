@@ -1,9 +1,6 @@
 package com.tersesystems.echopraxia;
 
-import com.tersesystems.echopraxia.api.Caller;
-import com.tersesystems.echopraxia.api.CoreLogger;
-import com.tersesystems.echopraxia.api.CoreLoggerFactory;
-import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -73,9 +70,18 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static Logger<FieldBuilder> getLogger() {
+  public static Logger<DefaultFieldBuilder> getLogger() {
     CoreLogger core = CoreLoggerFactory.getLogger(Logger.FQCN, Caller.resolveClassName());
-    return getLogger(core, FieldBuilder.instance());
+    return getLogger(core, DefaultFieldBuilder.instance());
+  }
+
+  /**
+   * Creates a logger from a core logger.
+   *
+   * @return the logger.
+   */
+  public static Logger<DefaultFieldBuilder> getLogger(CoreLogger core) {
+    return getLogger(core, DefaultFieldBuilder.instance());
   }
 
   /**
