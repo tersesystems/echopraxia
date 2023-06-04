@@ -108,7 +108,7 @@ public interface CoreLogger {
 
   /** Returns a logger with the given field converter. */
   @NotNull
-  CoreLogger withFieldConverter(FieldConverter fieldConverter);
+  CoreLogger withFieldConverter(FieldTransformer fieldTransformer);
 
   /**
    * Returns a logger with the given fully qualified caller name.

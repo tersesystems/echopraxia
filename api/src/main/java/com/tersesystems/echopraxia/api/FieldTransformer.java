@@ -2,9 +2,9 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface FieldConverter {
+public interface FieldTransformer {
 
-  static FieldConverter identity() {
+  static FieldTransformer identity() {
     return FieldConverterInstance.IDENTITY;
   }
 
@@ -20,5 +20,5 @@ public interface FieldConverter {
 }
 
 class FieldConverterInstance {
-  static final FieldConverter IDENTITY = new FieldConverter() {};
+  static final FieldTransformer IDENTITY = new FieldTransformer() {};
 }

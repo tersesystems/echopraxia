@@ -41,7 +41,7 @@ public class AttributesTest extends TestBase {
 
   @Test
   void testInstant() {
-    var converter = new InstantFieldConverter();
+    var converter = new InstantFieldTransformer();
     java.util.logging.Logger julLogger = java.util.logging.Logger.getLogger(getClass().getName());
     JULCoreLogger coreLogger =
         new JULCoreLogger(Logger.FQCN, julLogger).withFieldConverter(converter);
@@ -63,7 +63,7 @@ public class AttributesTest extends TestBase {
     public static MyFieldBuilder INSTANCE = new MyFieldBuilder();
   }
 
-  static class InstantFieldConverter implements FieldConverter {
+  static class InstantFieldTransformer implements FieldTransformer {
     @Override
     public @NotNull Field convertArgumentField(@NotNull Field field) {
       return field;

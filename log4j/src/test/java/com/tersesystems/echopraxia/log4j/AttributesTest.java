@@ -27,8 +27,8 @@ public class AttributesTest extends TestBase {
 
   @Test
   public void testSimpleField() {
-    FieldConverter fieldConverter =
-        new FieldConverter() {
+    FieldTransformer fieldTransformer =
+        new FieldTransformer() {
           @Override
           public @NotNull Field convertArgumentField(@NotNull Field field) {
             Boolean inBed = field.attributes().getOptional(IN_BED_ATTR_KEY).orElse(false);
@@ -40,7 +40,7 @@ public class AttributesTest extends TestBase {
             return field;
           }
         };
-    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldConverter);
+    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldTransformer);
     Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
 
     logger.info("message {}", fb -> fb.string("foo", "bar").withAttribute(IN_BED_ATTR));
@@ -55,8 +55,8 @@ public class AttributesTest extends TestBase {
 
   @Test
   public void testInstantToObject() {
-    FieldConverter fieldConverter =
-        new FieldConverter() {
+    FieldTransformer fieldTransformer =
+        new FieldTransformer() {
           @Override
           public @NotNull Field convertArgumentField(@NotNull Field field) {
             Optional<Class<?>> optClass = field.attributes().getOptional(CLASS_TYPE_ATTR);
@@ -74,7 +74,7 @@ public class AttributesTest extends TestBase {
             return field;
           }
         };
-    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldConverter);
+    CoreLogger coreLogger = getCoreLogger().withFieldConverter(fieldTransformer);
     Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
     logger.info("date shows {}", fb -> fb.instant(Instant.ofEpochMilli(0)));
 
