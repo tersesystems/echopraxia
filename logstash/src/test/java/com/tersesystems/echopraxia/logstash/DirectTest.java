@@ -14,7 +14,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.logback.ConditionMarker;
-import com.tersesystems.echopraxia.logback.FieldMarker;
+import com.tersesystems.echopraxia.logback.DirectFieldMarker;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -30,7 +30,7 @@ public class DirectTest {
   void testMarker() {
     FieldBuilder fb = FieldBuilder.instance();
     org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
-    logger.info(FieldMarker.apply(fb.string("foo", "bar")), "message with marker");
+    logger.info(DirectFieldMarker.apply(fb.string("foo", "bar")), "message with marker");
 
     final List<ILoggingEvent> eventList = getListAppender().list;
     final List<String> jsonList = getStringAppender().list;
@@ -45,8 +45,8 @@ public class DirectTest {
   void testTwoMarkers() {
     FieldBuilder fb = FieldBuilder.instance();
     org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
-    final FieldMarker fields =
-        FieldMarker.apply(fb.list(fb.string("foo", "bar"), fb.number("someNumber", 1)));
+    final DirectFieldMarker fields =
+        DirectFieldMarker.apply(fb.list(fb.string("foo", "bar"), fb.number("someNumber", 1)));
     logger.info(fields, "message with marker");
 
     final List<ILoggingEvent> eventList = getListAppender().list;
@@ -77,8 +77,8 @@ public class DirectTest {
   @Test
   void testConditionDependingOnMarkerPass() {
     FieldBuilder fb = FieldBuilder.instance();
-    final FieldMarker fields =
-        FieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
+    final DirectFieldMarker fields =
+        DirectFieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
     Condition condition = Condition.stringMatch("extra", s -> s.raw().equals("value"));
 
     org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
@@ -97,8 +97,8 @@ public class DirectTest {
   @Test
   void testConditionDependingOnMarkerFail() {
     FieldBuilder fb = FieldBuilder.instance();
-    final FieldMarker fields =
-        FieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
+    final DirectFieldMarker fields =
+        DirectFieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
     Condition condition = Condition.stringMatch("extra", s -> !s.raw().equals("value"));
 
     org.slf4j.Logger logger = loggerContext().getLogger("com.example.Foo");
@@ -147,8 +147,8 @@ public class DirectTest {
   @Test
   void testConditionDependingOnAndMarkerAndArgumentPass() {
     FieldBuilder fb = FieldBuilder.instance();
-    FieldMarker fields =
-        FieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
+    DirectFieldMarker fields =
+        DirectFieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
 
     Condition extraEqualsValue = Condition.stringMatch("extra", s -> s.raw().equals("value"));
     Condition fooEqualsBar = Condition.stringMatch("foo", s -> s.raw().equals("bar"));
@@ -170,8 +170,8 @@ public class DirectTest {
   @Test
   void testConditionDependingOnAndMarkerAndArgumentFail() {
     FieldBuilder fb = FieldBuilder.instance();
-    FieldMarker fields =
-        FieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
+    DirectFieldMarker fields =
+        DirectFieldMarker.apply(fb.list(fb.string("extra", "value"), fb.number("someNumber", 1)));
 
     Condition extraEqualsValue = Condition.stringMatch("extra", s -> s.raw().equals("value"));
     Condition fooEqualsBar = Condition.stringMatch("foo", s -> s.raw().equals("bar"));
