@@ -101,16 +101,21 @@ public class SimpleFieldVisitor implements FieldVisitor {
 
   @Override
   public Field visitArray(Value<List<Value<?>>> array) {
-    List<Value<?>> collect = array.raw().stream().map(el -> {
-      if (el.type() == Value.Type.OBJECT) {
-        List<Field> fields = el.asObject().raw().stream().map(this::visit).collect(Collectors.toList());
-        return Value.object(fields);
-      }
+    List<Value<?>> collect =
+        array.raw().stream()
+            .map(
+                el -> {
+                  if (el.type() == Value.Type.OBJECT) {
+                    List<Field> fields =
+                        el.asObject().raw().stream().map(this::visit).collect(Collectors.toList());
+                    return Value.object(fields);
+                  }
 
-      // XXX What if we have array of array of object?
+                  // XXX What if we have array of array of object?
 
-      return el;
-    }).collect(Collectors.toList());
+                  return el;
+                })
+            .collect(Collectors.toList());
     return fieldCreator.create(name, Value.array(collect), attributes);
   }
 

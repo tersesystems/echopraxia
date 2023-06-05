@@ -18,7 +18,8 @@ public class DefaultField
   protected final Value<?> value;
   protected final Attributes attributes;
 
-  protected DefaultField(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
+  protected DefaultField(
+      @NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
     this.name = Field.requireName(name);
     this.value = Field.requireValue(value);
     this.attributes = attributes;

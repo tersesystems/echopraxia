@@ -1,14 +1,12 @@
 package com.tersesystems.echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static org.assertj.core.api.Fail.fail;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -80,8 +78,10 @@ public class VisitorTests {
     FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
 
     MyFieldBuilder fb = MyFieldBuilder.instance();
-    Instant[] instants = { Instant.ofEpochMilli(0) };
-    Field instantArrayField = fb.array("instantArray", Value.array(i -> Value.string(i.toString()), instants)).withClassType(Instant.class);
+    Instant[] instants = {Instant.ofEpochMilli(0)};
+    Field instantArrayField =
+        fb.array("instantArray", Value.array(i -> Value.string(i.toString()), instants))
+            .withClassType(Instant.class);
 
     Field out = fieldTransformer.tranformArgumentField(instantArrayField);
     List<Value<?>> elements = out.value().asArray().raw();
@@ -97,7 +97,8 @@ public class VisitorTests {
     //    assertThat(jsonFields.get(0).value().asString().raw())
     //      .isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
     //
-    //    assertThat(textField.value().asString().raw()).isEqualTo(Instant.ofEpochMilli(0).toString());
+    //
+    // assertThat(textField.value().asString().raw()).isEqualTo(Instant.ofEpochMilli(0).toString());
   }
 
   @Test
@@ -126,7 +127,6 @@ public class VisitorTests {
     assertThat(textField.toString()).isEqualTo("\"start time\"=1970-01-01T00:00:00Z");
   }
 
-
   @Test
   public void testInstantInObjectInArray() {
     FieldVisitor instantVisitor = new InstantFieldVisitor();
@@ -134,18 +134,19 @@ public class VisitorTests {
 
     MyFieldBuilder fb = MyFieldBuilder.instance();
 
-    Value.ObjectValue obj = Value.object(
-    fb.instant("startTime", Instant.ofEpochMilli(0)).withDisplayName("start time"),
-    fb.instant("endTime", Instant.ofEpochMilli(0)).withDisplayName("end time"));
+    Value.ObjectValue obj =
+        Value.object(
+            fb.instant("startTime", Instant.ofEpochMilli(0)).withDisplayName("start time"),
+            fb.instant("endTime", Instant.ofEpochMilli(0)).withDisplayName("end time"));
     Field array = fb.array("arrayOfDateRanges", obj);
     Field dateRange = fieldTransformer.tranformArgumentField(array);
 
     Value.ArrayValue array1 = dateRange.value().asArray();
     List<Field> value = array1.raw().get(0).asObject().raw();
     MappedField field = (MappedField) value.get(0);
-    assertThat(field.getStructuredField().value().asObject().raw().get(0).name()).isEqualTo("@type");
+    assertThat(field.getStructuredField().value().asObject().raw().get(0).name())
+        .isEqualTo("@type");
   }
-
 
   static class MyFieldBuilder implements DefaultFieldBuilder {
     static MyFieldBuilder instance() {
@@ -183,7 +184,8 @@ public class VisitorTests {
     }
 
     Value.ObjectValue typedInstantValue(Value<String> v) {
-      return Value.object(string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
+      return Value.object(
+          string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
     }
   }
 
@@ -203,7 +205,8 @@ public class VisitorTests {
     @Override
     public Field visitArray(Value<List<Value<?>>> array) {
       if (isInstant()) {
-        List<Value<?>> value = array.raw().stream().map(this::mapInstant).collect(Collectors.toList());
+        List<Value<?>> value =
+            array.raw().stream().map(this::mapInstant).collect(Collectors.toList());
         fieldCreator.create(name, Value.array(value), attributes);
       }
       return super.visitArray(array);
@@ -221,12 +224,13 @@ public class VisitorTests {
 
   static class InstantField extends DefaultField {
 
-    protected InstantField(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
+    protected InstantField(
+        @NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
       super(name, value, attributes);
     }
 
     public InstantField withClassType(Class<?> clazz) {
-       return withAttribute(CLASS_TYPE_ATTR.bindValue(clazz));
+      return withAttribute(CLASS_TYPE_ATTR.bindValue(clazz));
     }
 
     @Override
@@ -242,7 +246,8 @@ public class VisitorTests {
   static class InstantFieldCreator implements FieldCreator<InstantField> {
 
     @Override
-    public @NotNull InstantField create(@NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
+    public @NotNull InstantField create(
+        @NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
       return new InstantField(name, value, attributes);
     }
 

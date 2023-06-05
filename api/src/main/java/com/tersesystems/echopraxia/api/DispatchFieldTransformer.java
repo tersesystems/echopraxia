@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /**
