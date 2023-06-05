@@ -83,22 +83,23 @@ public class VisitorTests {
         fb.array("instantArray", Value.array(i -> Value.string(i.toString()), instants))
             .withClassType(Instant.class);
 
-    Field out = fieldTransformer.tranformArgumentField(instantArrayField);
-    List<Value<?>> elements = out.value().asArray().raw();
+    MappedField transformed = (MappedField) fieldTransformer.tranformArgumentField(instantArrayField);
 
-    // XXX We need a MappedValue, not a MappedField.
-    Value.ObjectValue object = elements.get(0).asObject();
-    fail("This doesn't work because the array doesn't have mapped fields");
-    //    Field textField = transformed.getTextField();
-    //    Field structuredField = transformed.getStructuredField();
-    //
-    //    List<Field> jsonFields = structuredField.value().asObject().raw();
-    //    assertThat(jsonFields.get(0).name()).isEqualTo("@type");
-    //    assertThat(jsonFields.get(0).value().asString().raw())
-    //      .isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
-    //
-    //
-    // assertThat(textField.value().asString().raw()).isEqualTo(Instant.ofEpochMilli(0).toString());
+    // text field has an array of strings
+    Field textField = transformed.getTextField();
+
+    // structured field has an array of objects.
+    Field structuredField = transformed.getStructuredField();
+
+    List<Value<?>> objectElements = structuredField.value().asArray().raw();
+    List<Field> fields = objectElements.get(0).asObject().raw();
+    assertThat(fields.get(0).name()).isEqualTo("@type");
+    assertThat(fields.get(0).value().asString().raw())
+      .isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
+
+    List<Value<?>> stringElements = textField.value().asArray().raw();
+    String dateString = stringElements.get(0).asString().raw();
+    assertThat(dateString).isEqualTo(Instant.ofEpochMilli(0).toString());
   }
 
   @Test
@@ -205,11 +206,14 @@ public class VisitorTests {
     @Override
     public Field visitArray(Value<List<Value<?>>> array) {
       if (isInstant()) {
-        List<Value<?>> value =
+        List<Value<?>> objectValues =
             array.raw().stream().map(this::mapInstant).collect(Collectors.toList());
-        fieldCreator.create(name, Value.array(value), attributes);
+        Field textField = fieldCreator.create(name, array, attributes);
+        Field structuredField = fieldCreator.create(name, Value.array(objectValues), attributes);
+        return new MappedField(textField, structuredField);
+      } else {
+        return super.visitArray(array);
       }
-      return super.visitArray(array);
     }
 
     private Value<?> mapInstant(Value<?> el) {
