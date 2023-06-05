@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A very simple field visitor that returns its input.
@@ -27,35 +28,33 @@ public class SimpleFieldVisitor implements FieldVisitor {
   public Field visit(Field f) {
     visitAttributes(f.attributes());
     visitName(f.name());
-    switch (f.value().type()) {
-      case ARRAY:
-        FieldVisitor.ArrayVisitor arrayVisitor = visitArray();
-        List<Value<?>> raw = f.value().asArray().raw();
-        for (Value<?> value : raw) {
-          // XXX How do we map this back through dispatch?
-          arrayVisitor.visit(value);
-        }
-        return arrayVisitor.done();
+    return visitValue(f.value());
+  }
 
+  public Field visitValue(Value<?> value) {
+    switch (value.type()) {
       case OBJECT:
         FieldVisitor.ObjectVisitor objectVisitor = visitObject();
-        for (Field child : f.value().asObject().raw()) {
+        for (Field child : value.asObject().raw()) {
           FieldVisitor subVisitor = objectVisitor.visitChild();
           objectVisitor.visit(subVisitor.visit(child));
         }
         return objectVisitor.done();
 
+      case ARRAY:
+        return visitArray(value.asArray());
+
       case STRING:
-        return visitString(f.value().asString());
+        return visitString(value.asString());
 
       case NUMBER:
-        return visitNumber(f.value().asNumber());
+        return visitNumber(value.asNumber());
 
       case BOOLEAN:
-        return visitBoolean(f.value().asBoolean());
+        return visitBoolean(value.asBoolean());
 
       case EXCEPTION:
-        return visitException(f.value().asException());
+        return visitException(value.asException());
 
       case NULL:
         return visitNull();
@@ -101,31 +100,23 @@ public class SimpleFieldVisitor implements FieldVisitor {
   }
 
   @Override
-  public ArrayVisitor visitArray() {
-    return new DefaultArrayVisitor();
+  public Field visitArray(Value<List<Value<?>>> array) {
+    List<Value<?>> collect = array.raw().stream().map(el -> {
+      if (el.type() == Value.Type.OBJECT) {
+        List<Field> fields = el.asObject().raw().stream().map(this::visit).collect(Collectors.toList());
+        return Value.object(fields);
+      }
+
+      // XXX What if we have array of array of object?
+
+      return el;
+    }).collect(Collectors.toList());
+    return fieldCreator.create(name, Value.array(collect), attributes);
   }
 
   @Override
   public ObjectVisitor visitObject() {
     return new DefaultObjectVisitor();
-  }
-
-  class DefaultArrayVisitor implements ArrayVisitor {
-    private final List<Value<?>> values;
-
-    public DefaultArrayVisitor() {
-      this.values = new ArrayList<>();
-    }
-
-    @Override
-    public Field done() {
-      return fieldCreator.create(name, Value.array(values), attributes);
-    }
-
-    @Override
-    public void visit(Value<?> value) {
-      values.add(value);
-    }
   }
 
   class DefaultObjectVisitor implements ObjectVisitor {

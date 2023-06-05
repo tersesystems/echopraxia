@@ -1,11 +1,14 @@
 package com.tersesystems.echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
+import static org.assertj.core.api.Fail.fail;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +55,7 @@ public class VisitorTests {
   }
 
   @Test
-  public void testStructuredInstant() {
+  public void testInstant() {
     SimpleFieldVisitor instantVisitor = new InstantFieldVisitor();
     FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
 
@@ -72,7 +75,33 @@ public class VisitorTests {
   }
 
   @Test
-  public void testNestedInstant() {
+  public void testInstantInArray() {
+    SimpleFieldVisitor instantVisitor = new InstantFieldVisitor();
+    FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
+
+    MyFieldBuilder fb = MyFieldBuilder.instance();
+    Instant[] instants = { Instant.ofEpochMilli(0) };
+    Field instantArrayField = fb.array("instantArray", Value.array(i -> Value.string(i.toString()), instants)).withClassType(Instant.class);
+
+    Field out = fieldTransformer.tranformArgumentField(instantArrayField);
+    List<Value<?>> elements = out.value().asArray().raw();
+
+    // XXX We need a MappedValue, not a MappedField.
+    Value.ObjectValue object = elements.get(0).asObject();
+    fail("This doesn't work because the array doesn't have mapped fields");
+    //    Field textField = transformed.getTextField();
+    //    Field structuredField = transformed.getStructuredField();
+    //
+    //    List<Field> jsonFields = structuredField.value().asObject().raw();
+    //    assertThat(jsonFields.get(0).name()).isEqualTo("@type");
+    //    assertThat(jsonFields.get(0).value().asString().raw())
+    //      .isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
+    //
+    //    assertThat(textField.value().asString().raw()).isEqualTo(Instant.ofEpochMilli(0).toString());
+  }
+
+  @Test
+  public void testInstantInObject() {
     FieldVisitor instantVisitor = new InstantFieldVisitor();
     FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
 
@@ -99,22 +128,22 @@ public class VisitorTests {
 
 
   @Test
-  public void testNestedArray() {
+  public void testInstantInObjectInArray() {
     FieldVisitor instantVisitor = new InstantFieldVisitor();
     FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
 
     MyFieldBuilder fb = MyFieldBuilder.instance();
 
     Value.ObjectValue obj = Value.object(
-      fb.instant("startTime", Instant.ofEpochMilli(0)).withDisplayName("start time"),
-      fb.instant("endTime", Instant.ofEpochMilli(0)).withDisplayName("end time"));
-    Field array = fb.array("arrayOfDateRanges", obj).withClassType(Instant.class);
+    fb.instant("startTime", Instant.ofEpochMilli(0)).withDisplayName("start time"),
+    fb.instant("endTime", Instant.ofEpochMilli(0)).withDisplayName("end time"));
+    Field array = fb.array("arrayOfDateRanges", obj);
     Field dateRange = fieldTransformer.tranformArgumentField(array);
 
     Value.ArrayValue array1 = dateRange.value().asArray();
     List<Field> value = array1.raw().get(0).asObject().raw();
     MappedField field = (MappedField) value.get(0);
-    System.out.println(field.getStructuredField());
+    assertThat(field.getStructuredField().value().asObject().raw().get(0).name()).isEqualTo("@type");
   }
 
 
@@ -129,6 +158,10 @@ public class VisitorTests {
 
     public InstantField string(@NotNull String name, @NotNull String value) {
       return keyValue(name, Value.string(value));
+    }
+
+    public InstantField array(@NotNull String name, @NotNull Value.ArrayValue value) {
+      return keyValue(name, value);
     }
 
     @Override
@@ -146,11 +179,11 @@ public class VisitorTests {
     }
 
     public Field typedInstant(String name, Value<String> v) {
-      return typed(name, "http://www.w3.org/2001/XMLSchema#dateTime", v);
+      return object(name, typedInstantValue(v));
     }
 
-    private Field typed(String name, String type, Value<String> v) {
-      return object(name, string("@type", type), keyValue("@value", v));
+    Value.ObjectValue typedInstantValue(Value<String> v) {
+      return Value.object(string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
     }
   }
 
@@ -167,30 +200,17 @@ public class VisitorTests {
       return isInstant() ? new MappedField(textField, fb.typedInstant(name, v)) : textField;
     }
 
-    public ArrayVisitor visitArray() {
-      return new InstantArrayVisitor();
+    @Override
+    public Field visitArray(Value<List<Value<?>>> array) {
+      if (isInstant()) {
+        List<Value<?>> value = array.raw().stream().map(this::mapInstant).collect(Collectors.toList());
+        fieldCreator.create(name, Value.array(value), attributes);
+      }
+      return super.visitArray(array);
     }
 
-    class InstantArrayVisitor implements ArrayVisitor {
-      private final List<Value<?>> values;
-
-      public InstantArrayVisitor() {
-        this.values = new ArrayList<>();
-      }
-
-      @Override
-      public Field done() {
-        return fieldCreator.create(name, Value.array(values), attributes);
-      }
-
-      @Override
-      public void visit(Value<?> value) {
-        if (isInstant()) {
-
-        } else {
-          values.add(value);
-        }
-      }
+    private Value<?> mapInstant(Value<?> el) {
+      return el.type() == Value.Type.STRING ? fb.typedInstantValue(el.asString()) : el;
     }
 
     private boolean isInstant() {

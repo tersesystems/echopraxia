@@ -1,5 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
+import java.util.List;
+
 public interface FieldVisitor {
 
   Field visit(Field field);
@@ -18,7 +20,7 @@ public interface FieldVisitor {
 
   Field visitNull();
 
-  ArrayVisitor visitArray();
+  Field visitArray(Value<List<Value<?>>> array);
 
   ObjectVisitor visitObject();
 
