@@ -30,7 +30,7 @@ public class AttributesTest extends TestBase {
     FieldTransformer fieldTransformer =
         new FieldTransformer() {
           @Override
-          public @NotNull Field convertArgumentField(@NotNull Field field) {
+          public @NotNull Field tranformArgumentField(@NotNull Field field) {
             Boolean inBed = field.attributes().getOptional(IN_BED_ATTR_KEY).orElse(false);
             boolean isString = field.value().type() == Value.Type.STRING;
             if (inBed && isString) {
@@ -58,7 +58,7 @@ public class AttributesTest extends TestBase {
     FieldTransformer fieldTransformer =
         new FieldTransformer() {
           @Override
-          public @NotNull Field convertArgumentField(@NotNull Field field) {
+          public @NotNull Field tranformArgumentField(@NotNull Field field) {
             Optional<Class<?>> optClass = field.attributes().getOptional(CLASS_TYPE_ATTR);
             boolean isString = field.value().type() == Value.Type.STRING;
             if (optClass.isPresent()

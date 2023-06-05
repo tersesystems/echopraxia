@@ -65,12 +65,12 @@ public class AttributesTest extends TestBase {
 
   static class InstantFieldTransformer implements FieldTransformer {
     @Override
-    public @NotNull Field convertArgumentField(@NotNull Field field) {
+    public @NotNull Field tranformArgumentField(@NotNull Field field) {
       return field;
     }
 
     @Override
-    public @NotNull Field convertLoggerField(@NotNull Field field) {
+    public @NotNull Field transformLoggerField(@NotNull Field field) {
       Boolean isInstant = field.attributes().getOptional(INSTANT_ATTR_KEY).orElse(false);
       if (isInstant) {
         MyFieldBuilder fb = MyFieldBuilder.INSTANCE;

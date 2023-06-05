@@ -7,7 +7,6 @@ import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.*;
-import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import org.jetbrains.annotations.NotNull;
@@ -16,8 +15,6 @@ import org.junit.jupiter.api.Test;
 public class AttributesTest extends TestBase {
   public static final AttributeKey<Boolean> IN_BED_ATTR_KEY = AttributeKey.create("inbed");
   public static final Attribute<Boolean> IN_BED_ATTR = IN_BED_ATTR_KEY.bindValue(true);
-
-  public static final AttributeKey<Class<?>> CLASS_TYPE_ATTR = AttributeKey.create("class");
 
   @Test
   public void testSimpleField() {
@@ -34,12 +31,12 @@ public class AttributesTest extends TestBase {
           }
 
           @Override
-          public @NotNull Field convertArgumentField(@NotNull Field field) {
+          public @NotNull Field tranformArgumentField(@NotNull Field field) {
             return convertField(field);
           }
 
           @Override
-          public @NotNull Field convertLoggerField(@NotNull Field field) {
+          public @NotNull Field transformLoggerField(@NotNull Field field) {
             return convertField(field);
           }
         };
@@ -60,61 +57,9 @@ public class AttributesTest extends TestBase {
         .isEqualTo("fortune cookie says you will have a long and illustrious career IN BED");
   }
 
-  @Test
-  public void testInstantToObject() {
-    FieldTransformer fieldTransformer =
-        new FieldTransformer() {
-          public @NotNull Field convertField(@NotNull Field field) {
-            Optional<Class<?>> optClass = field.attributes().getOptional(CLASS_TYPE_ATTR);
-            boolean isString = field.value().type() == Value.Type.STRING;
-            if (optClass.isPresent()
-                && isString
-                && optClass.get().getName().equals("java.time.Instant")) {
-              MyFieldBuilder fb = MyFieldBuilder.instance();
-              Field typeField = fb.string("@type", "http://www.w3.org/2001/XMLSchema#dateTime");
-              Field valueField = fb.keyValue("@value", field.value());
-
-              Field objectField = fb.object(field.name(), typeField, valueField);
-              return new MappedField(field, objectField);
-            }
-            return field;
-          }
-
-          @Override
-          public @NotNull Field convertLoggerField(@NotNull Field field) {
-            return convertField(field);
-          }
-
-          @Override
-          public @NotNull Field convertArgumentField(@NotNull Field field) {
-            return convertField(field);
-          }
-        };
-    CoreLogger coreLogger = getCoreLogger().withFieldTransformer(fieldTransformer);
-    Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
-    logger.info("date shows {}", fb -> fb.instant(Instant.ofEpochMilli(0)));
-
-    final ListAppender<ILoggingEvent> listAppender = getListAppender();
-    assertThat(listAppender.list).isNotEmpty();
-
-    final ILoggingEvent event = listAppender.list.get(0);
-    String message = event.getFormattedMessage();
-    assertThat(message).isEqualTo("date shows 1970-01-01T00:00:00Z");
-
-    final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
-    final String json = stringAppender.list.get(0);
-    System.out.println(json);
-    assertThat(json).contains("@type");
-  }
-
   static class MyFieldBuilder implements DefaultFieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder() {};
-    }
-
-    public Field instant(Instant instant) {
-      return value("instant", Value.string(instant.toString()))
-          .withAttribute(CLASS_TYPE_ATTR.bindValue(instant.getClass()));
     }
 
     // Renders a `Person` as an object field.

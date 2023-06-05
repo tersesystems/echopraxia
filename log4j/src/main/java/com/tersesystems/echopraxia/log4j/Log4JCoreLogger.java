@@ -577,14 +577,14 @@ public class Log4JCoreLogger implements CoreLogger {
     List<Field> loggerFields = ctx.getLoggerFields();
     List<Field> input = new ArrayList<>(loggerFields.size());
     for (Field loggerField : loggerFields) {
-      Field f = (Field) fieldTransformer.convertLoggerField(loggerField);
+      Field f = (Field) fieldTransformer.transformLoggerField(loggerField);
       input.add(f);
     }
 
     List<Field> argumentFields = ctx.getArgumentFields();
     List<Field> args = new ArrayList<>(argumentFields.size());
     for (Field argumentField : argumentFields) {
-      Field f = (Field) fieldTransformer.convertArgumentField(argumentField);
+      Field f = (Field) fieldTransformer.tranformArgumentField(argumentField);
       args.add(f);
     }
     return new EchopraxiaFieldsMessage(template, input, args);
