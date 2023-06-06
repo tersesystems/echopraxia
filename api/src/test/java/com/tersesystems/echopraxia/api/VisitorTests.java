@@ -164,14 +164,23 @@ public class VisitorTests {
     Field f = a3.value().asArray().raw().get(0).asArray().raw().get(0).asArray().raw().get(0).asObject().raw().get(0);
     assertThat(f).isInstanceOf(MappedField.class);
     MappedField mapped = (MappedField) f;
-    System.out.println(mapped);
-    //    Value.ArrayValue array1 = dateRange.value().asArray();
-    //    List<Field> value = array1.raw().get(0).asObject().raw();
-    //    MappedField field = (MappedField) value.get(0);
-    //    assertThat(field.getStructuredField().value().asObject().raw().get(0).name())
-    //      .isEqualTo("@type");
+    //System.out.println(mapped);
   }
 
+  @Test
+  public void testArrayObjectArrayObjectInstant() {
+    FieldVisitor instantVisitor = new InstantFieldVisitor();
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(instantVisitor);
+
+    MyFieldBuilder fb = MyFieldBuilder.instance();
+
+    Field instant = fb.instant("startTime", Instant.ofEpochMilli(0)).withDisplayName("start time");
+    Field array1 = fb.array("array1", Value.array(Value.object(fb.array("array2", Value.object(instant)))));
+    Field a1 = fieldTransformer.tranformArgumentField(array1);
+
+    System.out.println(a1);
+    assertThat(a1.name()).isEqualTo("array1");
+  }
 
   static class MyFieldBuilder implements DefaultFieldBuilder {
     static MyFieldBuilder instance() {
