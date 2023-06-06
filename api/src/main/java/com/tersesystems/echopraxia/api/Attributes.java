@@ -141,7 +141,7 @@ final class AttributesImpl implements Attributes {
 
   @Override
   public String toString() {
-    return "AttributesImpl{" + "_map=" + _map + '}';
+    return "Attributes(" + _map + ')';
   }
 
   @Override

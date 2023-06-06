@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Fail.fail;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -22,8 +23,8 @@ public class VisitorTests {
     FieldVisitor inBedVisitor =
         new SimpleFieldVisitor(DefaultField.class) {
           @Override
-          public Field visitString(Value<String> v) {
-            return super.visitString(Value.string(v.raw() + " IN BED"));
+          public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+            return super.visitString(Value.string(stringValue.raw() + " IN BED"));
           }
         };
     FieldTransformer fieldTransformer = new VisitorFieldTransformer(inBedVisitor);
@@ -39,8 +40,8 @@ public class VisitorTests {
     FieldVisitor inBedVisitor =
         new SimpleFieldVisitor(DefaultField.class) {
           @Override
-          public Field visitString(Value<String> v) {
-            return super.visitString(Value.string(v.raw() + " IN BED"));
+          public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+            return super.visitString(Value.string(stringValue.raw() + " IN BED"));
           }
         };
     FieldTransformer fieldTransformer = new VisitorFieldTransformer(inBedVisitor);
@@ -223,7 +224,7 @@ public class VisitorTests {
     }
   }
 
-  static class InstantFieldVisitor extends SimpleFieldVisitor {
+  static class InstantFieldVisitor extends LoggingFieldVisitor {
     private final MyFieldBuilder fb = MyFieldBuilder.instance();
 
     public InstantFieldVisitor() {
@@ -231,22 +232,14 @@ public class VisitorTests {
     }
 
     @Override
-    public @NotNull Field visitString(Value<String> v) {
-      Field textField = fieldCreator.create(name, v, attributes);
-      return isInstant() ? new MappedField(textField, fb.typedInstant(name, v)) : textField;
+    public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+      Field textField = fieldCreator.create(name, stringValue, attributes);
+      return isInstant() ? new MappedField(textField, fb.typedInstant(name, stringValue)) : textField;
     }
 
     @Override
-    public Field visitArray(Value<List<Value<?>>> array) {
-      if (isInstant()) {
-        List<Value<?>> objectValues =
-            array.raw().stream().map(this::mapInstant).collect(Collectors.toList());
-        Field textField = fieldCreator.create(name, array, attributes);
-        Field structuredField = fieldCreator.create(name, Value.array(objectValues), attributes);
-        return new MappedField(textField, structuredField);
-      } else {
-        return super.visitArray(array);
-      }
+    public @NotNull ArrayVisitor visitArray() {
+      return new InstantArrayVisitor();
     }
 
     private Value<?> mapInstant(Value<?> el) {
@@ -256,6 +249,20 @@ public class VisitorTests {
     private boolean isInstant() {
       Optional<Class<?>> optClass = attributes.getOptional(CLASS_TYPE_ATTR);
       return optClass.isPresent() && optClass.get().getName().equals("java.time.Instant");
+    }
+
+    class InstantArrayVisitor extends LoggingArrayVisitor {
+      @Override
+      public @NotNull Field done() {
+        //        if (isInstant()) {
+        //          List<Value<?>> objectValues =
+        //            arrayValue.raw().stream().map(this::mapInstant).collect(Collectors.toList());
+        //          Field textField = fieldCreator.create(name, arrayValue, attributes);
+        //          Field structuredField = fieldCreator.create(name, Value.array(objectValues), attributes);
+        //          return new MappedField(textField, structuredField);
+        //        } else {
+        return fieldCreator.create(name, Value.array(elements), attributes);
+      }
     }
   }
 
