@@ -5,6 +5,7 @@ import static org.assertj.core.api.Fail.fail;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +26,7 @@ public class VisitorTests {
             return super.visitString(Value.string(v.raw() + " IN BED"));
           }
         };
-    FieldTransformer fieldTransformer = new DispatchFieldTransformer(inBedVisitor);
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(inBedVisitor);
 
     FieldBuilder fb = FieldBuilder.instance();
     Field field = fb.string("fortuneCookie", "You will have a long and illustrious career");
@@ -42,7 +43,7 @@ public class VisitorTests {
             return super.visitString(Value.string(v.raw() + " IN BED"));
           }
         };
-    FieldTransformer fieldTransformer = new DispatchFieldTransformer(inBedVisitor);
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(inBedVisitor);
 
     FieldBuilder fb = FieldBuilder.instance();
     Field cookieField = fb.string("fortuneCookie", "You will have a long and illustrious career");
@@ -55,7 +56,7 @@ public class VisitorTests {
   @Test
   public void testInstant() {
     SimpleFieldVisitor instantVisitor = new InstantFieldVisitor();
-    FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(instantVisitor);
 
     MyFieldBuilder fb = MyFieldBuilder.instance();
     Field instantField = fb.instant("instant", Instant.ofEpochMilli(0));
@@ -75,7 +76,7 @@ public class VisitorTests {
   @Test
   public void testInstantInArray() {
     SimpleFieldVisitor instantVisitor = new InstantFieldVisitor();
-    FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(instantVisitor);
 
     MyFieldBuilder fb = MyFieldBuilder.instance();
     Instant[] instants = {Instant.ofEpochMilli(0)};
@@ -105,7 +106,7 @@ public class VisitorTests {
   @Test
   public void testInstantInObject() {
     FieldVisitor instantVisitor = new InstantFieldVisitor();
-    FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(instantVisitor);
 
     MyFieldBuilder fb = MyFieldBuilder.instance();
 
@@ -131,7 +132,7 @@ public class VisitorTests {
   @Test
   public void testInstantInObjectInArray() {
     FieldVisitor instantVisitor = new InstantFieldVisitor();
-    FieldTransformer fieldTransformer = new DispatchFieldTransformer(instantVisitor);
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(instantVisitor);
 
     MyFieldBuilder fb = MyFieldBuilder.instance();
 
@@ -148,6 +149,29 @@ public class VisitorTests {
     assertThat(field.getStructuredField().value().asObject().raw().get(0).name())
         .isEqualTo("@type");
   }
+
+  @Test
+  public void testArrayOfArrayOfArrayOfInstant() {
+    FieldVisitor instantVisitor = new InstantFieldVisitor();
+    FieldTransformer fieldTransformer = new VisitorFieldTransformer(instantVisitor);
+
+    MyFieldBuilder fb = MyFieldBuilder.instance();
+
+    Field instant = fb.instant("startTime", Instant.ofEpochMilli(0)).withDisplayName("start time");
+    Field array3 = fb.array("array3", Value.array(Value.array(Value.array(Value.object(instant)))));
+    Field a3 = fieldTransformer.tranformArgumentField(array3);
+
+    Field f = a3.value().asArray().raw().get(0).asArray().raw().get(0).asArray().raw().get(0).asObject().raw().get(0);
+    assertThat(f).isInstanceOf(MappedField.class);
+    MappedField mapped = (MappedField) f;
+    System.out.println(mapped);
+    //    Value.ArrayValue array1 = dateRange.value().asArray();
+    //    List<Field> value = array1.raw().get(0).asObject().raw();
+    //    MappedField field = (MappedField) value.get(0);
+    //    assertThat(field.getStructuredField().value().asObject().raw().get(0).name())
+    //      .isEqualTo("@type");
+  }
+
 
   static class MyFieldBuilder implements DefaultFieldBuilder {
     static MyFieldBuilder instance() {

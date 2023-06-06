@@ -3,15 +3,15 @@ package com.tersesystems.echopraxia.api;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A field transformer that dispatches the field to a FieldVisitor.
+ * A field transformer that uses a FieldVisitor.
  *
  * @since 3.0
  */
-public class DispatchFieldTransformer implements FieldTransformer {
+public class VisitorFieldTransformer implements FieldTransformer {
 
   private final FieldVisitor visitor;
 
-  public DispatchFieldTransformer(FieldVisitor visitor) {
+  public VisitorFieldTransformer(FieldVisitor visitor) {
     this.visitor = visitor;
   }
 
