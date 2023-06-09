@@ -14,13 +14,14 @@ public class PresentationHints {
 
   public static final AttributeKey<Boolean> AS_CARDINAL = AttributeKey.create("asCardinal");
   public static final AttributeKey<String> DISPLAY_NAME = AttributeKey.create("displayName");
-
   public static final AttributeKey<Boolean> ELIDE = AttributeKey.create("elide");
+  public static final AttributeKey<FieldVisitor> FIELD_VISITOR = AttributeKey.create("fieldVisitor");
 
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
   private static final Attribute<Boolean> VALUE_ONLY_ATTR = VALUE_ONLY.bindValue(true);
   private static final Attribute<Boolean> ELIDE_ATTR = ELIDE.bindValue(true);
+
 
   private static final Attributes VALUE_ONLY_ATTRS =
       Attributes.create(PresentationHints.asValueOnly());
@@ -77,5 +78,9 @@ public class PresentationHints {
    */
   public static Attribute<Boolean> asElided() {
     return ELIDE_ATTR;
+  }
+
+  public static Attribute<FieldVisitor> withFieldVisitor(FieldVisitor visitor) {
+    return FIELD_VISITOR.bindValue(visitor);
   }
 }

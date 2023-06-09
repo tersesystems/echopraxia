@@ -35,6 +35,7 @@ public class DefaultField
     return this.withAttribute(PresentationHints.abbreviateAfter(after));
   }
 
+
   @Override
   public @NotNull DefaultField asCardinal() {
     return this.withAttribute(PresentationHints.asCardinal());
@@ -48,6 +49,11 @@ public class DefaultField
   @Override
   public @NotNull DefaultField withDisplayName(@NotNull String displayName) {
     return this.withAttribute(PresentationHints.withDisplayName(displayName));
+  }
+
+  @Override
+  public @NotNull DefaultField withFieldVisitor(@NotNull FieldVisitor fieldVisitor) {
+    return this.withAttribute(PresentationHints.withFieldVisitor(fieldVisitor));
   }
 
   @Override

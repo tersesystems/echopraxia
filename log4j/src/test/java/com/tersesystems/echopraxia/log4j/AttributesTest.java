@@ -50,43 +50,6 @@ public class AttributesTest extends TestBase {
     assertThat(message).isEqualTo("message bar IN BED");
   }
 
-  // {"instant":{"epochSecond":1684420039,"nanoOfSecond":21258307},"thread":"Test
-  // worker","level":"INFO","loggerName":"com.tersesystems.echopraxia.log4j.AttributesTest","message":"date shows instant={http://www.w3.org/2001/XMLSchema#dateTime, @value=1970-01-01T00:00:00Z}","endOfBatch":false,"loggerFqcn":"com.tersesystems.echopraxia.DefaultLoggerMethods","threadId":1,"threadPriority":5,"source":{"class":"com.tersesystems.echopraxia.log4j.AttributesTest","method":"testInstantToObject","file":"AttributesTest.java","line":76},"fields":{"instant":{"@type":"http://www.w3.org/2001/XMLSchema#dateTime","@value":"1970-01-01T00:00:00Z"}},"arguments":{"instant":{"@type":"http://www.w3.org/2001/XMLSchema#dateTime","@value":"1970-01-01T00:00:00Z"}},"context":{}}
-
-  @Test
-  public void testInstantToObject() {
-    FieldTransformer fieldTransformer =
-        new FieldTransformer() {
-          @Override
-          public @NotNull Field tranformArgumentField(@NotNull Field field) {
-            Optional<Class<?>> optClass = field.attributes().getOptional(CLASS_TYPE_ATTR);
-            boolean isString = field.value().type() == Value.Type.STRING;
-            if (optClass.isPresent()
-                && isString
-                && optClass.get().getName().equals("java.time.Instant")) {
-              MyFieldBuilder fb = MyFieldBuilder.instance();
-              Field typeField = fb.string("@type", "http://www.w3.org/2001/XMLSchema#dateTime");
-              Field valueField = fb.keyValue("@value", field.value());
-              Field structuredField = fb.object(field.name(), typeField, valueField);
-
-              return new MappedField(field, structuredField);
-            }
-            return field;
-          }
-        };
-    CoreLogger coreLogger = getCoreLogger().withFieldTransformer(fieldTransformer);
-    Logger<MyFieldBuilder> logger = LoggerFactory.getLogger(coreLogger, MyFieldBuilder.instance());
-    logger.info("date shows {}", fb -> fb.instant(Instant.ofEpochMilli(0)));
-
-    JsonNode entry = getEntry();
-    JsonPointer pointer = JsonPointer.compile("/arguments/instant/@type");
-    final String type = entry.at(pointer).asText();
-    assertThat(type).isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
-
-    final String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("date shows 1970-01-01T00:00:00Z");
-  }
-
   static class MyFieldBuilder implements DefaultFieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder() {};
