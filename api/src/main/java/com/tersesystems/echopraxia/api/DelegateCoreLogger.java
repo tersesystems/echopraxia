@@ -69,11 +69,6 @@ public class DelegateCoreLogger implements CoreLogger {
   }
 
   @Override
-  public @NotNull CoreLogger withFieldTransformer(FieldTransformer fieldConverter) {
-    return core.withFieldTransformer(fieldConverter);
-  }
-
-  @Override
   @NotNull
   public CoreLogger withFQCN(@NotNull String fqcn) {
     return core.withFQCN(fqcn);
