@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A very simple field visitor that returns its input.
@@ -25,7 +25,7 @@ public class SimpleFieldVisitor implements FieldVisitor {
   }
 
   @Override
-  public Field visit(Field f) {
+  public Field visit(@NotNull Field f) {
     visitAttributes(f.attributes());
     visitName(f.name());
     return visitValue(f.value());
@@ -42,7 +42,11 @@ public class SimpleFieldVisitor implements FieldVisitor {
         return objectVisitor.done();
 
       case ARRAY:
-        return visitArray(value.asArray());
+        FieldVisitor.ArrayVisitor arrayVisitor = visitArray();
+        for (Value<?> el : value.asArray().raw()) {
+          arrayVisitor.visitElement(el);
+        }
+        return arrayVisitor.done();
 
       case STRING:
         return visitString(value.asString());
@@ -65,84 +69,141 @@ public class SimpleFieldVisitor implements FieldVisitor {
   }
 
   @Override
-  public void visitAttributes(Attributes attributes) {
+  public void visitAttributes(@NotNull Attributes attributes) {
     this.attributes = attributes;
   }
 
   @Override
-  public void visitName(String name) {
+  public void visitName(@NotNull String name) {
     this.name = name;
   }
 
   @Override
-  public Field visitString(Value<String> v) {
-    return fieldCreator.create(name, v, attributes);
+  public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+    return fieldCreator.create(name, stringValue, attributes);
   }
 
   @Override
-  public Field visitException(Value<Throwable> exception) {
-    return fieldCreator.create(name, exception, attributes);
+  public @NotNull Field visitException(@NotNull Value<Throwable> exceptionValue) {
+    return fieldCreator.create(name, exceptionValue, attributes);
   }
 
   @Override
-  public Field visitBoolean(Value<Boolean> aBoolean) {
-    return fieldCreator.create(name, aBoolean, attributes);
+  public @NotNull Field visitBoolean(@NotNull Value<Boolean> booleanValue) {
+    return fieldCreator.create(name, booleanValue, attributes);
   }
 
   @Override
-  public Field visitNumber(Value<? extends Number> number) {
-    return fieldCreator.create(name, number, attributes);
+  public @NotNull Field visitNumber(@NotNull Value<? extends Number> numberValue) {
+    return fieldCreator.create(name, numberValue, attributes);
   }
 
   @Override
-  public Field visitNull() {
+  public @NotNull Field visitNull() {
     return fieldCreator.create(name, Value.nullValue(), attributes);
   }
 
   @Override
-  public Field visitArray(Value<List<Value<?>>> array) {
-    List<Value<?>> collect =
-        array.raw().stream()
-            .map(
-                el -> {
-                  if (el.type() == Value.Type.OBJECT) {
-                    List<Field> fields =
-                        el.asObject().raw().stream().map(this::visit).collect(Collectors.toList());
-                    return Value.object(fields);
-                  }
-
-                  // XXX What if we have array of array of object?
-
-                  return el;
-                })
-            .collect(Collectors.toList());
-    return fieldCreator.create(name, Value.array(collect), attributes);
+  public @NotNull ArrayVisitor visitArray() {
+    return new SimpleArrayVisitor();
   }
 
   @Override
-  public ObjectVisitor visitObject() {
-    return new DefaultObjectVisitor();
+  public @NotNull ObjectVisitor visitObject() {
+    return new SimpleObjectVisitor();
   }
 
-  class DefaultObjectVisitor implements ObjectVisitor {
-    private final List<Field> fields;
+  public class SimpleArrayVisitor implements ArrayVisitor {
 
-    public DefaultObjectVisitor() {
+    protected final List<Value<?>> elements = new ArrayList<>();
+
+    @Override
+    public @NotNull Field done() {
+      return fieldCreator.create(name, Value.array(elements), attributes);
+    }
+
+    @Override
+    public void visitElement(@NotNull Value<?> value) {
+      switch (value.type()) {
+        case ARRAY:
+          visitArrayElement(value.asArray());
+          break;
+        case OBJECT:
+          visitObjectElement(value.asObject());
+          break;
+        case STRING:
+          visitStringElement(value.asString());
+          break;
+        case NUMBER:
+          visitNumberElement(value.asNumber());
+          break;
+        case BOOLEAN:
+          visitBooleanElement(value.asBoolean());
+          break;
+        case EXCEPTION:
+          visitExceptionElement(value.asException());
+          break;
+        case NULL:
+          visitNullElement();
+          break;
+      }
+    }
+
+    @Override
+    public void visitStringElement(Value.StringValue stringValue) {
+      elements.add(stringValue);
+    }
+
+    @Override
+    public void visitNumberElement(Value.NumberValue<?> numberValue) {
+      elements.add(numberValue);
+    }
+
+    @Override
+    public void visitBooleanElement(Value.BooleanValue booleanValue) {
+      elements.add(booleanValue);
+    }
+
+    @Override
+    public void visitArrayElement(Value.ArrayValue arrayValue) {
+      elements.add(arrayValue);
+    }
+
+    @Override
+    public void visitObjectElement(Value.ObjectValue objectValue) {
+      elements.add(objectValue);
+    }
+
+    @Override
+    public void visitExceptionElement(Value.ExceptionValue exceptionValue) {
+      elements.add(exceptionValue);
+    }
+
+    @Override
+    public void visitNullElement() {
+      elements.add(Value.nullValue());
+    }
+  }
+
+  public class SimpleObjectVisitor implements ObjectVisitor {
+    protected final List<Field> fields;
+
+    public SimpleObjectVisitor() {
       fields = new ArrayList<>();
     }
 
     @Override
-    public Field done() {
+    public @NotNull Field done() {
       return fieldCreator.create(name, Value.object(fields), attributes);
     }
 
     @Override
-    public void visit(Field child) {
-      fields.add(child);
+    public void visit(@NotNull Field childField) {
+      fields.add(childField);
     }
 
     @Override
-    public FieldVisitor visitChild() {
+    public @NotNull FieldVisitor visitChild() {
       return SimpleFieldVisitor.this;
     }
   }

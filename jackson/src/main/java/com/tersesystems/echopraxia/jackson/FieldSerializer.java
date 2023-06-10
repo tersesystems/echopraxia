@@ -4,11 +4,14 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldVisitor;
+import com.tersesystems.echopraxia.api.PresentationHints;
 import com.tersesystems.echopraxia.api.Value;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Optional;
 
 /** The FieldSerializer class plugs into Jackson to serialize Field to JSON. */
 public class FieldSerializer extends StdSerializer<Field> {
@@ -24,8 +27,19 @@ public class FieldSerializer extends StdSerializer<Field> {
   }
 
   @Override
-  public void serialize(Field field, JsonGenerator jgen, SerializerProvider provider)
+  public void serialize(Field input, JsonGenerator jgen, SerializerProvider provider)
       throws IOException {
+
+    Field field;
+    Optional<FieldVisitor> fieldVisitorOpt =
+        input.attributes().getOptional(PresentationHints.FIELD_VISITOR);
+    if (fieldVisitorOpt.isPresent()) {
+      FieldVisitor fieldVisitor = fieldVisitorOpt.get();
+      field = fieldVisitor.visit(input);
+    } else {
+      field = input;
+    }
+
     final String name = field.name();
     final Value<?> value = field.value();
     // short circuit if a null value's been passed in, so we can keep logging.

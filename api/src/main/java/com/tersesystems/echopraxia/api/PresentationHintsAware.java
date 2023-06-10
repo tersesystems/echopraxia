@@ -51,4 +51,7 @@ public interface PresentationHintsAware<F extends Field> {
    */
   @NotNull
   F withDisplayName(@NotNull String displayName);
+
+  @NotNull
+  F withFieldVisitor(@NotNull FieldVisitor fieldVisitor);
 }

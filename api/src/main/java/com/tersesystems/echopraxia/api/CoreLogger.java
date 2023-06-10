@@ -106,10 +106,6 @@ public interface CoreLogger {
   @NotNull
   CoreLogger withExecutor(@NotNull Executor executor);
 
-  /** Returns a logger with the given field transformer. */
-  @NotNull
-  CoreLogger withFieldTransformer(FieldTransformer fieldTransformer);
-
   /**
    * Returns a logger with the given fully qualified caller name.
    *

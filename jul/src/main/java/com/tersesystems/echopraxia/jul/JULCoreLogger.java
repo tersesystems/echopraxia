@@ -25,7 +25,6 @@ public class JULCoreLogger implements CoreLogger {
   private final Supplier<Runnable> threadContextFunction;
 
   private final Executor executor;
-  private final FieldTransformer fieldTransformer;
 
   public JULCoreLogger(@NotNull String fqcn, @NotNull Logger logger) {
     this.fqcn = fqcn;
@@ -34,7 +33,6 @@ public class JULCoreLogger implements CoreLogger {
     this.condition = Condition.always();
     this.threadContextFunction = mdcContext();
     this.executor = ForkJoinPool.commonPool();
-    this.fieldTransformer = FieldTransformer.identity();
   }
 
   protected JULCoreLogger(
@@ -43,15 +41,13 @@ public class JULCoreLogger implements CoreLogger {
       @NotNull JULLoggerContext context,
       @NotNull Condition condition,
       @NotNull Supplier<Runnable> threadContextFunction,
-      @NotNull Executor executor,
-      @NotNull FieldTransformer fieldTransformer) {
+      @NotNull Executor executor) {
     this.fqcn = fqcn;
     this.logger = log4jLogger;
     this.context = context;
     this.condition = condition;
     this.threadContextFunction = threadContextFunction;
     this.executor = executor;
-    this.fieldTransformer = fieldTransformer;
   }
 
   @NotNull
@@ -121,11 +117,6 @@ public class JULCoreLogger implements CoreLogger {
   @Override
   public @NotNull JULCoreLogger withExecutor(@NotNull Executor executor) {
     return newLogger(executor);
-  }
-
-  @Override
-  public @NotNull JULCoreLogger withFieldTransformer(FieldTransformer fieldTransformer) {
-    return newLogger(fieldTransformer);
   }
 
   @Override
@@ -553,7 +544,7 @@ public class JULCoreLogger implements CoreLogger {
     int i = 0;
     Throwable thrown = null;
     for (Field f : argumentFields) {
-      arguments[i++] = (Field) this.fieldTransformer.tranformArgumentField(f);
+      arguments[i++] = f;
       if (f.value() instanceof Value.ExceptionValue) {
         thrown = (Throwable) f.value().raw();
         break;
@@ -564,41 +555,31 @@ public class JULCoreLogger implements CoreLogger {
     List<Field> loggerFields = ctx.getLoggerFields();
     final Field[] fields = new Field[loggerFields.size()];
     for (Field f : loggerFields) {
-      fields[i++] = (Field) this.fieldTransformer.transformLoggerField(f);
+      fields[i++] = f;
     }
     return new EchopraxiaLogRecord(getName(), julLevel, messageTemplate, arguments, fields, thrown);
   }
 
   @NotNull
   private JULCoreLogger newLogger(JULLoggerContext newContext) {
-    return new JULCoreLogger(
-        fqcn, logger, newContext, condition, threadContextFunction, executor, fieldTransformer);
+    return new JULCoreLogger(fqcn, logger, newContext, condition, threadContextFunction, executor);
   }
 
   private JULCoreLogger newLogger(Supplier<Runnable> newThreadContextFunction) {
-    return new JULCoreLogger(
-        fqcn, logger, context, condition, newThreadContextFunction, executor, fieldTransformer);
+    return new JULCoreLogger(fqcn, logger, context, condition, newThreadContextFunction, executor);
   }
 
   @NotNull
   private JULCoreLogger newLogger(@NotNull Condition condition) {
-    return new JULCoreLogger(
-        fqcn, logger, context, condition, threadContextFunction, executor, fieldTransformer);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
   }
 
   private JULCoreLogger newLogger(Executor executor) {
-    return new JULCoreLogger(
-        fqcn, logger, context, condition, threadContextFunction, executor, fieldTransformer);
-  }
-
-  private JULCoreLogger newLogger(FieldTransformer fieldTransformer) {
-    return new JULCoreLogger(
-        fqcn, logger, context, condition, threadContextFunction, executor, fieldTransformer);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
   }
 
   private JULCoreLogger newLogger(String fqcn) {
-    return new JULCoreLogger(
-        fqcn, logger, context, condition, threadContextFunction, executor, fieldTransformer);
+    return new JULCoreLogger(fqcn, logger, context, condition, threadContextFunction, executor);
   }
 
   private Supplier<Runnable> mdcContext() {
