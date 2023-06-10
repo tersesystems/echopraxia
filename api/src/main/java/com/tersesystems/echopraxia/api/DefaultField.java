@@ -35,7 +35,6 @@ public class DefaultField
     return this.withAttribute(PresentationHints.abbreviateAfter(after));
   }
 
-
   @Override
   public @NotNull DefaultField asCardinal() {
     return this.withAttribute(PresentationHints.asCardinal());

@@ -1,9 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A very simple field visitor that returns its input.
@@ -128,18 +127,25 @@ public class SimpleFieldVisitor implements FieldVisitor {
       switch (value.type()) {
         case ARRAY:
           visitArrayElement(value.asArray());
+          break;
         case OBJECT:
           visitObjectElement(value.asObject());
+          break;
         case STRING:
           visitStringElement(value.asString());
+          break;
         case NUMBER:
           visitNumberElement(value.asNumber());
+          break;
         case BOOLEAN:
           visitBooleanElement(value.asBoolean());
+          break;
         case EXCEPTION:
           visitExceptionElement(value.asException());
+          break;
         case NULL:
           visitNullElement();
+          break;
       }
     }
 
@@ -177,8 +183,6 @@ public class SimpleFieldVisitor implements FieldVisitor {
     public void visitNullElement() {
       elements.add(Value.nullValue());
     }
-
-
   }
 
   public class SimpleObjectVisitor implements ObjectVisitor {

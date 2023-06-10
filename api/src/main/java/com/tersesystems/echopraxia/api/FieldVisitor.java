@@ -2,8 +2,6 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-
 public interface FieldVisitor {
 
   Field visit(@NotNull Field field);
@@ -12,42 +10,55 @@ public interface FieldVisitor {
 
   void visitName(@NotNull String name);
 
-  @NotNull Field visitString(@NotNull Value<String> stringValue);
+  @NotNull
+  Field visitString(@NotNull Value<String> stringValue);
 
-  @NotNull Field visitException(@NotNull Value<Throwable> exceptionValue);
+  @NotNull
+  Field visitException(@NotNull Value<Throwable> exceptionValue);
 
-  @NotNull Field visitBoolean(@NotNull Value<Boolean> booleanValue);
+  @NotNull
+  Field visitBoolean(@NotNull Value<Boolean> booleanValue);
 
-  @NotNull Field visitNumber(@NotNull Value<? extends Number> numberValue);
+  @NotNull
+  Field visitNumber(@NotNull Value<? extends Number> numberValue);
 
-  @NotNull Field visitNull();
+  @NotNull
+  Field visitNull();
 
-  @NotNull ArrayVisitor visitArray();
+  @NotNull
+  ArrayVisitor visitArray();
 
-  @NotNull ObjectVisitor visitObject();
+  @NotNull
+  ObjectVisitor visitObject();
 
   interface ArrayVisitor {
-    @NotNull Field done();
+    @NotNull
+    Field done();
 
     void visitElement(@NotNull Value<?> value);
 
-    void visitStringElement(Value.StringValue  stringValue);
+    void visitStringElement(Value.StringValue stringValue);
+
     void visitNumberElement(Value.NumberValue<?> numberValue);
+
     void visitBooleanElement(Value.BooleanValue booleanValue);
 
     void visitArrayElement(Value.ArrayValue arrayValue);
 
     void visitObjectElement(Value.ObjectValue objectValue);
+
     void visitExceptionElement(Value.ExceptionValue exceptionValue);
 
     void visitNullElement();
   }
 
   interface ObjectVisitor {
-    @NotNull Field done();
+    @NotNull
+    Field done();
 
     void visit(@NotNull Field childField);
 
-    @NotNull FieldVisitor visitChild();
+    @NotNull
+    FieldVisitor visitChild();
   }
 }

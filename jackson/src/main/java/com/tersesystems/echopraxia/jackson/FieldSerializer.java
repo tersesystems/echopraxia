@@ -31,7 +31,8 @@ public class FieldSerializer extends StdSerializer<Field> {
       throws IOException {
 
     Field field;
-    Optional<FieldVisitor> fieldVisitorOpt = input.attributes().getOptional(PresentationHints.FIELD_VISITOR);
+    Optional<FieldVisitor> fieldVisitorOpt =
+        input.attributes().getOptional(PresentationHints.FIELD_VISITOR);
     if (fieldVisitorOpt.isPresent()) {
       FieldVisitor fieldVisitor = fieldVisitorOpt.get();
       field = fieldVisitor.visit(input);
