@@ -27,7 +27,7 @@ public class PresentationHints {
       Attributes.create(PresentationHints.asValueOnly());
 
   // package-private static, we only use this in Field.value as a shortcut
-  static Attributes valueOnlyAttributes() {
+  public static Attributes valueOnlyAttributes() {
     return VALUE_ONLY_ATTRS;
   }
 

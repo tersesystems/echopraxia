@@ -114,7 +114,7 @@ public class SimpleFieldVisitor implements FieldVisitor {
     return new SimpleObjectVisitor();
   }
 
-  class SimpleArrayVisitor implements ArrayVisitor {
+  public class SimpleArrayVisitor implements ArrayVisitor {
 
     protected final List<Value<?>> elements = new ArrayList<>();
 
@@ -181,7 +181,7 @@ public class SimpleFieldVisitor implements FieldVisitor {
 
   }
 
-  class SimpleObjectVisitor implements ObjectVisitor {
+  public class SimpleObjectVisitor implements ObjectVisitor {
     protected final List<Field> fields;
 
     public SimpleObjectVisitor() {
