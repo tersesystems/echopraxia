@@ -16,8 +16,12 @@ public class SimpleFieldVisitor implements FieldVisitor {
   protected Attributes attributes;
   protected String name;
 
+  public SimpleFieldVisitor() {
+    this(DefaultField.class);
+  }
+
   public <F extends Field> SimpleFieldVisitor(Class<F> fieldClass) {
-    this.fieldCreator = EchopraxiaService.getInstance().getFieldCreator(fieldClass);
+    this(EchopraxiaService.getInstance().getFieldCreator(fieldClass));
   }
 
   public SimpleFieldVisitor(FieldCreator<?> fieldCreator) {

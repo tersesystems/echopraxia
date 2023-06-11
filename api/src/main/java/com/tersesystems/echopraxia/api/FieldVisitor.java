@@ -2,6 +2,11 @@ package com.tersesystems.echopraxia.api;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A visitor interface that transforms the field in a structured JSON view.
+ *
+ * @since 3.0
+ */
 public interface FieldVisitor {
 
   Field visit(@NotNull Field field);

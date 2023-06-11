@@ -23,8 +23,8 @@ public class VisitorTests {
     MyFieldBuilder fb = MyFieldBuilder.instance();
     Field field =
         fb.string("fortuneCookie", "You will have a long and illustrious career")
-            .withFieldVisitor(
-                new SimpleFieldVisitor(DefaultField.class) {
+            .withStructuredFormat(
+                new SimpleFieldVisitor() {
                   @Override
                   public @NotNull Field visitString(@NotNull Value<String> stringValue) {
                     return fb.string(name, Value.string(stringValue.raw() + " IN BED"));
@@ -37,7 +37,7 @@ public class VisitorTests {
   @Test
   public void testNestedInBedVisitor() {
     FieldVisitor inBedVisitor =
-        new SimpleFieldVisitor(DefaultField.class) {
+        new SimpleFieldVisitor() {
           @Override
           public @NotNull Field visitString(@NotNull Value<String> stringValue) {
             return super.visitString(Value.string(stringValue.raw() + " IN BED"));
@@ -46,7 +46,7 @@ public class VisitorTests {
     MyFieldBuilder fb = MyFieldBuilder.instance();
     Field cookieField =
         fb.string("fortuneCookie", "You will have a long and illustrious career")
-            .withFieldVisitor(inBedVisitor);
+            .withStructuredFormat(inBedVisitor);
     Field restaurantField = fb.object("restaurant", cookieField);
     assertThatJson(restaurantField)
         .inPath("$.restaurant.fortuneCookie")
@@ -73,7 +73,7 @@ public class VisitorTests {
     Instant[] instants = {Instant.ofEpochMilli(0)};
     Field instantArrayField =
         fb.array("instantArray", Value.array(i -> Value.string(i.toString()), instants))
-            .withFieldVisitor(instantVisitor);
+            .withStructuredFormat(instantVisitor);
 
     var objectNode = toJson(instantArrayField);
     var element = objectNode.get("instantArray").get(0);
@@ -85,7 +85,6 @@ public class VisitorTests {
 
   @Test
   public void testInstantInObject() {
-    FieldVisitor instantVisitor = new InstantFieldVisitor();
     MyFieldBuilder fb = MyFieldBuilder.instance();
 
     Field dateRange =
@@ -103,7 +102,6 @@ public class VisitorTests {
 
   @Test
   public void testInstantInObjectInArray() {
-    FieldVisitor instantVisitor = new InstantFieldVisitor();
     MyFieldBuilder fb = MyFieldBuilder.instance();
 
     Value.ObjectValue obj =
@@ -154,7 +152,7 @@ public class VisitorTests {
     }
 
     public DefaultField instant(String name, Instant instant) {
-      return string(name, instant.toString()).withFieldVisitor(new InstantFieldVisitor());
+      return string(name, instant.toString()).withStructuredFormat(new InstantFieldVisitor());
     }
 
     public Field typedInstant(String name, Value<String> v) {
@@ -169,10 +167,6 @@ public class VisitorTests {
 
   static class InstantFieldVisitor extends SimpleFieldVisitor {
     private final MyFieldBuilder fb = MyFieldBuilder.instance();
-
-    public <F extends Field> InstantFieldVisitor() {
-      super(DefaultField.class);
-    }
 
     @Override
     public @NotNull Field visitString(@NotNull Value<String> stringValue) {

@@ -15,8 +15,8 @@ public class PresentationHints {
   public static final AttributeKey<Boolean> AS_CARDINAL = AttributeKey.create("asCardinal");
   public static final AttributeKey<String> DISPLAY_NAME = AttributeKey.create("displayName");
   public static final AttributeKey<Boolean> ELIDE = AttributeKey.create("elide");
-  public static final AttributeKey<FieldVisitor> FIELD_VISITOR =
-      AttributeKey.create("fieldVisitor");
+  public static final AttributeKey<FieldVisitor> STRUCTURED_FORMAT =
+      AttributeKey.create("structuredFormat");
 
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
@@ -80,7 +80,7 @@ public class PresentationHints {
     return ELIDE_ATTR;
   }
 
-  public static Attribute<FieldVisitor> withFieldVisitor(FieldVisitor visitor) {
-    return FIELD_VISITOR.bindValue(visitor);
+  public static Attribute<FieldVisitor> withStructuredFormat(FieldVisitor visitor) {
+    return STRUCTURED_FORMAT.bindValue(visitor);
   }
 }

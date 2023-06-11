@@ -134,6 +134,67 @@ Field object = keyValue("object", Value.object(fields), DefaultField.class);
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
+### StructuredFormat
+
+Using the `withStructuredFormat` method with a field visitor will allow the JSON output to contain different fields when you want to provide extra type information that isn't relevant in text.
+
+For example, imagine you want to render a `java.lang.Instant` in JSON as having an explicit `@type` of `http://www.w3.org/2001/XMLSchema#dateTime` alongside the value, but don't want to needlessly complicate your output.  Using `withStructuredFormat` with a class extending `SimpleFieldVisitor`, you can intercept and override field processing in JSON:
+
+```java
+public class InstantFieldBuilder implements DefaultFieldBuilder {
+
+  static InstantFieldBuilder instance() {
+    return new InstantFieldBuilder();
+  }
+
+  final FieldVisitor instantVisitor = new InstantFieldVisitor();
+
+  public DefaultField instant(String name, Instant instant) {
+    return string(name, instant.toString()).withStructuredFormat(instantVisitor);
+  }
+
+  Field typedInstant(String name, Value<String> v) {
+    return object(name, typedInstantValue(v));
+  }
+
+  Value.ObjectValue typedInstantValue(Value<String> v) {
+    return Value.object(
+      string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
+  }
+
+  class InstantFieldVisitor extends SimpleFieldVisitor {
+    @Override
+    public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+      return typedInstant(name, stringValue);
+    }
+
+    @Override
+    public @NotNull ArrayVisitor visitArray() {
+      return new InstantArrayVisitor();
+    }
+
+    class InstantArrayVisitor extends SimpleArrayVisitor {
+      @Override
+      public void visitStringElement(Value.StringValue stringValue) {
+        this.elements.add(typedInstantValue(stringValue));
+      }
+    }
+  }
+}
+```
+
+This field builder will render `fb.instant("startTime", Instant.ofEpochMillis(0))` as the following in text:
+
+```
+startTime=1970-01-01T00:00:00Z
+```
+
+But will render JSON as:
+
+```json
+{"startTime":{"@type":"http://www.w3.org/2001/XMLSchema#dateTime","@value":"1970-01-01T00:00:00Z"}}
+```
+
 ## Nulls
 
 By default, values are `@NotNull`, and passing in `null` to values is not recommended.  It's recommended to use `Value.optional` over null, if possible.

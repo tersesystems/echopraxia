@@ -32,7 +32,7 @@ public class FieldSerializer extends StdSerializer<Field> {
 
     Field field;
     Optional<FieldVisitor> fieldVisitorOpt =
-        input.attributes().getOptional(PresentationHints.FIELD_VISITOR);
+        input.attributes().getOptional(PresentationHints.STRUCTURED_FORMAT);
     if (fieldVisitorOpt.isPresent()) {
       FieldVisitor fieldVisitor = fieldVisitorOpt.get();
       field = fieldVisitor.visit(input);
