@@ -51,8 +51,8 @@ public class DefaultField
   }
 
   @Override
-  public @NotNull DefaultField withFieldVisitor(@NotNull FieldVisitor fieldVisitor) {
-    return this.withAttribute(PresentationHints.withFieldVisitor(fieldVisitor));
+  public @NotNull DefaultField withStructuredFormat(@NotNull FieldVisitor fieldVisitor) {
+    return this.withAttribute(PresentationHints.withStructuredFormat(fieldVisitor));
   }
 
   @Override
