@@ -2,15 +2,14 @@ package com.tersesystems.echopraxia.api;
 
 import static com.tersesystems.echopraxia.spi.FieldConstants.EXCEPTION;
 
-import com.tersesystems.echopraxia.spi.DefaultField;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public interface DefaultFieldBuilder extends FieldBuilder {
-  static @NotNull DefaultFieldBuilder instance() {
-    return DefaultFieldBuilderInstance.getInstance();
+public interface PresentationFieldBuilder extends FieldBuilder {
+  static @NotNull PresentationFieldBuilder instance() {
+    return PresentationFieldBuilderInstance.getInstance();
   }
   /**
    * Creates a field that renders in message template as value.
@@ -22,8 +21,8 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default DefaultField value(@NotNull String name, @NotNull Value<?> value) {
-    return Field.value(name, value, DefaultField.class);
+  default PresentationField value(@NotNull String name, @NotNull Value<?> value) {
+    return Field.value(name, value, PresentationField.class);
   }
 
   /**
@@ -36,8 +35,8 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default DefaultField keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return Field.keyValue(name, value, DefaultField.class);
+  default PresentationField keyValue(@NotNull String name, @NotNull Value<?> value) {
+    return Field.keyValue(name, value, PresentationField.class);
   }
 
   /**
@@ -98,7 +97,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default DefaultField string(@NotNull String name, @NotNull String value) {
+  default PresentationField string(@NotNull String name, @NotNull String value) {
     return keyValue(name, Value.string(value));
   }
 
@@ -110,7 +109,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return the field.
    */
   @NotNull
-  default DefaultField string(@NotNull String name, @NotNull Value.StringValue value) {
+  default PresentationField string(@NotNull String name, @NotNull Value.StringValue value) {
     return keyValue(name, value);
   }
 
@@ -125,35 +124,35 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField number(@NotNull String name, @NotNull Byte value) {
+  default PresentationField number(@NotNull String name, @NotNull Byte value) {
     return keyValue(name, Value.number(value));
   }
 
-  default DefaultField number(@NotNull String name, @NotNull Short value) {
+  default PresentationField number(@NotNull String name, @NotNull Short value) {
     return keyValue(name, Value.number(value));
   }
 
-  default DefaultField number(@NotNull String name, @NotNull Integer value) {
+  default PresentationField number(@NotNull String name, @NotNull Integer value) {
     return keyValue(name, Value.number(value));
   }
 
-  default DefaultField number(@NotNull String name, @NotNull Long value) {
+  default PresentationField number(@NotNull String name, @NotNull Long value) {
     return keyValue(name, Value.number(value));
   }
 
-  default DefaultField number(@NotNull String name, @NotNull Float value) {
+  default PresentationField number(@NotNull String name, @NotNull Float value) {
     return keyValue(name, Value.number(value));
   }
 
-  default DefaultField number(@NotNull String name, @NotNull Double value) {
+  default PresentationField number(@NotNull String name, @NotNull Double value) {
     return keyValue(name, Value.number(value));
   }
 
-  default DefaultField number(@NotNull String name, @NotNull BigInteger value) {
+  default PresentationField number(@NotNull String name, @NotNull BigInteger value) {
     return keyValue(name, Value.number(value));
   }
 
-  default DefaultField number(@NotNull String name, @NotNull BigDecimal value) {
+  default PresentationField number(@NotNull String name, @NotNull BigDecimal value) {
     return keyValue(name, Value.number(value));
   }
 
@@ -182,7 +181,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField bool(@NotNull String name, @NotNull Boolean value) {
+  default PresentationField bool(@NotNull String name, @NotNull Boolean value) {
     return keyValue(name, Value.bool(value));
   }
 
@@ -194,7 +193,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField bool(@NotNull String name, @NotNull Value.BooleanValue value) {
+  default PresentationField bool(@NotNull String name, @NotNull Value.BooleanValue value) {
     return keyValue(name, value);
   }
 
@@ -209,7 +208,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField array(@NotNull String name, @NotNull Value.ObjectValue... values) {
+  default PresentationField array(@NotNull String name, @NotNull Value.ObjectValue... values) {
     return keyValue(name, Value.array(values));
   }
 
@@ -221,7 +220,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField array(@NotNull String name, String... values) {
+  default PresentationField array(@NotNull String name, String... values) {
     return keyValue(name, Value.array(values));
   }
 
@@ -233,35 +232,35 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField array(@NotNull String name, Byte... values) {
+  default PresentationField array(@NotNull String name, Byte... values) {
     return keyValue(name, Value.array(values));
   }
 
-  default DefaultField array(@NotNull String name, Short... values) {
+  default PresentationField array(@NotNull String name, Short... values) {
     return keyValue(name, Value.array(values));
   }
 
-  default DefaultField array(@NotNull String name, Integer... values) {
+  default PresentationField array(@NotNull String name, Integer... values) {
     return keyValue(name, Value.array(values));
   }
 
-  default DefaultField array(@NotNull String name, Long... values) {
+  default PresentationField array(@NotNull String name, Long... values) {
     return keyValue(name, Value.array(values));
   }
 
-  default DefaultField array(@NotNull String name, Double... values) {
+  default PresentationField array(@NotNull String name, Double... values) {
     return keyValue(name, Value.array(values));
   }
 
-  default DefaultField array(@NotNull String name, Float... values) {
+  default PresentationField array(@NotNull String name, Float... values) {
     return keyValue(name, Value.array(values));
   }
 
-  default DefaultField array(@NotNull String name, BigInteger... values) {
+  default PresentationField array(@NotNull String name, BigInteger... values) {
     return keyValue(name, Value.array(values));
   }
 
-  default DefaultField array(@NotNull String name, BigDecimal... values) {
+  default PresentationField array(@NotNull String name, BigDecimal... values) {
     return keyValue(name, Value.array(values));
   }
 
@@ -273,7 +272,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField array(@NotNull String name, Boolean... values) {
+  default PresentationField array(@NotNull String name, Boolean... values) {
     return keyValue(name, Value.array(values));
   }
 
@@ -287,7 +286,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a list containing a single field.
    */
   @NotNull
-  default DefaultField array(@NotNull String name, @NotNull Value.ArrayValue value) {
+  default PresentationField array(@NotNull String name, @NotNull Value.ArrayValue value) {
     // Don't allow Value.ArrayValue... it's far too easy to double nest an array.
     return keyValue(name, value);
   }
@@ -303,7 +302,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a single field.
    */
   @NotNull
-  default DefaultField object(@NotNull String name, Field... values) {
+  default PresentationField object(@NotNull String name, Field... values) {
     return keyValue(name, Value.object(values));
   }
 
@@ -315,7 +314,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default DefaultField object(@NotNull String name, @NotNull List<Field> values) {
+  default PresentationField object(@NotNull String name, @NotNull List<Field> values) {
     return keyValue(name, Value.object(values));
   }
 
@@ -327,7 +326,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default DefaultField object(@NotNull String name, @NotNull Value.ObjectValue value) {
+  default PresentationField object(@NotNull String name, @NotNull Value.ObjectValue value) {
     // limited to object specifically -- if you want object or null,
     // use `value` or `keyValue`
     return keyValue(name, value);
@@ -343,7 +342,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default DefaultField exception(@NotNull Throwable t) {
+  default PresentationField exception(@NotNull Throwable t) {
     return keyValue(EXCEPTION, Value.exception(t));
   }
 
@@ -354,7 +353,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default DefaultField exception(@NotNull Value.ExceptionValue value) {
+  default PresentationField exception(@NotNull Value.ExceptionValue value) {
     return keyValue(EXCEPTION, value);
   }
 
@@ -366,7 +365,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default DefaultField exception(@NotNull String name, @NotNull Throwable t) {
+  default PresentationField exception(@NotNull String name, @NotNull Throwable t) {
     return keyValue(name, Value.exception(t));
   }
 
@@ -378,7 +377,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default DefaultField exception(@NotNull String name, @NotNull Value.ExceptionValue value) {
+  default PresentationField exception(@NotNull String name, @NotNull Value.ExceptionValue value) {
     return keyValue(name, value);
   }
 
@@ -392,15 +391,15 @@ public interface DefaultFieldBuilder extends FieldBuilder {
    * @return a field.
    */
   @NotNull
-  default DefaultField nullField(@NotNull String name) {
+  default PresentationField nullField(@NotNull String name) {
     return keyValue(name, Value.nullValue());
   }
 }
 
-class DefaultFieldBuilderInstance {
-  private static final DefaultFieldBuilder instance = new DefaultFieldBuilder() {};
+class PresentationFieldBuilderInstance {
+  private static final PresentationFieldBuilder instance = new PresentationFieldBuilder() {};
 
-  static DefaultFieldBuilder getInstance() {
+  static PresentationFieldBuilder getInstance() {
     return instance;
   }
 }

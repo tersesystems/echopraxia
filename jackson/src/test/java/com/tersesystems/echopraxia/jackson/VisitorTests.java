@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.spi.DefaultField;
 import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
@@ -147,16 +146,16 @@ public class VisitorTests {
         .isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
   }
 
-  static class MyFieldBuilder implements DefaultFieldBuilder {
+  static class MyFieldBuilder implements PresentationFieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder();
     }
 
-    public DefaultField instant(String name, Instant instant) {
+    public PresentationField instant(String name, Instant instant) {
       return string(name, instant.toString()).withStructuredFormat(new InstantFieldVisitor());
     }
 
-    public Field typedInstant(String name, Value<String> v) {
+    public PresentationField typedInstant(String name, Value<String> v) {
       return object(name, typedInstantValue(v));
     }
 

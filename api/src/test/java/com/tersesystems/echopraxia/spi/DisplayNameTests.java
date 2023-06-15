@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.spi.PresentationHints.withDisplayName;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.withDisplayName;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.api.*;

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 3.0
  */
-public class PresentationHints {
+public class PresentationHintAttributes {
   public static final AttributeKey<Boolean> VALUE_ONLY = AttributeKey.create("valueOnly");
   public static final AttributeKey<Integer> ABBREVIATE_AFTER =
       AttributeKey.create("abbreviateAfter");
@@ -25,7 +25,7 @@ public class PresentationHints {
   private static final Attribute<Boolean> ELIDE_ATTR = ELIDE.bindValue(true);
 
   private static final Attributes VALUE_ONLY_ATTRS =
-      Attributes.create(PresentationHints.asValueOnly());
+      Attributes.create(PresentationHintAttributes.asValueOnly());
 
   // package-private static, we only use this in Field.value as a shortcut
   public static Attributes valueOnlyAttributes() {

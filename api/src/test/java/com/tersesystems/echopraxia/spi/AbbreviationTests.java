@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.spi.PresentationHints.abbreviateAfter;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.abbreviateAfter;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.api.Field;

@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.spi.PresentationHints.asCardinal;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.asCardinal;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.spi.DefaultField;

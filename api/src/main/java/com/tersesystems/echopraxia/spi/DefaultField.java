@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.spi;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.api.PresentationHintsAware;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -13,8 +12,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 3.0
  */
-public class DefaultField
-    implements Field, PresentationHintsAware<DefaultField>, AttributesAware<DefaultField> {
+public class DefaultField implements PresentationField {
 
   protected final String name;
   protected final Value<?> value;
@@ -29,32 +27,32 @@ public class DefaultField
 
   @Override
   public @NotNull DefaultField asValueOnly() {
-    return this.withAttribute(PresentationHints.asValueOnly());
+    return this.withAttribute(PresentationHintAttributes.asValueOnly());
   }
 
   @Override
   public @NotNull DefaultField abbreviateAfter(int after) {
-    return this.withAttribute(PresentationHints.abbreviateAfter(after));
+    return this.withAttribute(PresentationHintAttributes.abbreviateAfter(after));
   }
 
   @Override
   public @NotNull DefaultField asCardinal() {
-    return this.withAttribute(PresentationHints.asCardinal());
+    return this.withAttribute(PresentationHintAttributes.asCardinal());
   }
 
   @Override
   public @NotNull DefaultField asElided() {
-    return this.withAttribute(PresentationHints.asElided());
+    return this.withAttribute(PresentationHintAttributes.asElided());
   }
 
   @Override
   public @NotNull DefaultField withDisplayName(@NotNull String displayName) {
-    return this.withAttribute(PresentationHints.withDisplayName(displayName));
+    return this.withAttribute(PresentationHintAttributes.withDisplayName(displayName));
   }
 
   @Override
   public @NotNull DefaultField withStructuredFormat(@NotNull FieldVisitor fieldVisitor) {
-    return this.withAttribute(PresentationHints.withStructuredFormat(fieldVisitor));
+    return this.withAttribute(PresentationHintAttributes.withStructuredFormat(fieldVisitor));
   }
 
   @Override
