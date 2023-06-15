@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.spi;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.api.PresentationHints;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
