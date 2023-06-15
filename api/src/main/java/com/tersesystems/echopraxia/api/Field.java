@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import com.tersesystems.echopraxia.spi.DefaultField;
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
-import com.tersesystems.echopraxia.spi.PresentationHints;
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
 
@@ -66,7 +66,7 @@ public interface Field extends FieldBuilderResult {
       @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
     return EchopraxiaService.getInstance()
         .getFieldCreator(fieldClass)
-        .create(name, value, PresentationHints.valueOnlyAttributes());
+        .create(name, value, PresentationHintAttributes.valueOnlyAttributes());
   }
 
   /**

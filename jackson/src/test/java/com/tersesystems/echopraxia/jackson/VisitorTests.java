@@ -147,16 +147,16 @@ public class VisitorTests {
         .isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
   }
 
-  static class MyFieldBuilder implements DefaultFieldBuilder {
+  static class MyFieldBuilder implements PresentationFieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder();
     }
 
-    public DefaultField instant(String name, Instant instant) {
+    public PresentationField instant(String name, Instant instant) {
       return string(name, instant.toString()).withStructuredFormat(new InstantFieldVisitor());
     }
 
-    public Field typedInstant(String name, Value<String> v) {
+    public PresentationField typedInstant(String name, Value<String> v) {
       return object(name, typedInstantValue(v));
     }
 

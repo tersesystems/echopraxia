@@ -71,9 +71,9 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static Logger<DefaultFieldBuilder> getLogger() {
+  public static Logger<PresentationFieldBuilder> getLogger() {
     CoreLogger core = CoreLoggerFactory.getLogger(Logger.FQCN, Caller.resolveClassName());
-    return getLogger(core, DefaultFieldBuilder.instance());
+    return getLogger(core, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -81,8 +81,8 @@ public class LoggerFactory {
    *
    * @return the logger.
    */
-  public static Logger<DefaultFieldBuilder> getLogger(CoreLogger core) {
-    return getLogger(core, DefaultFieldBuilder.instance());
+  public static Logger<PresentationFieldBuilder> getLogger(CoreLogger core) {
+    return getLogger(core, PresentationFieldBuilder.instance());
   }
 
   /**

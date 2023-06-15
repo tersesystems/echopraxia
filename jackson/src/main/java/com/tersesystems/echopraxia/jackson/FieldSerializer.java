@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldVisitor;
 import com.tersesystems.echopraxia.api.Value;
-import com.tersesystems.echopraxia.spi.PresentationHints;
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -32,7 +32,7 @@ public class FieldSerializer extends StdSerializer<Field> {
 
     Field field;
     Optional<FieldVisitor> fieldVisitorOpt =
-        input.attributes().getOptional(PresentationHints.STRUCTURED_FORMAT);
+        input.attributes().getOptional(PresentationHintAttributes.STRUCTURED_FORMAT);
     if (fieldVisitorOpt.isPresent()) {
       FieldVisitor fieldVisitor = fieldVisitorOpt.get();
       field = fieldVisitor.visit(input);

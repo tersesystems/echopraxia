@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 3.0
  */
-public interface PresentationHintsAware<F extends Field> {
+public interface PresentationHints<F extends Field> {
 
   /**
    * Tells the formatter that the field should be rendered with the value only, i.e. "value" and not

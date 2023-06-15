@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.spi.PresentationHints.ABBREVIATE_AFTER;
-import static com.tersesystems.echopraxia.spi.PresentationHints.AS_CARDINAL;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.ABBREVIATE_AFTER;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.AS_CARDINAL;
 
 import com.tersesystems.echopraxia.api.*;
 import java.util.List;
@@ -111,8 +111,8 @@ public class DefaultToStringFormatter implements ToStringFormatter {
 
   private void formatName(
       @NotNull StringBuilder builder, @NotNull String name, @NotNull Attributes attributes) {
-    if (attributes.containsKey(PresentationHints.DISPLAY_NAME)) {
-      String displayName = attributes.get(PresentationHints.DISPLAY_NAME);
+    if (attributes.containsKey(PresentationHintAttributes.DISPLAY_NAME)) {
+      String displayName = attributes.get(PresentationHintAttributes.DISPLAY_NAME);
       builder.append("\"").append(displayName).append("\"");
     } else {
       builder.append(name);
@@ -121,10 +121,10 @@ public class DefaultToStringFormatter implements ToStringFormatter {
   }
 
   private boolean isValueOnly(Field field) {
-    return field.attributes().getOptional(PresentationHints.VALUE_ONLY).orElse(false);
+    return field.attributes().getOptional(PresentationHintAttributes.VALUE_ONLY).orElse(false);
   }
 
   private boolean isElided(Field field) {
-    return field.attributes().getOptional(PresentationHints.ELIDE).orElse(false);
+    return field.attributes().getOptional(PresentationHintAttributes.ELIDE).orElse(false);
   }
 }
