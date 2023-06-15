@@ -1,8 +1,9 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.api.PresentationHints.ABBREVIATE_AFTER;
-import static com.tersesystems.echopraxia.api.PresentationHints.AS_CARDINAL;
+import static com.tersesystems.echopraxia.spi.PresentationHints.ABBREVIATE_AFTER;
+import static com.tersesystems.echopraxia.spi.PresentationHints.AS_CARDINAL;
 
+import com.tersesystems.echopraxia.api.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;

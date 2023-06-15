@@ -1,7 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.api.FieldConstants.EXCEPTION;
+import static com.tersesystems.echopraxia.spi.FieldConstants.EXCEPTION;
 
+import com.tersesystems.echopraxia.spi.DefaultField;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -9,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 public interface DefaultFieldBuilder extends FieldBuilder {
   static @NotNull DefaultFieldBuilder instance() {
-    return ExtendedFieldBuilderInstance.getInstance();
+    return DefaultFieldBuilderInstance.getInstance();
   }
   /**
    * Creates a field that renders in message template as value.
@@ -396,7 +397,7 @@ public interface DefaultFieldBuilder extends FieldBuilder {
   }
 }
 
-class ExtendedFieldBuilderInstance {
+class DefaultFieldBuilderInstance {
   private static final DefaultFieldBuilder instance = new DefaultFieldBuilder() {};
 
   static DefaultFieldBuilder getInstance() {

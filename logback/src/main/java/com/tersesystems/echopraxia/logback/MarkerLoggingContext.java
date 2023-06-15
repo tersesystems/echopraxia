@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.logback;
 
-import static com.tersesystems.echopraxia.api.Utilities.memoize;
+import static com.tersesystems.echopraxia.spi.Utilities.memoize;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.tersesystems.echopraxia.api.CoreLogger;

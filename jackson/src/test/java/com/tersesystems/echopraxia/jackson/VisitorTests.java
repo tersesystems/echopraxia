@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.DefaultField;
 import java.time.Instant;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;

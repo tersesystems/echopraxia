@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 import static org.slf4j.event.EventConstants.*;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -10,6 +10,8 @@ import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.logback.CallerMarker;
 import com.tersesystems.echopraxia.logback.LogbackLoggerContext;
 import com.tersesystems.echopraxia.logback.LogbackLoggingContext;
+import com.tersesystems.echopraxia.spi.EchopraxiaService;
+import com.tersesystems.echopraxia.spi.Utilities;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;

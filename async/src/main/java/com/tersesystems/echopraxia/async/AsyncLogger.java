@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.async;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.AbstractLoggerSupport;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;

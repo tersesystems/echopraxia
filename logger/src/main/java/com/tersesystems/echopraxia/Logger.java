@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.AbstractLoggerSupport;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

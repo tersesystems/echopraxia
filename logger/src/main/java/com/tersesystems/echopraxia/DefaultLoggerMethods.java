@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia;
 
-import static com.tersesystems.echopraxia.api.FieldConstants.EXCEPTION;
 import static com.tersesystems.echopraxia.api.Level.*;
 import static com.tersesystems.echopraxia.api.Level.ERROR;
 import static com.tersesystems.echopraxia.api.Value.exception;
+import static com.tersesystems.echopraxia.spi.FieldConstants.EXCEPTION;
 
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.DefaultMethodsSupport;

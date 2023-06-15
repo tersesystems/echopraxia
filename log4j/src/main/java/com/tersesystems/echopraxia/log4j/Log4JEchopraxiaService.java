@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.api.AbstractEchopraxiaService;
 import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.spi.AbstractEchopraxiaService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.jetbrains.annotations.NotNull;
