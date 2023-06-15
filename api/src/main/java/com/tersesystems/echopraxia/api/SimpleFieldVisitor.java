@@ -1,5 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
+import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.spi.EchopraxiaService;
+import com.tersesystems.echopraxia.spi.FieldCreator;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;

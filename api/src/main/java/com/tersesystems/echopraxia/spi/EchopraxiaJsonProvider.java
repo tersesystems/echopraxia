@@ -1,8 +1,9 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
 
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.spi.json.JsonProvider;
+import com.tersesystems.echopraxia.api.*;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;

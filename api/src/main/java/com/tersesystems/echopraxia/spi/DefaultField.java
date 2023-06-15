@@ -1,5 +1,7 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
 
+import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.api.PresentationHintsAware;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

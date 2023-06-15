@@ -1,5 +1,6 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
 
+import com.tersesystems.echopraxia.api.*;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,6 +34,10 @@ public interface EchopraxiaService {
    */
   @NotNull
   <F extends Field> FieldCreator<F> getFieldCreator(@NotNull Class<F> fieldClass);
+
+  static FieldCreator<Field> getFieldCreator() {
+    return getInstance().getFieldCreator(Field.class);
+  }
 
   @NotNull
   static EchopraxiaService getInstance() {

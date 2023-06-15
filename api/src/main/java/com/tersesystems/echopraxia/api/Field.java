@@ -1,5 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
+import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.spi.EchopraxiaService;
+import com.tersesystems.echopraxia.spi.PresentationHints;
 import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
 
