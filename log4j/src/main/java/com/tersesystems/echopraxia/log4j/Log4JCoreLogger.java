@@ -1,9 +1,10 @@
 package com.tersesystems.echopraxia.log4j;
 
-import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
+import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;

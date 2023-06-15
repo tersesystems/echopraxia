@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.jul;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

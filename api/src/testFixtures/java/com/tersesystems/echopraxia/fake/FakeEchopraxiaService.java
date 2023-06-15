@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.fake;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.AbstractEchopraxiaService;
 import org.jetbrains.annotations.NotNull;
 
 public class FakeEchopraxiaService extends AbstractEchopraxiaService {

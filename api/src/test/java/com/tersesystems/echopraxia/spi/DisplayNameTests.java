@@ -1,8 +1,9 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.api.PresentationHints.withDisplayName;
+import static com.tersesystems.echopraxia.spi.PresentationHints.withDisplayName;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.tersesystems.echopraxia.api.*;
 import org.junit.jupiter.api.Test;
 
 public class DisplayNameTests {

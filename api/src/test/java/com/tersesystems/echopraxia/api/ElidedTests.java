@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.api.Field.keyValue;
 import static com.tersesystems.echopraxia.api.Value.string;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.tersesystems.echopraxia.spi.DefaultField;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

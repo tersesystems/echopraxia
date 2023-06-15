@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.jul;
 
-import static com.tersesystems.echopraxia.api.Utilities.joinFields;
+import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 
 import com.tersesystems.echopraxia.api.Field;
 import java.util.Collections;

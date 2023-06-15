@@ -1,8 +1,9 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.api.PresentationHints.asCardinal;
+import static com.tersesystems.echopraxia.spi.PresentationHints.asCardinal;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.tersesystems.echopraxia.spi.DefaultField;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

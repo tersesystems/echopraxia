@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.jul;
 
-import com.tersesystems.echopraxia.api.AbstractEchopraxiaService;
 import com.tersesystems.echopraxia.api.CoreLogger;
+import com.tersesystems.echopraxia.spi.AbstractEchopraxiaService;
 import java.util.logging.Logger;
 import org.jetbrains.annotations.NotNull;
 
