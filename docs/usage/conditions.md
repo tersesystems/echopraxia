@@ -65,7 +65,7 @@ This is only a part of the available functionality in conditions.  You can tie c
 
 In situations where you're looking through fields for a condition, you can use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
 
-Tip: You can integrate IntelliJ IDEA with JSONPath using the [inject language](https://www.jetbrains.com/idea/guide/tips/evaluate-json-path-expressions/) settings page and adding `LoggingContext`.
+Tip: if you are using IntelliJ IDEA, you can add the [@Language("JSONPath")](https://www.jetbrains.com/help/idea/using-language-injections.html#language_annotation) annotation to [inject JSONPATH](https://www.jetbrains.com/idea/guide/tips/evaluate-json-path-expressions/).
 
 The `context.find*` methods take a class as a type, and a [JSON path](https://www.ietf.org/archive/id/draft-ietf-jsonpath-base-03.html), which can be used to search through context fields (or arguments, if the condition is used in a logging statement).
 
