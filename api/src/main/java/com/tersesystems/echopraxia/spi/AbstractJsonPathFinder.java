@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractJsonPathFinder implements FindPathMethods {
@@ -33,7 +34,7 @@ public abstract class AbstractJsonPathFinder implements FindPathMethods {
       Utilities.memoize(() -> JsonPath.parse(this, configuration));
 
   protected @NotNull <T> Optional<T> optionalFind(
-      @NotNull String jsonPath, @NotNull Class<T> desiredClass) {
+      @NotNull @Language("JSONPath") String jsonPath, @NotNull Class<T> desiredClass) {
     final DocumentContext documentContext = getDocumentContext();
     final Object o = documentContext.read(jsonPath);
 
@@ -54,7 +55,7 @@ public abstract class AbstractJsonPathFinder implements FindPathMethods {
 
   @Override
   @NotNull
-  public Optional<String> findString(@NotNull String jsonPath) {
+  public Optional<String> findString(@NotNull @Language("JSONPath") String jsonPath) {
     // Not all strings are mapped string values.
     // $.exception.message is a string but was never a string value,
     return optionalFind(jsonPath, String.class);
@@ -62,13 +63,13 @@ public abstract class AbstractJsonPathFinder implements FindPathMethods {
 
   @Override
   @NotNull
-  public Optional<Boolean> findBoolean(@NotNull String jsonPath) {
+  public Optional<Boolean> findBoolean(@NotNull @Language("JSONPath") String jsonPath) {
     return optionalFind(jsonPath, Boolean.class);
   }
 
   @Override
   @NotNull
-  public Optional<Number> findNumber(@NotNull String jsonPath) {
+  public Optional<Number> findNumber(@NotNull @Language("JSONPath") String jsonPath) {
     return optionalFind(jsonPath, Number.class);
   }
 
@@ -81,7 +82,7 @@ public abstract class AbstractJsonPathFinder implements FindPathMethods {
 
   @Override
   @NotNull
-  public Optional<Throwable> findThrowable(@NotNull String jsonPath) {
+  public Optional<Throwable> findThrowable(@NotNull @Language("JSONPath") String jsonPath) {
     // Pretty sure exceptions are always exception values.
     return optionalFind(jsonPath, ExceptionValue.class).map(ExceptionValue::raw);
   }
@@ -95,13 +96,13 @@ public abstract class AbstractJsonPathFinder implements FindPathMethods {
   @SuppressWarnings("unchecked")
   @Override
   @NotNull
-  public Optional<Map<String, ?>> findObject(@NotNull String jsonPath) {
+  public Optional<Map<String, ?>> findObject(@NotNull @Language("JSONPath") String jsonPath) {
     return optionalFind(jsonPath, Map.class).map(f -> (Map<String, ?>) f);
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public @NotNull List<?> findList(@NotNull String jsonPath) {
+  public @NotNull List<?> findList(@NotNull @Language("JSONPath") String jsonPath) {
     // finding a list has two different meanings in JSONPath
     // The first one is that you asked for a JSON array and it gives you
     // a json array.  Simple.
