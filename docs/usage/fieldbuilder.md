@@ -69,6 +69,52 @@ Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFie
 personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 ```
 
+## Nulls
+
+At some point you will have a value that you want to render and the Java API will return `null`.
+
+I recommend using [Jetbrains annotations](https://www.jetbrains.com/help/idea/annotating-source-code.html#jetbrains-annotations) which includes a `@NotNull` annotation.
+
+You can defensively program against this by explicitly checking against nulls in the field builder, using `Value.optional` over null, if possible.
+
+```java
+public interface NullableFieldBuilder extends FieldBuilder {
+  // extend as necessary
+  default Field nullableString(String name, String nullableString) {
+    Value<?> nullableValue = Value.optional(Optional.ofNullable(nullableString));
+    return keyValue(name, nullableValue);
+  }
+}
+```
+
+Field names are never allowed to be null.  If a field name is null, it will be replaced at runtime with `unknown-echopraxia-N` where N is an incrementing number.
+
+```java
+logger.info("Message name {}", fb -> 
+  fb.string(null, "some-value") // null field names not allowed
+);
+```
+
+## Exceptions
+
+Avoid throwing exceptions in a field builder function.  Because a field builder function runs in a closure, if an exception is thrown it will be caught by Echopraxia's error handler which writes the exception to `System.err` by default.  
+
+```java
+logger.info("Message name {}", fb -> {
+  String name = methodThatThrowsException(); // BAD
+  return fb.string(name, "some-value");
+});
+```
+
+Instead, only call field builder methods inside the closure and keep any construction logic outside:
+
+```java
+String name = methodThatThrowsException(); // GOOD
+logger.info("Message name {}", fb -> {
+  return fb.string(name, "some-value");
+});
+```
+
 ## Field Presentation
 
  There are times when the default field presentation is awkward, and you'd like to cut down on the amount of information displayed in the message.  You can do this by adding presentation hints to the field.
@@ -155,7 +201,7 @@ public class InstantFieldBuilder implements PresentationFieldBuilder {
     return string(name, instant.toString()).withStructuredFormat(instantVisitor);
   }
 
-  Field typedInstant(String name, Value<String> v) {
+  PresentationField typedInstant(String name, Value<String> v) {
     return object(name, typedInstantValue(v));
   }
 
@@ -195,48 +241,4 @@ But will render JSON as:
 
 ```json
 {"startTime":{"@type":"http://www.w3.org/2001/XMLSchema#dateTime","@value":"1970-01-01T00:00:00Z"}}
-```
-
-## Nulls
-
-At some point you will have a value that you want to render and the Java API will return `null`.
-
-You can defensively program against this by explicitly checking against nulls in the field builder, using `Value.optional` over null, if possible.
-
-```java
-public interface NullableFieldBuilder extends FieldBuilder {
-  // extend as necessary
-  default Field nullableString(String name, String nullableString) {
-    Value<?> nullableValue = Value.optional(Optional.ofNullable(nullableString));
-    return keyValue(name, nullableValue);
-  }
-}
-```
-
-Field names are never allowed to be null.  If a field name is null, it will be replaced at runtime with `unknown-echopraxia-N` where N is an incrementing number.
-
-```java
-logger.info("Message name {}", fb -> 
-  fb.string(null, "some-value") // null field names not allowed
-);
-```
-
-## Exceptions
-
-Avoid throwing exceptions in a field builder function.  Because a field builder function runs in a closure, if an exception is thrown it will be caught by Echopraxia's error handler which writes the exception to `System.err` by default.  
-
-```java
-logger.info("Message name {}", fb -> {
-  String name = methodThatThrowsException(); // BAD
-  return fb.string(name, "some-value");
-});
-```
-
-Instead, only call field builder methods inside the closure and keep any construction logic outside:
-
-```java
-String name = methodThatThrowsException(); // GOOD
-logger.info("Message name {}", fb -> {
-  return fb.string(name, "some-value");
-});
 ```
