@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.api;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
 /** Methods for finding values and fields using JSON path syntax. */
@@ -15,7 +16,7 @@ public interface FindPathMethods {
    * @return an optional string if found, otherwise empty().
    */
   @NotNull
-  Optional<String> findString(@NotNull String jsonPath);
+  Optional<String> findString(@NotNull @Language("JSONPath") String jsonPath);
 
   /**
    * Finds a boolean value from the JSON path.
@@ -24,7 +25,7 @@ public interface FindPathMethods {
    * @return an optional boolean if found, otherwise empty().
    */
   @NotNull
-  Optional<Boolean> findBoolean(@NotNull String jsonPath);
+  Optional<Boolean> findBoolean(@NotNull @Language("JSONPath") String jsonPath);
 
   /**
    * Finds a number value from the JSON path.
@@ -33,7 +34,7 @@ public interface FindPathMethods {
    * @return an optional number if found, otherwise empty().
    */
   @NotNull
-  Optional<Number> findNumber(@NotNull String jsonPath);
+  Optional<Number> findNumber(@NotNull @Language("JSONPath") String jsonPath);
 
   /**
    * Finds a null value from the JSON path.
@@ -41,7 +42,7 @@ public interface FindPathMethods {
    * @param jsonPath a JSON path to evaluate.
    * @return true if null found, false otherwise.
    */
-  boolean findNull(@NotNull String jsonPath);
+  boolean findNull(@NotNull @Language("JSONPath") String jsonPath);
 
   /**
    * Finds a throwable value from the JSON path.
@@ -50,7 +51,7 @@ public interface FindPathMethods {
    * @return optional throwable if found, empty() otherwise.
    */
   @NotNull
-  Optional<Throwable> findThrowable(@NotNull String jsonPath);
+  Optional<Throwable> findThrowable(@NotNull @Language("JSONPath") String jsonPath);
 
   /**
    * Finds a throwable value using the default path
@@ -67,7 +68,7 @@ public interface FindPathMethods {
    * @return optional map if found, empty() otherwise.
    */
   @NotNull
-  Optional<Map<String, ?>> findObject(@NotNull String jsonPath);
+  Optional<Map<String, ?>> findObject(@NotNull @Language("JSONPath") String jsonPath);
 
   /**
    * Finds a list using a json path.
@@ -76,5 +77,5 @@ public interface FindPathMethods {
    * @return list containing elements, may be empty if nothing found.
    */
   @NotNull
-  List<?> findList(@NotNull String jsonPath);
+  List<?> findList(@NotNull @Language("JSONPath") String jsonPath);
 }
