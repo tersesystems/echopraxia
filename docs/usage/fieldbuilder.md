@@ -73,9 +73,11 @@ personLogger.info("Person {}", fb -> fb.keyValue("user", user));
 
  There are times when the default field presentation is awkward, and you'd like to cut down on the amount of information displayed in the message.  You can do this by adding presentation hints to the field.
 
-The `FieldBuilder` interface provides some convenience methods around `Field` and `Value`.  In particular, there are two methods, `keyValue` and `value` that are used to create fields.  The `DefaultField` class implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
+The `FieldBuilder` interface provides some convenience methods around `Field` and `Value`.  In particular, there are two methods, `keyValue` and `value` that are used to create fields.  The `PresentationField` interface implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
 
-You can access these methods by passing in `DefaultField.class` to either `value` or `keyValue`, and then calling the extension methods -- this provides an easy way to construct fields while hiding the implementation outside the field builder.
+You can access these methods by passing in `PresentationField.class` to either `value` or `keyValue`, and then calling the extension methods -- this provides an easy way to construct fields while hiding the implementation outside the field builder.
+
+There is a `PresentationFieldBuilder` interface that you can extend that provides `PresentationField` by default.
 
 ### asValueOnly
 
@@ -83,7 +85,7 @@ The `asValueOnly` method has the effect of turning a "key=value" field into a "v
 
 ```java
 // same as Field valueField = value(name, value);
-Field valueField = keyValue("onlyValue", Value.string("someText"), DefaultField.class).asValueOnly();
+Field valueField = keyValue("onlyValue", Value.string("someText"), PresentationField.class).asValueOnly();
 valueField.toString() // renders someText
 ```
 
@@ -92,7 +94,7 @@ valueField.toString() // renders someText
 The `asCardinal` method, when used on a field with an array value or on a string, displays the number of elements in the array bracketed by "|" characters in text format:
 
 ```java
-Field cardinalField = keyValue("elements", Value.array(1,2,3), DefaultField.class).asCardinal();
+Field cardinalField = keyValue("elements", Value.array(1,2,3), PresentationField.class).asCardinal();
 cardinalField.toString(); // renders elements=|3|
 ```
 
@@ -101,7 +103,7 @@ cardinalField.toString(); // renders elements=|3|
 The `withDisplayName` method shows a human readable string in text format bracketed in quotes:
 
 ```java
-Field readableField = keyValue("json_field", Value.number(1), DefaultField.class).withDisplayName("human readable name");
+Field readableField = keyValue("json_field", Value.number(1), PresentationField.class).withDisplayName("human readable name");
 readableField.toString() // renders "human readable name"=1
 ```
 
@@ -110,7 +112,7 @@ readableField.toString() // renders "human readable name"=1
 The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
 
 ```java
-Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), DefaultField.class).abbreviateAfter(5);
+Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), PresentationField.class).abbreviateAfter(5);
 abbrField.toString() // renders abbreviatedField=12345...
 ```
 
@@ -119,18 +121,18 @@ abbrField.toString() // renders abbreviatedField=12345...
 The `asElided` method will elide the field so that it is passed over and does not show in text format:
 
 ```java
-Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), DefaultField.class).asElided();
+Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), PresentationField.class).asElided();
 abbrField.toString() // renders ""
 ```
 
 This is particularly useful in objects that have elided children that you don't need to see in the message:
 
 ```java
-Field first = keyValue("first", string("bar"), DefaultField.class).asElided();
-Field second = keyValue("second", string("bar"), DefaultField.class);
-Field third = keyValue("third", string("bar"), DefaultField.class).asElided();
+Field first = keyValue("first", string("bar"), PresentationField.class).asElided();
+Field second = keyValue("second", string("bar"), PresentationField.class);
+Field third = keyValue("third", string("bar"), PresentationField.class).asElided();
 List<Field> fields = List.of(first, second, third);
-Field object = keyValue("object", Value.object(fields), DefaultField.class);
+Field object = keyValue("object", Value.object(fields), PresentationField.class);
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
@@ -141,7 +143,7 @@ Using the `withStructuredFormat` method with a field visitor will allow the JSON
 For example, imagine you want to render a `java.lang.Instant` in JSON as having an explicit `@type` of `http://www.w3.org/2001/XMLSchema#dateTime` alongside the value, but don't want to needlessly complicate your output.  Using `withStructuredFormat` with a class extending `SimpleFieldVisitor`, you can intercept and override field processing in JSON:
 
 ```java
-public class InstantFieldBuilder implements DefaultFieldBuilder {
+public class InstantFieldBuilder implements PresentationFieldBuilder {
 
   static InstantFieldBuilder instance() {
     return new InstantFieldBuilder();
@@ -149,7 +151,7 @@ public class InstantFieldBuilder implements DefaultFieldBuilder {
 
   final FieldVisitor instantVisitor = new InstantFieldVisitor();
 
-  public DefaultField instant(String name, Instant instant) {
+  public PresentationField instant(String name, Instant instant) {
     return string(name, instant.toString()).withStructuredFormat(instantVisitor);
   }
 
@@ -197,15 +199,15 @@ But will render JSON as:
 
 ## Nulls
 
-By default, values are `@NotNull`, and passing in `null` to values is not recommended.  It's recommended to use `Value.optional` over null, if possible.
+At some point you will have a value that you want to render and the Java API will return `null`.
 
-If you want to handle nulls explicitly, you can extend the field builder as necessary:
+You can defensively program against this by explicitly checking against nulls in the field builder, using `Value.optional` over null, if possible.
 
 ```java
 public interface NullableFieldBuilder extends FieldBuilder {
   // extend as necessary
   default Field nullableString(String name, String nullableString) {
-    Value<?> nullableValue = (value == null) ? Value.nullValue() : Value.string(nullableString);
+    Value<?> nullableValue = Value.optional(Optional.ofNullable(nullableString));
     return keyValue(name, nullableValue);
   }
 }
