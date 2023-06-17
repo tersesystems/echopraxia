@@ -2,13 +2,14 @@
 
 ## 3.0.0-SNAPSHOT
 
+* Refactor internal classes into SPI package
 * Move from very large README.md to documentation website
 * Add `EchopraxiaServiceProvider` and `EchopraxiaService` for centralized management
-* Add `PresentationHintsAware` to `DefaultField` so we can do `field.abbreviateAfter(5)`.
+* Add `PresentationHintsAware` to `DefaultField` so we can do `field.abbreviateAfter(5)`
 * Add field creator and `DefaultField` so we can swap out field implementations
 * Add `ToStringFormatter` and wire `field.toString` and `value.toString` to it
 * Add presentation hints `valueOnly`, `abbreviateAfter`, `displayName`, `elide`, `cardinal`
-* Add `FieldTransformer` for changing field structure in JSON
+* Add `FieldVisitor` for changing field structure in JSON
 * Add exception handler
 * Change `equals` on fields so that fields are not equal if they have different attributes
 * Make all fields (`fb.string`, `fb.number`, `fb.nullValue`) use `keyValue` by default.
