@@ -7,7 +7,6 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
@@ -37,7 +36,7 @@ public class ScriptConditionTest {
                 + "    ctx[\"find_string\"](\"correlation_id\") == \"match\";"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("data of interest found", fb -> (fb.string("correlation_id", "match")));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -56,7 +55,7 @@ public class ScriptConditionTest {
                 + "    ctx[\"find_number\"](\"correlation_id\") == 123;"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("data of interest found", fb -> fb.number("correlation_id", 123));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -87,7 +86,7 @@ public class ScriptConditionTest {
                 + "    time.unix_timestamp(now()) > 0;"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("time is good");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -127,7 +126,7 @@ public class ScriptConditionTest {
                 + "    logger_property(\"herp\") == \"derp\";"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("the logger property is derp!");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -146,7 +145,7 @@ public class ScriptConditionTest {
                 + "    ctx[\"find_boolean\"](\"bool_value\") == true;"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("data of interest found", fb -> fb.bool("bool_value", true));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -165,7 +164,7 @@ public class ScriptConditionTest {
                 + "    ctx[:find_null](\"null_value\") == true;"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("data of interest found", fb -> fb.nullField("null_value"));
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -188,7 +187,7 @@ public class ScriptConditionTest {
                 + "    obj[:foo] == 1337;"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info(
         "data of interest found",
         fb -> fb.object("obj", fb.number("foo", 1337), fb.number("bar", 0xDEADBEEF)));
@@ -213,7 +212,7 @@ public class ScriptConditionTest {
                 + "    interests[1] == \"drink\";"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info(
         "data of interest found",
         fb -> fb.object("obj", (fb.array("interests", "food", "drink", "sleep"))));
@@ -237,7 +236,7 @@ public class ScriptConditionTest {
                 + "    fields[:obj][:interests][2] == \"sleep\";"
                 + "}",
             Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info(
         "data of interest found",
         fb -> fb.object("obj", (fb.array("interests", "food", "drink", "sleep"))));
@@ -253,7 +252,7 @@ public class ScriptConditionTest {
     Path path = Paths.get("src/test/tweakflow/exception.tf");
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger
         .withFields(fb -> (fb.exception(new RuntimeException("testing"))))
         .info("data of interest found");
@@ -269,7 +268,7 @@ public class ScriptConditionTest {
     Path path = Paths.get("src/test/tweakflow/condition.tf");
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.withFields(fb -> (fb.string("correlation_id", "match"))).info("data of interest found");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -283,7 +282,7 @@ public class ScriptConditionTest {
     Path path = Paths.get("src/test/tweakflow/condition.tf");
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger.info("this should not log");
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -306,7 +305,7 @@ public class ScriptConditionTest {
 
     Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
     logger
         .withFields(
             fb -> {

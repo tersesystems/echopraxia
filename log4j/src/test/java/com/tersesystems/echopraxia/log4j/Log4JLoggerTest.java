@@ -7,7 +7,6 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Value;
-import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +14,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   void testNullMessage() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug(null);
 
     JsonNode entry = getEntry();
@@ -25,7 +24,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   void testNullStringArgument() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     String value = null;
     logger.info("hello {}", fb -> (fb.string("name", value)));
 
@@ -36,7 +35,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   void testNullFieldName() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     String value = "value";
     logger.debug("array field is {}", fb -> (fb.array(null, value)));
 
@@ -47,7 +46,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   void testNullNumber() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer value = null;
     logger.debug("number is {}", fb -> (fb.number("name", value)));
 
@@ -58,7 +57,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   void testNullBoolean() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("boolean is {}", fb -> (fb.bool("name", (Boolean) null)));
 
     JsonNode entry = getEntry();
@@ -68,7 +67,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   void testNullArrayElement() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     String[] values = {"1", null, "3"};
     logger.debug("array field is {}", fb -> (fb.array("arrayName", values)));
 
@@ -79,7 +78,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   void testNullObject() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("object is {}", fb -> (fb.object("name", Value.object((Field) null))));
 
     JsonNode entry = getEntry();
@@ -90,7 +89,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithStringField() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     logger.info("my argument is {}", fb -> fb.string("random_key", "random_value"));
 
     JsonNode entry = getEntry();
@@ -103,7 +102,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerLocation() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     logger.info("Boring Message"); // this is line 109
 
     JsonNode entry = getEntry();
@@ -121,7 +120,7 @@ public class Log4JLoggerTest extends TestBase {
   public void testLoggerLocationWithAsyncLogger() {
     // note you must have includeLocation="true" in log4j2.xml to trigger the
     // throwable / stacktrace in the core logger...
-    AsyncLogger<?> asyncLogger = AsyncLoggerFactory.getLogger(getClass(), FieldBuilder.instance());
+    var asyncLogger = AsyncLoggerFactory.getLogger(getClass(), FieldBuilder.instance());
     asyncLogger.info("Boring Message");
 
     waitUntilMessages();
@@ -137,7 +136,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithObjectField() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     logger.info(
         "my argument is {}",
         fb -> {
@@ -158,7 +157,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithSeveralObjectField() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     logger.info(
         "my arguments are {} {}",
         fb ->
@@ -190,7 +189,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithArrayField() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     logger.info(
         "my argument is {}",
         fb -> {
@@ -211,7 +210,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithThrowable() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     Exception exception = new RuntimeException("Some exception");
     logger.error("Message", exception);
 
@@ -225,7 +224,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithThrowableField() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     Exception exception = new RuntimeException("Some exception");
     logger.error("Message {}", fb -> fb.exception(exception));
 
@@ -239,7 +238,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithContextField() {
-    Logger<?> logger =
+    var logger =
         LoggerFactory.getLogger(getClass())
             .withFields(fb -> fb.string("context_name", "context_field"));
     logger.error("Message");
@@ -254,7 +253,7 @@ public class Log4JLoggerTest extends TestBase {
 
   @Test
   public void testLoggerWithContextAndArgumentField() {
-    Logger<?> logger =
+    var logger =
         LoggerFactory.getLogger(getClass())
             .withFields(fb -> fb.string("context_name", "context_field"));
     logger.error("Message {}", fb -> fb.string("arg_name", "arg_field"));

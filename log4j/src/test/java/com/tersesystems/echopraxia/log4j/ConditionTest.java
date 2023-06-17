@@ -7,10 +7,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -23,7 +21,7 @@ public class ConditionTest extends TestBase {
 
   @Test
   void testCondition() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     LongAdder adder = new LongAdder();
     Condition condition =
         (l, c) -> {
@@ -49,8 +47,8 @@ public class ConditionTest extends TestBase {
           return level.equals(Level.INFO);
         };
 
-    Logger<?> logger = getLogger();
-    Logger<?> loggerWithCondition =
+    var logger = getLogger();
+    var loggerWithCondition =
         logger.withCondition(hasInfoLevel).withFields(f -> f.string("herp", "derp"));
 
     LongAdder fieldConditionAdder = new LongAdder();
@@ -71,11 +69,11 @@ public class ConditionTest extends TestBase {
   @Test
   void testFieldConditionIsLive() {
     Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final AtomicReference<String> changeableValue = new AtomicReference<>("derp");
 
     // we need to know that withFields is "call by name" and is evaluated fresh on every statement.
-    Logger<?> loggerWithContext = logger.withFields(f -> f.string("herp", changeableValue.get()));
+    var loggerWithContext = logger.withFields(f -> f.string("herp", changeableValue.get()));
 
     loggerWithContext.info(hasDerp, "has derp");
     changeableValue.set("notderp");
@@ -93,12 +91,12 @@ public class ConditionTest extends TestBase {
   @Test
   void testThreadContextConditionIsLive() {
     Condition hasDerp = Condition.valueMatch("herp", f -> f.raw().equals("derp"));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
 
     ThreadContext.put("herp", "derp");
     // we need to know that withThreadContext is "call by name" and is evaluated fresh on every
     // statement.
-    Logger<?> loggerWithContext = logger.withThreadContext();
+    var loggerWithContext = logger.withThreadContext();
     loggerWithContext.info(hasDerp, "has derp");
 
     ThreadContext.put("herp", "notderp");
@@ -126,7 +124,7 @@ public class ConditionTest extends TestBase {
         };
 
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
+    var loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -155,7 +153,7 @@ public class ConditionTest extends TestBase {
           }
           return true;
         };
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
+    var loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -176,7 +174,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testFailedAsyncLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger();
+    var loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
         handle -> {
           handle.log(

@@ -42,8 +42,7 @@ public class ContextTest extends TestBase {
     final Marker securityMarker = MarkerFactory.getMarker("SECURITY");
     final LogstashCoreLogger core =
         new LogstashCoreLogger(Logger.FQCN, loggerContext.getLogger(getClass().getName()));
-    Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarkers(securityMarker), FieldBuilder.instance());
+    var logger = LoggerFactory.getLogger(core.withMarkers(securityMarker), FieldBuilder.instance());
     logger.withFields(f -> f.string("key", "value")).error("This has a marker");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -66,7 +65,7 @@ public class ContextTest extends TestBase {
     final LogstashCoreLogger core =
         new LogstashCoreLogger(Logger.FQCN, loggerContext.getLogger(getClass().getName()));
     final CoreLogger security = core.withMarkers(securityMarker);
-    Logger<?> logger = LoggerFactory.getLogger(security, FieldBuilder.instance());
+    var logger = LoggerFactory.getLogger(security, FieldBuilder.instance());
 
     final org.slf4j.Logger slf4jLogger = core.logger();
 
@@ -82,7 +81,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testComplexFields() throws IOException {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger
         .withFields(
             fb -> {
@@ -116,7 +115,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testArrays() throws IOException {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger
         .withFields(
             fb -> {
@@ -149,8 +148,8 @@ public class ContextTest extends TestBase {
 
   @Test
   void testCombinedContext() {
-    Logger<?> logger = getLogger();
-    Logger<?> loggerWithContext = logger.withFields(f -> f.string("key", "value"));
+    var logger = getLogger();
+    var loggerWithContext = logger.withFields(f -> f.string("key", "value"));
     loggerWithContext
         .withFields(f -> f.string("key2", "value2"))
         .info("This should have two contexts.");
@@ -171,7 +170,7 @@ public class ContextTest extends TestBase {
   @Test
   void testThreadContext() {
     MDC.put("mdckey", "mdcvalue");
-    Logger<?> logger = getLogger().withThreadContext();
+    var logger = getLogger().withThreadContext();
     logger.info("some message");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -185,7 +184,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindString() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) -> ctx.findString("$.arg1").filter(v -> v.equals("value1")).isPresent();
     logger.info(c, "Matches on arg1", fb -> fb.string("arg1", "value1"));
@@ -198,7 +197,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindInteger() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) -> ctx.findNumber("$.arg1").filter(v -> v.intValue() == 1).isPresent();
     logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1));
@@ -211,7 +210,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindBoolean() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c = (level, ctx) -> ctx.findBoolean("$.arg1").orElse(false);
     logger.info(c, "Matches on arg1", fb -> fb.bool("arg1", true));
 
@@ -223,7 +222,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindDouble() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
     logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1.5));
@@ -236,7 +235,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testInlinePredicate() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition cheapBookCondition =
         (level, context) -> !context.findList("$.store.book[?(@.price < 10)]").isEmpty();
 
@@ -258,7 +257,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindNull() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
 
     logger.info(nullCondition, "found null", fb -> fb.nullField("myNullField"));
@@ -271,7 +270,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindNullButString() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
 
     logger.info(nullCondition, "found null", fb -> fb.string("myNullField", "notnull"));
@@ -282,7 +281,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testJsonPathMissingProperty() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition noFindException =
         (level, ctx) -> ctx.findString("$.exception.message").isPresent();
 
@@ -294,7 +293,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testMismatchedString() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition noFindException = (level, ctx) -> ctx.findString("$.notastring").isPresent();
 
     // property is present but is boolean, not a string
@@ -306,7 +305,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testMismatchedObject() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition noFindException = (level, ctx) -> ctx.findObject("$.notanobject").isPresent();
 
     // property is present but is boolean, not a string
@@ -318,7 +317,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testListOfElement() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition nestedCondition = (level, ctx) -> !ctx.findList("$..notalist").isEmpty();
 
     // property is present, but we need to return a list containing the single element.
@@ -332,7 +331,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testElementAsSingletonList() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition findBooleanAsList =
         (level, ctx) -> {
           final Optional<?> first = ctx.findList("$.boolean").stream().findFirst();
@@ -350,7 +349,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testOptionalEmptyForNothingFound() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final Condition noFindException =
         (level, ctx) -> {
           final Optional<?> first = ctx.findList("$.exception").stream().findFirst();
@@ -368,7 +367,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindException() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) ->
             ctx.findThrowable("$.exception")
@@ -385,7 +384,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindExceptionStacktrace() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) -> {
           List<?> trace = ctx.findList("$.exception.stackTrace");
@@ -402,7 +401,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindExceptionStackTraceElement() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) -> {
           Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
@@ -419,7 +418,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testNullMessageInException() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c = (level, ctx) -> ctx.findNull("$.exception.message");
     RuntimeException e = new IllegalArgumentException((String) null);
     logger.info(c, "Matches on null message in exception", e);
@@ -432,7 +431,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testNullInNestedArray() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c = (level, ctx) -> !ctx.findList("$..interests").isEmpty();
     logger.info(
         c,
@@ -447,7 +446,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testObjectArrayObject() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c = (level, ctx) -> ctx.findBoolean("$.foo.array[2].one").get();
     logger.info(
         c,

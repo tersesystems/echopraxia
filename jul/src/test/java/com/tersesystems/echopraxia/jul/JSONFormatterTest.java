@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tersesystems.echopraxia.Logger;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -13,7 +12,7 @@ public class JSONFormatterTest extends TestBase {
 
   @Test
   void testDebug() throws JsonProcessingException {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("hello");
 
     List<String> list = EncodedListHandler.ndjson();
@@ -28,7 +27,7 @@ public class JSONFormatterTest extends TestBase {
 
   @Test
   void testInfo() throws JsonProcessingException {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info("hello");
 
     List<String> list = EncodedListHandler.ndjson();
@@ -43,7 +42,7 @@ public class JSONFormatterTest extends TestBase {
 
   @Test
   void testArguments() throws JsonProcessingException {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info(
         "hello {0}, you are {1}, citizen status {2}",
         fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
@@ -61,7 +60,7 @@ public class JSONFormatterTest extends TestBase {
 
   @Test
   void testException() throws JsonProcessingException {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Throwable expected = new IllegalStateException("oh noes");
     logger.error("Error", expected);
 

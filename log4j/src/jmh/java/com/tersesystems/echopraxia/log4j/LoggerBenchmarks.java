@@ -4,6 +4,7 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -14,18 +15,19 @@ import org.openjdk.jmh.infra.Blackhole;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class LoggerBenchmarks {
-  private static final com.tersesystems.echopraxia.Logger<?> logger = LoggerFactory.getLogger();
+  private static final Logger<PresentationFieldBuilder> logger = LoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
 
-  private static final com.tersesystems.echopraxia.Logger<?> neverLogger =
+  private static final Logger<PresentationFieldBuilder> neverLogger =
       logger.withCondition(Condition.never());
-  private static final com.tersesystems.echopraxia.Logger<?> alwaysLogger =
+  private static final Logger<PresentationFieldBuilder> alwaysLogger =
       logger.withCondition(Condition.always());
-  private static final com.tersesystems.echopraxia.Logger<?> conditionLogger =
+  private static final Logger<PresentationFieldBuilder> conditionLogger =
       logger.withCondition((level, context) -> level.equals(Level.ERROR));
-  private static final com.tersesystems.echopraxia.Logger<?> fieldBuilderLogger =
+  private static final Logger<?> fieldBuilderLogger =
       logger.withFieldBuilder(FieldBuilder.instance());
-  private static final Logger<?> contextLogger = logger.withFields(fb -> fb.string("foo", "bar"));
+  private static final Logger<PresentationFieldBuilder> contextLogger =
+      logger.withFields(fb -> fb.string("foo", "bar"));
 
   @Benchmark
   public void info() {
