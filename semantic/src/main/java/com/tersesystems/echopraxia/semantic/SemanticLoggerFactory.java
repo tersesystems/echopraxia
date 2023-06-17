@@ -35,7 +35,7 @@ public class SemanticLoggerFactory {
    * @param <FB> the field builder type.
    * @return an implementation of semantic logger.
    */
-  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB> SemanticLogger<DataType> getLogger(
       Class<?> clazz,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -58,7 +58,7 @@ public class SemanticLoggerFactory {
    * @return an implementation of semantic logger.
    */
   @NotNull
-  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB> SemanticLogger<DataType> getLogger(
       String name,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -159,7 +159,7 @@ public class SemanticLoggerFactory {
    * @param <FB> the field builder type.
    */
   @NotNull
-  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB> SemanticLogger<DataType> getLogger(
       CoreLogger coreLogger,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
@@ -171,7 +171,7 @@ public class SemanticLoggerFactory {
   // The implementation uses a field builder type, but we can cheat and hide this by only
   // exposing the interface, on the basis that people will generally put up with so many
   // magic generic angle bracket type things.
-  public static class Impl<DataType, FB extends FieldBuilder> implements SemanticLogger<DataType> {
+  public static class Impl<DataType, FB> implements SemanticLogger<DataType> {
 
     private final CoreLogger core;
     private final Function<DataType, Function<FB, FieldBuilderResult>> builderFunction;
