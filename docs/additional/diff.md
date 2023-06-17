@@ -16,7 +16,7 @@ import com.tersesystems.echopraxia.diff.DiffFieldBuilder;
 class PersonFieldBuilder implements DiffFieldBuilder {
   // ...
   public FieldBuilderResult diff(String name, Person before, Person after) {
-    return diff(name, personValue(before), personValue(after));
+    return diff(name, personValue(before), personValue(after), Field.class);
   }
 }
 ```

@@ -17,11 +17,14 @@ public interface DiffFieldBuilder extends ObjectMapperProvider {
    * @param fieldName the field name to give the diff
    * @param before object before (aka `base`)
    * @param after object after (aka `working`)
+   * @param <F> field type
+   * @param fieldClass the field class
    * @return the field representing the diff between the two values, in RFC 6902.
    */
-  default Field diff(String fieldName, Value<?> before, Value<?> after) {
+  default <F extends Field> F diff(
+      String fieldName, Value<?> before, Value<?> after, Class<F> fieldClass) {
     ObjectMapper om = _objectMapper();
     Value<?> value = Diff.diff(om, before, after);
-    return Field.keyValue(fieldName, value);
+    return Field.keyValue(fieldName, value, fieldClass);
   }
 }
