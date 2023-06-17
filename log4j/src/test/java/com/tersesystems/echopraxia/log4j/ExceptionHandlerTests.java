@@ -2,16 +2,14 @@ package com.tersesystems.echopraxia.log4j;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.async.AsyncLogger;
 import org.junit.jupiter.api.Test;
 
 public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testBadArgument() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer number = null;
     logger.debug("this has a null value", fb -> fb.number("nullNumber", number.intValue()));
 
@@ -21,9 +19,9 @@ public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testBadWithField() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer number = null;
-    Logger<?> badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
+    var badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
     badLogger.debug("this has a null value");
 
     Throwable throwable = StaticExceptionHandler.head();
@@ -32,12 +30,12 @@ public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testConditionAndBadWithField() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer number = null;
     Condition condition =
         (level, context) -> context.findNumber("$.testing").stream().anyMatch(p -> p.equals(5));
 
-    Logger<?> badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
+    var badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
     badLogger.debug(condition, "I have a bad logger field and a good condition");
 
     Throwable throwable = StaticExceptionHandler.head();
@@ -46,13 +44,13 @@ public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testBadConditionWithCondition() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer number = null;
     Condition badCondition =
         (level, context) ->
             context.findNumber("$.testing").stream().anyMatch(p -> p.equals(number.intValue()));
 
-    Logger<?> badLogger = logger.withCondition(badCondition);
+    var badLogger = logger.withCondition(badCondition);
     badLogger.debug("I am passing in {}", fb -> fb.number("testing", 5));
 
     Throwable throwable = StaticExceptionHandler.head();
@@ -61,7 +59,7 @@ public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testBadCondition() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer number = null;
     Condition badCondition = (level, context) -> number.intValue() == 5;
 
@@ -73,7 +71,7 @@ public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testBadConditionAndArgument() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer number = null;
     Condition badCondition =
         (level, context) ->
@@ -88,7 +86,7 @@ public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testAsyncLog() {
-    AsyncLogger<?> asyncLogger = getAsyncLogger();
+    var asyncLogger = getAsyncLogger();
     Integer number = null;
     asyncLogger.info(
         handle -> {
@@ -102,7 +100,7 @@ public class ExceptionHandlerTests extends TestBase {
 
   @Test
   public void testAsyncLogWithField() {
-    AsyncLogger<?> asyncLogger = getAsyncLogger();
+    var asyncLogger = getAsyncLogger();
     Integer number = null;
     asyncLogger
         .withFields(fb -> fb.number("nullNumber", number.intValue()))

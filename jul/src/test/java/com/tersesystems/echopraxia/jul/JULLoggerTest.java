@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.jul;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import java.util.List;
@@ -17,7 +16,7 @@ class JULLoggerTest extends TestBase {
 
   @Test
   void testDebug() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("hello");
 
     List<LogRecord> list = EncodedListHandler.records();
@@ -28,7 +27,7 @@ class JULLoggerTest extends TestBase {
 
   @Test
   void testInfo() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info("hello");
 
     List<LogRecord> list = EncodedListHandler.records();
@@ -39,7 +38,7 @@ class JULLoggerTest extends TestBase {
 
   @Test
   void testArguments() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info(
         "hello {0}, you are {1}, citizen status {2}",
         fb -> fb.list(fb.string("name", "will"), fb.number("age", 13), fb.bool("citizen", true)));
@@ -56,7 +55,7 @@ class JULLoggerTest extends TestBase {
 
   @Test
   void testWithThreadContext() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     MDC.put("mdckey", "mdcvalue");
     logger.withThreadContext().info("hello");
 
@@ -70,7 +69,7 @@ class JULLoggerTest extends TestBase {
 
   @Test
   void testException() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Throwable expected = new IllegalStateException("oh noes");
     logger.error("Error", expected);
 

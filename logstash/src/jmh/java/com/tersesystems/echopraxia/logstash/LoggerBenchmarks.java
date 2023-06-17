@@ -4,6 +4,7 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
@@ -14,7 +15,7 @@ import org.openjdk.jmh.infra.Blackhole;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class LoggerBenchmarks {
-  private static final Logger<?> logger = LoggerFactory.getLogger();
+  private static final Logger<PresentationFieldBuilder> logger = LoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
 
   private static final Logger<?> neverLogger = logger.withCondition(Condition.never());

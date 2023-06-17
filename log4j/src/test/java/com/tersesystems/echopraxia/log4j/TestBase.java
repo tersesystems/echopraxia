@@ -7,10 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
+import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import com.tersesystems.echopraxia.log4j.appender.ListAppender;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 
 public class TestBase {
@@ -22,11 +25,12 @@ public class TestBase {
     listAppender.clear();
   }
 
-  Logger<?> getLogger() {
+  @NotNull
+  Logger<PresentationFieldBuilder> getLogger() {
     return LoggerFactory.getLogger();
   }
 
-  AsyncLogger<?> getAsyncLogger() {
+  AsyncLogger<FieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger();
   }
 

@@ -28,8 +28,7 @@ public class ContextTest extends TestBase {
     Marker securityMarker = MarkerManager.getMarker("SECURITY");
     Log4JCoreLogger core =
         (Log4JCoreLogger) CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
-    Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
+    var logger = LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
     logger.error("Message {}", fb -> fb.string("field_name", "field_value"));
 
     JsonNode entry = getEntry();
@@ -47,8 +46,7 @@ public class ContextTest extends TestBase {
     final Marker securityMarker = MarkerManager.getMarker("SECURITY");
     Log4JCoreLogger core =
         (Log4JCoreLogger) CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
-    Logger<?> logger =
-        LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
+    var logger = LoggerFactory.getLogger(core.withMarker(securityMarker), FieldBuilder.instance());
 
     org.apache.logging.log4j.Logger log4jLogger = core.logger();
 
@@ -64,7 +62,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testComplexFields() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger
         .withFields(
             fb -> {
@@ -88,7 +86,7 @@ public class ContextTest extends TestBase {
   @Test
   void testThreadContext() {
     ThreadContext.put("mdckey", "mdcvalue");
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.withThreadContext().error("message with mdc context");
 
     JsonNode entry = getEntry();
@@ -99,7 +97,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindExceptionStackTraceElement() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) -> {
           Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
@@ -115,7 +113,7 @@ public class ContextTest extends TestBase {
 
   @Test
   void testFindDouble() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition c =
         (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
     logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1.5));

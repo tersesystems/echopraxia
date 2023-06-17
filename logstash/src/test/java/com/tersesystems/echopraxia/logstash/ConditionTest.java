@@ -12,7 +12,6 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.Value;
-import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -23,7 +22,7 @@ public class ConditionTest extends TestBase {
 
   @Test
   void testCondition() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Condition condition = (l, c) -> true;
     logger.info(condition, "info");
 
@@ -37,8 +36,8 @@ public class ConditionTest extends TestBase {
   void testConditionWithContext() {
     Condition hasInfoLevel = (level, context) -> level.equals(Level.INFO);
 
-    Logger<?> logger = getLogger();
-    Logger<?> loggerWithCondition =
+    var logger = getLogger();
+    var loggerWithCondition =
         logger.withCondition(hasInfoLevel).withFields(f -> f.string("herp", "derp"));
 
     Condition hasFieldNamedHerp =
@@ -56,7 +55,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testNumberMatch() {
     Condition logins = Condition.numberMatch("logins", v -> v.equals(number(1)));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info(logins, "{}", fb -> fb.number("logins", 1));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -70,7 +69,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testBooleanMatch() {
     Condition logins = Condition.booleanMatch("isAwesome", v -> v.equals(Value.bool(true)));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info(logins, "{}", fb -> fb.bool("isAwesome", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -85,7 +84,7 @@ public class ConditionTest extends TestBase {
   void testObjectMatch() {
     Field field = Field.keyValue("foo", Value.string("bar"));
     Condition logins = Condition.objectMatch("myObject", v -> v.equals(Value.object(field)));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info(logins, "{}", fb -> fb.object("myObject", List.of(fb.string("foo", "bar"))));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -99,7 +98,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testArrayMatch() {
     Condition logins = Condition.arrayMatch("myarray", v -> v.equals(Value.array("foo")));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info(logins, "{}", fb -> fb.array("myarray", "foo"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -113,11 +112,11 @@ public class ConditionTest extends TestBase {
   @Test
   void testFieldConditionIsLive() {
     Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, string("derp")));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     final AtomicReference<String> changeableValue = new AtomicReference<>("derp");
 
     // we need to know that withFields is "call by name" and is evaluated fresh on every statement.
-    Logger<?> loggerWithContext = logger.withFields(f -> f.string("herp", changeableValue.get()));
+    var loggerWithContext = logger.withFields(f -> f.string("herp", changeableValue.get()));
 
     loggerWithContext.info(hasDerp, "has derp");
     changeableValue.set("notderp");
@@ -134,11 +133,11 @@ public class ConditionTest extends TestBase {
   @Test
   void testMDCConditionIsLive() {
     Condition hasDerp = Condition.stringMatch("herp", v -> Value.equals(v, string("derp")));
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
 
     MDC.put("herp", "derp");
     // we need to know that withFields is "call by name" and is evaluated fresh on every statement.
-    Logger<?> loggerWithContext = logger.withThreadContext();
+    var loggerWithContext = logger.withThreadContext();
 
     loggerWithContext.info(hasDerp, "has derp");
     MDC.put("herp", "notderp");
@@ -165,7 +164,7 @@ public class ConditionTest extends TestBase {
         };
 
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
+    var loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -193,7 +192,7 @@ public class ConditionTest extends TestBase {
           }
           return true;
         };
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger().withCondition(c);
+    var loggerWithCondition = getAsyncLogger().withCondition(c);
     loggerWithCondition.info(
         handle -> {
           handle.log("async logging test");
@@ -211,7 +210,7 @@ public class ConditionTest extends TestBase {
   @Test
   void testFailedAsyncLogging() {
     AtomicBoolean logged = new AtomicBoolean(false);
-    AsyncLogger<?> loggerWithCondition = getAsyncLogger();
+    var loggerWithCondition = getAsyncLogger();
     loggerWithCondition.info(
         handle -> {
           handle.log(

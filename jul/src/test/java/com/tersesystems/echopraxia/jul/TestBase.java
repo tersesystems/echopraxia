@@ -33,7 +33,7 @@ public class TestBase {
     EncodedListHandler.clear();
   }
 
-  Logger<?> getLogger() {
+  Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 

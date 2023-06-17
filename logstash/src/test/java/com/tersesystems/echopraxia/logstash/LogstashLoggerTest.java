@@ -12,7 +12,6 @@ import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Value;
-import com.tersesystems.echopraxia.async.AsyncLogger;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Optional;
@@ -27,7 +26,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testDebug() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("hello");
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -38,7 +37,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullMessage() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug(null);
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -49,7 +48,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   public void testLoggerLocation() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.info("Boring Message");
 
     // We can't go through the list appender here because it doesn't call the encoder,
@@ -63,7 +62,7 @@ class LogstashLoggerTest extends TestBase {
   @Test
   public void testAsyncLoggerLocation() {
     final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
-    AsyncLogger<?> asyncLogger = getAsyncLogger();
+    var asyncLogger = getAsyncLogger();
     asyncLogger.info("Boring Message");
 
     waitUntilMessages();
@@ -77,7 +76,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testArguments() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug(
         "hello {}, you are {}, {}",
         fb -> fb.list(fb.string("name", "PERSON"), fb.number("age", 13), fb.bool("citizen", true)));
@@ -90,7 +89,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testArrayOfStringsArgument() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("hello {}", fb -> fb.array("toys", "binkie"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -101,7 +100,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullArgument() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("hello {}", fb -> fb.nullField("nothing"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -112,7 +111,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullStringArgument() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     String value = null;
     logger.debug("hello {}", fb -> (fb.string("name", value)));
 
@@ -124,7 +123,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullFieldName() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     String value = "value";
     logger.debug("hello {}", fb -> (fb.string(null, value)));
 
@@ -136,7 +135,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullNumber() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     Integer value = null;
     logger.debug("hello {}", fb -> (fb.number("name", value)));
 
@@ -148,7 +147,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullBoolean() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("boolean is {}", fb -> (fb.bool("name", (Boolean) null)));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -159,7 +158,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullArrayElement() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     String[] values = {"1", null, "3"};
     logger.debug("array field is {}", fb -> fb.array("arrayName", values));
 
@@ -171,7 +170,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testNullObject() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug("object is {}", fb -> (fb.object("name", Value.object((Field) null))));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -183,7 +182,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testObjectArgument() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.debug(
         "hello {}",
         fb -> {
@@ -202,7 +201,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testException() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.error("Error", new IllegalStateException("oh noes"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -215,7 +214,7 @@ class LogstashLoggerTest extends TestBase {
 
   @Test
   void testArgumentsException() {
-    Logger<?> logger = getLogger();
+    var logger = getLogger();
     logger.error(
         "Error {}",
         fb ->

@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logger<FB>, FB>
+public class Logger<FB> extends AbstractLoggerSupport<Logger<FB>, FB>
     implements DefaultLoggerMethods<FB> {
 
   // This is where the logging methods are called, so the stacktrace element shows
@@ -58,7 +58,7 @@ public class Logger<FB extends FieldBuilder> extends AbstractLoggerSupport<Logge
    *
    * @param <FB> the field builder type.
    */
-  public static class NeverLogger<FB extends FieldBuilder> extends Logger<FB> {
+  public static class NeverLogger<FB> extends Logger<FB> {
 
     protected NeverLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
       super(core, fieldBuilder);

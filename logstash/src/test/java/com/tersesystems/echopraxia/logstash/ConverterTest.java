@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
 import ch.qos.logback.classic.LoggerContext;
-import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -32,7 +31,7 @@ public class ConverterTest {
 
   @Test
   public void testLog() {
-    Logger<?> logger = LoggerFactory.getLogger(getClass());
+    var logger = LoggerFactory.getLogger(getClass());
     logger.info("Only arguments", fb -> fb.string("book", "The Cask"));
     logger.withFields(fb -> fb.string("book", "The Cask")).info("Only logger context");
     logger

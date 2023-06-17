@@ -47,7 +47,7 @@ public class TestBase {
     return new LogstashCoreLogger(Logger.FQCN, loggerContext().getLogger(getClass().getName()));
   }
 
-  Logger<?> getLogger() {
+  Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 
