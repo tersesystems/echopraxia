@@ -80,7 +80,7 @@ class PersonFieldBuilder implements DiffFieldBuilder, FieldBuilder {
 
   public static final PersonFieldBuilder instance = new PersonFieldBuilder();
 
-  public FieldBuilderResult diff(String name, Person before, Person after) {
+  public Field diff(String name, Person before, Person after) {
     return diff(name, personValue(before), personValue(after), Field.class);
   }
 
