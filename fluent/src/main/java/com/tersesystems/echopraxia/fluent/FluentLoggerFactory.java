@@ -91,8 +91,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static <FB> FluentLogger<FB> getLogger(
-      CoreLogger coreLogger, FB builder) {
+  public static <FB> FluentLogger<FB> getLogger(CoreLogger coreLogger, FB builder) {
     return new FluentLogger<>(coreLogger, builder);
   }
 }

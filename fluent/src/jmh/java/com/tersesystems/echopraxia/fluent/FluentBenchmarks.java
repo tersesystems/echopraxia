@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.fluent;
 
-import java.util.concurrent.TimeUnit;
-
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 
 @BenchmarkMode(Mode.AverageTime)

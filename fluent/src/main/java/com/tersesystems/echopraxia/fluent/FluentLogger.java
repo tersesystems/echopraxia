@@ -14,8 +14,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public class FluentLogger<FB>
-    extends AbstractLoggerSupport<FluentLogger<FB>, FB> {
+public class FluentLogger<FB> extends AbstractLoggerSupport<FluentLogger<FB>, FB> {
 
   protected FluentLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     super(core, fieldBuilder, FluentLogger.class);
