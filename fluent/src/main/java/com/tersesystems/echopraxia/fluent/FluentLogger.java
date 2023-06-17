@@ -14,8 +14,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <FB> the field builder type.
  */
-public class FluentLogger<FB extends FieldBuilder>
-    extends AbstractLoggerSupport<FluentLogger<FB>, FB> {
+public class FluentLogger<FB> extends AbstractLoggerSupport<FluentLogger<FB>, FB> {
 
   protected FluentLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     super(core, fieldBuilder, FluentLogger.class);
@@ -158,11 +157,6 @@ public class FluentLogger<FB extends FieldBuilder>
     public EntryBuilder argument(@NotNull Function<FB, FieldBuilderResult> f) {
       this.argumentFnList.add(f);
       return this;
-    }
-
-    @NotNull
-    public EntryBuilder exception(@NotNull Throwable t) {
-      return argument(b -> b.exception(t));
     }
 
     public void log() {

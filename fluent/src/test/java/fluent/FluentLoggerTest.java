@@ -6,7 +6,6 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.tersesystems.echopraxia.fluent.FluentLogger;
 import com.tersesystems.echopraxia.fluent.FluentLoggerFactory;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,7 @@ public class FluentLoggerTest {
 
   @Test
   public void testLogger() {
-    FluentLogger<?> logger = FluentLoggerFactory.getLogger(getClass());
+    var logger = FluentLoggerFactory.getLogger(getClass());
 
     Person person = new Person("Eloise", 1);
 
