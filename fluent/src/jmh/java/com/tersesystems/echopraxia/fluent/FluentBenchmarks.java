@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.fluent;
 
 import java.util.concurrent.TimeUnit;
+
+import com.tersesystems.echopraxia.api.FieldBuilder;
 import org.openjdk.jmh.annotations.*;
 
 @BenchmarkMode(Mode.AverageTime)
@@ -9,7 +11,7 @@ import org.openjdk.jmh.annotations.*;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class FluentBenchmarks {
-  private static final FluentLogger<?> logger = FluentLoggerFactory.getLogger();
+  private static final FluentLogger<FieldBuilder> logger = FluentLoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
 
   @Benchmark
@@ -31,13 +33,13 @@ public class FluentBenchmarks {
         .atInfo()
         .message("Message {}")
         .argument(fb -> fb.string("foo", "bar"))
-        .exception(exception)
+        .argument(fb -> fb.exception(exception))
         .log();
   }
 
   @Benchmark
   public void infoWithException() {
     // FluentBenchmarks.infoWithException        avgt   25  351.918 +/-  7.124  ns/op
-    logger.atInfo().message("Message").exception(exception).log();
+    logger.atInfo().message("Message").argument(fb -> fb.exception(exception)).log();
   }
 }

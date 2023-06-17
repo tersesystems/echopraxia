@@ -26,7 +26,7 @@ public class FluentLoggerTest {
 
   @Test
   public void testLogger() {
-    FluentLogger<?> logger = FluentLoggerFactory.getLogger(getClass());
+    var logger = FluentLoggerFactory.getLogger(getClass());
 
     Person person = new Person("Eloise", 1);
 

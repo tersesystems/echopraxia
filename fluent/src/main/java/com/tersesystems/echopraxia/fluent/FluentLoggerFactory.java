@@ -30,7 +30,7 @@ public class FluentLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> FluentLogger<FB> getLogger(Class<?> clazz, FB builder) {
+  public static <FB> FluentLogger<FB> getLogger(Class<?> clazz, FB builder) {
     CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, clazz);
     return getLogger(coreLogger, builder);
   }
@@ -55,7 +55,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static <FB extends FieldBuilder> FluentLogger<FB> getLogger(String name, FB builder) {
+  public static <FB> FluentLogger<FB> getLogger(String name, FB builder) {
     CoreLogger coreLogger = CoreLoggerFactory.getLogger(FQCN, name);
     return getLogger(coreLogger, builder);
   }
@@ -91,7 +91,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static <FB extends FieldBuilder> FluentLogger<FB> getLogger(
+  public static <FB> FluentLogger<FB> getLogger(
       CoreLogger coreLogger, FB builder) {
     return new FluentLogger<>(coreLogger, builder);
   }
