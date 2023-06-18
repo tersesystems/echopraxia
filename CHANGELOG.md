@@ -2,20 +2,30 @@
 
 ## 3.0.0-SNAPSHOT
 
-* Refactor internal classes into SPI package
+* 
+* Remove lower bound for `*Logger<F extends FieldBuilder>`, now just `Logger<F>` so you can use your own builder.
+* Move internal classes in `api` into `spi` package
 * Move from very large README.md to documentation website
-* Add `EchopraxiaServiceProvider` and `EchopraxiaService` for centralized management
-* Add `PresentationHintsAware` to `DefaultField` so we can do `field.abbreviateAfter(5)`
-* Add field creator and `DefaultField` so we can swap out field implementations
-* Add `ToStringFormatter` and wire `field.toString` and `value.toString` to it
 * Add presentation hints `valueOnly`, `abbreviateAfter`, `displayName`, `elide`, `cardinal`
+* Add `PresentationHintsAware` and `PresentationField` so we can do `field.abbreviateAfter(5)`
+* Add `FieldCreator` and service implementations so Field can be extended with extra methods
+* Add `ToStringFormatter` and wire `field.toString` and `value.toString` to it
 * Add `FieldVisitor` for changing field structure in JSON
-* Add exception handler
+* Add exception handler tied to `EchopraxiaService`
+* Add `EchopraxiaServiceProvider` and `EchopraxiaService` for centralized management
 * Change `equals` on fields so that fields are not equal if they have different attributes
 * Make all fields (`fb.string`, `fb.number`, `fb.nullValue`) use `keyValue` by default.
-* Add field attributes
+* Add field attributes.
 
-## 2.3.0-RC1
+## 2.3.1
+
+* Move logback converters to logback module by @wsargent in https://github.com/tersesystems/echopraxia/pull/242
+* Add fallback logic for logstash by @wsargent in https://github.com/tersesystems/echopraxia/pull/241
+* Add JUL options for context by @wsargent in https://github.com/tersesystems/echopraxia/pull/250
+* Remove FieldBuilder as a dependency of DiffFieldBuilder by @wsargent in https://github.com/tersesystems/echopraxia/pull/251
+* Open logstash context by @wsargent in https://github.com/tersesystems/echopraxia/pull/252
+
+## 2.3.0
 
 * Add `getCore()` method to `LoggingContext` in https://github.com/tersesystems/echopraxia/pull/229
 * Add user defined functions to scripting to expose impure methods and context to Tweakflow in https://github.com/tersesystems/echopraxia/pull/227
