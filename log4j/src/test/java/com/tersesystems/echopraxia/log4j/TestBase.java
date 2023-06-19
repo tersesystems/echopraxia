@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
-import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
@@ -30,7 +29,7 @@ public class TestBase {
     return LoggerFactory.getLogger();
   }
 
-  AsyncLogger<FieldBuilder> getAsyncLogger() {
+  AsyncLogger<PresentationFieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger();
   }
 
