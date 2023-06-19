@@ -28,9 +28,7 @@ public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>
   }
 }
 
-class MyFieldBuilder implements PresentationFieldBuilder {
-
-}
+class MyFieldBuilder implements PresentationFieldBuilder {}
 
 class MyLoggerFactory {
 

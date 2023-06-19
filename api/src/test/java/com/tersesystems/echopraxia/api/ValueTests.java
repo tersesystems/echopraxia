@@ -5,10 +5,9 @@ import static com.tersesystems.echopraxia.api.Value.string;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Test;
-
 import java.time.Instant;
 import java.util.Optional;
+import org.junit.jupiter.api.Test;
 
 public class ValueTests {
 
@@ -74,5 +73,4 @@ public class ValueTests {
     var v = optional(Optional.ofNullable(instant).map(i -> string(i.toString())));
     assertThat(v).isEqualTo(Value.string("1970-01-01T00:00:00Z"));
   }
-
 }
