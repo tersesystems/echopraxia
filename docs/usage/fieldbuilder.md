@@ -29,17 +29,20 @@ In addition, there is `Value.optional` which takes `Optional<Value<V>>` and retu
 
 ### Fields
 
-TODO
+The `Field` interface has some static methods that are the primary way to create fields:
+
+* `Field.keyValue(name, value)` returns a `Field` with the given name and value set, displaying as "name=value" in text.
+* `Field.keyValue(name, value, PresentationField.class)` returns a `PresentationField` that has more methods on it.
+
+You can also define and extend `Field` with your own implementation, although that is outside the scope of this section.
+
+You can also create a field using `Field.value(name, value)` or `Field.value(name, value, PresentationField.class)`, which creates a `Field` with the presentation attribute `asValueOnly` set.
 
 ## Field Presentation
 
 There are times when the default field presentation is awkward, and you'd like to cut down on the amount of information displayed in the message.  You can do this by adding presentation hints to the field.
 
-The `FieldBuilder` interface provides some convenience methods around `Field` and `Value`.  In particular, there are two methods, `keyValue` and `value` that are used to create fields.  The `PresentationField` interface implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
-
-You can access these methods by passing in `PresentationField.class` to either `value` or `keyValue`, and then calling the extension methods -- this provides an easy way to construct fields while hiding the implementation outside the field builder.
-
-There is a `PresentationFieldBuilder` interface that you can extend that provides `PresentationField` by default.
+The `PresentationField` interface implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
 
 ### asValueOnly
 
@@ -98,12 +101,26 @@ Field object = keyValue("object", Value.object(fields), PresentationField.class)
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
-
 ## Defining Field Builders
 
-Echopraxia lets you specify field builders whenever you want to log domain objects.
+The `FieldBuilder` interface provides some convenience methods around `Field` and `Value`.  
 
-You do this by defining a field builder (typically using `FieldBuilder` or `PresentationFieldBuilder` as a base) and then pass that field builder into your `Logger` using `withFieldBuilder`.
+* `keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
+* `value`: renders a field with `value` when rendered in logfmt line oriented text.
+
+`FieldBuilder` comes with some additional methods for common types, i.e.
+
+* `fb.string`: creates a field with a string as a value, same as `fb.keyValue(name, Value.string(str))`.
+* `fb.number`: creates a field with a number as a value, same as `fb.keyValue(name, Value.number(num))`.
+* `fb.bool`: creates a field with a boolean as a value, same as `fb.keyValue(name, Value.bool(b))`.
+* `fb.nullValue`: creates a field with a null as a value, same as `fb.keyValue(name, Value.nullValue())`
+* `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
+* `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
+* `fb.exception`: renders exception field and sets throwable on logging event.
+
+There is a `PresentationFieldBuilder` interface is the same as `FieldBuilder` but returns `PresentationField` by default.
+
+To create a field builder, you start with an interface (typically using `FieldBuilder` or `PresentationFieldBuilder` as a base) and then pass that field builder into your `Logger` using `withFieldBuilder`.  Although convenient, you are not required to extend `FieldBuilder` or `PresentationFieldBuilder`, and can use `Field` and `Value` methods directly to create your own builders (useful if you don't want to expose field names directly).
 
 You can then create custom methods on your field builder that will render your class.  In this case, we'll create a field builder that can handle a `java.util.Date`, and create `date` and `dateValue` methods for it.
 
@@ -141,11 +158,9 @@ And now you can render a date automatically:
 dateLogger.info("Date {}", fb -> fb.date("creation_date", new Date()));
 ```
 
-Using `PresentationFieldBuilder` gives you some convenient base methods like `keyValue` and `value` to start with, but these do expose names.  You are not required to extend these interfaces, and can use `Field` and `Value` directly.
-
 ## Field Names
 
-Exposing both `date(value)` and `date(name, value)` allows the end user to render with a default, but still override the default name if necessary.  Allowing the end user to define field names can be nice, but also introduces additional complexity.
+Allowing the end user to define field names directly can be nice, but also introduces additional complexity.
 
 The advantage to using a field name is that it allows a user to distinguish ad-hoc inputs.  For example, if you have a start date and an end date:
 
@@ -195,14 +210,15 @@ At some point you will have a value that you want to render and the Java API wil
 
 I recommend using [Jetbrains annotations](https://www.jetbrains.com/help/idea/annotating-source-code.html#jetbrains-annotations) which includes a `@NotNull` annotation.
 
-You can defensively program against this by explicitly checking against nulls in the field builder, either explicitly checking against `null` or using `Value.optional`.
+You can defensively program against this by explicitly checking against nulls in the field builder, by explicitly checking against `null`.
 
 ```java
+import java.time.Duration;
+import org.jetbrains.annotations.NotNull;
+
 public interface NullableFieldBuilder extends FieldBuilder {
-  // extend as necessary
-  default Field nullableString(String name, String nullableString) {
-    Value<?> nullableValue = Value.optional(Optional.ofNullable(nullableString));
-    return keyValue(name, nullableValue);
+  default Value<?> durationValue(@NotNull Duration duration) {
+    return (deadline != null) ? Value.string(duration.toString()) : Value.nullValue();
   }
 }
 ```
@@ -222,36 +238,37 @@ The value of a field builder compounds as you build up complex objects from simp
 In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
 
 ```java
-public class PersonFieldBuilder implements PresentationFieldBuilder {
-  private PersonFieldBuilder() {}
-  public static final PersonFieldBuilder instance = new PersonFieldBuilder();
+public interface PersonFieldBuilder extends FieldBuilder {
 
   // Renders a `Person` as an object field.
-  public PresentationField keyValue(String fieldName, Person p) {
+  default Field person(String fieldName, Person p) {
     return keyValue(fieldName, personValue(p));
   }
 
-  public Value<?> personValue(Person p) {
-    if (p == null) {
-      return Value.nullValue();
-    }
+  default Value<?> personValue(Person p) {
+    if (p == null) return Value.nullValue();
+    // Note that properties must be broken down to the basic JSON types,
+    // i.e. a primitive string/number/boolean/null or object/array.
     Field name = string("name", p.name());
     Field age = number("age", p.age());
-    // optional returns either an object value or null value, keyValue is untyped
-    Field father = keyValue("father", Value.optional(p.getFather().map(this::personValue)));
-    Field mother = keyValue("mother", Value.optional(p.getMother().map(this::personValue)));
+    Field father = keyValue("father", personValue(p.getFather()));
+    Field mother = keyValue("mother", personValue(p.getMother()));
     Field interests = array("interests", p.interests());
     return Value.object(name, age, father, mother, interests);
+  }
+
+  default Value<?> personValue(Optional<Person> p) {
+    return Value.optional(p.map(this::personValue));
   }
 }
 ```
 
-And then you can do the same by calling `fb.keyValue` with `Person`:
+And then you can render a person:
 
 ```java
 Person user = ...
 Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.instance);
-personLogger.info("Person {}", fb -> fb.keyValue("user", user));
+personLogger.info("Person {}", fb -> fb.person("user", user));
 ```
 
 ## Packages and Modules
