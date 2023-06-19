@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import java.util.concurrent.TimeUnit;
