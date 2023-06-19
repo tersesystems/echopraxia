@@ -44,13 +44,15 @@ There are times when the default field presentation is awkward, and you'd like t
 
 The `PresentationField` interface implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
 
+For the examples, we'll assume that `PresentationFieldBuilder` is being used here and therefore `keyValue` returns `PresentationField`.
+
 ### asValueOnly
 
 The `asValueOnly` method has the effect of turning a "key=value" field into a "value" field in text format, just like the value method:
 
 ```java
 // same as Field valueField = value(name, value);
-Field valueField = keyValue("onlyValue", Value.string("someText"), PresentationField.class).asValueOnly();
+Field valueField = keyValue("onlyValue", Value.string("someText")).asValueOnly();
 valueField.toString() // renders someText
 ```
 
@@ -59,7 +61,7 @@ valueField.toString() // renders someText
 The `asCardinal` method, when used on a field with an array value or on a string, displays the number of elements in the array bracketed by "|" characters in text format:
 
 ```java
-Field cardinalField = keyValue("elements", Value.array(1,2,3), PresentationField.class).asCardinal();
+var cardinalField = keyValue("elements", Value.array(1,2,3).asCardinal();
 cardinalField.toString(); // renders elements=|3|
 ```
 
@@ -68,7 +70,7 @@ cardinalField.toString(); // renders elements=|3|
 The `withDisplayName` method shows a human readable string in text format bracketed in quotes:
 
 ```java
-Field readableField = keyValue("json_field", Value.number(1), PresentationField.class).withDisplayName("human readable name");
+var readableField = keyValue("json_field", Value.number(1)).withDisplayName("human readable name");
 readableField.toString() // renders "human readable name"=1
 ```
 
@@ -77,27 +79,27 @@ readableField.toString() // renders "human readable name"=1
 The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
 
 ```java
-Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), PresentationField.class).abbreviateAfter(5);
+var abbrField = keyValue("abbreviatedField", Value.string(veryLongString)).abbreviateAfter(5);
 abbrField.toString() // renders abbreviatedField=12345...
 ```
 
-## asElided
+### asElided
 
 The `asElided` method will elide the field so that it is passed over and does not show in text format:
 
 ```java
-Field abbrField = keyValue("abbreviatedField", Value.string(veryLongString), PresentationField.class).asElided();
+var abbrField = keyValue("abbreviatedField", Value.string(veryLongString)).asElided();
 abbrField.toString() // renders ""
 ```
 
 This is particularly useful in objects that have elided children that you don't need to see in the message:
 
 ```java
-Field first = keyValue("first", string("bar"), PresentationField.class).asElided();
-Field second = keyValue("second", string("bar"), PresentationField.class);
-Field third = keyValue("third", string("bar"), PresentationField.class).asElided();
+Field first = keyValue("first", string("bar")).asElided();
+Field second = keyValue("second", string("bar"));
+Field third = keyValue("third", string("bar")).asElided();
 List<Field> fields = List.of(first, second, third);
-Field object = keyValue("object", Value.object(fields), PresentationField.class);
+Field object = keyValue("object", Value.object(fields));
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
@@ -116,9 +118,9 @@ The `FieldBuilder` interface provides some convenience methods around `Field` an
 * `fb.nullValue`: creates a field with a null as a value, same as `fb.keyValue(name, Value.nullValue())`
 * `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
 * `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
-* `fb.exception`: renders exception field and sets throwable on logging event.
+* `fb.exception`: creates a field with a throwable as a value, same as `fb.keyValue(name, Value.exception(t))`.
 
-There is a `PresentationFieldBuilder` interface is the same as `FieldBuilder` but returns `PresentationField` by default.
+The `PresentationFieldBuilder` interface is the same as `FieldBuilder` but returns `PresentationField` by default.
 
 To create a field builder, you start with an interface (typically using `FieldBuilder` or `PresentationFieldBuilder` as a base) and then pass that field builder into your `Logger` using `withFieldBuilder`.  Although convenient, you are not required to extend `FieldBuilder` or `PresentationFieldBuilder`, and can use `Field` and `Value` methods directly to create your own builders (useful if you don't want to expose field names directly).
 
@@ -194,7 +196,11 @@ However, there are downsides to defining names directly in statements, especiall
 
 The first issue is that you may have to sanitize or validate the input name depending on your centralized logging.  For example, ElasticSearch does not support [field names containing a . (dot) character](https://www.elastic.co/blog/introducing-the-de_dot-filter), so if you do not convert or reject invalid field names.  
 
-A broader issue is that field names are not scoped by the logger name.  Centralized logging does not know that in the `FooLogger` a field name may be a string, but in the `BarLogger`, the same field name will be a number.  This can cause issues in centralized logging -- ElasticSearch will attempt to define a schema based on dynamic mapping, meaning that if two log statements in the same index have the same field name but different types, i.e. `"error": 404` vs `"error": "not found"` then Elasticsearch will render `mapper_parsing_exception` and may reject log statements if you do not have [ignore_malformed](https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-malformed.html) turned on.  Even if you turn `ignore_malformed` on or have different mappings, a change in a mapping across indexes will be enough to stop ElasticSearch from querying correctly.  ElasticSearch will also flatten field names, which can cause more confusion as conflicts will only come when objects have both the same field name and property, i.e. they are both called `error` and are objects that work fine, but fail when an optional `code` property is added.
+A broader issue is that field names are not scoped by the logger name.  Centralized logging does not know that in the `FooLogger` a field name may be a string, but in the `BarLogger`, the same field name will be a number.  
+
+This can cause issues in centralized logging -- ElasticSearch will attempt to define a schema based on dynamic mapping, meaning that if two log statements in the same index have the same field name but different types, i.e. `"error": 404` vs `"error": "not found"` then Elasticsearch will render `mapper_parsing_exception` and may reject log statements if you do not have [ignore_malformed](https://www.elastic.co/guide/en/elasticsearch/reference/current/ignore-malformed.html) turned on.  
+
+Even if you turn `ignore_malformed` on or have different mappings, a change in a mapping across indexes will be enough to stop ElasticSearch from querying correctly.  ElasticSearch will also flatten field names, which can cause more confusion as conflicts will only come when objects have both the same field name and property, i.e. they are both called `error` and are objects that work fine, but fail when an optional `code` property is added.
 
 Likewise, field names are not automatically scoped by context.  You may have collision cases where two different fields have the same name in the same statement:
 
@@ -204,7 +210,7 @@ logger.withFields(fb -> fb.keyValue("user_id", userId)).info("{}", fb -> fb.keyV
 
 This will produce a statement that has two `user_id` fields with two different values -- which is technically valid JSON, but may not be what centralized logging expects.  You can qualify your arguments by adding a [nested](https://github.com/logfellow/logstash-logback-encoder#nested-json-provider), or add logic that will validate/reject/clean invalid fields, but it may be simpler to explicitly pass in distinct names or namespace with `fb.object` or `Value.object`.
 
-## Nulls
+## Managing Null Values
 
 At some point you will have a value that you want to render and the Java API will return `null`.
 
@@ -298,7 +304,8 @@ interface UserFieldBuilder extends PresentationFieldBuilder {
 }
 
 public abstract class LoggingBase {
-  protected static Logger<UserFieldBuilder> logger = LoggerFactory.getLogger(this.getClass(), UserFieldBuilder.instance);
+  protected static final Logger<UserFieldBuilder> logger =
+    LoggerFactory.getLogger(this.getClass(), UserFieldBuilder.instance);
 }
 
 public class SomeUserService extends LoggingBase {
@@ -342,7 +349,7 @@ public class SomeOrderService extends LoggingBase {
 
 This way, you can have your loggers automatically "know" their domain classes and build on each other without exposing the underlying machinery to end users.
 
-## Exceptions
+## Exception Handling
 
 Avoid throwing exceptions in a field builder function.  Because a field builder function runs in a closure, if an exception is thrown it will be caught by Echopraxia's error handler which writes the exception to `System.err` by default.  
 
@@ -362,8 +369,7 @@ logger.info("Message name {}", fb -> {
 });
 ```
 
-
-### StructuredFormat
+## StructuredFormat
 
 Using the `withStructuredFormat` method with a field visitor will allow the JSON output to contain different fields when you want to provide extra type information that isn't relevant in text.
 
@@ -417,5 +423,10 @@ startTime=1970-01-01T00:00:00Z
 But will render JSON as:
 
 ```json
-{"startTime":{"@type":"http://www.w3.org/2001/XMLSchema#dateTime","@value":"1970-01-01T00:00:00Z"}}
+{
+  "startTime": {
+    "@type":"http://www.w3.org/2001/XMLSchema#dateTime",
+    "@value":"1970-01-01T00:00:00Z"
+  }
+}
 ```

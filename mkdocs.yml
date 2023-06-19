@@ -67,8 +67,8 @@ nav:
     - Filters: usage/filters.md      
     - Scripting: usage/scripting.md
   - Frameworks:      
-    - Logback Features: frameworks/logback.md
-    - Log4J2 Features: frameworks/log4j2.md
+    - Logback Framework: frameworks/logback.md
+    - Log4J2 Framework: frameworks/log4j2.md
   - Additional Features:
     - Diff Field Builder: additional/diff.md
     - Fluent Logger: additional/fluent.md

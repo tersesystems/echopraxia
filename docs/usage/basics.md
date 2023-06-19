@@ -9,7 +9,7 @@ Add the import:
 import com.tersesystems.echopraxia.*;
 ```
 
-First you define a logger (usually in a controller or singleton -- `getClass()` is particularly useful for abstract controllers):
+Define a logger (usually in a controller or singleton -- `getClass()` is particularly useful for abstract controllers):
 
 ```java
 final Logger<PresentationFieldBuilder> basicLogger = LoggerFactory.getLogger(getClass());

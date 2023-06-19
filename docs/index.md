@@ -27,10 +27,12 @@ and in a JSON format as:
 }
 ```
 
-What makes Echopraxia effective -- especially for debugging -- is that you can define your own mappings, and then pass in your own objects and render complex objects.  For example, we can render a `Person` object:
+What makes Echopraxia effective -- especially for debugging -- is that you can define your own field builders to map between objects and fields, and then pass in your own objects and render complex objects.  For example, we can render a `Person` object:
 
 ```java
-Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger(getClass()).withFieldBuilder(PersonFieldBuilder.instance());
+Logger<PersonFieldBuilder> logger = LoggerFactory
+                                        .getLogger(getClass())
+                                        .withFieldBuilder(PersonFieldBuilder.instance());
 
 Person abe = new Person("Abe", 1, "yodelling");
 abe.setFather(new Person("Bert", 35, "keyboards"));
@@ -44,6 +46,25 @@ And print out the internal state of the `Person` in both logfmt and JSON.
 ```
 INFO 13.223 abe={Abe, 1, father={Bert, 35, father=null, mother=null, interests=[keyboards]}, mother={Candace, 30, father=null, mother=null, interests=[iceskating]}, interests=[yodelling]}
 ```
+
+Echopraxia also has a "contextual" logging feature that renders fields in JSON:
+
+```java
+var fooLogger = logger.withFields(fb -> fb.string("foo", "bar"));
+fooLogger.info("This logs the 'foo' field automatically in JSON");
+```
+
+And has conditional logging based on fields and exceptions using JSONPath:
+
+```java
+Condition c = (level, ctx) ->
+    ctx.findString("$.exception.stackTrace[0].methodName")
+        .filter(s -> s.endsWith("Foo"))
+        .isPresent();
+logger.error(c, "Only render this error if method name ends in Foo", e);
+```
+
+And there is also a feature to change logging conditions [dynamically using scripts](https://github.com/tersesystems/smallest-dynamic-logging-example).
 
 ## Examples
 
