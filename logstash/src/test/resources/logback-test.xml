@@ -1,4 +1,4 @@
-<configuration>
+<configuration debug="true">
 
     <!-- tell async logger to create a throwable -->
     <property scope="context" name="echopraxia.async.caller" value="true"/>
@@ -8,10 +8,11 @@
              actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
 
     <!-- always create a logging event if the SECURITY marker exists -->
-    <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">
-        <Marker>SECURITY</Marker>
-        <OnMatch>ACCEPT</OnMatch>
-    </turboFilter>
+    <!-- this dies in 1.3.x because it tries to get the markerfactory while still configuring, so it is null -->
+    <!--    <turboFilter class="ch.qos.logback.classic.turbo.MarkerFilter">-->
+    <!--        <Marker>SECURITY</Marker>-->
+    <!--        <OnMatch>ACCEPT</OnMatch>-->
+    <!--    </turboFilter>-->
 
     <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
     </appender>
