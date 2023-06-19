@@ -27,6 +27,7 @@ And then continuing on from the [custom field builder example](https://github.co
 
 ```java
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.*;
 
 public final class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFieldBuilder>
   implements DefaultLoggerMethods<PersonFieldBuilder> {

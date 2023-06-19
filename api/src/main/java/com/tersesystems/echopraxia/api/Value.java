@@ -457,7 +457,7 @@ public abstract class Value<V> {
   @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
   @NotNull
   public static Value<?> optional(@NotNull Optional<? extends Value<?>> optionalValue) {
-    if (optionalValue.isPresent()) {
+    if (optionalValue != null && optionalValue.isPresent()) {
       return optionalValue.get();
     }
     return nullValue();

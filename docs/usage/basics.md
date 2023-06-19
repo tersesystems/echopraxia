@@ -63,5 +63,4 @@ basicLogger.info("Message name {}", fb -> fb.list(
 In older versions, `fb.only()` was required to convert a `Field` -- this is no longer required, but a `FieldBuilderWithOnly` interface is available to maintain those methods.
 
 Note that unlike SLF4J, you don't have to worry about including the exception as an argument "swallowing" the stacktrace.  If an exception is present, it's always applied to the underlying logger.
-
-So far so good. But logging strings and numbers can get tedious.  Let's go into custom field builders.  
+ 
