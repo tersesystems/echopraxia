@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.CoreLoggerFactory;
-import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import com.tersesystems.echopraxia.spi.Caller;
 import org.jetbrains.annotations.NotNull;
 
@@ -17,8 +17,8 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static FluentLogger<FieldBuilder> getLogger(Class<?> clazz) {
-    return getLogger(clazz, FieldBuilder.instance());
+  public static FluentLogger<PresentationFieldBuilder> getLogger(Class<?> clazz) {
+    return getLogger(clazz, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -42,8 +42,8 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static FluentLogger<FieldBuilder> getLogger(String name) {
-    return getLogger(name, FieldBuilder.instance());
+  public static FluentLogger<PresentationFieldBuilder> getLogger(String name) {
+    return getLogger(name, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -66,7 +66,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static FluentLogger<FieldBuilder> getLogger() {
+  public static FluentLogger<PresentationFieldBuilder> getLogger() {
     return getLogger(Caller.resolveClassName());
   }
 
@@ -78,7 +78,7 @@ public class FluentLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> FluentLogger<FieldBuilder> getLogger(FB builder) {
+  public static <FB> FluentLogger<FB> getLogger(FB builder) {
     return getLogger(Caller.resolveClassName(), builder);
   }
 

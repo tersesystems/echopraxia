@@ -51,7 +51,7 @@ public class TestBase {
     return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 
-  AsyncLogger<?> getAsyncLogger() {
+  AsyncLogger<FieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 

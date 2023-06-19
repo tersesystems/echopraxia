@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.logstash;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import java.util.concurrent.Executor;
@@ -16,7 +17,7 @@ import org.openjdk.jmh.annotations.*;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class AsyncLoggerBenchmarks {
-  private static final AsyncLogger<?> logger =
+  private static final AsyncLogger<PresentationFieldBuilder> logger =
       AsyncLoggerFactory.getLogger()
           .withExecutor(
               new Executor() {

@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.jul;
 
 import com.tersesystems.echopraxia.*;
-import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import com.tersesystems.echopraxia.async.AsyncLogger;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
 import java.io.IOException;
@@ -33,11 +33,11 @@ public class TestBase {
     EncodedListHandler.clear();
   }
 
-  Logger<FieldBuilder> getLogger() {
-    return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
+  Logger<PresentationFieldBuilder> getLogger() {
+    return LoggerFactory.getLogger(getCoreLogger(), PresentationFieldBuilder.instance());
   }
 
-  AsyncLogger<?> getAsyncLogger() {
+  AsyncLogger<PresentationFieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger();
   }
 
