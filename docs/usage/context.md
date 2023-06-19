@@ -3,7 +3,7 @@
 You can also add fields directly to the logger using `logger.withFields` for contextual logging:
 
 ```java
-Logger<?> loggerWithFoo = basicLogger.withFields(fb -> fb.string("foo", "bar"));
+var loggerWithFoo = basicLogger.withFields(fb -> fb.string("foo", "bar"));
 
 // will log "foo": "bar" field in a JSON appender.
 loggerWithFoo.info("JSON field will log automatically") 
@@ -11,7 +11,7 @@ loggerWithFoo.info("JSON field will log automatically")
 
 This works very well for HTTP session and request data such as correlation ids.
 
-One thing to be aware of that the popular idiom of using `public static final Logger<?> logger` can be limiting in cases where you want to include context data.  For example, if you have a number of objects with their own internal state, it may be more appropriate to create a logger field on the object.
+One thing to be aware of that the popular idiom of using `public static final Logger<MyFieldBuilder> logger` can be limiting in cases where you want to include context data.  For example, if you have a number of objects with their own internal state, it may be more appropriate to create a logger field on the object.
 
 ```java
 public class PlayerData {
@@ -63,7 +63,7 @@ For example, `SimpleDateFormat` is infamously not thread-safe, and so the follow
 private final static DateFormat df = new SimpleDateFormat("yyyyMMdd");
 
 // UNSAFE EXAMPLE
-private static final Logger<?> logger =
+private static final Logger<PresentationFieldBuilder> logger =
         LoggerFactory.getLogger()
         .withFields(fb -> fb.string("unsafe_date", df.format(new Date())));
 ```

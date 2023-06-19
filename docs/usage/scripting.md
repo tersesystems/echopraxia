@@ -128,7 +128,7 @@ import com.tersesystems.echopraxia.scripting.*;
 Path path = Paths.get("src/test/tweakflow/condition.tf");
 Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
 
-Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
 ```
 
 Where `condition.tf` contains a tweakflow script, e.g.
@@ -174,7 +174,7 @@ class NowFunction {
   public void logWithNow() {
     Path path = Paths.get("src/test/tweakflow/condition.tf");
     Condition condition = ScriptCondition.create(ctx -> userFunctions, false, path, Throwable::printStackTrace);
-    Logger<?> logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
   }
 }
 ```

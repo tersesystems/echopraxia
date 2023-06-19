@@ -2,7 +2,6 @@ package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import java.util.concurrent.TimeUnit;
@@ -24,8 +23,8 @@ public class LoggerBenchmarks {
       logger.withCondition(Condition.always());
   private static final Logger<PresentationFieldBuilder> conditionLogger =
       logger.withCondition((level, context) -> level.equals(Level.ERROR));
-  private static final Logger<?> fieldBuilderLogger =
-      logger.withFieldBuilder(FieldBuilder.instance());
+  private static final Logger<PresentationFieldBuilder> fieldBuilderLogger =
+      logger.withFieldBuilder(PresentationFieldBuilder.instance());
   private static final Logger<PresentationFieldBuilder> contextLogger =
       logger.withFields(fb -> fb.string("foo", "bar"));
 
