@@ -146,13 +146,13 @@ There are many more options available using JSONPath.  You can try out the [onli
 You can use conditions in a logger, and statements will only log if the condition is met:
 
 ```java
-Logger<?> loggerWithCondition = logger.withCondition(condition);
+var loggerWithCondition = logger.withCondition(condition);
 ```
 
 You can also build up conditions:
 
 ```java
-Logger<?> loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
+Logger<PresentationFieldBuilder> loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
 ```
 
 Conditions are only evaluated once a level/marker check is passed, so something like
@@ -204,7 +204,7 @@ boolean loggerEnabled = logger
 Using a predicate with a condition does not trigger any logging, so it can be a nice way to "dry run" a condition.  Note that the context evaluation takes place every time a condition is run, so doing something like this is not good:
 
 ```java
-Logger<?> loggerWithContextAndCondition =  logger
+var loggerWithContextAndCondition =  logger
   .withFields(fb -> fb.string("somename", "somevalue"))
   .withCondition(condition);
 
@@ -220,7 +220,7 @@ This results in the context being evaluated both in the block and in the info st
 It is generally preferable to pass in a condition explicitly on the statement, as it will only evaluate once.
 
 ```java
-Logger<?> loggerWithContext = logger
+var loggerWithContext = logger
   .withFields(fb -> fb.string("somename", "somevalue"))
 loggerWithContext.info(condition, "message");
 ```

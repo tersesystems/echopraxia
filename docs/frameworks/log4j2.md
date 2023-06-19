@@ -15,7 +15,7 @@ The `Log4JCoreLogger` has a `withMarker` method that takes a Log4J marker:
 
 ```java
 final Marker securityMarker = MarkerManager.getMarker("SECURITY");
-Logger<?> logger = LoggerFactory.getLogger(
+Logger<FieldBuilder> logger = LoggerFactory.getLogger(
       core.withMarker(securityMarker), FieldBuilder.instance);
 ```
 
@@ -32,7 +32,7 @@ Condition hasAnyMarkers = (level, context) -> {
 If you need to get the Log4j logger from a core logger, you can cast and call `core.logger()`:
 
 ```java
-Logger<?> baseLogger = LoggerFactory.getLogger();
+Logger<PresentationFieldBuilder> baseLogger = LoggerFactory.getLogger();
 Log4JCoreLogger core = (Log4JCoreLogger) baseLogger.core();
 org.apache.logging.log4j.Logger log4jLogger = core.logger();
 ```

@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The LoggerFactory class. This is used to create the appropriate `Logger`.
  *
- * <p>{@code private static final Logger<?> logger = LoggerFactory.getLogger(); }
+ * <p>{@code private static final Logger<PresentationFieldBuilder> logger = LoggerFactory.getLogger(); }
  */
 public class LoggerFactory {
 

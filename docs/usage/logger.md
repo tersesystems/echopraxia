@@ -3,7 +3,7 @@
 
 If you are using a particular set of field builders for your domain and want them available by default, it's easy to create your own logger with your own field builder, using the support classes and interfaces.  
 
-Creating your own logger will also remove the type parameter from your code, so you don't have to type `Logger<?>` everywhere, and allow you to create custom methods that leverage field builders.
+Creating your own logger will also remove the type parameter from your code, so you don't have to type `Logger<PersonFieldBuilder>` everywhere, and allow you to create custom methods that leverage field builders.
 
 If you want to make sure your logger is the only one available, you should import only the API:
 

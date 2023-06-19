@@ -18,13 +18,13 @@ public class LoggerBenchmarks {
   private static final Logger<PresentationFieldBuilder> logger = LoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
 
-  private static final Logger<?> neverLogger = logger.withCondition(Condition.never());
-  private static final Logger<?> alwaysLogger = logger.withCondition(Condition.always());
-  private static final Logger<?> conditionLogger =
+  private static final Logger<PresentationFieldBuilder> neverLogger = logger.withCondition(Condition.never());
+  private static final Logger<PresentationFieldBuilder> alwaysLogger = logger.withCondition(Condition.always());
+  private static final Logger<PresentationFieldBuilder> conditionLogger =
       logger.withCondition((level, context) -> level.equals(Level.ERROR));
-  private static final Logger<?> fieldBuilderLogger =
-      logger.withFieldBuilder(FieldBuilder.instance());
-  private static final Logger<?> contextLogger = logger.withFields(fb -> fb.string("foo", "bar"));
+  private static final Logger<PresentationFieldBuilder> fieldBuilderLogger =
+      logger.withFieldBuilder(PresentationFieldBuilder.instance());
+  private static final Logger<PresentationFieldBuilder> contextLogger = logger.withFields(fb -> fb.string("foo", "bar"));
 
   @Benchmark
   public void info() {

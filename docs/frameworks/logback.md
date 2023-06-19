@@ -16,7 +16,7 @@ LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
 The `LogstashCoreLogger` has a `withMarkers` method that takes an SLF4J marker:
 
 ```java
-Logger<?> logger = LoggerFactory.getLogger(
+Logger<FieldBuilder> logger = LoggerFactory.getLogger(
       core.withMarkers(MarkerFactory.getMarker("SECURITY")), FieldBuilder.instance);
 ```
 
@@ -33,7 +33,7 @@ Condition hasAnyMarkers = (level, context) -> {
 If you need to get at the SLF4J logger from a core logger, you can cast and call `core.logger()`:
 
 ```java
-Logger<?> baseLogger = LoggerFactory.getLogger();
+Logger baseLogger = LoggerFactory.getLogger();
 LogstashCoreLogger core = (LogstashCoreLogger) baseLogger.core();
 org.slf4j.Logger slf4jLogger = core.logger();
 ```

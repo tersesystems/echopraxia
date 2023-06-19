@@ -12,7 +12,7 @@ import com.tersesystems.echopraxia.*;
 First you define a logger (usually in a controller or singleton -- `getClass()` is particularly useful for abstract controllers):
 
 ```java
-final Logger<?> basicLogger = LoggerFactory.getLogger(getClass());
+final Logger<PresentationFieldBuilder> basicLogger = LoggerFactory.getLogger(getClass());
 ```
 
 Logging simple messages and exceptions are done as in SLF4J:

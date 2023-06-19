@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The AsyncLoggerFactory class. This is used to create the appropriate `Logger`.
  *
- * <p>{@code private static final AsyncLogger<?> logger = AsyncLoggerFactory.getLogger(); }
+ * <p>{@code private static final AsyncLogger<PresentationFieldBuilder> logger = AsyncLoggerFactory.getLogger(); }
  */
 public class AsyncLoggerFactory {
 
