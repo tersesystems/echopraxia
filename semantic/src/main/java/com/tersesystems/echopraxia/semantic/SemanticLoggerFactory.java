@@ -83,8 +83,8 @@ public class SemanticLoggerFactory {
       String name,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Function<FieldBuilder, FieldBuilderResult>> f) {
-    return getLogger(name, dataTypeClass, messageFunction, f, FieldBuilder.instance());
+      Function<DataType, Function<PresentationFieldBuilder, FieldBuilderResult>> f) {
+    return getLogger(name, dataTypeClass, messageFunction, f, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -102,8 +102,8 @@ public class SemanticLoggerFactory {
       Class<?> clazz,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Function<FieldBuilder, FieldBuilderResult>> f) {
-    return getLogger(clazz, dataTypeClass, messageFunction, f, FieldBuilder.instance());
+      Function<DataType, Function<PresentationFieldBuilder, FieldBuilderResult>> f) {
+    return getLogger(clazz, dataTypeClass, messageFunction, f, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -119,9 +119,13 @@ public class SemanticLoggerFactory {
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Function<FieldBuilder, FieldBuilderResult>> f) {
+      Function<DataType, Function<PresentationFieldBuilder, FieldBuilderResult>> f) {
     return getLogger(
-        Caller.resolveClassName(), dataTypeClass, messageFunction, f, FieldBuilder.instance());
+        Caller.resolveClassName(),
+        dataTypeClass,
+        messageFunction,
+        f,
+        PresentationFieldBuilder.instance());
   }
 
   /**
@@ -136,7 +140,7 @@ public class SemanticLoggerFactory {
    * @param <FB> the field builder type.
    */
   @NotNull
-  public static <DataType, FB extends FieldBuilder> SemanticLogger<DataType> getLogger(
+  public static <DataType, FB> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
       Function<DataType, Function<FB, FieldBuilderResult>> f,

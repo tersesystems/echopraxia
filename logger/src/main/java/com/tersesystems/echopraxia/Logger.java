@@ -30,12 +30,12 @@ public class Logger<FB> extends AbstractLoggerSupport<Logger<FB>, FB>
    * @return a new logger using the given field builder.
    */
   @NotNull
-  public <T extends FieldBuilder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
+  public <T> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
     return newLogger(newBuilder);
   }
 
   // This is not part of the AbstractLoggerSupport
-  protected <T extends FieldBuilder> Logger<T> newLogger(T newBuilder) {
+  protected <T> Logger<T> newLogger(T newBuilder) {
     if (this.fieldBuilder == newBuilder) {
       //noinspection unchecked
       return (Logger<T>) this;
@@ -74,7 +74,7 @@ public class Logger<FB> extends AbstractLoggerSupport<Logger<FB>, FB>
     }
 
     @Override
-    public @NotNull <T extends FieldBuilder> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
+    public @NotNull <T> Logger<T> withFieldBuilder(@NotNull T newBuilder) {
       return new NeverLogger<T>(core, newBuilder);
     }
 

@@ -33,7 +33,7 @@ public class FluentLogger<FB> extends AbstractLoggerSupport<FluentLogger<FB>, FB
   }
 
   @NotNull
-  public <T extends FieldBuilder> FluentLogger<T> withFieldBuilder(@NotNull T newBuilder) {
+  public <T> FluentLogger<T> withFieldBuilder(@NotNull T newBuilder) {
     return new FluentLogger<>(core, newBuilder);
   }
 

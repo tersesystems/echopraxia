@@ -18,9 +18,9 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static Logger<FieldBuilder> getLogger(Class<?> clazz) {
+  public static Logger<PresentationFieldBuilder> getLogger(Class<?> clazz) {
     final CoreLogger core = CoreLoggerFactory.getLogger(Logger.FQCN, clazz);
-    return getLogger(core, FieldBuilder.instance());
+    return getLogger(core, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -32,8 +32,7 @@ public class LoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> Logger<FB> getLogger(
-      @NotNull Class<?> clazz, @NotNull FB builder) {
+  public static <FB> Logger<FB> getLogger(@NotNull Class<?> clazz, @NotNull FB builder) {
     CoreLogger coreLogger = LoggerFactory.getLogger(clazz).core();
     return getLogger(coreLogger, builder);
   }
@@ -45,9 +44,9 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static Logger<FieldBuilder> getLogger(@NotNull String name) {
+  public static Logger<PresentationFieldBuilder> getLogger(@NotNull String name) {
     final CoreLogger core = CoreLoggerFactory.getLogger(Logger.FQCN, name);
-    return getLogger(core, FieldBuilder.instance());
+    return getLogger(core, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -59,8 +58,7 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static <FB extends FieldBuilder> Logger<FB> getLogger(
-      @NotNull String name, @NotNull FB builder) {
+  public static <FB> Logger<FB> getLogger(@NotNull String name, @NotNull FB builder) {
     CoreLogger coreLogger = LoggerFactory.getLogger(name).core();
     return getLogger(coreLogger, builder);
   }
@@ -107,8 +105,7 @@ public class LoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> Logger<FB> getLogger(
-      @NotNull CoreLogger core, @NotNull FB fieldBuilder) {
+  public static <FB> Logger<FB> getLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     return new Logger<>(core, fieldBuilder);
   }
 }

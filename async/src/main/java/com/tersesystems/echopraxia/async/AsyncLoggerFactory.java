@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.async;
 
 import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.CoreLoggerFactory;
-import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import com.tersesystems.echopraxia.spi.Caller;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,9 +22,9 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static AsyncLogger<FieldBuilder> getLogger(Class<?> clazz) {
+  public static AsyncLogger<PresentationFieldBuilder> getLogger(Class<?> clazz) {
     final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, clazz);
-    return new AsyncLogger<>(core, FieldBuilder.instance());
+    return new AsyncLogger<>(core, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -36,8 +36,7 @@ public class AsyncLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(
-      @NotNull Class<?> clazz, @NotNull FB builder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull Class<?> clazz, @NotNull FB builder) {
     CoreLogger coreLogger = AsyncLoggerFactory.getLogger(clazz).core();
     return new AsyncLogger<>(coreLogger, builder);
   }
@@ -49,9 +48,9 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static AsyncLogger<FieldBuilder> getLogger(@NotNull String name) {
+  public static AsyncLogger<PresentationFieldBuilder> getLogger(@NotNull String name) {
     final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, name);
-    return new AsyncLogger<>(core, FieldBuilder.instance());
+    return new AsyncLogger<>(core, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -63,8 +62,7 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(
-      @NotNull String name, @NotNull FB builder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull String name, @NotNull FB builder) {
     CoreLogger coreLogger = AsyncLoggerFactory.getLogger(name).core();
     return new AsyncLogger<>(coreLogger, builder);
   }
@@ -75,9 +73,9 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static AsyncLogger<FieldBuilder> getLogger() {
+  public static AsyncLogger<PresentationFieldBuilder> getLogger() {
     CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
-    return new AsyncLogger<>(core, FieldBuilder.instance());
+    return new AsyncLogger<>(core, PresentationFieldBuilder.instance());
   }
 
   /**
@@ -88,7 +86,7 @@ public class AsyncLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(@NotNull FB fieldBuilder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull FB fieldBuilder) {
     CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
     return new AsyncLogger<>(core, fieldBuilder);
   }
@@ -102,8 +100,7 @@ public class AsyncLoggerFactory {
    * @param <FB> the type of field builder.
    */
   @NotNull
-  public static <FB extends FieldBuilder> AsyncLogger<FB> getLogger(
-      @NotNull CoreLogger core, @NotNull FB fieldBuilder) {
+  public static <FB> AsyncLogger<FB> getLogger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     return new AsyncLogger<>(core.withFQCN(FQCN), fieldBuilder);
   }
 }
