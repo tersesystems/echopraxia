@@ -1,4 +1,4 @@
-<configuration debug="true">
+<configuration>
 
     <!-- tell async logger to create a throwable -->
     <property scope="context" name="echopraxia.async.caller" value="true"/>
@@ -35,10 +35,12 @@
         </encoder>
     </appender>
 
+    <appender name="caller" class="com.tersesystems.echopraxia.logback.CallerDataAppender">
+        <appender-ref ref="LIST"/>
+        <appender-ref ref="STRINGLIST"/>
+    </appender>
+
     <root level="DEBUG">
-        <appender class="com.tersesystems.echopraxia.logback.CallerDataAppender">
-            <appender-ref ref="LIST"/>
-            <appender-ref ref="STRINGLIST"/>
-        </appender>
+        <appender-ref ref="caller"/>
     </root>
 </configuration>

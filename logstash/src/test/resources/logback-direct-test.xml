@@ -1,4 +1,4 @@
-<configuration>
+<configuration debug="true">
 
     <!-- loosen the rule on appender refs so appenders can reference them -->
     <newRule pattern="*/appender/appender-ref"
@@ -26,10 +26,12 @@
         </encoder>
     </appender>
 
+    <appender name="LOGSTASHFIELD" class="com.tersesystems.echopraxia.logstash.LogstashFieldAppender">
+        <appender-ref ref="STRINGLIST"/>
+    </appender>
+
     <root level="DEBUG">
         <appender-ref ref="LIST"/>
-        <appender class="com.tersesystems.echopraxia.logstash.LogstashFieldAppender">
-            <appender-ref ref="STRINGLIST"/>
-        </appender>
+        <appender-ref ref="LOGSTASHFIELD"/>
     </root>
 </configuration>
