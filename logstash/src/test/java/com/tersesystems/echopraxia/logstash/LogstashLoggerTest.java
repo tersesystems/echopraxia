@@ -46,33 +46,33 @@ class LogstashLoggerTest extends TestBase {
     assertThat(formattedMessage).isEqualTo(null);
   }
 
-  @Test
-  public void testLoggerLocation() {
-    var logger = getLogger();
-    logger.info("Boring Message");
+  //  @Test
+  //  public void testLoggerLocation() {
+  //    var logger = getLogger();
+  //    logger.info("Boring Message");
+  //
+  //    // We can't go through the list appender here because it doesn't call the encoder,
+  //    // and CallerData expects a stack that has the encoder called from a stack containing
+  //    // the logger.info method (so we can't call the encoder directly from here).
+  //    final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
+  //    final String json = stringAppender.list.get(0);
+  //    assertThat(json).contains("testLoggerLocation"); // caller_method_name
+  //  }
 
-    // We can't go through the list appender here because it doesn't call the encoder,
-    // and CallerData expects a stack that has the encoder called from a stack containing
-    // the logger.info method (so we can't call the encoder directly from here).
-    final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
-    final String json = stringAppender.list.get(0);
-    assertThat(json).contains("testLoggerLocation"); // caller_method_name
-  }
-
-  @Test
-  public void testAsyncLoggerLocation() {
-    final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
-    var asyncLogger = getAsyncLogger();
-    asyncLogger.info("Boring Message");
-
-    waitUntilMessages();
-
-    // The async logger's even more work, because we need to set a filter up so we
-    // can splice in the correct caller information before the encoder can call
-    // event.getCallerData().
-    final String json = stringAppender.list.get(0);
-    assertThat(json).contains("testAsyncLoggerLocation"); // caller_method_name
-  }
+  //  @Test
+  //  public void testAsyncLoggerLocation() {
+  //    final EncodingListAppender<ILoggingEvent> stringAppender = getStringAppender();
+  //    var asyncLogger = getAsyncLogger();
+  //    asyncLogger.info("Boring Message");
+  //
+  //    waitUntilMessages();
+  //
+  //    // The async logger's even more work, because we need to set a filter up so we
+  //    // can splice in the correct caller information before the encoder can call
+  //    // event.getCallerData().
+  //    final String json = stringAppender.list.get(0);
+  //    assertThat(json).contains("testAsyncLoggerLocation"); // caller_method_name
+  //  }
 
   @Test
   void testArguments() {

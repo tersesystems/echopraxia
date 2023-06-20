@@ -7,7 +7,6 @@ import java.net.URISyntaxException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.impl.StaticLoggerBinder;
 
 public class ConverterTest {
   protected LoggerContext loggerContext;
@@ -21,7 +20,7 @@ public class ConverterTest {
     } catch (MalformedURLException | URISyntaxException e) {
       throw new RuntimeException(e);
     }
-    loggerContext = (LoggerContext) StaticLoggerBinder.getSingleton().getLoggerFactory();
+    loggerContext = (LoggerContext) org.slf4j.LoggerFactory.getILoggerFactory();
   }
 
   @AfterEach
