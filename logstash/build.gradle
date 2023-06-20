@@ -12,8 +12,7 @@ dependencies {
     jmhImplementation project(":logger")
     jmhImplementation project(":async")
 
-    implementation "org.slf4j:slf4j-api:$slf4jApiVersion"
-    implementation "ch.qos.logback:logback-classic:$logbackVersion"
-    implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
-    implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
+    implementation("net.logstash.logback:logstash-logback-encoder:$logstashVersion") {
+        because("We require logstash-logback-encoder")
+    }
 }

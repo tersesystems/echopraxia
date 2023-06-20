@@ -5,8 +5,8 @@ plugins {
 dependencies {
     api project(":api")
 
-    implementation "org.slf4j:slf4j-api:$slf4jApiVersion"
-    implementation "ch.qos.logback:logback-classic:$logbackVersion"
-
+    api("ch.qos.logback:logback-classic:$logbackVersion") {
+        because("We require a logback implementation")
+    }
     testImplementation(testFixtures(project(':api')))
 }
