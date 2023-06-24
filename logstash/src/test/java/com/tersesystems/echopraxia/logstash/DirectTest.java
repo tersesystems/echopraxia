@@ -193,8 +193,9 @@ public class DirectTest {
       joran.setContext(factory);
       factory.reset();
       // https://github.com/qos-ch/logback/commit/ca7fbc7f4c1b1883092037ee4a662034586df07a
-      LogbackMDCAdapter logbackMDCAdapter = new LogbackMDCAdapter();
-      factory.setMDCAdapter(logbackMDCAdapter);
+      // this is only valid in logback 1.3 :-(
+      //LogbackMDCAdapter logbackMDCAdapter = new LogbackMDCAdapter();
+      //factory.setMDCAdapter(logbackMDCAdapter);
       joran.doConfigure(getClass().getResource("/logback-direct-test.xml").toURI().toURL());
       this.loggerContext = factory;
     } catch (JoranException | URISyntaxException | MalformedURLException je) {

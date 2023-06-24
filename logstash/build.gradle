@@ -2,6 +2,33 @@ plugins {
     id 'java-library'
 }
 
+ext {
+    logbackVersions = ['1.2.3', '1.3.0']
+}
+
+test {
+    // Disable test task execution by default
+    enabled = false
+
+    // Configure test execution for each Logback version
+    project.ext.logbackVersions.each { version ->
+        // Set the Logback version dynamically
+        project.ext.logbackVersion = version
+
+        // Create a new task for each Logback version
+        def testTask = task("test${version.capitalize()}", type: Test) {
+            // Enable the test task
+            enabled = true
+
+            // Set the classpath for the test task
+            classpath = sourceSets.test.runtimeClasspath
+        }
+
+        // Configure dependencies between tasks
+        testTask.dependsOn(test)
+    }
+}
+
 dependencies {
     api project(":api")
     api project(":logback")
@@ -11,9 +38,14 @@ dependencies {
     testImplementation project(":async")
     jmhImplementation project(":logger")
     jmhImplementation project(":async")
+    jmhImplementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
 
-    implementation "org.slf4j:slf4j-api:$slf4jApiVersion"
-    implementation "ch.qos.logback:logback-classic:$logbackVersion"
-    implementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
+    compileOnly "org.slf4j:slf4j-api:$slf4jApiVersion"
+    compileOnly "ch.qos.logback:logback-classic:$logbackVersion"
+    compileOnly "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
+
+    testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
+    testImplementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
+
     implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
 }
