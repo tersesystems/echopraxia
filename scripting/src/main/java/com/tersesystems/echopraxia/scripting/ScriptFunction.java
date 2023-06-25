@@ -25,6 +25,7 @@ public final class ScriptFunction {
     return new Builder();
   }
 
+  /** A builder class for ScriptFunction. */
   public static final class Builder {
 
     private final List<FunctionParameter> parameterList = new ArrayList<>();
@@ -55,13 +56,21 @@ public final class ScriptFunction {
       return this;
     }
 
-    /** Sets a supplier for the user function. You should not set any parameters. */
+    /**
+     * Sets a supplier for the user function. You should not set any parameters.
+     *
+     * @return the new builder
+     */
     public Builder supplier(Supplier<Value> supplier) {
       this.userFunction = (Arity0UserFunction) userCtx -> supplier.get();
       return this;
     }
 
-    /** Sets a function for the user function. */
+    /**
+     * Sets a function for the user function.
+     *
+     * @return the new builder
+     */
     public Builder function(Function<Value, Value> fn) {
       this.userFunction = (Arity1UserFunction) (context, pathValue) -> fn.apply(pathValue);
       return this;
@@ -70,6 +79,8 @@ public final class ScriptFunction {
     /**
      * Sets an optional function for the user function. You should not set the result type, it
      * should be ANY.
+     *
+     * @return the new builder
      */
     public Builder optionalFunction(Function<Value, Optional<Value>> optFunction) {
       this.userFunction =
@@ -77,7 +88,11 @@ public final class ScriptFunction {
       return this;
     }
 
-    /** Sets a bifunction for the user function. */
+    /**
+     * Sets a bifunction for the user function.
+     *
+     * @return the new builder
+     */
     public Builder biFunction(BiFunction<Value, Value, Value> booleanFunction) {
       this.userFunction =
           (Arity2UserFunction) (context, first, second) -> booleanFunction.apply(first, second);
@@ -87,6 +102,8 @@ public final class ScriptFunction {
     /**
      * Sets an optional bifunction for the user function. You should not set the result type, it
      * should be ANY.
+     *
+     * @return the new builder
      */
     public Builder optionalBiFunction(BiFunction<Value, Value, Optional<Value>> booleanFunction) {
       this.userFunction =
@@ -95,7 +112,11 @@ public final class ScriptFunction {
       return this;
     }
 
-    /** Sets a varadic function for the user function. */
+    /**
+     * Sets a varadic function for the user function.
+     *
+     * @return the new builder
+     */
     public Builder varadicFunction(Function<Value[], Value> varadicFunction) {
       this.userFunction = (ArityNUserFunction) (context, args) -> varadicFunction.apply(args);
       return this;
@@ -104,6 +125,8 @@ public final class ScriptFunction {
     /**
      * Sets an optional varadic function for the user function. You should not set the result type,
      * it should be ANY.
+     *
+     * @return the new builder
      */
     public Builder optionalVaradicFunction(Function<Value[], Optional<Value>> varadicFunction) {
       this.userFunction =
@@ -111,6 +134,11 @@ public final class ScriptFunction {
       return this;
     }
 
+    /**
+     * Builds the user function value
+     *
+     * @return the user function value
+     */
     public UserFunctionValue build() {
       FunctionSignature signature = new FunctionSignature(parameterList, resultType);
       return new UserFunctionValue(signature, userFunction);

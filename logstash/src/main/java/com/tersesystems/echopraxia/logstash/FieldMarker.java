@@ -6,6 +6,10 @@ import java.util.List;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * This class is used by logstash-logback-encoder to turn a field into something that looks like a
+ * StructuredArgument/Marker.
+ */
 public class FieldMarker extends ObjectAppendingMarker implements Field {
 
   private final Field field;

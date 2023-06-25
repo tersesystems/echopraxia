@@ -17,6 +17,7 @@ public final class ValueMapEntry
   }
 
   /**
+   * @param name the name of the entry
    * @param userFunction the user function to apply
    * @return the value map entry
    */
