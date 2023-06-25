@@ -78,7 +78,7 @@ Gradle:
 implementation "com.tersesystems.echopraxia:log4j:<VERSION>" 
 ```
 
-You may want to explicitly define the Log4J dependencies as well:
+You should explicitly define the Log4J dependencies as well:
 
 ```gradle
 implementation "org.apache.logging.log4j:log4j-core:$log4j2Version"
