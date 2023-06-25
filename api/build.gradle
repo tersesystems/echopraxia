@@ -5,8 +5,6 @@ plugins {
 
 dependencies {
     // https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path
-    implementation "org.slf4j:slf4j-api:$slf4jApiVersion"
     implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
     implementation 'org.pcollections:pcollections:4.0.1'
-
 }
