@@ -20,10 +20,20 @@ public interface ScriptHandle extends AutoCloseable {
    */
   String path();
 
+  /**
+   * The library name for the script handle, "echopraxia" by default
+   *
+   * @return the library name
+   */
   default String libraryName() {
     return "echopraxia";
   }
 
+  /**
+   * The function name for the script handle, "evaluate" by default
+   *
+   * @return the function name.
+   */
   default String functionName() {
     return "evaluate";
   }

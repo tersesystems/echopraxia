@@ -15,10 +15,16 @@ import org.jetbrains.annotations.Nullable;
 public class Logger<FB> extends AbstractLoggerSupport<Logger<FB>, FB>
     implements DefaultLoggerMethods<FB> {
 
-  // This is where the logging methods are called, so the stacktrace element shows
-  // DefaultLoggerMethods as the caller.
+  /**
+   * This is where the logging methods are called, so the stacktrace element shows
+   * DefaultLoggerMethods as the caller.
+   */
   public static final String FQCN = DefaultLoggerMethods.class.getName();
 
+  /**
+   * @param core the coree logger
+   * @param fieldBuilder the field builder
+   */
   protected Logger(@NotNull CoreLogger core, @NotNull FB fieldBuilder) {
     super(core, fieldBuilder, Logger.class);
   }

@@ -10,18 +10,38 @@ import org.jetbrains.annotations.NotNull;
  * @since 3.0
  */
 public interface EchopraxiaService {
+
+  /**
+   * @return the exception handler used by the service.
+   */
   @NotNull
   ExceptionHandler getExceptionHandler();
 
+  /**
+   * @return the exception handler used by the service.
+   */
   @NotNull
   Filters getFilters();
 
+  /**
+   * @param fqcn the fully qualified class name of the caller.
+   * @param clazz the logger class.
+   * @return the core logger associated with the service.
+   */
   @NotNull
   CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull Class<?> clazz);
 
+  /**
+   * @param fqcn the fully qualified class name of the caller.
+   * @param name the logger name.
+   * @return the core logger associated with the service.
+   */
   @NotNull
   CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull String name);
 
+  /**
+   * @return the formatter used by the service.
+   */
   @NotNull
   ToStringFormatter getToStringFormatter();
 
@@ -35,10 +55,9 @@ public interface EchopraxiaService {
   @NotNull
   <F extends Field> FieldCreator<F> getFieldCreator(@NotNull Class<F> fieldClass);
 
-  static FieldCreator<Field> getFieldCreator() {
-    return getInstance().getFieldCreator(Field.class);
-  }
-
+  /**
+   * @return an instance of the service.
+   */
   @NotNull
   static EchopraxiaService getInstance() {
     return EchopraxiaServiceLazyHolder.INSTANCE;

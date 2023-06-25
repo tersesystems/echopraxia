@@ -15,12 +15,18 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
 
   private static final ClassLoader[] classLoaders = {ClassLoader.getSystemClassLoader()};
 
-  protected Filters filters;
-  protected ToStringFormatter toStringFormatter;
-  protected ExceptionHandler exceptionHandler;
-
   private final ConcurrentHashMap<Class<?>, FieldCreator<?>> fieldCreatorMap;
 
+  /** The filters used by the service. */
+  protected Filters filters;
+
+  /** The formatter used by the service. */
+  protected ToStringFormatter toStringFormatter;
+
+  /** The exception handler used by the service. */
+  protected ExceptionHandler exceptionHandler;
+
+  /** Creates a service with defaults. */
   public AbstractEchopraxiaService() {
     this.exceptionHandler = Throwable::printStackTrace;
     this.toStringFormatter = new DefaultToStringFormatter();
@@ -55,7 +61,7 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
     return toStringFormatter;
   }
 
-  public <F extends Field> @NotNull FieldCreator<F> getFieldCreator(Class<F> fieldClass) {
+  public <F extends Field> @NotNull FieldCreator<F> getFieldCreator(@NotNull Class<F> fieldClass) {
     //noinspection unchecked
     return (FieldCreator<F>)
         fieldCreatorMap.computeIfAbsent(fieldClass, AbstractEchopraxiaService::loadFieldCreator);

@@ -15,6 +15,7 @@ import java.util.function.Supplier;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
+/** An abstract path finder that implements the methods using Jayway JSONPath. */
 public abstract class AbstractJsonPathFinder implements FindPathMethods {
   private static final String EXCEPTION_PATH = "$." + EXCEPTION;
 
@@ -32,6 +33,14 @@ public abstract class AbstractJsonPathFinder implements FindPathMethods {
   private final Supplier<DocumentContext> supplier =
       Utilities.memoize(() -> JsonPath.parse(this, configuration));
 
+  /**
+   * Finds an Optional of type T given a path and a desired class of T.
+   *
+   * @param jsonPath the json path to the object
+   * @param desiredClass the desired class type
+   * @return an optional containing the instance if exists and can be mapped, otherwise empty().
+   * @param <T> the type
+   */
   protected @NotNull <T> Optional<T> optionalFind(
       @NotNull @Language("JSONPath") String jsonPath, @NotNull Class<T> desiredClass) {
     final DocumentContext documentContext = getDocumentContext();
