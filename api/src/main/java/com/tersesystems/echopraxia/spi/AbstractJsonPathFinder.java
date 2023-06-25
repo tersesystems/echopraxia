@@ -5,7 +5,6 @@ import static com.tersesystems.echopraxia.spi.FieldConstants.*;
 import com.jayway.jsonpath.*;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import com.tersesystems.echopraxia.api.FindPathMethods;
 import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.api.Value.*;
 import java.util.Collections;

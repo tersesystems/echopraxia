@@ -6,9 +6,9 @@ import static com.tersesystems.echopraxia.api.Value.exception;
 import static com.tersesystems.echopraxia.spi.FieldConstants.EXCEPTION;
 
 import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.DefaultMethodsSupport;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilderResult;
+import com.tersesystems.echopraxia.spi.DefaultMethodsSupport;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

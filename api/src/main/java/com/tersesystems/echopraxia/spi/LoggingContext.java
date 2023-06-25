@@ -1,4 +1,6 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
+
+import com.tersesystems.echopraxia.api.Field;
 
 import java.util.List;
 import org.jetbrains.annotations.NotNull;

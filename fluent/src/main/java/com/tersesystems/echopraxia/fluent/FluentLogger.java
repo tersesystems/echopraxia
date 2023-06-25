@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.spi.AbstractLoggerSupport;
+import com.tersesystems.echopraxia.spi.CoreLogger;
 import com.tersesystems.echopraxia.spi.Utilities;
 import java.util.ArrayList;
 import java.util.List;

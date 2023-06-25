@@ -2,6 +2,8 @@ package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.spi.AbstractLoggerSupport;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>

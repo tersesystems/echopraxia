@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.spi.LoggingContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

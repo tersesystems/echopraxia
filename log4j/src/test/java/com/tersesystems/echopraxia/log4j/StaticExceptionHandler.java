@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
-import com.tersesystems.echopraxia.api.ExceptionHandler;
+import com.tersesystems.echopraxia.spi.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 

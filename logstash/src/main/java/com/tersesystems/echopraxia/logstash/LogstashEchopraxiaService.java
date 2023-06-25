@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.logstash;
 
 import ch.qos.logback.classic.LoggerContext;
-import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.spi.AbstractEchopraxiaService;
+import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.ServiceConfigurationError;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.ILoggerFactory;

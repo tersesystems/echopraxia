@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.fake.FakeCoreLogger;
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.LoggingContext;
 import org.junit.jupiter.api.Test;
 
 public class ConditionTests {

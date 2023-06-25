@@ -1,6 +1,11 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
 
 import java.util.Collection;
+
+import com.tersesystems.echopraxia.api.Attribute;
+import com.tersesystems.echopraxia.api.AttributeKey;
+import com.tersesystems.echopraxia.api.Attributes;
+import com.tersesystems.echopraxia.api.Field;
 import org.jetbrains.annotations.NotNull;
 
 public interface AttributesAware<F extends Field> {

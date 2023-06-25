@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.fake;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;

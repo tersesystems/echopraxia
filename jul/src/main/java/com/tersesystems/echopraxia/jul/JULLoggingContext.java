@@ -3,10 +3,10 @@ package com.tersesystems.echopraxia.jul;
 import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 import static com.tersesystems.echopraxia.spi.Utilities.memoize;
 
-import com.tersesystems.echopraxia.api.CoreLogger;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.LoggingContext;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.LoggingContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;

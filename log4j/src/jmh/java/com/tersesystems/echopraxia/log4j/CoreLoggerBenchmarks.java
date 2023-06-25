@@ -1,10 +1,10 @@
 package com.tersesystems.echopraxia.log4j;
 
 import com.tersesystems.echopraxia.Logger;
-import com.tersesystems.echopraxia.api.CoreLogger;
-import com.tersesystems.echopraxia.api.CoreLoggerFactory;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Level;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
