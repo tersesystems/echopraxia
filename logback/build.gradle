@@ -5,8 +5,12 @@ plugins {
 dependencies {
     api project(":api")
 
-    implementation "org.slf4j:slf4j-api:$slf4jApiVersion"
-    implementation "ch.qos.logback:logback-classic:$logbackVersion"
+    // We don't depend on SLF4J 2.x or Logback 1.3 features, but we don't want to bind
+    // consumers to them either.
+    compileOnly "org.slf4j:slf4j-api:$slf4jApiVersion"
+    compileOnly "ch.qos.logback:logback-classic:$logbackVersion"
 
     testImplementation(testFixtures(project(':api')))
+    testImplementation "org.slf4j:slf4j-api:$slf4jApiVersion"
+    testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
 }

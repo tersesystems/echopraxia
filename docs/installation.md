@@ -39,10 +39,24 @@ Maven:
 Gradle:
 
 ```gradle
-implementation "com.tersesystems.echopraxia:logstash:<VERSION>" 
+implementation "com.tersesystems.echopraxia:logstash:<VERSION>"
 ```
 
-There are a couple of features that are Logback specific, such as the [logback converters(#logback-converters) and the direct Logback API.
+Because Logback 1.2 is compiled with SLF4J 1.7.x and Logback 1.3 uses SLF4J 2.x, Echopraxia does not include the transitive dependencies.  Instead, you will need to select the appropriate Logback implementation:
+
+For SLF4J 1.7.x:
+
+```gradle
+implementation "ch.qos.logback:logback-classic:1.2.12"
+implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
+```
+
+For SLF4J 2.0.x and for `logstash-logback-encoder` from 7.4:
+
+```gradle
+implementation "ch.qos.logback:logback-classic:1.4.6"
+implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+```
 
 ## Log4J Core Logger
 
@@ -62,6 +76,14 @@ Gradle:
 
 ```gradle
 implementation "com.tersesystems.echopraxia:log4j:<VERSION>" 
+```
+
+You may want to explicitly define the Log4J dependencies as well:
+
+```gradle
+implementation "org.apache.logging.log4j:log4j-core:$log4j2Version"
+implementation "org.apache.logging.log4j:log4j-api:$log4j2Version"
+implementation "org.apache.logging.log4j:log4j-layout-template-json:$log4j2Version"
 ```
 
 You will need to integrate the `com.tersesystems.echopraxia.log4j.layout` package into your `log4j2.xml` file, e.g. by using the `packages` attribute, and add an `EventTemplateAdditionalField` element:
