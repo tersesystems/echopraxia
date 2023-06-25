@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.scripting;
 import static com.tersesystems.echopraxia.scripting.ScriptFunction.*;
 
 import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.spi.LoggingContext;
 import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;

@@ -2,6 +2,8 @@ package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.spi.Caller;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 /**

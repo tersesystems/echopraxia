@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.turbo.TurboFilter;
 import ch.qos.logback.core.spi.FilterReply;
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.spi.LoggingContext;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;

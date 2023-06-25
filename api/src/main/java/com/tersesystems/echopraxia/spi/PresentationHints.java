@@ -1,5 +1,7 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.spi;
 
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldVisitor;
 import org.jetbrains.annotations.NotNull;
 
 /**

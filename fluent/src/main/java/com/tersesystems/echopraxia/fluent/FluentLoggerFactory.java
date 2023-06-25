@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.fluent;
 
-import com.tersesystems.echopraxia.api.CoreLogger;
-import com.tersesystems.echopraxia.api.CoreLoggerFactory;
 import com.tersesystems.echopraxia.api.PresentationFieldBuilder;
 import com.tersesystems.echopraxia.spi.Caller;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 /** The factory for FluentLogger. */
