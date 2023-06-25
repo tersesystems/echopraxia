@@ -5,9 +5,7 @@ import com.twineworks.tweakflow.lang.values.Values;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * A value map entry that maps a string to a valeu.
- */
+/** A value map entry that maps a string to a valeu. */
 public final class ValueMapEntry
     implements Map.Entry<String, com.twineworks.tweakflow.lang.values.Value> {
   final String key;

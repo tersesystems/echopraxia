@@ -15,9 +15,7 @@ import java.util.function.Supplier;
 import org.intellij.lang.annotations.Language;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * An abstract path finder that implements the methods using Jayway JSONPath.
- */
+/** An abstract path finder that implements the methods using Jayway JSONPath. */
 public abstract class AbstractJsonPathFinder implements FindPathMethods {
   private static final String EXCEPTION_PATH = "$." + EXCEPTION;
 

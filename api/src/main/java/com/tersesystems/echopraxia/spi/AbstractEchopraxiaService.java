@@ -26,9 +26,7 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
   /** The exception handler used by the service. */
   protected ExceptionHandler exceptionHandler;
 
-  /**
-   * Creates a service with defaults.
-   */
+  /** Creates a service with defaults. */
   public AbstractEchopraxiaService() {
     this.exceptionHandler = Throwable::printStackTrace;
     this.toStringFormatter = new DefaultToStringFormatter();

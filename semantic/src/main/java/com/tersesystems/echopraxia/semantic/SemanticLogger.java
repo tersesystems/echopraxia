@@ -28,7 +28,9 @@ public interface SemanticLogger<DataType> {
   @NotNull
   CoreLogger core();
 
-  /** @return true if the level is enabled, otherwise false */
+  /**
+   * @return true if the level is enabled, otherwise false
+   */
   boolean isErrorEnabled();
 
   /**
@@ -52,7 +54,9 @@ public interface SemanticLogger<DataType> {
    */
   void error(@NotNull Condition c, @NotNull DataType data);
 
-  /** @return true if the level is enabled, otherwise false */
+  /**
+   * @return true if the level is enabled, otherwise false
+   */
   boolean isWarnEnabled();
 
   /**
@@ -76,7 +80,9 @@ public interface SemanticLogger<DataType> {
    */
   void warn(@NotNull Condition c, @NotNull DataType data);
 
-  /** @return true if the level is enabled, otherwise false */
+  /**
+   * @return true if the level is enabled, otherwise false
+   */
   boolean isInfoEnabled();
 
   /**
@@ -100,7 +106,9 @@ public interface SemanticLogger<DataType> {
    */
   void info(@NotNull Condition c, @NotNull DataType data);
 
-  /** @return true if the level is enabled, otherwise false */
+  /**
+   * @return true if the level is enabled, otherwise false
+   */
   boolean isDebugEnabled();
 
   /**
@@ -122,10 +130,11 @@ public interface SemanticLogger<DataType> {
    * @param c the condition to meet
    * @param data the data to log.
    */
-
   void debug(@NotNull Condition c, @NotNull DataType data);
 
-  /** @return true if the level is enabled, otherwise false */
+  /**
+   * @return true if the level is enabled, otherwise false
+   */
   boolean isTraceEnabled();
 
   /**

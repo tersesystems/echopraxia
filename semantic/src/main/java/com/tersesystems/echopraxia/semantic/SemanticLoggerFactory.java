@@ -205,14 +205,23 @@ public class SemanticLoggerFactory {
       return core;
     }
 
+    /**
+     * @return the field builder.
+     */
     public @NotNull FB fieldBuilder() {
       return builder;
     }
 
+    /**
+     * @return the message function.
+     */
     public @NotNull Function<DataType, String> messageFunction() {
       return messageFunction;
     }
 
+    /**
+     * @return the builder function.
+     */
     public @NotNull Function<DataType, Function<FB, FieldBuilderResult>> builderFunction() {
       return builderFunction;
     }
