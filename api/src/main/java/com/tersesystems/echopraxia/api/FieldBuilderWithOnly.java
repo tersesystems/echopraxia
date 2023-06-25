@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Extended field builder with "only" interfaces for backwards compatibility. */
+@Deprecated
 public interface FieldBuilderWithOnly extends FieldBuilder {
 
   /**
