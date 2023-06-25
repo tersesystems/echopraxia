@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SemanticLoggerFactory {
 
-  public static final String FQCN = SemanticLogger.class.getName();
+  static final String FQCN = SemanticLogger.class.getName();
 
   /**
    * Creates a semantic logger using a logger class and explicit field builder.
@@ -177,7 +177,7 @@ public class SemanticLoggerFactory {
   // The implementation uses a field builder type, but we can cheat and hide this by only
   // exposing the interface, on the basis that people will generally put up with so many
   // magic generic angle bracket type things.
-  public static class Impl<DataType, FB> implements SemanticLogger<DataType> {
+  static class Impl<DataType, FB> implements SemanticLogger<DataType> {
 
     private final CoreLogger core;
     private final Function<DataType, Function<FB, FieldBuilderResult>> builderFunction;

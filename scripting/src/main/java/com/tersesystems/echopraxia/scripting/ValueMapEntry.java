@@ -5,6 +5,9 @@ import com.twineworks.tweakflow.lang.values.Values;
 import java.util.Map;
 import java.util.Objects;
 
+/**
+ * A value map entry that maps a string to a valeu.
+ */
 public final class ValueMapEntry
     implements Map.Entry<String, com.twineworks.tweakflow.lang.values.Value> {
   final String key;
@@ -15,6 +18,10 @@ public final class ValueMapEntry
     value = Objects.requireNonNull(v);
   }
 
+  /**
+   * @param userFunction the user function to apply
+   * @return the value map entry
+   */
   public static ValueMapEntry make(String name, UserFunctionValue userFunction) {
     return new ValueMapEntry(name, Values.make(userFunction));
   }

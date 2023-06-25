@@ -7,10 +7,20 @@ import java.math.BigInteger;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * A field builder that returns PresentationField for values.
+ *
+ * @since 3.0
+ */
 public interface PresentationFieldBuilder extends FieldBuilder {
+
+  /**
+   * @return an instance of presentation field builder.
+   */
   static @NotNull PresentationFieldBuilder instance() {
     return PresentationFieldBuilderInstance.getInstance();
   }
+
   /**
    * Creates a field that renders in message template as value.
    *
