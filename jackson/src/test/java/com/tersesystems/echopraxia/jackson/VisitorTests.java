@@ -180,21 +180,13 @@ public class VisitorTests {
       Field structuredField = string(name, duration.toString());
       return string(name, duration.toDays() + " day")
           .asValueOnly()
-          .withStructuredFormat(new DurationFieldVisitor(structuredField));
-    }
-  }
-
-  static class DurationFieldVisitor extends SimpleFieldVisitor {
-    private static final MyFieldBuilder fb = MyFieldBuilder.instance();
-    private final Field f;
-
-    public DurationFieldVisitor(Field f) {
-      this.f = f;
-    }
-
-    @Override
-    public @NotNull Field visitString(@NotNull Value<String> stringValue) {
-      return f;
+          .withStructuredFormat(
+              new SimpleFieldVisitor() {
+                @Override
+                public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+                  return structuredField;
+                }
+              });
     }
   }
 
