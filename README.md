@@ -72,11 +72,20 @@ Condition c = (level, ctx) ->
 logger.error(c, "Only render this error if method name ends in Foo", e);
 ```
 
-And there is also a feature to change logging conditions [dynamically using scripts](https://github.com/tersesystems/smallest-dynamic-logging-example).
+There is also a feature to change logging conditions [dynamically using scripts](https://github.com/tersesystems/smallest-dynamic-logging-example).
 
 ## Documentation
 
 Please see the [online documentation](https://tersesystems.github.io/echopraxia).
+
+## Migration to 3.0
+
+There are some changes in 3.0 which require migration:
+
+* `Logger<?>` is no longer valid -- you must now specify `Logger<SomeFieldBuilder>` as there is no lower bound on wildcards.
+* You must add Logback or Log4J2 library dependencies explicitly (Echopraxia no longer pulls in Logback 1.2 or Log4J2 for you).  Please see the installation page for details.
+* If you are extending or implementing a logger, the classes for abstract loggers and logger support have been moved to the `spi` package.
+* The default for all primitive (`string`, `number`, `boolean`) methods in `FieldBuilder` is now `keyValue`, you can override in your own field builder with `fb.value` as appropriate.
 
 ## Examples
 
