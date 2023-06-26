@@ -7,10 +7,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.api.*;
-
 import java.time.Duration;
 import java.time.Instant;
-
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -65,10 +63,7 @@ public class VisitorTests {
     Field durationField = fb.duration("duration", Duration.ofDays(1));
 
     assertThat(durationField.toString()).isEqualTo("1 day");
-    assertThatJson(durationField)
-            .inPath("$.duration")
-            .asString()
-            .isEqualTo("PT24H");
+    assertThatJson(durationField).inPath("$.duration").asString().isEqualTo("PT24H");
   }
 
   @Test
@@ -183,7 +178,9 @@ public class VisitorTests {
 
     public PresentationField duration(String name, Duration duration) {
       Field structuredField = string(name, duration.toString());
-      return string(name, duration.toDays() + " day").asValueOnly().withStructuredFormat(new DurationFieldVisitor(structuredField));
+      return string(name, duration.toDays() + " day")
+          .asValueOnly()
+          .withStructuredFormat(new DurationFieldVisitor(structuredField));
     }
   }
 
