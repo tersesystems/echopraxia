@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.1
+
+* Move `LoggingContext` from `spi` back to the api package.
+
 ## 3.0.0
 
 * Make Logback and logstash-logback-encoder dependencies be compile only for Logback 1.3/1.4 and LLE 7.4

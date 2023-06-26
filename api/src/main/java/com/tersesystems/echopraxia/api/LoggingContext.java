@@ -1,6 +1,7 @@
-package com.tersesystems.echopraxia.spi;
+package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.FindPathMethods;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
