@@ -1,12 +1,16 @@
 package com.tersesystems.echopraxia.jackson;
 
 import static net.javacrumbs.jsonunit.assertj.JsonAssertions.assertThatJson;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.tersesystems.echopraxia.api.*;
+
+import java.time.Duration;
 import java.time.Instant;
+
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
@@ -52,6 +56,19 @@ public class VisitorTests {
         .inPath("$.restaurant.fortuneCookie")
         .asString()
         .endsWith("IN BED");
+  }
+
+  @Test
+  public void testDuration() {
+
+    MyFieldBuilder fb = MyFieldBuilder.instance();
+    Field durationField = fb.duration("duration", Duration.ofDays(1));
+
+    assertThat(durationField.toString()).isEqualTo("1 day");
+    assertThatJson(durationField)
+            .inPath("$.duration")
+            .asString()
+            .isEqualTo("PT24H");
   }
 
   @Test
@@ -163,10 +180,29 @@ public class VisitorTests {
       return Value.object(
           string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
     }
+
+    public PresentationField duration(String name, Duration duration) {
+      Field structuredField = string(name, duration.toString());
+      return string(name, duration.toDays() + " day").asValueOnly().withStructuredFormat(new DurationFieldVisitor(structuredField));
+    }
+  }
+
+  static class DurationFieldVisitor extends SimpleFieldVisitor {
+    private static final MyFieldBuilder fb = MyFieldBuilder.instance();
+    private final Field f;
+
+    public DurationFieldVisitor(Field f) {
+      this.f = f;
+    }
+
+    @Override
+    public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+      return f;
+    }
   }
 
   static class InstantFieldVisitor extends SimpleFieldVisitor {
-    private final MyFieldBuilder fb = MyFieldBuilder.instance();
+    private static final MyFieldBuilder fb = MyFieldBuilder.instance();
 
     @Override
     public @NotNull Field visitString(@NotNull Value<String> stringValue) {
