@@ -11,7 +11,7 @@ import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.logstash.LogstashCoreLogger;
-import com.tersesystems.echopraxia.spi.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContext;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.FunctionParameter;
 import com.twineworks.tweakflow.lang.values.Values;

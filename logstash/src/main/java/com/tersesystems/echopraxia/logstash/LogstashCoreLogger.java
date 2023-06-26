@@ -11,7 +11,7 @@ import com.tersesystems.echopraxia.logback.LogbackLoggerContext;
 import com.tersesystems.echopraxia.logback.LogbackLoggingContext;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
-import com.tersesystems.echopraxia.spi.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContext;
 import com.tersesystems.echopraxia.spi.Utilities;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;

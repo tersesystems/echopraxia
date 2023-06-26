@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.logback;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
-import com.tersesystems.echopraxia.spi.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

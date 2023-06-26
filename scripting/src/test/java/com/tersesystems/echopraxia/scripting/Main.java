@@ -5,7 +5,7 @@ import static com.tersesystems.echopraxia.api.Level.INFO;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Value;
-import com.tersesystems.echopraxia.spi.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

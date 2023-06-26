@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.spi.LoggingContext;
 import java.util.List;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.Contract;
