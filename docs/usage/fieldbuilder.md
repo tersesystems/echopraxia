@@ -2,9 +2,17 @@
 
 To do most useful things in Echopraxia, you'll want to define field builders.  This page explains the overall API of fields and values, what a field builder does, and how to use it.
 
+## Imports
+
+Start by importing the API package.  Everything relevant to field building will be in there.
+
+```java
+import com.tersesystems.echopraxia.api.*;
+```
+
 ## Fields and Values
 
-Structured logging in Echopraxia is defined using `com.tersesystems.echopraxia.api.Field` and `com.tersesystems.echopraxia.api.Value`.  A `Field` consists of a `name()` that is a `String`, and a `value()` of type `Value<?>`.
+Structured logging in Echopraxia is defined using `Field` and `Value`.  A `Field` consists of a `name()` that is a `String`, and a `value()` of type `Value<?>`.
 
 ### Values
 
@@ -373,7 +381,36 @@ logger.info("Message name {}", fb -> {
 
 Using the `withStructuredFormat` method with a field visitor will allow the JSON output to contain different fields when you want to provide extra type information that isn't relevant in text.
 
-For example, imagine you want to render a `java.lang.Instant` in JSON as having an explicit `@type` of `http://www.w3.org/2001/XMLSchema#dateTime` alongside the value, but don't want to needlessly complicate your output.  Using `withStructuredFormat` with a class extending `SimpleFieldVisitor`, you can intercept and override field processing in JSON:
+This can be used to show "human friendly" fields in a text based format, while showing more machine-readable output in JSON.  For example, you may want to render a duration in days:
+
+```java
+Field durationField = fb.duration("duration", Duration.ofDays(1));
+
+assertThat(durationField.toString()).isEqualTo("1 day");
+assertThatJson(durationField).inPath("$.duration").asString().isEqualTo("PT24H");
+```
+
+To do this, you would add a field as follows:
+
+```java
+public class MyFieldBuilder extends PresentationFieldBuilder {
+  public PresentationField duration(String name, Duration duration) {
+    Field structuredField = string(name, duration.toString());
+    return string(name, duration.toDays() + " day")
+            .asValueOnly()
+            .withStructuredFormat(new SimpleFieldVisitor() {
+              @Override
+              public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+                return structuredField;
+              }
+            });
+  } 
+}
+```
+
+This is especially relevant for numeric fields where you may want to indicate [units](https://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/) -- for example, a retry may indicate a numeric value of seconds, and a cache size may indicate bytes, kilobytes, or gigabytes.  Unless you have a pre-defined schema or a consistent naming convention i.e. adding `_second` suffixes, the unit information is lost and comparing numbers with different units is needlessly complicated.
+
+Type information is also useful in string contexts.  For example, imagine you want to render a `java.lang.Instant` in JSON as having an explicit `@type` of `http://www.w3.org/2001/XMLSchema#dateTime` alongside the value, but don't want to needlessly complicate your output.  Using `withStructuredFormat` with a class extending `SimpleFieldVisitor`, you can intercept and override field processing in JSON:
 
 ```java
 public class InstantFieldBuilder implements PresentationFieldBuilder {
@@ -430,3 +467,5 @@ But will render JSON as:
   }
 }
 ```
+
+This also applies to Java durations using `ISO-8601` which you could mark with a `"@type": "https://schema.org/Duration"` and so on.
