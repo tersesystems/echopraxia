@@ -11,7 +11,6 @@ import com.tersesystems.echopraxia.fake.FakeCoreLogger;
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
 import com.tersesystems.echopraxia.spi.EchopraxiaJsonProvider;
 import com.tersesystems.echopraxia.spi.EchopraxiaMappingProvider;
-
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
