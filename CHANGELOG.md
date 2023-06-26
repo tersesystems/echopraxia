@@ -1,8 +1,8 @@
 # Changelog
 
-## 3.0.0-SNAPSHOT
+## 3.0.0
 
-* Make Logback and logstash-logback-encoder dependencies be compileOnly
+* Make Logback and logstash-logback-encoder dependencies be compile only for Logback 1.3/1.4 and LLE 7.4
 * Remove lower bound for `*Logger<F extends FieldBuilder>`, now just `Logger<F>` so you can use your own builder.
 * Move internal classes in `api` into `spi` package
 * Move from very large README.md to documentation website
