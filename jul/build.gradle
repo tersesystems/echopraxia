@@ -6,8 +6,12 @@ dependencies {
     api project(":api")
     api project(":jackson")
 
-    implementation "org.slf4j:slf4j-api:$slf4jApiVersion"
-    implementation "org.slf4j:slf4j-jdk14:$slf4jJdk14Version"
+    // Cannot add a hard transitive dependency that can evict things here
+    compileOnly "org.slf4j:slf4j-api:$slf4jApiVersion"
+    compileOnly "org.slf4j:slf4j-jdk14:$slf4jJdk14Version"
+
+    testImplementation "org.slf4j:slf4j-api:$slf4jApiVersion"
+    testImplementation "org.slf4j:slf4j-jdk14:$slf4jJdk14Version"
 
     jmhImplementation project(":logger")
     testImplementation project(":logger")

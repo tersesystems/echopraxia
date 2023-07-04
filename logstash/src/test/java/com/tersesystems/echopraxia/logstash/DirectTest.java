@@ -8,7 +8,6 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.classic.util.LogbackMDCAdapter;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.read.ListAppender;
@@ -192,10 +191,6 @@ public class DirectTest {
       JoranConfigurator joran = new JoranConfigurator();
       joran.setContext(factory);
       factory.reset();
-      // https://github.com/qos-ch/logback/commit/ca7fbc7f4c1b1883092037ee4a662034586df07a
-      // this is only valid in logback 1.3 :-(
-      LogbackMDCAdapter logbackMDCAdapter = new LogbackMDCAdapter();
-      factory.setMDCAdapter(logbackMDCAdapter);
       joran.doConfigure(getClass().getResource("/logback-direct-test.xml").toURI().toURL());
       this.loggerContext = factory;
     } catch (JoranException | URISyntaxException | MalformedURLException je) {
