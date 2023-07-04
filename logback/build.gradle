@@ -11,6 +11,6 @@ dependencies {
     compileOnly "ch.qos.logback:logback-classic:$logbackVersion"
 
     testImplementation(testFixtures(project(':api')))
-    testImplementation "org.slf4j:slf4j-api:$slf4jApiVersion"
-    testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
+    testImplementation "org.slf4j:slf4j-api:1.7.36"
+    testImplementation "ch.qos.logback:logback-classic:1.2.12"
 }

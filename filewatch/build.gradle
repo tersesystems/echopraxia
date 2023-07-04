@@ -4,7 +4,7 @@ plugins {
 
 dependencies {
     // intentionally no dependency on project(":api")
-    implementation "org.slf4j:slf4j-api:$slf4jApiVersion"
+    compileOnly "org.slf4j:slf4j-api:$slf4jApiVersion"
     implementation "io.methvin:directory-watcher:$directoryWatcherVersion"
     testImplementation project(":logstash")
 }

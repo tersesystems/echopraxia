@@ -8,6 +8,4 @@ dependencies {
     jmhImplementation project(":logstash")
 
     testImplementation project(":logstash")
-    testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
-    testImplementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
 }
