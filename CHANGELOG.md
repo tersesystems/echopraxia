@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.2
+
+* Make the `slf4j-api` dependency in `filewatch` and `jul` modules be "compileOnly"
+
 ## 3.0.1
 
 * Move `LoggingContext` from `spi` back to the api package.

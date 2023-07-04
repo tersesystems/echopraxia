@@ -252,10 +252,10 @@ The value of a field builder compounds as you build up complex objects from simp
 In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
 
 ```java
-public interface PersonFieldBuilder extends FieldBuilder {
+public interface PersonFieldBuilder extends PresentationFieldBuilder {
 
   // Renders a `Person` as an object field.
-  default Field person(String fieldName, Person p) {
+  default PresentationField person(String fieldName, Person p) {
     return keyValue(fieldName, personValue(p));
   }
 
@@ -297,7 +297,7 @@ For example, you may have a [domain driven design](https://en.wikipedia.org/wiki
 
 You would naturally have domain classes organized by package in each module, i.e. the user module would have `com.mystore.user.User`, and an order would be `com.mystore.order.Order` and would have a `User` attached to it.
 
-So, define a field builder per package, and add a `Logging` abstract class that exposes a logger with the appropriate field builder:
+So, define a field builder per package:
 
 ```java
 package com.mystore.user;
@@ -344,11 +344,9 @@ interface OrderFieldBuilder extends UserFieldBuilder {
   }
 }
 
-public abstract class LoggingBase {
-  protected static Logger<OrderFieldBuilder> logger = LoggerFactory.getLogger(this.getClass(), OrderFieldBuilder.instance);
-}
+public class SomeOrderService {
+  private static final Logger<OrderFieldBuilder> logger = LoggerFactory.getLogger(SomeOrderService.class, OrderFieldBuilder.instance);
 
-public class SomeOrderService extends LoggingBase {
   public void someMethod(Order order) {
     logger.trace("someMethod: {}", fb -> fb.order(order));
   }
