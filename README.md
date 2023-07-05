@@ -40,7 +40,7 @@ and in a JSON format as:
 What makes Echopraxia effective -- especially in debugging -- is that you can define your own mappings, and then pass in your own objects and render complex objects.  For example, we can render a `Person` object:
 
 ```java
-Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger(getClass()).withFieldBuilder(PersonFieldBuilder.instance());
+Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger(getClass(), PersonFieldBuilder.instance());
 
 Person abe = new Person("Abe", 1, "yodelling");
 abe.setFather(new Person("Bert", 35, "keyboards"));

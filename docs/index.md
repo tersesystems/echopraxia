@@ -1,6 +1,6 @@
 # Echopraxia
 
-[Echopraxia](https://github.com/tersesystems/echopraxia) is a Java logging API designed around structured logging, rich context, and conditional logging.  There are Logback and Log4J2 implementations, but Echopraxia's API is completely dependency-free, meaning it can be implemented with any logging API, i.e. jboss-logging, JUL, JEP 264, or even directly.
+[Echopraxia](https://github.com/tersesystems/echopraxia) is a Java logging API designed around structured logging, rich context, and conditional logging.  There are Logback, Log4J2, and JUL implementations, but Echopraxia's API is completely dependency-free, meaning it can be implemented with any logging API, i.e. jboss-logging, JEP 264, or even your own custom implementation.
 
 What this means is that all arguments in a logging statement have a name and a value, for example:
 
@@ -30,9 +30,7 @@ and in a JSON format as:
 What makes Echopraxia effective -- especially for debugging -- is that you can define your own field builders to map between objects and fields, and then pass in your own objects and render complex objects.  For example, we can render a `Person` object:
 
 ```java
-Logger<PersonFieldBuilder> logger = LoggerFactory
-                                        .getLogger(getClass())
-                                        .withFieldBuilder(PersonFieldBuilder.instance());
+Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger(getClass(), PersonFieldBuilder.instance());
 
 Person abe = new Person("Abe", 1, "yodelling");
 abe.setFather(new Person("Bert", 35, "keyboards"));
