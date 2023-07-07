@@ -113,7 +113,9 @@ assertThat(object.toString()).isEqualTo("object={second=bar}");
 
 ## Defining Field Builders
 
-The `FieldBuilder` interface provides some convenience methods around `Field` and `Value`.  
+
+
+The `PresentationFieldBuilder` interface provides some convenience methods around `Field` and `Value`.  
 
 * `keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
 * `value`: renders a field with `value` when rendered in logfmt line oriented text.
@@ -128,9 +130,11 @@ The `FieldBuilder` interface provides some convenience methods around `Field` an
 * `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
 * `fb.exception`: creates a field with a throwable as a value, same as `fb.keyValue(name, Value.exception(t))`.
 
-The `PresentationFieldBuilder` interface is the same as `FieldBuilder` but returns `PresentationField` by default.
+The `FieldBuilder` interface is the same as `PresentationFieldBuilder` but returns `Field` by default so it does not have the presentation methods available.
 
-To create a field builder, you start with an interface (typically using `FieldBuilder` or `PresentationFieldBuilder` as a base) and then pass that field builder into your `Logger` using `withFieldBuilder`.  Although convenient, you are not required to extend `FieldBuilder` or `PresentationFieldBuilder`, and can use `Field` and `Value` methods directly to create your own builders (useful if you don't want to expose field names directly).
+To create a field builder, you start with an interface (typically using `FieldBuilder` or `PresentationFieldBuilder` as a base) and then pass that field builder into your `Logger` using `withFieldBuilder` or through the `LoggerFactory.getLogger` method.  
+
+Although convenient, you are not required to extend `FieldBuilder` or `PresentationFieldBuilder`, and can use `Field` and `Value` methods directly to create your own builders (useful if you don't want to expose field names directly).
 
 You can then create custom methods on your field builder that will render your class.  In this case, we'll create a field builder that can handle a `java.util.Date`, and create `date` and `dateValue` methods for it.
 
