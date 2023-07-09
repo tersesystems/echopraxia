@@ -6,7 +6,7 @@ import java.time.Duration;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 
-public class TextFormatTests {
+public class ToStringFormatTests {
 
   @Test
   public void testSimpleFormat() {
@@ -25,7 +25,7 @@ public class TextFormatTests {
     public PresentationField duration(String name, Duration duration) {
       return string(name, duration.toString())
           .asValueOnly()
-          .withTextFormat(
+          .withToStringFormat(
               new SimpleFieldVisitor() {
                 @Override
                 public @NotNull Field visitString(@NotNull Value<String> stringValue) {

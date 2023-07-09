@@ -19,7 +19,7 @@ public class PresentationHintAttributes {
   public static final AttributeKey<FieldVisitor> STRUCTURED_FORMAT =
       AttributeKey.create("structuredFormat");
 
-  public static final AttributeKey<FieldVisitor> TEXT_FORMAT = AttributeKey.create("textFormat");
+  public static final AttributeKey<FieldVisitor> TOSTRING_FORMAT = AttributeKey.create("toStringFormat");
 
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
@@ -100,7 +100,7 @@ public class PresentationHintAttributes {
    * @param visitor the field visitor
    * @return text format attribute
    */
-  public static Attribute<FieldVisitor> withTextFormat(FieldVisitor visitor) {
-    return TEXT_FORMAT.bindValue(visitor);
+  public static Attribute<FieldVisitor> withToStringFormat(FieldVisitor visitor) {
+    return TOSTRING_FORMAT.bindValue(visitor);
   }
 }

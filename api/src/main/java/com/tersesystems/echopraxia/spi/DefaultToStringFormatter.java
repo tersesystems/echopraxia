@@ -14,8 +14,8 @@ public class DefaultToStringFormatter implements ToStringFormatter {
   public String formatField(@NotNull Field field) {
     StringBuilder builder = new StringBuilder();
 
-    if (field.attributes().containsKey(TEXT_FORMAT)) {
-      FieldVisitor fieldVisitor = field.attributes().get(TEXT_FORMAT);
+    if (field.attributes().containsKey(TOSTRING_FORMAT)) {
+      FieldVisitor fieldVisitor = field.attributes().get(TOSTRING_FORMAT);
       assert fieldVisitor != null;
       field = fieldVisitor.visit(field);
     }
