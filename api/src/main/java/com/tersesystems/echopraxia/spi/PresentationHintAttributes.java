@@ -19,6 +19,8 @@ public class PresentationHintAttributes {
   public static final AttributeKey<FieldVisitor> STRUCTURED_FORMAT =
       AttributeKey.create("structuredFormat");
 
+  public static final AttributeKey<FieldVisitor> TEXT_FORMAT = AttributeKey.create("textFormat");
+
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
   private static final Attribute<Boolean> VALUE_ONLY_ATTR = VALUE_ONLY.bindValue(true);
@@ -33,8 +35,8 @@ public class PresentationHintAttributes {
   }
 
   /**
-   * Tells the formatter that the field should be rendered with the value only, i.e. "value" and not
-   * "name=value".
+   * Tells the text formatter that the field should be rendered with the value only, i.e. "value"
+   * and not "name=value".
    *
    * @return valueOnly attribute
    */
@@ -44,7 +46,8 @@ public class PresentationHintAttributes {
   }
 
   /**
-   * Tells the formatter that the array value should be represented as a cardinal number in text.
+   * Tells the text formatter that the array value should be represented as a cardinal number in
+   * text.
    *
    * @return asCardinal attribute
    */
@@ -53,7 +56,7 @@ public class PresentationHintAttributes {
   }
 
   /**
-   * Tells the formatter to render a display name in text.
+   * Tells the text formatter to render a display name in text.
    *
    * @return displayName attribute
    */
@@ -62,8 +65,8 @@ public class PresentationHintAttributes {
   }
 
   /**
-   * Tells the formatter that the string value or array value should be abbreviated after the given
-   * number of elements.
+   * Tells the text formatter that the string value or array value should be abbreviated after the
+   * given number of elements.
    *
    * @param after the maximum number of elements to render
    * @return abbreviateAfter attribute
@@ -73,7 +76,7 @@ public class PresentationHintAttributes {
   }
 
   /**
-   * Tells the formatter to render nothing in text.
+   * Tells the text formatter to render nothing in text.
    *
    * @return elide attribute
    */
@@ -81,7 +84,23 @@ public class PresentationHintAttributes {
     return ELIDE_ATTR;
   }
 
+  /**
+   * Tells the JSON formatter to render using the field visitor
+   *
+   * @param visitor the field visitor
+   * @return structured format attribute
+   */
   public static Attribute<FieldVisitor> withStructuredFormat(FieldVisitor visitor) {
     return STRUCTURED_FORMAT.bindValue(visitor);
+  }
+
+  /**
+   * Tells the text formatter to render using the field visitor.
+   *
+   * @param visitor the field visitor
+   * @return text format attribute
+   */
+  public static Attribute<FieldVisitor> withTextFormat(FieldVisitor visitor) {
+    return TEXT_FORMAT.bindValue(visitor);
   }
 }

@@ -32,12 +32,13 @@ public class SimpleFieldVisitor implements FieldVisitor {
   }
 
   @Override
-  public Field visit(@NotNull Field f) {
+  public @NotNull Field visit(@NotNull Field f) {
     visitAttributes(f.attributes());
     visitName(f.name());
     return visitValue(f.value());
   }
 
+  @NotNull
   public Field visitValue(Value<?> value) {
     switch (value.type()) {
       case OBJECT:

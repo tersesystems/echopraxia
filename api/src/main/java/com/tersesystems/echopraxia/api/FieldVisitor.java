@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface FieldVisitor {
 
+  @NotNull
   Field visit(@NotNull Field field);
 
   void visitAttributes(@NotNull Attributes attributes);
