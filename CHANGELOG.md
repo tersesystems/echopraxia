@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.0
+
+* Add `withToStringFormat` to PresentationField.
+
 ## 3.0.2
 
 * Make the `slf4j-api` dependency in `filewatch` and `jul` modules be "compileOnly"
