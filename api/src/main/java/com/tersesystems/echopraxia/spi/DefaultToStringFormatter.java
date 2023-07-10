@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.ABBREVIATE_AFTER;
-import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.AS_CARDINAL;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.*;
 
 import com.tersesystems.echopraxia.api.*;
 import java.util.List;
@@ -14,6 +13,12 @@ public class DefaultToStringFormatter implements ToStringFormatter {
   @NotNull
   public String formatField(@NotNull Field field) {
     StringBuilder builder = new StringBuilder();
+
+    if (field.attributes().containsKey(TOSTRING_FORMAT)) {
+      FieldVisitor fieldVisitor = field.attributes().get(TOSTRING_FORMAT);
+      assert fieldVisitor != null;
+      field = fieldVisitor.visit(field);
+    }
 
     if (isElided(field)) {
       return "";

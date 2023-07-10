@@ -88,6 +88,7 @@ public class VisitorTests {
             .withStructuredFormat(instantVisitor);
 
     var objectNode = toJson(instantArrayField);
+    System.out.println(objectNode);
     var element = objectNode.get("instantArray").get(0);
     assertThatJson(element)
         .inPath("$.@type")

@@ -2,6 +2,10 @@
 
 To do most useful things in Echopraxia, you'll want to define field builders.  This page explains the overall API of fields and values, what a field builder does, and how to use it.
 
+## Overview
+
+Conceptually, a field builder is a handle for creating structured data.  The `Logger` does not hardcode a field builder type, and you are free to create your own field builders from scratch.  A `PresentationFieldBuilder` interface is provided as the default, but it is not required.
+
 ## Imports
 
 Start by importing the API package.  Everything relevant to field building will be in there.
@@ -10,41 +14,147 @@ Start by importing the API package.  Everything relevant to field building will 
 import com.tersesystems.echopraxia.api.*;
 ```
 
-## Fields and Values
+## Defining Field Builders
 
-Structured logging in Echopraxia is defined using `Field` and `Value`.  A `Field` consists of a `name()` that is a `String`, and a `value()` of type `Value<?>`.
+The `PresentationFieldBuilder` interface provides some convenience methods around `Field` and `Value`.  We'll cover `Field` and `Value` in depth, but let's start with `PresentationFieldBuilder` and run thorugh
 
-### Values
+* `keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
+* `value`: renders a field with `value` when rendered in logfmt line oriented text.
 
-A `Value` corresponds mostly to the JSON infoset. It can be a *primitive*: a string, a number, a boolean, a null, or `java.lang.Throwable`.  Or, it can be *complex*: an array that contains a list of values, or an object which contains a list of fields.
+`FieldBuilder` comes with some additional methods for common types, i.e.
 
-To create a primitive value, you call a static factory method:
+* `fb.string`: creates a field with a string as a value, same as `fb.keyValue(name, Value.string(str))`.
+* `fb.number`: creates a field with a number as a value, same as `fb.keyValue(name, Value.number(num))`.
+* `fb.bool`: creates a field with a boolean as a value, same as `fb.keyValue(name, Value.bool(b))`.
+* `fb.nullValue`: creates a field with a null as a value, same as `fb.keyValue(name, Value.nullValue())`
+* `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
+* `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
+* `fb.exception`: creates a field with a throwable as a value, same as `fb.keyValue(name, Value.exception(t))`.
 
-* `Value.string("string value")` creates a `Value<String>`
-* `Value.nullValue()` create a `Value<Void>`
-* `Value.number(intValue)` create a `Value<Number>`
-* `Value.bool(true)` creates a `Value<Boolean>`
-* `Value.exception(throwable)` creates a `Value<Throwable>`
+You can then create custom methods on your field builder that will render your class.  In this case, we'll create a field builder that can handle a `java.util.Date`, and create `date` and `dateValue` methods for it.
 
-For complex objects, there are some utility methods:
+```java
+import com.tersesystems.echopraxia.api.*;
+import java.util.Date;
 
-* `Value.array(valueList)` takes `Value` or the known primitives 
-* `Value.array(function, valueList)` will map the elements of `valueList` into `Value` using `function`.
-* `Value.object(fields)` takes a list of fields
-* `Value.object(function, objectList)` will map the elements of `objectList` into `Field` using `function`.
+public interface BuilderWithDate implements PresentationFieldBuilder {
+  static BuilderWithDate instance = new BuilderWithDate() {};
+  
+  default PresentationField date(Date date) {
+    return value("date", dateValue(date)); // use a default name
+  }
 
-In addition, there is `Value.optional` which takes `Optional<Value<V>>` and returns `Value<?>` where `nullValue` is used if `Optional.empty()` is found. 
+  default PresentationField date(String name, Date date) {
+    return value(name, dateValue(date));
+  }
 
-### Fields
+  // Renders a date as an ISO 8601 string.
+  default Value.StringValue dateValue(Date date) {
+    return Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
+  }
+}
+```
 
-The `Field` interface has some static methods that are the primary way to create fields:
+And then create a `Logger<BuilderWithDate>`:
 
-* `Field.keyValue(name, value)` returns a `Field` with the given name and value set, displaying as "name=value" in text.
-* `Field.keyValue(name, value, PresentationField.class)` returns a `PresentationField` that has more methods on it.
+```java
+Logger<BuilderWithDate> dateLogger = LoggerFactory.getLogger(YourService.class, BuilderWithDate.instance);
+```
 
-You can also define and extend `Field` with your own implementation, although that is outside the scope of this section.
+And now you can render a date automatically:
 
-You can also create a field using `Field.value(name, value)` or `Field.value(name, value, PresentationField.class)`, which creates a `Field` with the presentation attribute `asValueOnly` set.
+```java
+dateLogger.info("Date {}", fb -> fb.date("creation_date", new Date()));
+```
+
+### Exception Handling
+
+Avoid throwing exceptions in a field builder function. 
+
+```java
+logger.info("Message name {}", fb -> {
+  String name = methodThatThrowsException(); // BAD
+  return fb.string(name, "some-value");
+});
+```
+
+Instead, only call field builder methods inside the closure and keep any construction logic outside:
+
+```java
+String name = methodThatThrowsException(); // GOOD
+logger.info("Message name {}", fb -> {
+  return fb.string(name, "some-value");
+});
+```
+
+If an exception is thrown it will be caught by Echopraxia's default `ExceptionHandler` which writes the exception to `System.err` by default.  You can provide your own behavior for the `ExceptionHandler` using a service loader pattern.
+
+### Managing Null Values
+
+At some point you will have a value that you want to render and the Java API will return `null`.
+
+I recommend using [Jetbrains annotations](https://www.jetbrains.com/help/idea/annotating-source-code.html#jetbrains-annotations) which includes a `@NotNull` annotation.
+
+You can defensively program against this by explicitly checking against nulls in the field builder, by explicitly checking against `null` and returning `Value<?>`.
+
+```java
+import java.time.Duration;
+import org.jetbrains.annotations.NotNull;
+
+public interface NullableFieldBuilder extends FieldBuilder {
+  default Value<?> durationValue(@NotNull Duration duration) {
+    return (deadline != null) ? Value.string(duration.toString()) : Value.nullValue();
+  }
+}
+```
+
+Field names are never allowed to be null.  If a field name is null, it will be replaced at runtime with `unknown-echopraxia-N` where N is an incrementing number.
+
+```java
+logger.info("Message name {}", fb -> 
+  fb.string(null, "some-value") // null field names not allowed
+);
+```
+
+### Complex Objects
+
+The value of a field builder compounds as you build up complex objects from simple ones.
+
+In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
+
+```java
+public interface PersonFieldBuilder extends PresentationFieldBuilder {
+
+  // Renders a `Person` as an object field.
+  default PresentationField person(String fieldName, Person p) {
+    return keyValue(fieldName, personValue(p));
+  }
+
+  default Value<?> personValue(Person p) {
+    if (p == null) return Value.nullValue();
+    // Note that properties must be broken down to the basic JSON types,
+    // i.e. a primitive string/number/boolean/null or object/array.
+    Field name = string("name", p.name());
+    Field age = number("age", p.age());
+    Field father = keyValue("father", personValue(p.getFather()));
+    Field mother = keyValue("mother", personValue(p.getMother()));
+    Field interests = array("interests", p.interests());
+    return Value.object(name, age, father, mother, interests);
+  }
+
+  default Value<?> personValue(Optional<Person> p) {
+    return Value.optional(p.map(this::personValue));
+  }
+}
+```
+
+And then you can render a person:
+
+```java
+Person user = ...
+Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.instance);
+personLogger.info("Person {}", fb -> fb.person("user", user));
+```
 
 ## Field Presentation
 
@@ -111,66 +221,99 @@ Field object = keyValue("object", Value.object(fields));
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
-## Defining Field Builders
+### ToStringFormat
 
+Using the `withToStringFormat` method with a field visitor will change the text format used when rendering a message.
 
-
-The `PresentationFieldBuilder` interface provides some convenience methods around `Field` and `Value`.  
-
-* `keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
-* `value`: renders a field with `value` when rendered in logfmt line oriented text.
-
-`FieldBuilder` comes with some additional methods for common types, i.e.
-
-* `fb.string`: creates a field with a string as a value, same as `fb.keyValue(name, Value.string(str))`.
-* `fb.number`: creates a field with a number as a value, same as `fb.keyValue(name, Value.number(num))`.
-* `fb.bool`: creates a field with a boolean as a value, same as `fb.keyValue(name, Value.bool(b))`.
-* `fb.nullValue`: creates a field with a null as a value, same as `fb.keyValue(name, Value.nullValue())`
-* `fb.array`: creates a field with an array as a value, same as `fb.keyValue(name, Value.array(arr))`
-* `fb.obj`: creates a field with an object as a value, same as `fb.keyValue(name, Value.``object``(o))`
-* `fb.exception`: creates a field with a throwable as a value, same as `fb.keyValue(name, Value.exception(t))`.
-
-The `FieldBuilder` interface is the same as `PresentationFieldBuilder` but returns `Field` by default so it does not have the presentation methods available.
-
-To create a field builder, you start with an interface (typically using `FieldBuilder` or `PresentationFieldBuilder` as a base) and then pass that field builder into your `Logger` using `withFieldBuilder` or through the `LoggerFactory.getLogger` method.  
-
-Although convenient, you are not required to extend `FieldBuilder` or `PresentationFieldBuilder`, and can use `Field` and `Value` methods directly to create your own builders (useful if you don't want to expose field names directly).
-
-You can then create custom methods on your field builder that will render your class.  In this case, we'll create a field builder that can handle a `java.util.Date`, and create `date` and `dateValue` methods for it.
+This is useful when you want to keep the field value in a machine-readable format -- for example, if you have conditions that may apply to the field -- and want to customize the data so it's more human readable.
 
 ```java
-import com.tersesystems.echopraxia.api.*;
-import java.util.Date;
-
-public interface BuilderWithDate implements PresentationFieldBuilder {
-  static BuilderWithDate instance = new BuilderWithDate() {};
-  
-  default PresentationField date(Date date) {
-    return value("date", dateValue(date)); // use a default name
+static class MyFieldBuilder implements PresentationFieldBuilder {
+  static MyFieldBuilder instance() {
+    return new MyFieldBuilder();
   }
 
-  default PresentationField date(String name, Date date) {
-    return value(name, dateValue(date));
-  }
-
-  // Renders a date as an ISO 8601 string.
-  default Value.StringValue dateValue(Date date) {
-    return Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
+  public PresentationField duration(String name, Duration duration) {
+    return string(name, duration.toString())
+            .asValueOnly()
+            .withToStringFormat(
+                    new SimpleFieldVisitor() {
+                      @Override
+                      public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+                        return string(name, duration.toDays() + " day");
+                      }
+                    });
   }
 }
 ```
 
-And then create a `Logger<BuilderWithDate>`:
+This will render `log.info("{}", fb -> fb.duration("duration", Duration.ofDays(1))` as `1 day` in a text format, while rendering as `PT24H` for conditions and in JSON.
 
-```
-Logger<BuilderWithDate> dateLogger = basicLogger.withFieldBuilder(BuilderWithDate.instance);
-```
+### StructuredFormat
 
-And now you can render a date automatically:
+Using the `withStructuredFormat` method with a field visitor will override and transform the structured JSON format.
+
+Imagine you want to render a `java.lang.Instant` in JSON as having an explicit `@type` of `http://www.w3.org/2001/XMLSchema#dateTime` alongside the value, but don't want to needlessly complicate your output.  Using `withStructuredFormat` with a class extending `SimpleFieldVisitor`, you can intercept and override field processing in JSON:
 
 ```java
-dateLogger.info("Date {}", fb -> fb.date("creation_date", new Date()));
+public class InstantFieldBuilder implements PresentationFieldBuilder {
+
+  private static final FieldVisitor instantVisitor = new InstantFieldVisitor();
+
+  public PresentationField instant(String name, Instant instant) {
+    return string(name, instant.toString()).withStructuredFormat(instantVisitor);
+  }
+
+  class InstantFieldVisitor extends SimpleFieldVisitor {
+    @Override
+    public @NotNull Field visitString(@NotNull Value<String> stringValue) {
+      return typedInstant(name, stringValue);
+    }
+
+    PresentationField typedInstant(String name, Value<String> v) {
+      return object(name, typedInstantValue(v));
+    }
+
+    Value.ObjectValue typedInstantValue(Value<String> v) {
+      return Value.object(
+        string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
+    }
+
+    @Override
+    public @NotNull ArrayVisitor visitArray() {
+      return new InstantArrayVisitor();
+    }
+
+    class InstantArrayVisitor extends SimpleArrayVisitor {
+      @Override
+      public void visitStringElement(Value.StringValue stringValue) {
+        this.elements.add(typedInstantValue(stringValue));
+      }
+    }
+  }
+}
 ```
+
+This field builder will render `fb.instant("startTime", Instant.ofEpochMillis(0))` as the following in text:
+
+```
+startTime=1970-01-01T00:00:00Z
+```
+
+But will render JSON as:
+
+```json
+{
+  "startTime": {
+    "@type":"http://www.w3.org/2001/XMLSchema#dateTime",
+    "@value":"1970-01-01T00:00:00Z"
+  }
+}
+```
+
+This also applies to Java durations using `ISO-8601` which you could mark with a `"@type": "https://schema.org/Duration"` and so on.
+
+This is also relevant for numeric fields where you may want to indicate [units](https://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/) -- for example, a retry may indicate a numeric value of seconds, and a cache size may indicate bytes, kilobytes, or gigabytes.  Unless you have a pre-defined schema or a consistent naming convention i.e. adding `_second` suffixes, the unit information is lost and comparing numbers with different units is needlessly complicated -- using a `@type` can help disambiguate the unit and help with ingestion.
 
 ## Field Names
 
@@ -222,72 +365,43 @@ logger.withFields(fb -> fb.keyValue("user_id", userId)).info("{}", fb -> fb.keyV
 
 This will produce a statement that has two `user_id` fields with two different values -- which is technically valid JSON, but may not be what centralized logging expects.  You can qualify your arguments by adding a [nested](https://github.com/logfellow/logstash-logback-encoder#nested-json-provider), or add logic that will validate/reject/clean invalid fields, but it may be simpler to explicitly pass in distinct names or namespace with `fb.object` or `Value.object`.
 
-## Managing Null Values
+## Fields and Values
 
-At some point you will have a value that you want to render and the Java API will return `null`.
+We've touched on this in the field builder section, but let's get deeper into how fields and values actually work.  
 
-I recommend using [Jetbrains annotations](https://www.jetbrains.com/help/idea/annotating-source-code.html#jetbrains-annotations) which includes a `@NotNull` annotation.
+Structured logging in Echopraxia is defined using `Field` and `Value`.  A `Field` consists of a `name()` that is a `String`, and a `value()` of type `Value<?>`.
 
-You can defensively program against this by explicitly checking against nulls in the field builder, by explicitly checking against `null`.
+### Values
 
-```java
-import java.time.Duration;
-import org.jetbrains.annotations.NotNull;
+A `Value` corresponds mostly to the JSON infoset. It can be a *primitive*: a string, a number, a boolean, a null, or `java.lang.Throwable`.  Or, it can be *complex*: an array that contains a list of values, or an object which contains a list of fields.
 
-public interface NullableFieldBuilder extends FieldBuilder {
-  default Value<?> durationValue(@NotNull Duration duration) {
-    return (deadline != null) ? Value.string(duration.toString()) : Value.nullValue();
-  }
-}
-```
+To create a primitive value, you call a static factory method:
 
-Field names are never allowed to be null.  If a field name is null, it will be replaced at runtime with `unknown-echopraxia-N` where N is an incrementing number.
+* `Value.string("string value")` creates a `Value<String>`
+* `Value.nullValue()` create a `Value<Void>`
+* `Value.number(intValue)` create a `Value<Number>`
+* `Value.bool(true)` creates a `Value<Boolean>`
+* `Value.exception(throwable)` creates a `Value<Throwable>`
 
-```java
-logger.info("Message name {}", fb -> 
-  fb.string(null, "some-value") // null field names not allowed
-);
-```
+For complex objects, there are some utility methods:
 
-## Complex Objects
+* `Value.array(valueList)` takes `Value` or the known primitives
+* `Value.array(function, valueList)` will map the elements of `valueList` into `Value` using `function`.
+* `Value.object(fields)` takes a list of fields
+* `Value.object(function, objectList)` will map the elements of `objectList` into `Field` using `function`.
 
-The value of a field builder compounds as you build up complex objects from simple ones.
+In addition, there is `Value.optional` which takes `Optional<Value<V>>` and returns `Value<?>` where `nullValue` is used if `Optional.empty()` is found.
 
-In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
+### Fields
 
-```java
-public interface PersonFieldBuilder extends PresentationFieldBuilder {
+The `Field` interface has some static methods that are the primary way to create fields:
 
-  // Renders a `Person` as an object field.
-  default PresentationField person(String fieldName, Person p) {
-    return keyValue(fieldName, personValue(p));
-  }
+* `Field.keyValue(name, value)` returns a `Field` with the given name and value set, displaying as "name=value" in text.
+* `Field.keyValue(name, value, PresentationField.class)` returns a `PresentationField` that has more methods on it.
 
-  default Value<?> personValue(Person p) {
-    if (p == null) return Value.nullValue();
-    // Note that properties must be broken down to the basic JSON types,
-    // i.e. a primitive string/number/boolean/null or object/array.
-    Field name = string("name", p.name());
-    Field age = number("age", p.age());
-    Field father = keyValue("father", personValue(p.getFather()));
-    Field mother = keyValue("mother", personValue(p.getMother()));
-    Field interests = array("interests", p.interests());
-    return Value.object(name, age, father, mother, interests);
-  }
+You can also define and extend `Field` with your own implementation, although that is outside the scope of this section.
 
-  default Value<?> personValue(Optional<Person> p) {
-    return Value.optional(p.map(this::personValue));
-  }
-}
-```
-
-And then you can render a person:
-
-```java
-Person user = ...
-Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.instance);
-personLogger.info("Person {}", fb -> fb.person("user", user));
-```
+You can also create a field using `Field.value(name, value)` or `Field.value(name, value, PresentationField.class)`, which creates a `Field` with the presentation attribute `asValueOnly` set.
 
 ## Packages and Modules
 
@@ -358,116 +472,3 @@ public class SomeOrderService {
 ```
 
 This way, you can have your loggers automatically "know" their domain classes and build on each other without exposing the underlying machinery to end users.
-
-## Exception Handling
-
-Avoid throwing exceptions in a field builder function.  Because a field builder function runs in a closure, if an exception is thrown it will be caught by Echopraxia's error handler which writes the exception to `System.err` by default.  
-
-```java
-logger.info("Message name {}", fb -> {
-  String name = methodThatThrowsException(); // BAD
-  return fb.string(name, "some-value");
-});
-```
-
-Instead, only call field builder methods inside the closure and keep any construction logic outside:
-
-```java
-String name = methodThatThrowsException(); // GOOD
-logger.info("Message name {}", fb -> {
-  return fb.string(name, "some-value");
-});
-```
-
-## StructuredFormat
-
-Using the `withStructuredFormat` method with a field visitor will allow the JSON output to contain different fields when you want to provide extra type information that isn't relevant in text.
-
-This can be used to show "human friendly" fields in a text based format, while showing more machine-readable output in JSON.  For example, you may want to render a duration in days:
-
-```java
-Field durationField = fb.duration("duration", Duration.ofDays(1));
-
-assertThat(durationField.toString()).isEqualTo("1 day");
-assertThatJson(durationField).inPath("$.duration").asString().isEqualTo("PT24H");
-```
-
-To do this, you would add a field as follows:
-
-```java
-public class MyFieldBuilder extends PresentationFieldBuilder {
-  public PresentationField duration(String name, Duration duration) {
-    Field structuredField = string(name, duration.toString());
-    return string(name, duration.toDays() + " day")
-            .asValueOnly()
-            .withStructuredFormat(new SimpleFieldVisitor() {
-              @Override
-              public @NotNull Field visitString(@NotNull Value<String> stringValue) {
-                return structuredField;
-              }
-            });
-  } 
-}
-```
-
-This is especially relevant for numeric fields where you may want to indicate [units](https://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/) -- for example, a retry may indicate a numeric value of seconds, and a cache size may indicate bytes, kilobytes, or gigabytes.  Unless you have a pre-defined schema or a consistent naming convention i.e. adding `_second` suffixes, the unit information is lost and comparing numbers with different units is needlessly complicated.
-
-Type information is also useful in string contexts.  For example, imagine you want to render a `java.lang.Instant` in JSON as having an explicit `@type` of `http://www.w3.org/2001/XMLSchema#dateTime` alongside the value, but don't want to needlessly complicate your output.  Using `withStructuredFormat` with a class extending `SimpleFieldVisitor`, you can intercept and override field processing in JSON:
-
-```java
-public class InstantFieldBuilder implements PresentationFieldBuilder {
-
-  private static final FieldVisitor instantVisitor = new InstantFieldVisitor();
-
-  public PresentationField instant(String name, Instant instant) {
-    return string(name, instant.toString()).withStructuredFormat(instantVisitor);
-  }
-
-  class InstantFieldVisitor extends SimpleFieldVisitor {
-    @Override
-    public @NotNull Field visitString(@NotNull Value<String> stringValue) {
-      return typedInstant(name, stringValue);
-    }
-
-    PresentationField typedInstant(String name, Value<String> v) {
-      return object(name, typedInstantValue(v));
-    }
-
-    Value.ObjectValue typedInstantValue(Value<String> v) {
-      return Value.object(
-        string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
-    }
-
-    @Override
-    public @NotNull ArrayVisitor visitArray() {
-      return new InstantArrayVisitor();
-    }
-
-    class InstantArrayVisitor extends SimpleArrayVisitor {
-      @Override
-      public void visitStringElement(Value.StringValue stringValue) {
-        this.elements.add(typedInstantValue(stringValue));
-      }
-    }
-  }
-}
-```
-
-This field builder will render `fb.instant("startTime", Instant.ofEpochMillis(0))` as the following in text:
-
-```
-startTime=1970-01-01T00:00:00Z
-```
-
-But will render JSON as:
-
-```json
-{
-  "startTime": {
-    "@type":"http://www.w3.org/2001/XMLSchema#dateTime",
-    "@value":"1970-01-01T00:00:00Z"
-  }
-}
-```
-
-This also applies to Java durations using `ISO-8601` which you could mark with a `"@type": "https://schema.org/Duration"` and so on.
