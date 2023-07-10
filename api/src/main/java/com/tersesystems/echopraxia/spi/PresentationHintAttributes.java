@@ -19,7 +19,8 @@ public class PresentationHintAttributes {
   public static final AttributeKey<FieldVisitor> STRUCTURED_FORMAT =
       AttributeKey.create("structuredFormat");
 
-  public static final AttributeKey<FieldVisitor> TOSTRING_FORMAT = AttributeKey.create("toStringFormat");
+  public static final AttributeKey<FieldVisitor> TOSTRING_FORMAT =
+      AttributeKey.create("toStringFormat");
 
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
