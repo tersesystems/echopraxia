@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.jul;
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
+import com.tersesystems.echopraxia.spi.LoggerContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +62,11 @@ public class JULCoreLogger implements CoreLogger {
   @NotNull
   public String getName() {
     return logger.getName();
+  }
+
+  @Override
+  public @NotNull LoggerContext getLoggerContext() {
+    return context;
   }
 
   @Override

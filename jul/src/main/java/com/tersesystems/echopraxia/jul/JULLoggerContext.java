@@ -3,12 +3,13 @@ package com.tersesystems.echopraxia.jul;
 import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 
 import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.spi.LoggerContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
 
-public class JULLoggerContext {
+public class JULLoggerContext implements LoggerContext {
   protected final Supplier<List<Field>> fieldsSupplier;
 
   private static final JULLoggerContext EMPTY = new JULLoggerContext();
