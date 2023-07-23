@@ -28,6 +28,9 @@ public interface CoreLogger {
   @NotNull
   String getName();
 
+  @NotNull
+  LoggerContext getLoggerContext();
+
   /**
    * Returns the given condition.
    *

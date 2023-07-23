@@ -6,6 +6,7 @@ import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
+import com.tersesystems.echopraxia.spi.LoggerContext;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -67,6 +68,11 @@ public class Log4JCoreLogger implements CoreLogger {
   @NotNull
   public String getName() {
     return logger.getName();
+  }
+
+  @Override
+  public @NotNull LoggerContext getLoggerContext() {
+    return context;
   }
 
   @Override
@@ -676,7 +682,7 @@ public class Log4JCoreLogger implements CoreLogger {
     return "Log4JCoreLogger[" + logger.getName() + "]";
   }
 
-  protected static class Context {
+  protected static class Context implements LoggerContext {
     protected final Supplier<List<Field>> fieldsSupplier;
     protected final Marker marker;
 

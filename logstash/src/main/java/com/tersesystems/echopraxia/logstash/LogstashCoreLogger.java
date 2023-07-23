@@ -108,6 +108,12 @@ public class LogstashCoreLogger implements CoreLogger {
     return fqcn;
   }
 
+  @Override
+  @NotNull
+  public com.tersesystems.echopraxia.spi.LoggerContext getLoggerContext() {
+    return context;
+  }
+
   // Logstash specific, not part of CoreLogger API
   public CoreLogger withMarkers(Marker... markers) {
     final LogstashMarkerContext contextWithMarkers =

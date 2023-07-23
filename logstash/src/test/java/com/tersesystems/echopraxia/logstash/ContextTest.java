@@ -13,6 +13,8 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
@@ -33,6 +35,20 @@ public class ContextTest extends TestBase {
   @BeforeEach
   void clearMDC() {
     MDC.clear();
+  }
+
+  @Test
+  void testGetLoggerContext() {
+    CoreLogger core = CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
+    var logger =
+        LoggerFactory.getLogger(core, FieldBuilder.instance())
+            .withFields(fb -> fb.string("herp", "derp"));
+    var coreWithFields = logger.core();
+    var fields = coreWithFields.getLoggerContext().getLoggerFields();
+
+    Field field = fields.get(0);
+    assertThat(field.name()).isEqualTo("herp");
+    assertThat(field.value().asString().raw()).isEqualTo("derp");
   }
 
   @Test

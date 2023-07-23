@@ -26,6 +26,11 @@ public class DelegateCoreLogger implements CoreLogger {
   }
 
   @Override
+  public @NotNull LoggerContext getLoggerContext() {
+    return core.getLoggerContext();
+  }
+
+  @Override
   @NotNull
   public Condition condition() {
     return core.condition();

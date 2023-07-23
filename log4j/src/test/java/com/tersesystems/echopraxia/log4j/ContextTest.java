@@ -24,6 +24,21 @@ public class ContextTest extends TestBase {
   }
 
   @Test
+  void testGetLoggerContext() {
+    Log4JCoreLogger core =
+        (Log4JCoreLogger) CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
+    var logger =
+        LoggerFactory.getLogger(core, FieldBuilder.instance())
+            .withFields(fb -> fb.string("herp", "derp"));
+    var coreWithFields = logger.core();
+    var fields = coreWithFields.getLoggerContext().getLoggerFields();
+
+    Field field = fields.get(0);
+    assertThat(field.name()).isEqualTo("herp");
+    assertThat(field.value().asString().raw()).isEqualTo("derp");
+  }
+
+  @Test
   void testMarkers() {
     Marker securityMarker = MarkerManager.getMarker("SECURITY");
     Log4JCoreLogger core =
