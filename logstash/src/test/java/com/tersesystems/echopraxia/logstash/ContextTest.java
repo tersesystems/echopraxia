@@ -13,15 +13,14 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
 import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.spi.CoreLogger;
+import com.tersesystems.echopraxia.spi.CoreLoggerFactory;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import com.tersesystems.echopraxia.spi.CoreLogger;
-import com.tersesystems.echopraxia.spi.CoreLoggerFactory;
 import net.logstash.logback.marker.EmptyLogstashMarker;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,10 +36,13 @@ public class ContextTest extends TestBase {
   void clearMDC() {
     MDC.clear();
   }
+
   @Test
   void testGetLoggerContext() {
     CoreLogger core = CoreLoggerFactory.getLogger(Logger.class.getName(), ContextTest.class);
-    var logger = LoggerFactory.getLogger(core, FieldBuilder.instance()).withFields(fb -> fb.string("herp", "derp"));
+    var logger =
+        LoggerFactory.getLogger(core, FieldBuilder.instance())
+            .withFields(fb -> fb.string("herp", "derp"));
     var coreWithFields = logger.core();
     var fields = coreWithFields.getLoggerContext().getLoggerFields();
 
