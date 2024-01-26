@@ -6,6 +6,7 @@ include('logback')
 include('log4j')
 include('jackson')
 include('jul')
+include('noop')
 
 include('logger')
 include('async')
