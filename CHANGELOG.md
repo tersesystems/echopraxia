@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.1
+
+* Add a no-op EchopraxiaService provider, for use in tests.
+
 ## 3.1.0
 
 * Add `withToStringFormat` to PresentationField.
