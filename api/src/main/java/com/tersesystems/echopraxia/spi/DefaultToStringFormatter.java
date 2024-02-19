@@ -12,20 +12,19 @@ public class DefaultToStringFormatter implements ToStringFormatter {
   @Override
   @NotNull
   public String formatField(@NotNull Field field) {
+    if (isElided(field)) {
+      return "";
+    }
+
     StringBuilder builder = new StringBuilder();
+    if (!isValueOnly(field)) {
+      formatName(builder, field.name(), field.attributes());
+    }
 
     if (field.attributes().containsKey(TOSTRING_FORMAT)) {
       FieldVisitor fieldVisitor = field.attributes().get(TOSTRING_FORMAT);
       assert fieldVisitor != null;
       field = fieldVisitor.visit(field);
-    }
-
-    if (isElided(field)) {
-      return "";
-    }
-
-    if (!isValueOnly(field)) {
-      formatName(builder, field.name(), field.attributes());
     }
     formatValue(builder, field.value(), field.attributes());
     return builder.toString();
@@ -106,6 +105,12 @@ public class DefaultToStringFormatter implements ToStringFormatter {
         }
         if (!isValueOnly(field)) {
           formatName(b, field.name(), field.attributes());
+        }
+
+        if (field.attributes().containsKey(TOSTRING_FORMAT)) {
+          FieldVisitor fieldVisitor = field.attributes().get(TOSTRING_FORMAT);
+          assert fieldVisitor != null;
+          field = fieldVisitor.visit(field);
         }
         formatValue(b, field.value(), field.attributes());
         displayComma = i < fieldList.size();
