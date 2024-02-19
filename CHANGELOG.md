@@ -1,9 +1,12 @@
 # Changelog
 
+## 3.1.2
+
+* Fix bug in ToStringFormat attribute where child fields were not processed correctly.
+
 ## 3.1.1
 
 * Add a no-op EchopraxiaService provider, for use in tests.
-* Fix bug in ToStringFormat attribute where child fields were not processed correctly.
 
 ## 3.1.0
 
