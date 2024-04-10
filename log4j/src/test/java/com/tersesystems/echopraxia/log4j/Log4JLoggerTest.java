@@ -15,7 +15,8 @@ public class Log4JLoggerTest extends TestBase {
   @Test
   void testNullMessage() {
     var logger = getLogger();
-    logger.debug(null);
+    String s = null;
+    logger.debug(s);
 
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();

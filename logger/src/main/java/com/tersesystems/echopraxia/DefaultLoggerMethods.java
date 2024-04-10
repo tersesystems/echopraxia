@@ -9,7 +9,9 @@ import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import com.tersesystems.echopraxia.spi.DefaultMethodsSupport;
+import java.util.Arrays;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,10 +43,30 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   /**
    * Logs statement at TRACE level.
    *
+   * @param fields field parameters.
+   */
+  default void trace(Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(TRACE, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
+  /**
+   * Logs statement at TRACE level.
+   *
    * @param message the given message.
    */
   default void trace(@Nullable String message) {
     core().log(TRACE, message);
+  }
+
+  /**
+   * Logs statement at TRACE level.
+   *
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void trace(@Nullable String message, Field... fields) {
+    core().log(TRACE, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -71,10 +93,32 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * Conditionally logs statement at TRACE level.
    *
    * @param condition the given condition.
+   * @param fields field parameters.
+   */
+  default void trace(@NotNull Condition condition, Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(TRACE, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
+  /**
+   * Conditionally logs statement at TRACE level.
+   *
+   * @param condition the given condition.
    * @param message the message.
    */
   default void trace(@NotNull Condition condition, @Nullable String message) {
     core().log(TRACE, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at TRACE level.
+   *
+   * @param condition the given condition.
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void trace(@NotNull Condition condition, @Nullable String message, Field... fields) {
+    core().log(TRACE, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -126,6 +170,11 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
     return core().isEnabled(DEBUG, condition);
   }
 
+  default void debug(Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(DEBUG, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
   /**
    * Logs statement at DEBUG level.
    *
@@ -133,6 +182,16 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    */
   default void debug(@Nullable String message) {
     core().log(DEBUG, message);
+  }
+
+  /**
+   * Logs statement at DEBUG level.
+   *
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void debug(@Nullable String message, Field... fields) {
+    core().log(DEBUG, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -159,10 +218,32 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * Conditionally logs statement at DEBUG level.
    *
    * @param condition the given condition.
+   * @param fields field parameters.
+   */
+  default void debug(@NotNull Condition condition, Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(DEBUG, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
+  /**
+   * Conditionally logs statement at DEBUG level.
+   *
+   * @param condition the given condition.
    * @param message the message.
    */
   default void debug(@NotNull Condition condition, @Nullable String message) {
     core().log(DEBUG, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at TRACE level.
+   *
+   * @param condition the given condition.
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void debug(@NotNull Condition condition, @Nullable String message, Field... fields) {
+    core().log(DEBUG, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -214,6 +295,11 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
     return core().isEnabled(INFO, condition);
   }
 
+  default void info(Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(INFO, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
   /**
    * Logs statement at INFO level.
    *
@@ -221,6 +307,16 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    */
   default void info(@Nullable String message) {
     core().log(INFO, message);
+  }
+
+  /**
+   * Logs statement at INFO level.
+   *
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void info(@Nullable String message, Field... fields) {
+    core().log(INFO, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -247,10 +343,32 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    * Conditionally logs statement at INFO level.
    *
    * @param condition the given condition.
+   * @param fields field parameters.
+   */
+  default void info(@NotNull Condition condition, Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(INFO, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
+  /**
+   * Conditionally logs statement at INFO level.
+   *
+   * @param condition the given condition.
    * @param message the message.
    */
   default void info(@NotNull Condition condition, @Nullable String message) {
     core().log(INFO, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at INFO level.
+   *
+   * @param condition the given condition.
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void info(@NotNull Condition condition, @Nullable String message, Field... fields) {
+    core().log(INFO, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -302,6 +420,11 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
     return core().isEnabled(WARN, condition);
   }
 
+  default void warn(Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(WARN, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
   /**
    * Logs statement at WARN level.
    *
@@ -309,6 +432,16 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    */
   default void warn(@Nullable String message) {
     core().log(WARN, message);
+  }
+
+  /**
+   * Logs statement at WARN level.
+   *
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void warn(@Nullable String message, Field... fields) {
+    core().log(WARN, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -332,6 +465,17 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   }
 
   /**
+   * Conditionally logs statement at WARN level.
+   *
+   * @param condition the given condition.
+   * @param fields field parameters.
+   */
+  default void warn(@NotNull Condition condition, Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(WARN, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
+  /**
    * Conditionally logs statement at INFO level.
    *
    * @param condition the given condition.
@@ -339,6 +483,17 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    */
   default void warn(@NotNull Condition condition, @Nullable String message) {
     core().log(WARN, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at WARN level.
+   *
+   * @param condition the given condition.
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void warn(@NotNull Condition condition, @Nullable String message, Field... fields) {
+    core().log(WARN, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -391,12 +546,32 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   }
 
   /**
-   * Logs statement at INFO level.
+   * Logs statement at ERROR level.
+   *
+   * @param fields field parameters.
+   */
+  default void error(Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(ERROR, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
+  /**
+   * Logs statement at ERROR level.
    *
    * @param message the given message.
    */
   default void error(@Nullable String message) {
     core().log(ERROR, message);
+  }
+
+  /**
+   * Logs statement at ERROR level.
+   *
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void error(@Nullable String message, Field... fields) {
+    core().log(ERROR, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
@@ -420,6 +595,17 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
   }
 
   /**
+   * Conditionally logs statement at ERROR level.
+   *
+   * @param condition the given condition.
+   * @param fields field parameters.
+   */
+  default void error(@NotNull Condition condition, Field... fields) {
+    String message = Arrays.stream(fields).map(f -> "{}").collect(Collectors.joining(" "));
+    core().log(ERROR, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
+  }
+
+  /**
    * Conditionally logs statement at INFO level.
    *
    * @param condition the given condition.
@@ -427,6 +613,17 @@ public interface DefaultLoggerMethods<FB> extends LoggerMethods<FB>, DefaultMeth
    */
   default void error(@NotNull Condition condition, @Nullable String message) {
     core().log(ERROR, condition, message);
+  }
+
+  /**
+   * Conditionally logs statement at ERROR level.
+   *
+   * @param condition the given condition.
+   * @param message the given message.
+   * @param fields field parameters.
+   */
+  default void error(@NotNull Condition condition, @Nullable String message, Field... fields) {
+    core().log(ERROR, condition, message, fb -> FieldBuilderResult.list(fields), fieldBuilder());
   }
 
   /**
