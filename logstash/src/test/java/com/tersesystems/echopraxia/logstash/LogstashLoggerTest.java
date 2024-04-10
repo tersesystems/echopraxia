@@ -36,9 +36,34 @@ class LogstashLoggerTest extends TestBase {
   }
 
   @Test
+  void testDebugField() {
+    var logger = getLogger();
+    var field = FieldBuilder.instance().string("key", "value");
+    logger.debug(field);
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("key=value");
+  }
+
+  @Test
+  void testDebugMessageAndField() {
+    var logger = getLogger();
+    var field = FieldBuilder.instance().string("key", "value");
+    logger.debug("hello {}", field);
+
+    final ListAppender<ILoggingEvent> listAppender = getListAppender();
+    final ILoggingEvent event = listAppender.list.get(0);
+    final String formattedMessage = event.getFormattedMessage();
+    assertThat(formattedMessage).isEqualTo("hello key=value");
+  }
+
+  @Test
   void testNullMessage() {
     var logger = getLogger();
-    logger.debug(null);
+    String s = null;
+    logger.debug(s);
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
     final ILoggingEvent event = listAppender.list.get(0);
