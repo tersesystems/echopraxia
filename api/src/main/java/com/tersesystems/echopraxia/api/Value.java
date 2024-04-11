@@ -777,9 +777,6 @@ public abstract class Value<V> {
     }
   }
 
-  /**
-   * ArrayValue is public because it is a collection
-   */
   public static class ArrayValue extends Value<List<Value<?>>> {
     private final List<Value<?>> raw;
 
