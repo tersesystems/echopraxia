@@ -46,6 +46,21 @@ public abstract class Value<V> {
   public abstract Value.Type type();
 
   /**
+   * @return the attributes associated with the value.
+   */
+  public Attributes attributes() {
+    return Attributes.empty();
+  }
+
+  /**
+   * Sets the attributes to newAttributes, replacing the original value.
+   *
+   * @param newAttributes the new attributes.
+   * @return the value with attributes.
+   */
+  public abstract Value<V> withAttributes(Attributes newAttributes);
+
+  /**
    * @return this value as an object value.
    */
   @NotNull
@@ -499,8 +514,7 @@ public abstract class Value<V> {
     return list;
   }
 
-  public static final class BooleanValue extends Value<Boolean> {
-
+  public static class BooleanValue extends Value<Boolean> implements Comparable<BooleanValue> {
     public static final BooleanValue TRUE = new BooleanValue(true);
 
     public static final BooleanValue FALSE = new BooleanValue(false);
@@ -520,6 +534,30 @@ public abstract class Value<V> {
     public @NotNull Value.Type type() {
       return Type.BOOLEAN;
     }
+
+    @Override
+    public BooleanValue withAttributes(Attributes newAttributes) {
+      return new BooleanValueWithAttributes(raw, newAttributes);
+    }
+
+    @Override
+    public int compareTo(@NotNull Value.BooleanValue o) {
+      return this.raw.compareTo(o.raw);
+    }
+  }
+
+  private static final class BooleanValueWithAttributes extends BooleanValue {
+    private final Attributes attributes;
+
+    BooleanValueWithAttributes(Boolean bool, Attributes attrs) {
+      super(bool);
+      this.attributes = attrs;
+    }
+
+    @Override
+    public Attributes attributes() {
+      return this.attributes;
+    }
   }
 
   public static class NumberValue<N extends Number & Comparable<N>> extends Value<N>
@@ -538,6 +576,11 @@ public abstract class Value<V> {
     @Override
     public @NotNull Value.Type type() {
       return Type.NUMBER;
+    }
+
+    @Override
+    public NumberValue<N> withAttributes(Attributes newAttributes) {
+      return new NumberValueWithAttributes<>(raw, newAttributes);
     }
 
     @Override
@@ -574,6 +617,21 @@ public abstract class Value<V> {
         static {
           for (int i = 0; i < cache.length; i++) cache[i] = new ByteValue((byte) (i - 128));
         }
+      }
+    }
+
+    private static final class NumberValueWithAttributes<N extends Number & Comparable<N>> extends NumberValue<N> {
+
+      private final Attributes attributes;
+
+      private NumberValueWithAttributes(N number, Attributes attributes) {
+        super(number);
+        this.attributes = attributes;
+      }
+
+      @Override
+      public Attributes attributes() {
+        return this.attributes;
       }
     }
 
@@ -663,7 +721,7 @@ public abstract class Value<V> {
     }
   }
 
-  public static final class StringValue extends Value<String> implements Comparable<StringValue> {
+  public static class StringValue extends Value<String> implements Comparable<StringValue> {
     private final String raw;
 
     private StringValue(String s) {
@@ -678,6 +736,11 @@ public abstract class Value<V> {
     @Override
     public @NotNull Value.Type type() {
       return Type.STRING;
+    }
+
+    @Override
+    public StringValue withAttributes(Attributes newAttributes) {
+      return new StringValueWithAttributes(raw, newAttributes);
     }
 
     @Override
@@ -699,7 +762,25 @@ public abstract class Value<V> {
     }
   }
 
-  public static final class ArrayValue extends Value<List<Value<?>>> {
+  private static final class StringValueWithAttributes extends StringValue {
+
+    private final Attributes attributes;
+
+    public StringValueWithAttributes(String raw, Attributes newAttributes) {
+      super(raw);
+      this.attributes = newAttributes;
+    }
+
+    @Override
+    public Attributes attributes() {
+      return attributes;
+    }
+  }
+
+  /**
+   * ArrayValue is public because it is a collection
+   */
+  public static class ArrayValue extends Value<List<Value<?>>> {
     private final List<Value<?>> raw;
 
     public static final ArrayValue EMPTY = new ArrayValue(Collections.emptyList());
@@ -716,6 +797,11 @@ public abstract class Value<V> {
     @Override
     public @NotNull Value.Type type() {
       return Type.ARRAY;
+    }
+
+    @Override
+    public ArrayValue withAttributes(Attributes newAttributes) {
+      return new ArrayValueWithAttributes(raw, newAttributes);
     }
 
     public ArrayValue add(Value<?> value) {
@@ -744,7 +830,34 @@ public abstract class Value<V> {
     }
   }
 
-  public static final class ObjectValue extends Value<List<Field>> {
+  private static final class ArrayValueWithAttributes extends ArrayValue {
+
+    private final Attributes attributes;
+
+    public ArrayValueWithAttributes(List<Value<?>> raw, Attributes newAttributes) {
+      super(raw);
+      this.attributes = newAttributes;
+    }
+
+    @Override
+    public Attributes attributes() {
+      return attributes;
+    }
+
+    public ArrayValue add(Value<?> value) {
+      ArrayList<Value<?>> values = new ArrayList<>(raw());
+      values.add(value);
+      return new ArrayValueWithAttributes(values, attributes);
+    }
+
+    public ArrayValue addAll(Collection<Value<?>> values) {
+      ArrayList<Value<?>> joinedValues = new ArrayList<>(raw());
+      joinedValues.addAll(values);
+      return new ArrayValueWithAttributes(joinedValues, attributes);
+    }
+  }
+
+  public static class ObjectValue extends Value<List<Field>> {
     public static final ObjectValue EMPTY = new ObjectValue(Collections.emptyList());
 
     private final List<Field> raw;
@@ -756,6 +869,11 @@ public abstract class Value<V> {
     @Override
     public @NotNull Value.Type type() {
       return Type.OBJECT;
+    }
+
+    @Override
+    public ObjectValue withAttributes(Attributes newAttributes) {
+      return new ObjectValueWithAttributes(raw, newAttributes);
     }
 
     @Override
@@ -789,7 +907,35 @@ public abstract class Value<V> {
     }
   }
 
-  public static final class NullValue extends Value<Void> {
+  private static final class ObjectValueWithAttributes extends ObjectValue {
+
+    private final Attributes attributes;
+
+    public ObjectValueWithAttributes(List<Field> raw, Attributes newAttributes) {
+      super(raw);
+      this.attributes = newAttributes;
+    }
+
+    @Override
+    public Attributes attributes() {
+      return attributes;
+    }
+
+
+    public ObjectValue add(Field field) {
+      ArrayList<Field> fields = new ArrayList<>(raw());
+      fields.add(field);
+      return new ObjectValueWithAttributes(fields, attributes);
+    }
+
+    public ObjectValue addAll(Collection<Field> fields) {
+      ArrayList<Field> joinedFields = new ArrayList<>(raw());
+      joinedFields.addAll(fields);
+      return new ObjectValueWithAttributes(joinedFields, attributes);
+    }
+  }
+
+  public static class NullValue extends Value<Void> {
     // Should not be able to instantiate this outside of class.
     private NullValue() {}
 
@@ -803,10 +949,28 @@ public abstract class Value<V> {
       return Type.NULL;
     }
 
+    @Override
+    public NullValue withAttributes(Attributes newAttributes) {
+      return new NullValueWithAttributes(newAttributes);
+    }
+
     public static final @NotNull NullValue instance = new NullValue();
   }
 
-  public static final class ExceptionValue extends Value<Throwable> {
+  private static final class NullValueWithAttributes extends NullValue {
+    private final Attributes attributes;
+
+    public NullValueWithAttributes(Attributes newAttributes) {
+      this.attributes = newAttributes;
+    }
+
+    @Override
+    public Attributes attributes() {
+      return attributes;
+    }
+  }
+
+  public static class ExceptionValue extends Value<Throwable> {
     private final Throwable raw;
 
     private ExceptionValue(Throwable raw) {
@@ -816,6 +980,11 @@ public abstract class Value<V> {
     @Override
     public @NotNull Value.Type type() {
       return Type.EXCEPTION;
+    }
+
+    @Override
+    public ExceptionValue withAttributes(Attributes newAttributes) {
+      return new ExceptionValueWithAttributes(raw, newAttributes);
     }
 
     @Override
@@ -834,6 +1003,20 @@ public abstract class Value<V> {
     @Override
     public int hashCode() {
       return raw != null ? raw.hashCode() : 0;
+    }
+  }
+
+  private static final class ExceptionValueWithAttributes extends ExceptionValue {
+    private final Attributes attributes;
+
+    public ExceptionValueWithAttributes(Throwable raw, Attributes newAttributes) {
+      super(raw);
+      this.attributes = newAttributes;
+    }
+
+    @Override
+    public Attributes attributes() {
+      return attributes;
     }
   }
 }
