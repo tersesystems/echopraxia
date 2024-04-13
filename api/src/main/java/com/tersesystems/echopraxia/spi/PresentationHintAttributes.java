@@ -31,8 +31,7 @@ public class PresentationHintAttributes {
   public static final AttributeKey<FieldVisitor> TOSTRING_FORMAT =
       AttributeKey.create("toStringFormat");
 
-  public static final AttributeKey<String> TOSTRING_VALUE =
-          AttributeKey.create("toStringValue");
+  public static final AttributeKey<String> TOSTRING_VALUE = AttributeKey.create("toStringValue");
 
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
