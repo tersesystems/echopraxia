@@ -9,13 +9,22 @@ import org.jetbrains.annotations.NotNull;
  * @since 3.0
  */
 public class PresentationHintAttributes {
+
+  // Field attributes
   public static final AttributeKey<Boolean> VALUE_ONLY = AttributeKey.create("valueOnly");
+  public static final AttributeKey<String> DISPLAY_NAME = AttributeKey.create("displayName");
+  public static final AttributeKey<Boolean> ELIDE = AttributeKey.create("elide");
+
+  /** AbbreviateAfter will abbreviate a string or array after the given number of elements. */
   public static final AttributeKey<Integer> ABBREVIATE_AFTER =
       AttributeKey.create("abbreviateAfter");
 
+  /**
+   * AsCardinal will render the cardinal value of a string or array value, i.e. string length or
+   * array size.
+   */
   public static final AttributeKey<Boolean> AS_CARDINAL = AttributeKey.create("asCardinal");
-  public static final AttributeKey<String> DISPLAY_NAME = AttributeKey.create("displayName");
-  public static final AttributeKey<Boolean> ELIDE = AttributeKey.create("elide");
+
   public static final AttributeKey<FieldVisitor> STRUCTURED_FORMAT =
       AttributeKey.create("structuredFormat");
 
@@ -91,17 +100,19 @@ public class PresentationHintAttributes {
    * @param visitor the field visitor
    * @return structured format attribute
    */
-  public static Attribute<FieldVisitor> withStructuredFormat(FieldVisitor visitor) {
+  public static @NotNull Attribute<FieldVisitor> withStructuredFormat(FieldVisitor visitor) {
     return STRUCTURED_FORMAT.bindValue(visitor);
   }
 
   /**
-   * Tells the text formatter to render using the field visitor.
+   * Tells the text formatter to render the field using the field visitor.
+   *
+   * <p>This is very low level and should probably not be used directly.
    *
    * @param visitor the field visitor
    * @return text format attribute
    */
-  public static Attribute<FieldVisitor> withToStringFormat(FieldVisitor visitor) {
+  public static @NotNull Attribute<FieldVisitor> withToStringFormat(FieldVisitor visitor) {
     return TOSTRING_FORMAT.bindValue(visitor);
   }
 }

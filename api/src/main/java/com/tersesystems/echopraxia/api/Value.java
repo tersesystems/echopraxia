@@ -620,7 +620,8 @@ public abstract class Value<V> {
       }
     }
 
-    private static final class NumberValueWithAttributes<N extends Number & Comparable<N>> extends NumberValue<N> {
+    private static final class NumberValueWithAttributes<N extends Number & Comparable<N>>
+        extends NumberValue<N> {
 
       private final Attributes attributes;
 
@@ -917,7 +918,6 @@ public abstract class Value<V> {
     public Attributes attributes() {
       return attributes;
     }
-
 
     public ObjectValue add(Field field) {
       ArrayList<Field> fields = new ArrayList<>(raw());

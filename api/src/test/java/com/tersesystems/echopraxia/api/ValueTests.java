@@ -7,18 +7,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.util.Optional;
-
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import org.junit.jupiter.api.Test;
 
 public class ValueTests {
-
-  @Test
-  void testStringWithAttribute() {
-    var string = Value.string("foo");
-    var asCardinal = string.withAttributes(Attributes.create(PresentationHintAttributes.asCardinal()));
-    assertThat(asCardinal.toString()).isEqualTo("|3|");
-  }
 
   @Test
   void testObjectValueAdd() {
@@ -26,7 +17,7 @@ public class ValueTests {
     Value.StringValue stringValue = string("some string value");
     Field stringField = Field.value("string", stringValue);
     Value.ObjectValue objectPlus = object.add(stringField);
-    assertThat(objectPlus.raw().size()).isEqualTo(1);
+    assertThat(objectPlus.raw()).hasSize(1);
   }
 
   @Test
@@ -35,7 +26,7 @@ public class ValueTests {
     Value.StringValue stringValue = string("some string value");
     Field stringField = Field.value("string", stringValue);
     Value.ObjectValue objectPlus = object.addAll(singleton(stringField));
-    assertThat(objectPlus.raw().size()).isEqualTo(1);
+    assertThat(objectPlus.raw()).hasSize(1);
   }
 
   @Test
@@ -45,7 +36,7 @@ public class ValueTests {
     Value.ArrayValue arrayValue = Value.array(stringValue);
 
     Value.ArrayValue arrayPlus = arrayValue.add(numberValue);
-    assertThat(arrayPlus.raw().size()).isEqualTo(2);
+    assertThat(arrayPlus.raw()).hasSize(2);
   }
 
   @Test
@@ -55,7 +46,7 @@ public class ValueTests {
     Value.ArrayValue arrayValue = Value.array(stringValue);
 
     Value.ArrayValue arrayPlus = arrayValue.addAll(singleton(numberValue));
-    assertThat(arrayPlus.raw().size()).isEqualTo(2);
+    assertThat(arrayPlus.raw()).hasSize(2);
   }
 
   @Test

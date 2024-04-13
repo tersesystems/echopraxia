@@ -56,7 +56,7 @@ public class DefaultField implements PresentationField {
   }
 
   @Override
-  public @NotNull PresentationField withToStringFormat(@NotNull FieldVisitor fieldVisitor) {
+  public @NotNull DefaultField withToStringFormat(@NotNull FieldVisitor fieldVisitor) {
     return this.withAttribute(PresentationHintAttributes.withToStringFormat(fieldVisitor));
   }
 
