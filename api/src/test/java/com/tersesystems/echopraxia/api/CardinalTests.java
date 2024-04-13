@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.asCardi
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
@@ -14,21 +15,21 @@ public class CardinalTests {
     Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9);
     Field field =
         Field.keyValue("longArray", value, DefaultField.class).withAttribute(asCardinal());
-    assertThat(field.toString()).isEqualTo("longArray=|9|");
+    assertThat(field).hasToString("longArray=|9|");
   }
 
   @Test
   public void testCardinalArrayWithExtended() {
     Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9);
     Field field = Field.keyValue("longArray", value, DefaultField.class).asCardinal();
-    assertThat(field.toString()).isEqualTo("longArray=|9|");
+    assertThat(field).hasToString("longArray=|9|");
   }
 
   @Test
   public void testCardinalArrayWithValueOnly() {
     Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9);
     Field field = Field.value("longArray", value, DefaultField.class).withAttribute(asCardinal());
-    assertThat(field.toString()).isEqualTo("|9|");
+    assertThat(field).hasToString("|9|");
   }
 
   @Test
@@ -37,7 +38,7 @@ public class CardinalTests {
     Value<?> value = Value.string(generatedString);
     Field field =
         Field.keyValue("longString", value, DefaultField.class).withAttribute(asCardinal());
-    assertThat(field.toString()).isEqualTo("longString=|36|");
+    assertThat(field).hasToString("longString=|36|");
   }
 
   @Test
@@ -45,6 +46,22 @@ public class CardinalTests {
     String generatedString = UUID.randomUUID().toString();
     Value<?> value = Value.string(generatedString);
     Field field = Field.value("longString", value, DefaultField.class).withAttribute(asCardinal());
-    assertThat(field.toString()).isEqualTo("|36|");
+    assertThat(field).hasToString("|36|");
+  }
+
+  @Test
+  void testStringWithAsCardinal() {
+    var string = Value.string("foo");
+    var asCardinal =
+        string.withAttributes(Attributes.create(PresentationHintAttributes.asCardinal()));
+    assertThat(asCardinal).hasToString("|3|");
+  }
+
+  @Test
+  void testArrayWithAsCardinal() {
+    var array = Value.array("one", "two", "three");
+    var asCardinal =
+        array.withAttributes(Attributes.create(PresentationHintAttributes.asCardinal()));
+    assertThat(asCardinal).hasToString("|3|");
   }
 }

@@ -17,7 +17,7 @@ public class ValueTests {
     Value.StringValue stringValue = string("some string value");
     Field stringField = Field.value("string", stringValue);
     Value.ObjectValue objectPlus = object.add(stringField);
-    assertThat(objectPlus.raw().size()).isEqualTo(1);
+    assertThat(objectPlus.raw()).hasSize(1);
   }
 
   @Test
@@ -26,7 +26,7 @@ public class ValueTests {
     Value.StringValue stringValue = string("some string value");
     Field stringField = Field.value("string", stringValue);
     Value.ObjectValue objectPlus = object.addAll(singleton(stringField));
-    assertThat(objectPlus.raw().size()).isEqualTo(1);
+    assertThat(objectPlus.raw()).hasSize(1);
   }
 
   @Test
@@ -36,7 +36,7 @@ public class ValueTests {
     Value.ArrayValue arrayValue = Value.array(stringValue);
 
     Value.ArrayValue arrayPlus = arrayValue.add(numberValue);
-    assertThat(arrayPlus.raw().size()).isEqualTo(2);
+    assertThat(arrayPlus.raw()).hasSize(2);
   }
 
   @Test
@@ -46,7 +46,7 @@ public class ValueTests {
     Value.ArrayValue arrayValue = Value.array(stringValue);
 
     Value.ArrayValue arrayPlus = arrayValue.addAll(singleton(numberValue));
-    assertThat(arrayPlus.raw().size()).isEqualTo(2);
+    assertThat(arrayPlus.raw()).hasSize(2);
   }
 
   @Test
@@ -68,7 +68,7 @@ public class ValueTests {
   }
 
   @Test
-  void testOptionaMap() {
+  void testOptionalMap() {
     Instant instant = Instant.ofEpochSecond(0);
     var v = optional(Optional.ofNullable(instant).map(i -> string(i.toString())));
     assertThat(v).isEqualTo(Value.string("1970-01-01T00:00:00Z"));

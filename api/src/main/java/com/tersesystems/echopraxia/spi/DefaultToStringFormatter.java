@@ -6,54 +6,70 @@ import com.tersesystems.echopraxia.api.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class DefaultToStringFormatter implements ToStringFormatter {
 
   @Override
   @NotNull
   public String formatField(@NotNull Field field) {
-    if (isElided(field)) {
+    Attributes attributes = field.attributes();
+    if (isElided(attributes)) {
       return "";
     }
 
     StringBuilder builder = new StringBuilder();
-    if (!isValueOnly(field)) {
-      formatName(builder, field.name(), field.attributes());
+    if (!isValueOnly(attributes)) {
+      formatName(builder, field.name(), attributes);
     }
 
-    if (field.attributes().containsKey(TOSTRING_FORMAT)) {
-      FieldVisitor fieldVisitor = field.attributes().get(TOSTRING_FORMAT);
+    if (isToStringFormat(attributes)) {
+      FieldVisitor fieldVisitor = getToStringFormat(attributes);
       assert fieldVisitor != null;
       field = fieldVisitor.visit(field);
     }
-    formatValue(builder, field.value(), field.attributes());
+    formatValue(builder, field.value(), attributes);
     return builder.toString();
   }
 
   @NotNull
   @Override
   public String formatValue(@NotNull Value<?> value) {
+    Attributes attributes = value.attributes();
+    if (isElided(attributes)) {
+      return "";
+    }
+
     if (value.type() == Value.Type.OBJECT) {
       StringBuilder b = new StringBuilder();
       formatObject(b, value.asObject());
       return b.toString();
+    } else if (attributes == Attributes.empty()) {
+      // ArrayList renders elements with [] in toString, so we can just render toString!
+      return String.valueOf(value.raw());
+    } else {
+      StringBuilder b = new StringBuilder();
+      formatValue(b, value, attributes);
+      return b.toString();
     }
-    // ArrayList renders elements with [] in toString, so we can just render toString!
-    return String.valueOf(value.raw());
   }
 
   private void formatValue(
       @NotNull StringBuilder b, @NotNull Value<?> v, @NotNull Attributes attributes) {
+    if (isElided(attributes)) {
+      return;
+    }
+
     if (v.type() == Value.Type.OBJECT) {
       formatObject(b, v.asObject());
     } else {
       // asCardinal takes priority over abbreviateAfter
-      if (attributes.containsKey(AS_CARDINAL) && v.type() == Value.Type.ARRAY) {
+      if (isAsCardinal(attributes) && v.type() == Value.Type.ARRAY) {
         b.append("|").append(v.asArray().raw().size()).append("|");
-      } else if (attributes.containsKey(AS_CARDINAL) && v.type() == Value.Type.STRING) {
+      } else if (isAsCardinal(attributes) && v.type() == Value.Type.STRING) {
         b.append("|").append(v.asString().raw().length()).append("|");
-      } else if (attributes.containsKey(ABBREVIATE_AFTER)) {
-        String abbreviated = abbreviateValue(v, attributes.get(ABBREVIATE_AFTER));
+      } else if (isAbbreviateAfter(attributes)) {
+        String abbreviated = abbreviateValue(v, getAbbreviateAfter(attributes));
         b.append(abbreviated);
       } else {
         b.append(v.raw());
@@ -99,20 +115,21 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     boolean displayComma = false;
     for (int i = 0; i < fieldList.size(); i++) {
       Field field = fieldList.get(i);
-      if (!isElided(field)) {
+      Attributes attributes = field.attributes();
+      if (!isElided(attributes)) {
         if (displayComma) {
           b.append(", ");
         }
-        if (!isValueOnly(field)) {
-          formatName(b, field.name(), field.attributes());
+        if (!isValueOnly(attributes)) {
+          formatName(b, field.name(), attributes);
         }
 
-        if (field.attributes().containsKey(TOSTRING_FORMAT)) {
-          FieldVisitor fieldVisitor = field.attributes().get(TOSTRING_FORMAT);
+        if (isToStringFormat(attributes)) {
+          FieldVisitor fieldVisitor = getToStringFormat(attributes);
           assert fieldVisitor != null;
           field = fieldVisitor.visit(field);
         }
-        formatValue(b, field.value(), field.attributes());
+        formatValue(b, field.value(), attributes);
         displayComma = i < fieldList.size();
       }
     }
@@ -121,8 +138,8 @@ public class DefaultToStringFormatter implements ToStringFormatter {
 
   private void formatName(
       @NotNull StringBuilder builder, @NotNull String name, @NotNull Attributes attributes) {
-    if (attributes.containsKey(PresentationHintAttributes.DISPLAY_NAME)) {
-      String displayName = attributes.get(PresentationHintAttributes.DISPLAY_NAME);
+    if (isDisplayName(attributes)) {
+      String displayName = getDisplayName(attributes);
       builder.append("\"").append(displayName).append("\"");
     } else {
       builder.append(name);
@@ -130,11 +147,39 @@ public class DefaultToStringFormatter implements ToStringFormatter {
     builder.append("=");
   }
 
-  private boolean isValueOnly(Field field) {
-    return field.attributes().getOptional(PresentationHintAttributes.VALUE_ONLY).orElse(false);
+  private static boolean isToStringFormat(Attributes attributes) {
+    return attributes.containsKey(TOSTRING_FORMAT);
   }
 
-  private boolean isElided(Field field) {
-    return field.attributes().getOptional(PresentationHintAttributes.ELIDE).orElse(false);
+  private static @Nullable FieldVisitor getToStringFormat(Attributes attributes) {
+    return attributes.get(TOSTRING_FORMAT);
+  }
+
+  private static boolean isDisplayName(@NotNull Attributes attributes) {
+    return attributes.containsKey(PresentationHintAttributes.DISPLAY_NAME);
+  }
+
+  private static @Nullable String getDisplayName(@NotNull Attributes attributes) {
+    return attributes.get(PresentationHintAttributes.DISPLAY_NAME);
+  }
+
+  private boolean isAbbreviateAfter(@NotNull Attributes attributes) {
+    return attributes.containsKey(ABBREVIATE_AFTER);
+  }
+
+  private static @Nullable Integer getAbbreviateAfter(@NotNull Attributes attributes) {
+    return attributes.get(ABBREVIATE_AFTER);
+  }
+
+  private boolean isAsCardinal(@NotNull Attributes attributes) {
+    return attributes.containsKey(AS_CARDINAL);
+  }
+
+  private boolean isValueOnly(Attributes attributes) {
+    return attributes.containsKey(PresentationHintAttributes.VALUE_ONLY);
+  }
+
+  private boolean isElided(Attributes attributes) {
+    return attributes.containsKey(PresentationHintAttributes.ELIDE);
   }
 }

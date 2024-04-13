@@ -5,6 +5,7 @@ import static com.tersesystems.echopraxia.api.Value.string;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -73,5 +74,19 @@ public class ElidedTests {
     List<Field> fields = List.of(first, second, third);
     Field object = keyValue("object", Value.object(fields), DefaultField.class);
     assertThat(object.toString()).isEqualTo("object={}");
+  }
+
+  @Test
+  void testStringWithElided() {
+    var elided = Attributes.create(PresentationHintAttributes.asElided());
+    var string = Value.string("two").withAttributes(elided);
+    assertThat(string).hasToString("");
+  }
+
+  @Test
+  void testArrayWithElidedElement() {
+    var elided = Attributes.create(PresentationHintAttributes.asElided());
+    var array = Value.array(Value.string("one"), Value.string("two").withAttributes(elided));
+    assertThat(array).hasToString("[one, ]");
   }
 }
