@@ -7,9 +7,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Instant;
 import java.util.Optional;
+
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import org.junit.jupiter.api.Test;
 
 public class ValueTests {
+
+  @Test
+  void testStringWithAttribute() {
+    var string = Value.string("foo");
+    var asCardinal = string.withAttributes(Attributes.create(PresentationHintAttributes.asCardinal()));
+    assertThat(asCardinal.toString()).isEqualTo("|3|");
+  }
 
   @Test
   void testObjectValueAdd() {
@@ -68,7 +77,7 @@ public class ValueTests {
   }
 
   @Test
-  void testOptionaMap() {
+  void testOptionalMap() {
     Instant instant = Instant.ofEpochSecond(0);
     var v = optional(Optional.ofNullable(instant).map(i -> string(i.toString())));
     assertThat(v).isEqualTo(Value.string("1970-01-01T00:00:00Z"));

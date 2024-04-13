@@ -39,7 +39,14 @@ public class DefaultToStringFormatter implements ToStringFormatter {
       return b.toString();
     }
     // ArrayList renders elements with [] in toString, so we can just render toString!
-    return String.valueOf(value.raw());
+    Attributes attributes = value.attributes();
+    if (attributes == Attributes.empty()) {
+      return String.valueOf(value.raw());
+    } else {
+      StringBuilder b = new StringBuilder();
+      formatValue(b, value, attributes);
+      return b.toString();
+    }
   }
 
   private void formatValue(
