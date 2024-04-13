@@ -60,6 +60,12 @@ public class DefaultToStringFormatter implements ToStringFormatter {
       return;
     }
 
+    if (isToStringValue(attributes)) {
+      String toStringValue = getToStringValue(attributes);
+      b.append(toStringValue);
+      return;
+    }
+
     if (v.type() == Value.Type.OBJECT) {
       formatObject(b, v.asObject());
     } else {
@@ -181,5 +187,13 @@ public class DefaultToStringFormatter implements ToStringFormatter {
 
   private boolean isElided(Attributes attributes) {
     return attributes.containsKey(PresentationHintAttributes.ELIDE);
+  }
+
+  private boolean isToStringValue(Attributes attributes) {
+    return attributes.containsKey(TOSTRING_VALUE);
+  }
+
+  private String getToStringValue(Attributes attributes) {
+    return attributes.get(TOSTRING_VALUE);
   }
 }

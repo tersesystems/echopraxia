@@ -31,6 +31,8 @@ public class PresentationHintAttributes {
   public static final AttributeKey<FieldVisitor> TOSTRING_FORMAT =
       AttributeKey.create("toStringFormat");
 
+  public static final AttributeKey<String> TOSTRING_VALUE = AttributeKey.create("toStringValue");
+
   private static final Attribute<Boolean> AS_CARDINAL_ATTR = AS_CARDINAL.bindValue(true);
 
   private static final Attribute<Boolean> VALUE_ONLY_ATTR = VALUE_ONLY.bindValue(true);
@@ -97,6 +99,8 @@ public class PresentationHintAttributes {
   /**
    * Tells the JSON formatter to render using the field visitor
    *
+   * <p>This is very low level and should probably not be used directly.
+   *
    * @param visitor the field visitor
    * @return structured format attribute
    */
@@ -114,5 +118,15 @@ public class PresentationHintAttributes {
    */
   public static @NotNull Attribute<FieldVisitor> withToStringFormat(FieldVisitor visitor) {
     return TOSTRING_FORMAT.bindValue(visitor);
+  }
+
+  /**
+   * Sets the value to render with the given string with the ToString formatter.
+   *
+   * @param string the value to use in line oriented format.
+   * @return the attribute.
+   */
+  public static @NotNull Attribute<String> withToStringValue(String string) {
+    return TOSTRING_VALUE.bindValue(string);
   }
 }
