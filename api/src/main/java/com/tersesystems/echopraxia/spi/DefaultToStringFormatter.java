@@ -28,8 +28,24 @@ public class DefaultToStringFormatter implements ToStringFormatter {
       assert fieldVisitor != null;
       field = fieldVisitor.visit(field);
     }
-    formatValue(builder, field.value(), attributes);
+
+    Attributes valueAttributes = collectValueAttributes(field.attributes(), field.value().attributes());
+    formatValue(builder, field.value(), valueAttributes);
     return builder.toString();
+  }
+
+  // if the field has elided, tostringvalue, abbreviateafter, or ascardinal,
+  // it should apply to the value instead.
+  Attributes collectValueAttributes(Attributes fa, Attributes valueAttributes) {
+    if (fa.containsKey(ABBREVIATE_AFTER)) {
+      return valueAttributes.plus(abbreviateAfter(fa.get(ABBREVIATE_AFTER)));
+    } else if (fa.containsKey(AS_CARDINAL)) {
+      return valueAttributes.plus(asCardinal());
+    } else if (fa.containsKey(TOSTRING_VALUE)) {
+      return valueAttributes.plus(withToStringValue(fa.get(TOSTRING_VALUE)));
+    } else {
+      return valueAttributes;
+    }
   }
 
   @NotNull
@@ -135,7 +151,7 @@ public class DefaultToStringFormatter implements ToStringFormatter {
           assert fieldVisitor != null;
           field = fieldVisitor.visit(field);
         }
-        formatValue(b, field.value(), attributes);
+        formatValue(b, field.value(), field.value().attributes());
         displayComma = i < fieldList.size();
       }
     }
