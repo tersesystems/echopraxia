@@ -29,7 +29,8 @@ public class DefaultToStringFormatter implements ToStringFormatter {
       field = fieldVisitor.visit(field);
     }
 
-    Attributes valueAttributes = collectValueAttributes(field.attributes(), field.value().attributes());
+    Attributes valueAttributes =
+        collectValueAttributes(field.attributes(), field.value().attributes());
     formatValue(builder, field.value(), valueAttributes);
     return builder.toString();
   }
