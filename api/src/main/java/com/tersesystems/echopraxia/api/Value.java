@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -52,13 +53,49 @@ public abstract class Value<V> {
     return Attributes.empty();
   }
 
+  public <A> @NotNull Value<V> withAttribute(@NotNull Attribute<A> attr) {
+    return newAttributes(attributes().plus(attr));
+  }
+
+  public @NotNull Value<V> withAttributes(@NotNull Attributes attrs) {
+    return newAttributes(attributes().plusAll(attrs));
+  }
+
+  public <A> @NotNull Value<V> withoutAttribute(@NotNull AttributeKey<A> key) {
+    return newAttributes(attributes().minus(key));
+  }
+
+  public @NotNull Value<V> withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+    return newAttributes(attributes().minusAll(keys));
+  }
+
+  public @NotNull Value<V> clearAttributes() {
+    return newAttributes(Attributes.empty());
+  }
+
+  protected abstract @NotNull Value<V> newAttributes(@NotNull Attributes attrs);
+
   /**
-   * Sets the attributes to newAttributes, replacing the original value.
+   * Tells the formatter that the value should be represented as a cardinal number in text.
    *
-   * @param newAttributes the new attributes.
-   * @return the value with attributes.
+   * @return field with cardinal attribute set
    */
-  public abstract Value<V> withAttributes(Attributes newAttributes);
+  @NotNull
+  public Value<V> asCardinal() {
+    return newAttributes(attributes().plus(PresentationHintAttributes.asCardinal()));
+  }
+
+  /**
+   * Tells the formatter that the string value or array value should be abbreviated after the given
+   * number of elements.
+   *
+   * @param after the maximum number of elements to render
+   * @return the field with the attribute applied
+   */
+  @NotNull
+  public Value<V> abbreviateAfter(int after) {
+    return withAttributes(attributes().plus(PresentationHintAttributes.abbreviateAfter(after)));
+  }
 
   /**
    * @return this value as an object value.
@@ -536,7 +573,7 @@ public abstract class Value<V> {
     }
 
     @Override
-    public BooleanValue withAttributes(Attributes newAttributes) {
+    public BooleanValue newAttributes(@NotNull Attributes newAttributes) {
       return new BooleanValueWithAttributes(raw, newAttributes);
     }
 
@@ -579,7 +616,7 @@ public abstract class Value<V> {
     }
 
     @Override
-    public NumberValue<N> withAttributes(Attributes newAttributes) {
+    protected NumberValue<N> newAttributes(@NotNull Attributes newAttributes) {
       return new NumberValueWithAttributes<>(raw, newAttributes);
     }
 
@@ -740,7 +777,7 @@ public abstract class Value<V> {
     }
 
     @Override
-    public StringValue withAttributes(Attributes newAttributes) {
+    protected StringValue newAttributes(@NotNull Attributes newAttributes) {
       return new StringValueWithAttributes(raw, newAttributes);
     }
 
@@ -797,8 +834,9 @@ public abstract class Value<V> {
       return Type.ARRAY;
     }
 
+    @NotNull
     @Override
-    public ArrayValue withAttributes(Attributes newAttributes) {
+    protected ArrayValue newAttributes(@NotNull Attributes newAttributes) {
       return new ArrayValueWithAttributes(raw, newAttributes);
     }
 
@@ -870,7 +908,7 @@ public abstract class Value<V> {
     }
 
     @Override
-    public ObjectValue withAttributes(Attributes newAttributes) {
+    protected ObjectValue newAttributes(@NotNull Attributes newAttributes) {
       return new ObjectValueWithAttributes(raw, newAttributes);
     }
 
@@ -946,8 +984,9 @@ public abstract class Value<V> {
       return Type.NULL;
     }
 
+    @NotNull
     @Override
-    public NullValue withAttributes(Attributes newAttributes) {
+    protected NullValue newAttributes(@NotNull Attributes newAttributes) {
       return new NullValueWithAttributes(newAttributes);
     }
 
@@ -979,8 +1018,9 @@ public abstract class Value<V> {
       return Type.EXCEPTION;
     }
 
+    @NotNull
     @Override
-    public ExceptionValue withAttributes(Attributes newAttributes) {
+    protected ExceptionValue newAttributes(@NotNull Attributes newAttributes) {
       return new ExceptionValueWithAttributes(raw, newAttributes);
     }
 
