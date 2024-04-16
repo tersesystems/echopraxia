@@ -34,7 +34,9 @@ public class DefaultField implements PresentationField {
   @Override
   public @NotNull DefaultField abbreviateAfter(int after) {
     // Set these on the value so the behavior is consistent
-    Value<?> newValue = value.withAttributes(value.attributes().plus(PresentationHintAttributes.abbreviateAfter(after)));
+    Value<?> newValue =
+        value.withAttributes(
+            value.attributes().plus(PresentationHintAttributes.abbreviateAfter(after)));
     return new DefaultField(name, newValue, attributes);
   }
 
@@ -42,7 +44,8 @@ public class DefaultField implements PresentationField {
   @Override
   public @NotNull DefaultField asCardinal() {
     // Set these on the value so the behavior is consistent
-    Value<?> newValue = value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()));
+    Value<?> newValue =
+        value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()));
     return new DefaultField(name, newValue, attributes);
   }
 
