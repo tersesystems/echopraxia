@@ -30,14 +30,20 @@ public class DefaultField implements PresentationField {
     return this.withAttribute(PresentationHintAttributes.asValueOnly());
   }
 
+  @Deprecated
   @Override
   public @NotNull DefaultField abbreviateAfter(int after) {
-    return this.withAttribute(PresentationHintAttributes.abbreviateAfter(after));
+    // Set these on the value so the behavior is consistent
+    Value<?> newValue = value.withAttributes(value.attributes().plus(PresentationHintAttributes.abbreviateAfter(after)));
+    return new DefaultField(name, newValue, attributes);
   }
 
+  @Deprecated
   @Override
   public @NotNull DefaultField asCardinal() {
-    return this.withAttribute(PresentationHintAttributes.asCardinal());
+    // Set these on the value so the behavior is consistent
+    Value<?> newValue = value.withAttributes(value.attributes().plus(PresentationHintAttributes.asCardinal()));
+    return new DefaultField(name, newValue, attributes);
   }
 
   @Override
