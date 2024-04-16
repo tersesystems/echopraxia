@@ -78,11 +78,11 @@ public abstract class Value<V> {
   /**
    * Tells the formatter that the value should be represented as a cardinal number in text.
    *
-   * @return field with cardinal attribute set
+   * @return value with cardinal attribute set
    */
   @NotNull
   public Value<V> asCardinal() {
-    return newAttributes(attributes().plus(PresentationHintAttributes.asCardinal()));
+    return withAttribute(PresentationHintAttributes.asCardinal());
   }
 
   /**
@@ -90,11 +90,22 @@ public abstract class Value<V> {
    * number of elements.
    *
    * @param after the maximum number of elements to render
-   * @return the field with the attribute applied
+   * @return the value with the attribute applied
    */
   @NotNull
   public Value<V> abbreviateAfter(int after) {
-    return withAttributes(attributes().plus(PresentationHintAttributes.abbreviateAfter(after)));
+    return withAttribute(PresentationHintAttributes.abbreviateAfter(after));
+  }
+
+  /**
+   * Tells the formatter to use the given string when rendering the value.
+   *
+   * @param stringValue the given string to render.
+   * @return the value with the attribute applied
+   */
+  @NotNull
+  public Value<V> withToStringValue(String stringValue) {
+    return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
   }
 
   /**
@@ -572,8 +583,9 @@ public abstract class Value<V> {
       return Type.BOOLEAN;
     }
 
+    @NotNull
     @Override
-    public BooleanValue newAttributes(@NotNull Attributes newAttributes) {
+    protected BooleanValue newAttributes(@NotNull Attributes newAttributes) {
       return new BooleanValueWithAttributes(raw, newAttributes);
     }
 
@@ -616,7 +628,7 @@ public abstract class Value<V> {
     }
 
     @Override
-    protected NumberValue<N> newAttributes(@NotNull Attributes newAttributes) {
+    protected @NotNull NumberValue<N> newAttributes(@NotNull Attributes newAttributes) {
       return new NumberValueWithAttributes<>(raw, newAttributes);
     }
 
@@ -777,7 +789,7 @@ public abstract class Value<V> {
     }
 
     @Override
-    protected StringValue newAttributes(@NotNull Attributes newAttributes) {
+    protected @NotNull StringValue newAttributes(@NotNull Attributes newAttributes) {
       return new StringValueWithAttributes(raw, newAttributes);
     }
 
@@ -908,7 +920,7 @@ public abstract class Value<V> {
     }
 
     @Override
-    protected ObjectValue newAttributes(@NotNull Attributes newAttributes) {
+    protected @NotNull ObjectValue newAttributes(@NotNull Attributes newAttributes) {
       return new ObjectValueWithAttributes(raw, newAttributes);
     }
 
