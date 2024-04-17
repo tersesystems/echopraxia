@@ -1081,7 +1081,7 @@ public abstract class Value<V> {
 
     @Override
     public @NotNull ObjectValue clearAttributes() {
-      return newAttributes(Attributes.empty());
+      return new ObjectValue(raw);
     }
 
     @Override
