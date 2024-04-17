@@ -34,14 +34,16 @@ public class DefaultField implements PresentationField {
   @Override
   public @NotNull DefaultField abbreviateAfter(int after) {
     // Set these on the value so the behavior is consistent
-    return new DefaultField(name, value.abbreviateAfter(after), attributes);
+    return new DefaultField(
+        name, value.withAttribute(PresentationHintAttributes.abbreviateAfter(after)), attributes);
   }
 
   @Deprecated
   @Override
   public @NotNull DefaultField asCardinal() {
     // Set these on the value so the behavior is consistent
-    return new DefaultField(name, value.asCardinal(), attributes);
+    return new DefaultField(
+        name, value.withAttribute(PresentationHintAttributes.asCardinal()), attributes);
   }
 
   @Override
