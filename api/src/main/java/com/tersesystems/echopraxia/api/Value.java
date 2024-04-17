@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
@@ -52,13 +53,26 @@ public abstract class Value<V> {
     return Attributes.empty();
   }
 
+  public abstract <A> @NotNull Value<V> withAttribute(@NotNull Attribute<A> attr);
+
+  public abstract @NotNull Value<V> withAttributes(@NotNull Attributes attrs);
+
+  public abstract <A> @NotNull Value<V> withoutAttribute(@NotNull AttributeKey<A> key);
+
+  public abstract @NotNull Value<V> withoutAttributes(@NotNull Collection<AttributeKey<?>> keys);
+
+  public abstract @NotNull Value<V> clearAttributes();
+
+  protected abstract @NotNull Value<V> newAttributes(@NotNull Attributes attrs);
+
   /**
-   * Sets the attributes to newAttributes, replacing the original value.
+   * Tells the formatter to use the given string when rendering the value.
    *
-   * @param newAttributes the new attributes.
-   * @return the value with attributes.
+   * @param stringValue the given string to render.
+   * @return the value with the attribute applied
    */
-  public abstract Value<V> withAttributes(Attributes newAttributes);
+  @NotNull
+  public abstract Value<V> withToStringValue(String stringValue);
 
   /**
    * @return this value as an object value.
@@ -536,8 +550,39 @@ public abstract class Value<V> {
     }
 
     @Override
-    public BooleanValue withAttributes(Attributes newAttributes) {
+    public @NotNull <A> BooleanValue withAttribute(@NotNull Attribute<A> attr) {
+      return newAttributes(attributes().plus(attr));
+    }
+
+    @Override
+    public @NotNull BooleanValue withAttributes(@NotNull Attributes attrs) {
+      return newAttributes(attributes().plusAll(attrs));
+    }
+
+    @Override
+    public @NotNull <A> BooleanValue withoutAttribute(@NotNull AttributeKey<A> key) {
+      return newAttributes(attributes().minus(key));
+    }
+
+    @Override
+    public @NotNull BooleanValue withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+      return newAttributes(attributes().minusAll(keys));
+    }
+
+    @Override
+    public @NotNull BooleanValue clearAttributes() {
+      return new BooleanValue(raw);
+    }
+
+    @NotNull
+    @Override
+    protected BooleanValue newAttributes(@NotNull Attributes newAttributes) {
       return new BooleanValueWithAttributes(raw, newAttributes);
+    }
+
+    @Override
+    public @NotNull BooleanValue withToStringValue(String stringValue) {
+      return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
     }
 
     @Override
@@ -579,8 +624,38 @@ public abstract class Value<V> {
     }
 
     @Override
-    public NumberValue<N> withAttributes(Attributes newAttributes) {
+    public @NotNull <A> NumberValue<N> withAttribute(@NotNull Attribute<A> attr) {
+      return newAttributes(attributes().plus(attr));
+    }
+
+    @Override
+    public @NotNull NumberValue<N> withAttributes(@NotNull Attributes attrs) {
+      return newAttributes(attributes().plusAll(attrs));
+    }
+
+    @Override
+    public @NotNull <A> NumberValue<N> withoutAttribute(@NotNull AttributeKey<A> key) {
+      return newAttributes(attributes().minus(key));
+    }
+
+    @Override
+    public @NotNull NumberValue<N> withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+      return newAttributes(attributes().minusAll(keys));
+    }
+
+    @Override
+    public @NotNull NumberValue<N> clearAttributes() {
+      return new NumberValue<>(raw);
+    }
+
+    @Override
+    protected @NotNull NumberValue<N> newAttributes(@NotNull Attributes newAttributes) {
       return new NumberValueWithAttributes<>(raw, newAttributes);
+    }
+
+    @Override
+    public @NotNull NumberValue<N> withToStringValue(String stringValue) {
+      return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
     }
 
     @Override
@@ -740,8 +815,60 @@ public abstract class Value<V> {
     }
 
     @Override
-    public StringValue withAttributes(Attributes newAttributes) {
+    public @NotNull <A> StringValue withAttribute(@NotNull Attribute<A> attr) {
+      return newAttributes(attributes().plus(attr));
+    }
+
+    @Override
+    public @NotNull StringValue withAttributes(@NotNull Attributes attrs) {
+      return newAttributes(attributes().plusAll(attrs));
+    }
+
+    @Override
+    public @NotNull <A> StringValue withoutAttribute(@NotNull AttributeKey<A> key) {
+      return newAttributes(attributes().minus(key));
+    }
+
+    @Override
+    public @NotNull StringValue withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+      return newAttributes(attributes().minusAll(keys));
+    }
+
+    @Override
+    public @NotNull StringValue clearAttributes() {
+      return new StringValue(raw);
+    }
+
+    @Override
+    protected @NotNull StringValue newAttributes(@NotNull Attributes newAttributes) {
       return new StringValueWithAttributes(raw, newAttributes);
+    }
+
+    @Override
+    public @NotNull StringValue withToStringValue(String stringValue) {
+      return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
+    }
+
+    /**
+     * Tells the formatter that the value should be represented as a cardinal number in text.
+     *
+     * @return value with cardinal attribute set
+     */
+    @NotNull
+    public StringValue asCardinal() {
+      return withAttribute(PresentationHintAttributes.asCardinal());
+    }
+
+    /**
+     * Tells the formatter that the string value or array value should be abbreviated after the
+     * given number of elements.
+     *
+     * @param after the maximum number of elements to render
+     * @return the value with the attribute applied
+     */
+    @NotNull
+    public StringValue abbreviateAfter(int after) {
+      return withAttribute(PresentationHintAttributes.abbreviateAfter(after));
     }
 
     @Override
@@ -798,8 +925,61 @@ public abstract class Value<V> {
     }
 
     @Override
-    public ArrayValue withAttributes(Attributes newAttributes) {
+    public @NotNull <A> ArrayValue withAttribute(@NotNull Attribute<A> attr) {
+      return newAttributes(attributes().plus(attr));
+    }
+
+    @Override
+    public @NotNull ArrayValue withAttributes(@NotNull Attributes attrs) {
+      return newAttributes(attributes().plusAll(attrs));
+    }
+
+    @Override
+    public @NotNull <A> ArrayValue withoutAttribute(@NotNull AttributeKey<A> key) {
+      return newAttributes(attributes().minus(key));
+    }
+
+    @Override
+    public @NotNull ArrayValue withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+      return newAttributes(attributes().minusAll(keys));
+    }
+
+    @Override
+    public @NotNull ArrayValue clearAttributes() {
+      return new ArrayValue(raw);
+    }
+
+    /**
+     * Tells the formatter that the value should be represented as a cardinal number in text.
+     *
+     * @return value with cardinal attribute set
+     */
+    @NotNull
+    public ArrayValue asCardinal() {
+      return withAttribute(PresentationHintAttributes.asCardinal());
+    }
+
+    /**
+     * Tells the formatter that the string value or array value should be abbreviated after the
+     * given number of elements.
+     *
+     * @param after the maximum number of elements to render
+     * @return the value with the attribute applied
+     */
+    @NotNull
+    public ArrayValue abbreviateAfter(int after) {
+      return withAttribute(PresentationHintAttributes.abbreviateAfter(after));
+    }
+
+    @NotNull
+    @Override
+    protected ArrayValue newAttributes(@NotNull Attributes newAttributes) {
       return new ArrayValueWithAttributes(raw, newAttributes);
+    }
+
+    @Override
+    public @NotNull ArrayValue withToStringValue(String stringValue) {
+      return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
     }
 
     public ArrayValue add(Value<?> value) {
@@ -870,8 +1050,38 @@ public abstract class Value<V> {
     }
 
     @Override
-    public ObjectValue withAttributes(Attributes newAttributes) {
+    protected @NotNull ObjectValue newAttributes(@NotNull Attributes newAttributes) {
       return new ObjectValueWithAttributes(raw, newAttributes);
+    }
+
+    @Override
+    public @NotNull ObjectValue withToStringValue(String stringValue) {
+      return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
+    }
+
+    @Override
+    public @NotNull <A> ObjectValue withAttribute(@NotNull Attribute<A> attr) {
+      return newAttributes(attributes().plus(attr));
+    }
+
+    @Override
+    public @NotNull ObjectValue withAttributes(@NotNull Attributes attrs) {
+      return newAttributes(attributes().plusAll(attrs));
+    }
+
+    @Override
+    public @NotNull <A> ObjectValue withoutAttribute(@NotNull AttributeKey<A> key) {
+      return newAttributes(attributes().minus(key));
+    }
+
+    @Override
+    public @NotNull ObjectValue withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+      return newAttributes(attributes().minusAll(keys));
+    }
+
+    @Override
+    public @NotNull ObjectValue clearAttributes() {
+      return new ObjectValue(raw);
     }
 
     @Override
@@ -947,8 +1157,39 @@ public abstract class Value<V> {
     }
 
     @Override
-    public NullValue withAttributes(Attributes newAttributes) {
+    public @NotNull <A> NullValue withAttribute(@NotNull Attribute<A> attr) {
+      return newAttributes(attributes().plus(attr));
+    }
+
+    @Override
+    public @NotNull NullValue withAttributes(@NotNull Attributes attrs) {
+      return newAttributes(attributes().plusAll(attrs));
+    }
+
+    @Override
+    public @NotNull <A> NullValue withoutAttribute(@NotNull AttributeKey<A> key) {
+      return newAttributes(attributes().minus(key));
+    }
+
+    @Override
+    public @NotNull NullValue withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+      return newAttributes(attributes().minusAll(keys));
+    }
+
+    @Override
+    public @NotNull NullValue clearAttributes() {
+      return instance;
+    }
+
+    @NotNull
+    @Override
+    protected NullValue newAttributes(@NotNull Attributes newAttributes) {
       return new NullValueWithAttributes(newAttributes);
+    }
+
+    @Override
+    public @NotNull Value<Void> withToStringValue(String stringValue) {
+      return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
     }
 
     public static final @NotNull NullValue instance = new NullValue();
@@ -980,8 +1221,39 @@ public abstract class Value<V> {
     }
 
     @Override
-    public ExceptionValue withAttributes(Attributes newAttributes) {
+    public @NotNull <A> ExceptionValue withAttribute(@NotNull Attribute<A> attr) {
+      return newAttributes(attributes().plus(attr));
+    }
+
+    @Override
+    public @NotNull ExceptionValue withAttributes(@NotNull Attributes attrs) {
+      return newAttributes(attributes().plusAll(attrs));
+    }
+
+    @Override
+    public @NotNull <A> ExceptionValue withoutAttribute(@NotNull AttributeKey<A> key) {
+      return newAttributes(attributes().minus(key));
+    }
+
+    @Override
+    public @NotNull ExceptionValue withoutAttributes(@NotNull Collection<AttributeKey<?>> keys) {
+      return newAttributes(attributes().minusAll(keys));
+    }
+
+    @Override
+    public @NotNull ExceptionValue clearAttributes() {
+      return new ExceptionValue(raw);
+    }
+
+    @NotNull
+    @Override
+    protected ExceptionValue newAttributes(@NotNull Attributes newAttributes) {
       return new ExceptionValueWithAttributes(raw, newAttributes);
+    }
+
+    @Override
+    public @NotNull ExceptionValue withToStringValue(String stringValue) {
+      return withAttribute(PresentationHintAttributes.withToStringValue(stringValue));
     }
 
     @Override

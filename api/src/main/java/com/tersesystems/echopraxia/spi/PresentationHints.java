@@ -21,7 +21,7 @@ public interface PresentationHints<F extends Field> {
   F asValueOnly();
 
   /**
-   * Tells the formatter that the array value should be represented as a cardinal number in text.
+   * Tells the formatter that the value should be represented as a cardinal number in text.
    *
    * @return field with cardinal attribute set
    * @deprecated asCardinal attribute only applies to values, this will not set an attribute on the
@@ -32,8 +32,7 @@ public interface PresentationHints<F extends Field> {
   F asCardinal();
 
   /**
-   * Tells the formatter that the string value or array value should be abbreviated after the given
-   * number of elements.
+   * Tells the formatter that the value should be abbreviated after the given number of elements.
    *
    * @deprecated abbreviateAfter attribute only applies to values, this will not set an attribute on
    *     the field.
