@@ -171,34 +171,16 @@ The `asValueOnly` method has the effect of turning a "key=value" field into a "v
 ```java
 // same as Field valueField = value(name, value);
 Field valueField = keyValue("onlyValue", Value.string("someText")).asValueOnly();
-valueField.toString() // renders someText
-```
-
-### asCardinal
-
-The `asCardinal` method, when used on a field with an array value or on a string, displays the number of elements in the array bracketed by "|" characters in text format:
-
-```java
-var cardinalField = keyValue("elements", Value.array(1,2,3).asCardinal();
-cardinalField.toString(); // renders elements=|3|
+valueField.toString(); // renders someText
 ```
 
 ### withDisplayName
 
-The `withDisplayName` method shows a human readable string in text format bracketed in quotes:
+The `withDisplayName` method shows a human-readable string in text format bracketed in quotes:
 
 ```java
 var readableField = keyValue("json_field", Value.number(1)).withDisplayName("human readable name");
-readableField.toString() // renders "human readable name"=1
-```
-
-### abbreviateAfter
-
-The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
-
-```java
-var abbrField = keyValue("abbreviatedField", Value.string(veryLongString)).abbreviateAfter(5);
-abbrField.toString() // renders abbreviatedField=12345...
+readableField.toString(); // renders "human readable name"=1
 ```
 
 ### asElided
@@ -207,7 +189,7 @@ The `asElided` method will elide the field so that it is passed over and does no
 
 ```java
 var abbrField = keyValue("abbreviatedField", Value.string(veryLongString)).asElided();
-abbrField.toString() // renders ""
+abbrField.toString(); // renders ""
 ```
 
 This is particularly useful in objects that have elided children that you don't need to see in the message:
@@ -221,35 +203,7 @@ Field object = keyValue("object", Value.object(fields));
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
-### ToStringFormat
-
-Using the `withToStringFormat` method with a field visitor will change the text format used when rendering a message.
-
-This is useful when you want to keep the field value in a machine-readable format -- for example, if you have conditions that may apply to the field -- and want to customize the data so it's more human readable.
-
-```java
-static class MyFieldBuilder implements PresentationFieldBuilder {
-  static MyFieldBuilder instance() {
-    return new MyFieldBuilder();
-  }
-
-  public PresentationField duration(String name, Duration duration) {
-    return string(name, duration.toString())
-            .asValueOnly()
-            .withToStringFormat(
-                    new SimpleFieldVisitor() {
-                      @Override
-                      public @NotNull Field visitString(@NotNull Value<String> stringValue) {
-                        return string(name, duration.toDays() + " day");
-                      }
-                    });
-  }
-}
-```
-
-This will render `log.info("{}", fb -> fb.duration("duration", Duration.ofDays(1))` as `1 day` in a text format, while rendering as `PT24H` for conditions and in JSON.
-
-### StructuredFormat
+### withStructuredFormat
 
 Using the `withStructuredFormat` method with a field visitor will override and transform the structured JSON format.
 
@@ -314,6 +268,46 @@ But will render JSON as:
 This also applies to Java durations using `ISO-8601` which you could mark with a `"@type": "https://schema.org/Duration"` and so on.
 
 This is also relevant for numeric fields where you may want to indicate [units](https://erikerlandson.github.io/blog/2020/04/26/your-data-type-is-a-unit/) -- for example, a retry may indicate a numeric value of seconds, and a cache size may indicate bytes, kilobytes, or gigabytes.  Unless you have a pre-defined schema or a consistent naming convention i.e. adding `_second` suffixes, the unit information is lost and comparing numbers with different units is needlessly complicated -- using a `@type` can help disambiguate the unit and help with ingestion.
+
+## Value Presentation
+
+Value presentation changes how values are rendered in a line oriented format, so that they are more human readable.  Value presentation is different from field presentation in that the field name cannot be changed in value presentation.
+
+### asCardinal
+
+The `asCardinal` method, when used on an array value or on a string value, displays the number of elements in the array bracketed by "|" characters in text format:
+
+```java
+var cardinalField = keyValue("elements", Value.array(1,2,3).asCardinal());
+cardinalField.toString(); // renders elements=|3|
+```
+
+or for a string value:
+
+```java
+var cardinalField = keyValue("elements", Value.string("123").asCardinal());
+cardinalField.toString(); // renders elements=|3|
+```
+
+### abbreviateAfter
+
+The `abbreviateAfter` method will truncate an array or string that is very long and replace the rest with ellipsis:
+
+```java
+var abbrField = keyValue("abbreviatedField", Value.string(veryLongString).abbreviateAfter(5));
+abbrField.toString(); // renders abbreviatedField=12345...
+```
+
+### withToStringValue
+
+The `withToStringValue` uses a custom string for the value, providing something more human-readable.  This is particularly useful in arrays and complex nested objects, where you may want a summary of the object rather than the full JSON rendering.
+
+```java
+var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
+        .withZone(ZoneId.systemDefault());
+var instantField = keyValue("instant", Value.string(instant.toString()).withToStringValue(formatter.format(instant)));
+instantField.toString(); // renders ISO8601 in JSON, but 01/01/1970 with toString().
+```
 
 ## Field Names
 
