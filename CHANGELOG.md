@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.2.0
+
+* Add value attributes, `value.attributes()` etc.
+* Make `abbreviateAfter`, `asCardinal` methods on `StringValue` and `ArrayValue`, deprecate the field methods.
+* Add `withToStringValue` to `Value` so that `toStringFormat` doesn't have to be used (FieldVisitor is too complex).
+* Add `(Field...)` method signatures to Logger so that you can log arguments without using field builder function.
+* Add "no message" method signatures, so you don't need an explicit string template.
+
 ## 3.1.2
 
 * Fix bug in ToStringFormat attribute where child fields were not processed correctly.

@@ -176,7 +176,7 @@ valueField.toString(); // renders someText
 
 ### withDisplayName
 
-The `withDisplayName` method shows a human readable string in text format bracketed in quotes:
+The `withDisplayName` method shows a human-readable string in text format bracketed in quotes:
 
 ```java
 var readableField = keyValue("json_field", Value.number(1)).withDisplayName("human readable name");
@@ -203,7 +203,7 @@ Field object = keyValue("object", Value.object(fields));
 assertThat(object.toString()).isEqualTo("object={second=bar}");
 ```
 
-### StructuredFormat
+### withStructuredFormat
 
 Using the `withStructuredFormat` method with a field visitor will override and transform the structured JSON format.
 
@@ -298,7 +298,7 @@ var abbrField = keyValue("abbreviatedField", Value.string(veryLongString).abbrev
 abbrField.toString(); // renders abbreviatedField=12345...
 ```
 
-### WithToStringValue
+### withToStringValue
 
 The `withToStringValue` uses a custom string for the value, providing something more human-readable.  This is particularly useful in arrays and complex nested objects, where you may want a summary of the object rather than the full JSON rendering.
 
@@ -306,7 +306,7 @@ The `withToStringValue` uses a custom string for the value, providing something 
 var formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
         .withZone(ZoneId.systemDefault());
 var instantField = keyValue("instant", Value.string(instant.toString()).withToStringValue(formatter.format(instant)));
-instantField.toString(); // renders ISO8601 in JSON, but 01/01/1970 in line oriented format.
+instantField.toString(); // renders ISO8601 in JSON, but 01/01/1970 with toString().
 ```
 
 ## Field Names
