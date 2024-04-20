@@ -221,7 +221,7 @@ It is generally preferable to pass in a condition explicitly on the statement, a
 
 ```java
 var loggerWithContext = logger
-  .withFields(fb -> fb.string("somename", "somevalue"))
+  .withFields(fb -> fb.string("somename", "somevalue"));
 loggerWithContext.info(condition, "message");
 ```
 
