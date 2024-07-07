@@ -29,6 +29,26 @@ public class ToStringValueTests {
     assertThat(array).hasToString("[one, dos, three]");
   }
 
+  @Test
+  public void testObjectWithToStringValue() {
+    var frame = new IllegalStateException().getStackTrace()[0];
+    var stackObject =
+        Value.object(
+                Field.keyValue("line_number", Value.number(frame.getLineNumber())),
+                Field.keyValue("method_name", Value.string(frame.getMethodName())),
+                Field.keyValue("method_name", Value.string(frame.getFileName())))
+            .withToStringValue(frame.getFileName());
+
+    assertThat(stackObject).hasToString("ToStringValueTests.java");
+  }
+
+  @Test
+  public void testArrayWithToStringValue() {
+    var stackObject = Value.array("1", "2", "3").withToStringValue("herp derp");
+
+    assertThat(stackObject).hasToString("herp derp");
+  }
+
   private static String formatDuration(Duration duration) {
     List<String> parts = new ArrayList<>();
     long days = duration.toDaysPart();
