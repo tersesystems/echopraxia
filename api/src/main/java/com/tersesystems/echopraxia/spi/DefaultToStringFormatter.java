@@ -57,6 +57,10 @@ public class DefaultToStringFormatter implements ToStringFormatter {
       return "";
     }
 
+    if (isToStringValue(attributes)) {
+      return getToStringValue(attributes);
+    }
+
     if (value.type() == Value.Type.OBJECT) {
       StringBuilder b = new StringBuilder();
       formatObject(b, value.asObject());
