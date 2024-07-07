@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.2.1
+
+* Fix a bug where `toStringValue` was not correctly applied to `Value.object` or `Value.array`.
+
 ## 3.2.0
 
 * Add value attributes, `value.attributes()` etc.
