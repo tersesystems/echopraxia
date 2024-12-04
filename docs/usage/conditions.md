@@ -139,7 +139,7 @@ class FindException {
 }
 ```
 
-There are many more options available using JSONPath.  You can try out the [online evaluator](https://jsonpath.herokuapp.com/) to test out expressions.
+There are many more options available using JSONPath.  You can try out the [online evaluator](https://jsoning.com/jsonpath/) to test out expressions.
 
 ## Logger
 
