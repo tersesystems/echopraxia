@@ -255,6 +255,7 @@ public interface AsyncLoggerMethods<FB> {
       @NotNull Condition condition,
       @Nullable String message,
       @NotNull Function<FB, FieldBuilderResult> f);
+
   /**
    * Logs using a logger handle at WARN level.
    *
