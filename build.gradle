@@ -82,18 +82,20 @@ subprojects { subproj ->
 
     dependencies {
         // https://docs.gradle.org/6.7.1/release-notes.html
-        compileOnlyApi 'org.jetbrains:annotations:23.0.0'
+        compileOnlyApi 'org.jetbrains:annotations:26.0.1'
 
         // Fix a dependency in log4jbenchmarks
-        jmhImplementation 'org.jetbrains:annotations:23.0.0'
+        jmhImplementation 'org.jetbrains:annotations:26.0.1'
 
-        jmhImplementation 'org.openjdk.jmh:jmh-core:1.35'
-        jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.35'
+        jmhImplementation 'org.openjdk.jmh:jmh-core:1.37'
+        jmhAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 
         // Use JUnit Jupiter for testing.
-        testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-        testImplementation 'org.assertj:assertj-core:3.21.0'
-        testImplementation 'org.awaitility:awaitility:4.1.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.11.3'
+        testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.11.3'
+
+        testImplementation 'org.assertj:assertj-core:3.26.3'
+        testImplementation 'org.awaitility:awaitility:4.2.2'
     }
 
     tasks.named('test') {
