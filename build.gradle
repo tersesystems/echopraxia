@@ -77,7 +77,7 @@ subprojects { subproj ->
 
     compileJava {
         // Make sure we can release JDK 1.8 code
-        options.release = 8
+        options.release = 11
     }
 
     dependencies {
