@@ -21,6 +21,7 @@ import java.util.Iterator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.helpers.BasicMDCAdapter;
 
 public class DirectTest {
 
@@ -188,6 +189,11 @@ public class DirectTest {
   public void before() {
     try {
       LoggerContext factory = new LoggerContext();
+      factory.setMDCAdapter(new BasicMDCAdapter());
+
+      // If we don't set MDC explicitly here then we get...
+      //at java.lang.NullPointerException: Cannot invoke "org.slf4j.spi.MDCAdapter.getCopyOfContextMap()" because "mdcAdapter" is null
+      //at 	at ch.qos.logback.classic.spi.LoggingEvent.getMDCPropertyMap(LoggingEvent.java:460)
       JoranConfigurator joran = new JoranConfigurator();
       joran.setContext(factory);
       factory.reset();
