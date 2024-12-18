@@ -1,9 +1,6 @@
 package com.tersesystems.echopraxia.jul;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.FieldBuilderResult;
-import com.tersesystems.echopraxia.model.Value;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import com.tersesystems.echopraxia.spi.LoggerContext;

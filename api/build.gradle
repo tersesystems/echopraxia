@@ -4,8 +4,6 @@ plugins {
 }
 
 dependencies {
-    api project(":model")
-
     // https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path
     implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
     implementation 'org.pcollections:pcollections:4.0.1'

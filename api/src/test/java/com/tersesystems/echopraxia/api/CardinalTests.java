@@ -1,9 +1,10 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.model.PresentationHintAttributes.asCardinal;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.asCardinal;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.model.*;
+import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

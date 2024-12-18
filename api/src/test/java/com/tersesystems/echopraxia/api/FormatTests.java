@@ -1,10 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.model.Value.*;
+import static com.tersesystems.echopraxia.api.Value.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import org.junit.jupiter.api.Test;
 
 public class FormatTests {

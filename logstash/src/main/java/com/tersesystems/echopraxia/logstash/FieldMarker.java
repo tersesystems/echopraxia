@@ -1,8 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
-import com.tersesystems.echopraxia.model.Attributes;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
+import com.tersesystems.echopraxia.api.*;
 import java.util.Collections;
 import java.util.List;
 import net.logstash.logback.marker.ObjectAppendingMarker;

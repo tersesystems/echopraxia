@@ -4,10 +4,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.tersesystems.echopraxia.*;
+import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.async.AsyncLoggerFactory;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import org.junit.jupiter.api.Test;
 
 public class Log4JLoggerTest extends TestBase {

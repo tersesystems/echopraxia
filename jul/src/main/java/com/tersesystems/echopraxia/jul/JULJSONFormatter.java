@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.jul;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.api.Field;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.management.ManagementFactory;

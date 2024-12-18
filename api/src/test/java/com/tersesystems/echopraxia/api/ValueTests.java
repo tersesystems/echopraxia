@@ -1,12 +1,10 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.model.Value.optional;
-import static com.tersesystems.echopraxia.model.Value.string;
+import static com.tersesystems.echopraxia.api.Value.optional;
+import static com.tersesystems.echopraxia.api.Value.string;
 import static java.util.Collections.singleton;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import java.time.Instant;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

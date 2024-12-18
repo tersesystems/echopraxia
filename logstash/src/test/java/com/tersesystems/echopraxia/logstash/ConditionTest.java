@@ -1,16 +1,17 @@
 package com.tersesystems.echopraxia.logstash;
 
-import static com.tersesystems.echopraxia.model.Value.*;
+import static com.tersesystems.echopraxia.api.Value.*;
 import static java.util.concurrent.TimeUnit.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import com.tersesystems.echopraxia.*;
 import com.tersesystems.echopraxia.api.Condition;
+import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
+import com.tersesystems.echopraxia.api.Value;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;

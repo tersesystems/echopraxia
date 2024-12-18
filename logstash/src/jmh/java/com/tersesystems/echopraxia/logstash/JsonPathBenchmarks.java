@@ -3,8 +3,6 @@ package com.tersesystems.echopraxia.logstash;
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;

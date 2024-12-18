@@ -4,8 +4,6 @@ import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;

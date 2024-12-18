@@ -4,9 +4,6 @@ import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.FieldBuilderResult;
-import com.tersesystems.echopraxia.model.Value;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import com.tersesystems.echopraxia.spi.LoggerContext;

@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

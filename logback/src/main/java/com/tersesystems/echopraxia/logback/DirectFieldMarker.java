@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.logback;
 
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.FieldBuilderResult;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 

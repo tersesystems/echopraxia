@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import com.tersesystems.echopraxia.spi.AbstractLoggerSupport;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.function.Function;

@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia.scripting;
 
+import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.model.Field;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.Arrays;

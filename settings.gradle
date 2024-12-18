@@ -1,6 +1,5 @@
 rootProject.name = 'echopraxia'
 
-include('model')
 include('api')
 include('logstash')
 include('logback')
