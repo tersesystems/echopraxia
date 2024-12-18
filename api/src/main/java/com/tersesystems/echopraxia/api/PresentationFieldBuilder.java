@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import static com.tersesystems.echopraxia.spi.FieldConstants.EXCEPTION;
 
-import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.model.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;

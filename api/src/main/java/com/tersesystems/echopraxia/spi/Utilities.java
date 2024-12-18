@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.Value;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.async;
 
 import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.FieldBuilderResult;
 import com.tersesystems.echopraxia.api.LoggerHandle;
+import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;

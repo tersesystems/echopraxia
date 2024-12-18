@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.api.Field.keyValue;
-import static com.tersesystems.echopraxia.api.Value.string;
+import static com.tersesystems.echopraxia.model.Field.keyValue;
+import static com.tersesystems.echopraxia.model.Value.string;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.spi.DefaultField;
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
+import com.tersesystems.echopraxia.model.*;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

@@ -1,9 +1,5 @@
-package com.tersesystems.echopraxia.spi;
+package com.tersesystems.echopraxia.model;
 
-import com.tersesystems.echopraxia.api.Attribute;
-import com.tersesystems.echopraxia.api.AttributeKey;
-import com.tersesystems.echopraxia.api.Attributes;
-import com.tersesystems.echopraxia.api.Field;
 import java.util.Collection;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.semantic;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;

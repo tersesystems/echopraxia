@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.log4j.layout;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.Value;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;

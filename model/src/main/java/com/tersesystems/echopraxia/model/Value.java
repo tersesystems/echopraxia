@@ -1,6 +1,5 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.model;
 
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;

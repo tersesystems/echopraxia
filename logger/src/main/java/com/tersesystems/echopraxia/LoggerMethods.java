@@ -1,7 +1,7 @@
 package com.tersesystems.echopraxia;
 
 import com.tersesystems.echopraxia.api.Condition;
-import com.tersesystems.echopraxia.api.FieldBuilderResult;
+import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

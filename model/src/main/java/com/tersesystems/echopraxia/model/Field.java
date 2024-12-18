@@ -1,7 +1,5 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.model;
 
-import com.tersesystems.echopraxia.spi.DefaultField;
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.LongAdder;

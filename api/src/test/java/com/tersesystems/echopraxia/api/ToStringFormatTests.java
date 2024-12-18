@@ -1,10 +1,13 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.api.Value.array;
-import static com.tersesystems.echopraxia.api.Value.string;
+import static com.tersesystems.echopraxia.model.Value.array;
+import static com.tersesystems.echopraxia.model.Value.string;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.model.DefaultField;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.PresentationField;
+import com.tersesystems.echopraxia.model.Value;
 import java.time.Duration;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;

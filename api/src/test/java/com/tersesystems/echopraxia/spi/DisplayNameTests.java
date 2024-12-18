@@ -1,9 +1,12 @@
 package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.withDisplayName;
+import static com.tersesystems.echopraxia.model.PresentationHintAttributes.withDisplayName;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.model.Attributes;
+import com.tersesystems.echopraxia.model.DefaultField;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.Value;
 import org.junit.jupiter.api.Test;
 
 public class DisplayNameTests {
