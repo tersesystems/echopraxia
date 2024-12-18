@@ -2,10 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.model.AttributeKey;
-import com.tersesystems.echopraxia.model.DefaultField;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
+import com.tersesystems.echopraxia.spi.DefaultField;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;

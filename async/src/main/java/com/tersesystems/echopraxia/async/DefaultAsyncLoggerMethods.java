@@ -1,12 +1,10 @@
 package com.tersesystems.echopraxia.async;
 
 import static com.tersesystems.echopraxia.api.Level.*;
-import static com.tersesystems.echopraxia.model.Value.exception;
+import static com.tersesystems.echopraxia.api.Value.exception;
 import static com.tersesystems.echopraxia.spi.FieldConstants.EXCEPTION;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import com.tersesystems.echopraxia.spi.DefaultMethodsSupport;
 import java.util.function.Consumer;
 import java.util.function.Function;

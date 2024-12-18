@@ -1,7 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import java.util.List;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.Contract;

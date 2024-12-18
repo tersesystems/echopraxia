@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.jul;
 
 import static java.lang.Boolean.parseBoolean;
 
-import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.api.Field;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 

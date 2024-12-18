@@ -1,8 +1,8 @@
 package com.tersesystems.echopraxia.logback;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
-import com.tersesystems.echopraxia.model.Field;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
 import java.util.*;
 import java.util.stream.Collectors;

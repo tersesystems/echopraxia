@@ -1,12 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
-import static com.tersesystems.echopraxia.model.PresentationHintAttributes.withToStringValue;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.withToStringValue;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.model.Attribute;
-import com.tersesystems.echopraxia.model.Attributes;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;

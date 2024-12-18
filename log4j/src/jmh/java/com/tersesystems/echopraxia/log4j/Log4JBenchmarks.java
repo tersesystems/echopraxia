@@ -3,9 +3,9 @@ package com.tersesystems.echopraxia.log4j;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.log4j.layout.EchopraxiaFieldsMessage;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;

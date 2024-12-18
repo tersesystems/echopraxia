@@ -1,9 +1,9 @@
 package com.tersesystems.echopraxia.diff;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Value;
 import com.tersesystems.echopraxia.jackson.ObjectMapperProvider;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
 
 /**
  * This field builder uses the stable structured representation of objects to diff them against each

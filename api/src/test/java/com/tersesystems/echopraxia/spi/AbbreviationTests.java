@@ -1,11 +1,10 @@
 package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.model.PresentationHintAttributes.abbreviateAfter;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.abbreviateAfter;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.model.DefaultField;
-import com.tersesystems.echopraxia.model.Field;
-import com.tersesystems.echopraxia.model.Value;
+import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.api.Value;
 import org.junit.jupiter.api.Test;
 
 public class AbbreviationTests {

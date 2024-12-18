@@ -1,5 +1,6 @@
-package com.tersesystems.echopraxia.model;
+package com.tersesystems.echopraxia.spi;
 
+import com.tersesystems.echopraxia.api.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;

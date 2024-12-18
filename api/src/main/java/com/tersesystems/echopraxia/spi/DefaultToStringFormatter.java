@@ -1,7 +1,8 @@
-package com.tersesystems.echopraxia.model;
+package com.tersesystems.echopraxia.spi;
 
-import static com.tersesystems.echopraxia.model.PresentationHintAttributes.*;
+import static com.tersesystems.echopraxia.spi.PresentationHintAttributes.*;
 
+import com.tersesystems.echopraxia.api.*;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
