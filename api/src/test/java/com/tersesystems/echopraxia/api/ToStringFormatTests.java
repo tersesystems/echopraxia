@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.api.Value.array;
 import static com.tersesystems.echopraxia.api.Value.string;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.tersesystems.echopraxia.spi.DefaultField;
 import java.time.Duration;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +45,7 @@ public class ToStringFormatTests {
             return new SimpleArrayVisitor() {
               @Override
               public @NotNull Field done() {
-                return fieldCreator.create(
+                return new DefaultField(
                     name, array(f -> string(formatDuration(f)), durationsArray), attributes);
               }
             };

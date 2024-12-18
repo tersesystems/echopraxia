@@ -1,8 +1,7 @@
 package com.tersesystems.echopraxia.api;
 
 import com.tersesystems.echopraxia.spi.DefaultField;
-import com.tersesystems.echopraxia.spi.EchopraxiaService;
-import com.tersesystems.echopraxia.spi.FieldCreator;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -14,8 +13,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SimpleFieldVisitor implements FieldVisitor {
 
-  protected final FieldCreator<?> fieldCreator;
-
+  protected final Class<? extends Field> fieldClass;
   protected Attributes attributes;
   protected String name;
 
@@ -24,11 +22,7 @@ public class SimpleFieldVisitor implements FieldVisitor {
   }
 
   public <F extends Field> SimpleFieldVisitor(Class<F> fieldClass) {
-    this(EchopraxiaService.getInstance().getFieldCreator(fieldClass));
-  }
-
-  public SimpleFieldVisitor(FieldCreator<?> fieldCreator) {
-    this.fieldCreator = fieldCreator;
+    this.fieldClass = fieldClass;
   }
 
   @Override
@@ -88,27 +82,41 @@ public class SimpleFieldVisitor implements FieldVisitor {
 
   @Override
   public @NotNull Field visitString(@NotNull Value<String> stringValue) {
-    return fieldCreator.create(name, stringValue, attributes);
+    return create(name, stringValue, attributes);
   }
 
   @Override
   public @NotNull Field visitException(@NotNull Value<Throwable> exceptionValue) {
-    return fieldCreator.create(name, exceptionValue, attributes);
+    return create(name, exceptionValue, attributes);
+  }
+
+  private @NotNull Field create(String name, @NotNull Value<?> value, Attributes attributes) {
+    if (fieldClass == DefaultField.class) {
+      return new DefaultField(name, value, attributes);
+    } else {
+      try {
+        Constructor<? extends Field> constructor =
+            fieldClass.getConstructor(String.class, Value.class, Attributes.class);
+        return constructor.newInstance(name, value, attributes);
+      } catch (Exception e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   @Override
   public @NotNull Field visitBoolean(@NotNull Value<Boolean> booleanValue) {
-    return fieldCreator.create(name, booleanValue, attributes);
+    return create(name, booleanValue, attributes);
   }
 
   @Override
   public @NotNull Field visitNumber(@NotNull Value<? extends Number> numberValue) {
-    return fieldCreator.create(name, numberValue, attributes);
+    return create(name, numberValue, attributes);
   }
 
   @Override
   public @NotNull Field visitNull() {
-    return fieldCreator.create(name, Value.nullValue(), attributes);
+    return create(name, Value.nullValue(), attributes);
   }
 
   @Override
@@ -127,7 +135,7 @@ public class SimpleFieldVisitor implements FieldVisitor {
 
     @Override
     public @NotNull Field done() {
-      return fieldCreator.create(name, Value.array(elements), attributes);
+      return create(name, Value.array(elements), attributes);
     }
 
     @Override
@@ -202,7 +210,7 @@ public class SimpleFieldVisitor implements FieldVisitor {
 
     @Override
     public @NotNull Field done() {
-      return fieldCreator.create(name, Value.object(fields), attributes);
+      return create(name, Value.object(fields), attributes);
     }
 
     @Override

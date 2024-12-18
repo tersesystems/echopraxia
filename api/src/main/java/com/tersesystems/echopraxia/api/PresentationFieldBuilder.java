@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.api;
 
 import static com.tersesystems.echopraxia.spi.FieldConstants.EXCEPTION;
 
+import com.tersesystems.echopraxia.spi.DefaultField;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
@@ -32,7 +33,7 @@ public interface PresentationFieldBuilder extends FieldBuilder {
    */
   @NotNull
   default PresentationField value(@NotNull String name, @NotNull Value<?> value) {
-    return Field.value(name, value, PresentationField.class);
+    return Field.value(name, value, DefaultField.class);
   }
 
   /**
@@ -46,7 +47,7 @@ public interface PresentationFieldBuilder extends FieldBuilder {
    */
   @NotNull
   default PresentationField keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return Field.keyValue(name, value, PresentationField.class);
+    return Field.keyValue(name, value, DefaultField.class);
   }
 
   /**

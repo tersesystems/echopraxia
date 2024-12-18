@@ -1,8 +1,9 @@
 package com.tersesystems.echopraxia.api;
 
 import com.tersesystems.echopraxia.spi.DefaultField;
-import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.LongAdder;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,7 +53,7 @@ public interface Field extends FieldBuilderResult {
    */
   @NotNull
   static Field value(@NotNull String name, @NotNull Value<?> value) {
-    return value(name, value, DefaultField.class);
+    return new DefaultField(name, value, PresentationHintAttributes.valueOnlyAttributes());
   }
 
   /**
@@ -64,9 +65,21 @@ public interface Field extends FieldBuilderResult {
   @NotNull
   static <F extends Field> F value(
       @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
-    return EchopraxiaService.getInstance()
-        .getFieldCreator(fieldClass)
-        .create(name, value, PresentationHintAttributes.valueOnlyAttributes());
+    if (fieldClass == DefaultField.class) {
+      return (F) value(name, value);
+    } else {
+      try {
+        Constructor<F> constructor =
+            fieldClass.getConstructor(String.class, Value.class, Attributes.class);
+        return constructor.newInstance(
+            name, value, PresentationHintAttributes.valueOnlyAttributes());
+      } catch (NoSuchMethodException
+          | InstantiationException
+          | IllegalAccessException
+          | InvocationTargetException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   /**
@@ -76,7 +89,7 @@ public interface Field extends FieldBuilderResult {
    */
   @NotNull
   static Field keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return keyValue(name, value, DefaultField.class);
+    return new DefaultField(name, value, Attributes.empty());
   }
 
   /**
@@ -87,9 +100,20 @@ public interface Field extends FieldBuilderResult {
    */
   static <F extends Field> F keyValue(
       @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
-    return EchopraxiaService.getInstance()
-        .getFieldCreator(fieldClass)
-        .create(name, value, Attributes.empty());
+    if (fieldClass == DefaultField.class) {
+      return (F) keyValue(name, value);
+    } else {
+      try {
+        Constructor<F> constructor =
+            fieldClass.getConstructor(String.class, Value.class, Attributes.class);
+        return constructor.newInstance(name, value, Attributes.empty());
+      } catch (NoSuchMethodException
+          | InstantiationException
+          | IllegalAccessException
+          | InvocationTargetException e) {
+        throw new RuntimeException(e);
+      }
+    }
   }
 
   // construct a field name so that json is happy and keep going.

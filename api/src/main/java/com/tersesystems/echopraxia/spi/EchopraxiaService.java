@@ -1,7 +1,8 @@
 package com.tersesystems.echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
-import java.util.*;
+import java.util.Iterator;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -38,16 +39,6 @@ public interface EchopraxiaService {
    */
   @NotNull
   CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull String name);
-
-  /**
-   * Gets the field creator.
-   *
-   * @param <F> the field type
-   * @param fieldClass the field class.
-   * @return the field creator matching the field class.
-   */
-  @NotNull
-  <F extends Field> FieldCreator<F> getFieldCreator(@NotNull Class<F> fieldClass);
 
   /**
    * @return an instance of the service.
