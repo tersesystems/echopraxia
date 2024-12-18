@@ -9,9 +9,8 @@ import ch.qos.logback.core.read.ListAppender;
 import com.tersesystems.echopraxia.Logger;
 import com.tersesystems.echopraxia.LoggerFactory;
 import com.tersesystems.echopraxia.api.*;
-import java.util.List;
-
 import com.tersesystems.echopraxia.spi.DefaultField;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
