@@ -1,6 +1,5 @@
 package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -129,7 +128,7 @@ public abstract class Value<V> {
 
   @NotNull
   public String toString() {
-    return EchopraxiaService.getInstance().getToStringFormatter().formatValue(this);
+    return ToStringFormatter.getInstance().formatValue(this);
   }
 
   /**

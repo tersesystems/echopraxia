@@ -40,12 +40,6 @@ public interface EchopraxiaService {
   CoreLogger getCoreLogger(@NotNull String fqcn, @NotNull String name);
 
   /**
-   * @return the formatter used by the service.
-   */
-  @NotNull
-  ToStringFormatter getToStringFormatter();
-
-  /**
    * Gets the field creator.
    *
    * @param <F> the field type

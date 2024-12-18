@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
+import com.tersesystems.echopraxia.spi.DefaultToStringFormatter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -9,6 +10,10 @@ import org.jetbrains.annotations.NotNull;
  * @since 3.0
  */
 public interface ToStringFormatter {
+
+  static ToStringFormatter getInstance() {
+    return DefaultToStringFormatter.getInstance();
+  }
 
   /**
    * Formats a field, applying attributes to the field name and value as needed.

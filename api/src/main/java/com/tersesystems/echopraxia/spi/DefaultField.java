@@ -128,7 +128,7 @@ public class DefaultField implements PresentationField {
   }
 
   public String toString() {
-    return EchopraxiaService.getInstance().getToStringFormatter().formatField(this);
+    return ToStringFormatter.getInstance().formatField(this);
   }
 
   private @NotNull DefaultField newAttributes(@NotNull Attributes attrs) {

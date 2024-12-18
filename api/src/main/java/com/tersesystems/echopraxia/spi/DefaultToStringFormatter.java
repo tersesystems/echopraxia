@@ -10,6 +10,12 @@ import org.jetbrains.annotations.Nullable;
 
 public class DefaultToStringFormatter implements ToStringFormatter {
 
+  private static final DefaultToStringFormatter INSTANCE = new DefaultToStringFormatter();
+
+  public static DefaultToStringFormatter getInstance() {
+    return INSTANCE;
+  }
+
   @Override
   @NotNull
   public String formatField(@NotNull Field field) {

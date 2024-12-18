@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import java.util.List;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.jetbrains.annotations.NotNull;
@@ -53,6 +52,6 @@ public class MappedFieldMarker extends ObjectAppendingMarker implements Field {
 
   @Override
   public String toStringSelf() {
-    return EchopraxiaService.getInstance().getToStringFormatter().formatField(textField);
+    return ToStringFormatter.getInstance().formatField(textField);
   }
 }
