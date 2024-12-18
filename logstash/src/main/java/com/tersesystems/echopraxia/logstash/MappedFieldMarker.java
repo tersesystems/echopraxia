@@ -1,7 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
 import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.spi.EchopraxiaService;
 import java.util.List;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.jetbrains.annotations.NotNull;
