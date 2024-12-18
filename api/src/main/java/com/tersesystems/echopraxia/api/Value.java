@@ -129,7 +129,7 @@ public abstract class Value<V> {
 
   @NotNull
   public String toString() {
-    return EchopraxiaService.getInstance().getToStringFormatter().formatValue(this);
+    return ToStringFormatter.getInstance().formatValue(this);
   }
 
   /**

@@ -56,11 +56,6 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
     return exceptionHandler;
   }
 
-  @Override
-  public @NotNull ToStringFormatter getToStringFormatter() {
-    return toStringFormatter;
-  }
-
   public <F extends Field> @NotNull FieldCreator<F> getFieldCreator(@NotNull Class<F> fieldClass) {
     //noinspection unchecked
     return (FieldCreator<F>)
