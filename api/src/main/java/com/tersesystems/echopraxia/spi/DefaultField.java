@@ -18,7 +18,7 @@ public class DefaultField implements PresentationField {
   protected final Value<?> value;
   protected final Attributes attributes;
 
-  protected DefaultField(
+  public DefaultField(
       @NotNull String name, @NotNull Value<?> value, @NotNull Attributes attributes) {
     this.name = Field.requireName(name);
     this.value = Field.requireValue(value);

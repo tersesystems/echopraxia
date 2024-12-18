@@ -2,8 +2,6 @@ package com.tersesystems.echopraxia.spi;
 
 import com.tersesystems.echopraxia.api.*;
 import java.util.Collections;
-import java.util.ServiceLoader;
-import java.util.concurrent.ConcurrentHashMap;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -14,8 +12,6 @@ import org.jetbrains.annotations.NotNull;
 public abstract class AbstractEchopraxiaService implements EchopraxiaService {
 
   private static final ClassLoader[] classLoaders = {ClassLoader.getSystemClassLoader()};
-
-  private final ConcurrentHashMap<Class<?>, FieldCreator<?>> fieldCreatorMap;
 
   /** The filters used by the service. */
   protected Filters filters;
@@ -31,7 +27,6 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
     this.exceptionHandler = Throwable::printStackTrace;
     this.toStringFormatter = new DefaultToStringFormatter();
     this.filters = initFilters();
-    this.fieldCreatorMap = new ConcurrentHashMap<>();
   }
 
   private Filters initFilters() {
@@ -54,19 +49,5 @@ public abstract class AbstractEchopraxiaService implements EchopraxiaService {
   @Override
   public @NotNull ExceptionHandler getExceptionHandler() {
     return exceptionHandler;
-  }
-
-  public <F extends Field> @NotNull FieldCreator<F> getFieldCreator(@NotNull Class<F> fieldClass) {
-    //noinspection unchecked
-    return (FieldCreator<F>)
-        fieldCreatorMap.computeIfAbsent(fieldClass, AbstractEchopraxiaService::loadFieldCreator);
-  }
-
-  private static <T extends Field> FieldCreator<T> loadFieldCreator(Class<?> t) {
-    for (FieldCreator<?> s : ServiceLoader.load(FieldCreator.class))
-      if (s.canServe(t))
-        //noinspection unchecked
-        return (FieldCreator<T>) s;
-    throw new UnsupportedOperationException("No field creator found for class " + t);
   }
 }
