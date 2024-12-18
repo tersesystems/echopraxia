@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.api.Condition.jsonPath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.api.Condition;
@@ -33,7 +34,9 @@ public class ExceptionHandlerTests extends TestBase {
     var logger = getLogger();
     Integer number = null;
     Condition condition =
-        (level, context) -> context.findNumber("$.testing").stream().anyMatch(p -> p.equals(5));
+        jsonPath(
+            (level, context) ->
+                context.findNumber("$.testing").stream().anyMatch(p -> p.equals(5)));
 
     var badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
     badLogger.debug(condition, "I have a bad logger field and a good condition");
@@ -47,8 +50,10 @@ public class ExceptionHandlerTests extends TestBase {
     var logger = getLogger();
     Integer number = null;
     Condition badCondition =
-        (level, context) ->
-            context.findNumber("$.testing").stream().anyMatch(p -> p.equals(number.intValue()));
+        jsonPath(
+            (level, context) ->
+                context.findNumber("$.testing").stream()
+                    .anyMatch(p -> p.equals(number.intValue())));
 
     var badLogger = logger.withCondition(badCondition);
     badLogger.debug("I am passing in {}", fb -> fb.number("testing", 5));
@@ -74,9 +79,10 @@ public class ExceptionHandlerTests extends TestBase {
     var logger = getLogger();
     Integer number = null;
     Condition badCondition =
-        (level, context) ->
-            context.findNumber("$.testing").stream().anyMatch(p -> p.equals(number.intValue()));
-
+        jsonPath(
+            (level, context) ->
+                context.findNumber("$.testing").stream()
+                    .anyMatch(p -> p.equals(number.intValue())));
     logger.debug(
         badCondition, "I am passing in {}", fb -> fb.number("nullNumber", number.intValue()));
 

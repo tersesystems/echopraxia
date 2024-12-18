@@ -4,7 +4,7 @@ import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 import static com.tersesystems.echopraxia.spi.Utilities.memoize;
 
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContextWithFindPathMethods;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.Collections;
@@ -13,7 +13,8 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-public class Log4JLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+public class Log4JLoggingContext extends AbstractJsonPathFinder
+    implements LoggingContextWithFindPathMethods {
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
   private final Supplier<List<Field>> joinedFields;

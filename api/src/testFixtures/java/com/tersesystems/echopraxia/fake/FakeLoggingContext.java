@@ -2,6 +2,7 @@ package com.tersesystems.echopraxia.fake;
 
 import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContextWithFindPathMethods;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.Arrays;
@@ -12,7 +13,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-public class FakeLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+public class FakeLoggingContext extends AbstractJsonPathFinder
+    implements LoggingContextWithFindPathMethods {
   protected final Supplier<List<Field>> loggerFields;
   protected final Supplier<List<Field>> argumentFields;
   private final CoreLogger core;

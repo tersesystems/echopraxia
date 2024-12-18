@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.tersesystems.echopraxia.api.Level;
-import com.tersesystems.echopraxia.api.LoggingContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -52,7 +51,7 @@ public class ScriptManagerTest {
         };
     final ScriptManager scriptManager = new ScriptManager(handle);
 
-    LoggingContext empty = new FakeLoggingContext();
+    FakeLoggingContext empty = new FakeLoggingContext();
     int parallel = 4;
     final ExecutorService executorService = Executors.newWorkStealingPool(parallel);
     LongAdder count = new LongAdder();

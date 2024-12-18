@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.api;
 
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -9,6 +11,28 @@ import org.jetbrains.annotations.NotNull;
  * A condition is used to conditionally log statements based on the level and context of the logger.
  */
 public interface Condition {
+
+  static Condition jsonPath(Function<LoggingContextWithFindPathMethods, Boolean> o) {
+    return (level, context) -> {
+      if (context instanceof LoggingContextWithFindPathMethods) {
+        return o.apply((LoggingContextWithFindPathMethods) context);
+      } else {
+        // XXX should log something here.
+        return false;
+      }
+    };
+  }
+
+  static Condition jsonPath(BiFunction<Level, LoggingContextWithFindPathMethods, Boolean> o) {
+    return (level, context) -> {
+      if (context instanceof LoggingContextWithFindPathMethods) {
+        return o.apply(level, (LoggingContextWithFindPathMethods) context);
+      } else {
+        // XXX should log something here.
+        return false;
+      }
+    };
+  }
 
   /**
    * Tests the condition.

@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.log4j;
 
+import static com.tersesystems.echopraxia.api.Condition.jsonPath;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -114,10 +115,12 @@ public class ContextTest extends TestBase {
   void testFindExceptionStackTraceElement() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) -> {
-          Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
-          return element.get("fileName").toString().endsWith("ContextTest.java");
-        };
+        jsonPath(
+            (level, ctx) -> {
+              Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
+              return element.get("fileName").toString().endsWith("ContextTest.java");
+            });
+
     RuntimeException e = new RuntimeException("test message");
     logger.info(c, "Matches on exception", e);
 
@@ -130,7 +133,9 @@ public class ContextTest extends TestBase {
   void testFindDouble() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
+        jsonPath(
+            (level, ctx) ->
+                ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent());
     logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1.5));
 
     JsonNode entry = getEntry();

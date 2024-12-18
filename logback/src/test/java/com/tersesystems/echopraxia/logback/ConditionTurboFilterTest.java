@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logback;
 
+import static com.tersesystems.echopraxia.api.Condition.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -43,7 +44,7 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition successCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent();
+        jsonPath((level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent());
     Marker successMarker = ConditionMarker.apply(successCondition);
     logger.info(successMarker, "Argument {}", fb.string("foo", "bar"));
 
@@ -57,7 +58,7 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition fooCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("quux")).isPresent();
+        jsonPath((level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("quux")).isPresent());
     Marker marker = ConditionMarker.apply(fooCondition);
     logger.info(marker, "Argument {}", fb.string("foo", "bar"));
 
@@ -70,7 +71,7 @@ public class ConditionTurboFilterTest extends TestBase {
     Logger logger = loggerContext().getLogger(getClass());
     FieldBuilder fb = FieldBuilder.instance();
 
-    Condition countCondition = Condition.numberMatch("count", c -> c.equals(Value.number(5)));
+    Condition countCondition = numberMatch("count", c -> c.equals(Value.number(5)));
     Marker countMarker = ConditionMarker.apply(countCondition);
     logger.info(countMarker, "Argument {}", (fb.number("count", 5)));
 
@@ -84,8 +85,8 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition fooCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent();
-    Condition countCondition = Condition.numberMatch("count", c -> c.equals(Value.number(5)));
+        jsonPath((level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent());
+    Condition countCondition = numberMatch("count", c -> c.equals(Value.number(5)));
     Marker fooMarker = ConditionMarker.apply(fooCondition);
     Marker countMarker = ConditionMarker.apply(countCondition);
     fooMarker.add(countMarker);
@@ -101,8 +102,8 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition fooCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent();
-    Condition countCondition = Condition.numberMatch("count", c -> c.equals(Value.number(5)));
+        jsonPath((level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent());
+    Condition countCondition = numberMatch("count", c -> c.equals(Value.number(5)));
     Marker fooMarker = ConditionMarker.apply(fooCondition);
     Marker countMarker = ConditionMarker.apply(countCondition);
     fooMarker.add(countMarker);
