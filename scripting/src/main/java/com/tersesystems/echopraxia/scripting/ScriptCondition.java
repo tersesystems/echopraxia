@@ -3,6 +3,7 @@ package com.tersesystems.echopraxia.scripting;
 import com.tersesystems.echopraxia.api.Condition;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContextWithFindPathMethods;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -135,6 +136,6 @@ public class ScriptCondition implements Condition {
 
   @Override
   public boolean test(Level level, LoggingContext context) {
-    return scriptManager.execute(defaultValue, level, context);
+    return scriptManager.execute(defaultValue, level, (LoggingContextWithFindPathMethods) context);
   }
 }

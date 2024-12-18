@@ -4,7 +4,7 @@ import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 import static com.tersesystems.echopraxia.spi.Utilities.memoize;
 
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContextWithFindPathMethods;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.Collections;
@@ -17,7 +17,8 @@ import org.slf4j.Marker;
  * The logging context composes the "logger context" (markers/fields associated with the logger) and
  * the field arguments associated with the individual logging event.
  */
-public class LogbackLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+public class LogbackLoggingContext extends AbstractJsonPathFinder
+    implements LoggingContextWithFindPathMethods {
 
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;

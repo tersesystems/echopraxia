@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.logback;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContextWithFindPathMethods;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;
 
 public abstract class AbstractEventLoggingContext extends AbstractJsonPathFinder
-    implements LoggingContext {
+    implements LoggingContextWithFindPathMethods {
 
   protected List<Field> fieldArguments(@NotNull ILoggingEvent event) {
     final Object[] argumentArray = event.getArgumentArray();

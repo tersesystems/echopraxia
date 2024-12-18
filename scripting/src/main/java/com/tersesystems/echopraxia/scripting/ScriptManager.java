@@ -4,6 +4,7 @@ import static com.tersesystems.echopraxia.scripting.ScriptFunction.*;
 
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.api.LoggingContextWithFindPathMethods;
 import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
@@ -70,7 +71,7 @@ public class ScriptManager {
         findNumber("$.age") == 3 && findString("$.name") == "Will";
    }
   */
-  public boolean execute(boolean df, Level level, LoggingContext context) {
+  public boolean execute(boolean df, Level level, LoggingContextWithFindPathMethods context) {
     try {
       Value levelV = getLevelV(level);
       List<ValueMapEntry> functionMapList = new ArrayList<>(userFunctions.apply(context));
@@ -107,7 +108,8 @@ public class ScriptManager {
     }
   }
 
-  private void addContextFunctions(List<ValueMapEntry> functionMapList, LoggingContext ctx) {
+  private void addContextFunctions(
+      List<ValueMapEntry> functionMapList, LoggingContextWithFindPathMethods ctx) {
     functionMapList.add(
         ValueMapEntry.make(
             "fields",

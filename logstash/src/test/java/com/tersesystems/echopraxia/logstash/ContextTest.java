@@ -1,5 +1,6 @@
 package com.tersesystems.echopraxia.logstash;
 
+import static com.tersesystems.echopraxia.api.Condition.jsonPath;
 import static com.tersesystems.echopraxia.api.Value.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -201,7 +202,8 @@ public class ContextTest extends TestBase {
   void testFindString() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) -> ctx.findString("$.arg1").filter(v -> v.equals("value1")).isPresent();
+        jsonPath(
+            (level, ctx) -> ctx.findString("$.arg1").filter(v -> v.equals("value1")).isPresent());
     logger.info(c, "Matches on arg1", fb -> fb.string("arg1", "value1"));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -214,7 +216,8 @@ public class ContextTest extends TestBase {
   void testFindInteger() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) -> ctx.findNumber("$.arg1").filter(v -> v.intValue() == 1).isPresent();
+        jsonPath(
+            (level, ctx) -> ctx.findNumber("$.arg1").filter(v -> v.intValue() == 1).isPresent());
     logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -226,7 +229,7 @@ public class ContextTest extends TestBase {
   @Test
   void testFindBoolean() {
     var logger = getLogger();
-    Condition c = (level, ctx) -> ctx.findBoolean("$.arg1").orElse(false);
+    Condition c = jsonPath((level, ctx) -> ctx.findBoolean("$.arg1").orElse(false));
     logger.info(c, "Matches on arg1", fb -> fb.bool("arg1", true));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -239,7 +242,9 @@ public class ContextTest extends TestBase {
   void testFindDouble() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) -> ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent();
+        jsonPath(
+            (level, ctx) ->
+                ctx.findNumber("$.arg1").filter(f -> f.doubleValue() == 1.5).isPresent());
     logger.info(c, "Matches on arg1", fb -> fb.number("arg1", 1.5));
 
     final ListAppender<ILoggingEvent> listAppender = getListAppender();
@@ -252,7 +257,7 @@ public class ContextTest extends TestBase {
   void testInlinePredicate() {
     var logger = getLogger();
     final Condition cheapBookCondition =
-        (level, context) -> !context.findList("$.store.book[?(@.price < 10)]").isEmpty();
+        jsonPath((level, context) -> !context.findList("$.store.book[?(@.price < 10)]").isEmpty());
 
     logger.info(
         cheapBookCondition,
@@ -273,7 +278,7 @@ public class ContextTest extends TestBase {
   @Test
   void testFindNull() {
     var logger = getLogger();
-    final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
+    final Condition nullCondition = jsonPath((level, context) -> context.findNull("$.myNullField"));
 
     logger.info(nullCondition, "found null", fb -> fb.nullField("myNullField"));
 
@@ -286,7 +291,7 @@ public class ContextTest extends TestBase {
   @Test
   void testFindNullButString() {
     var logger = getLogger();
-    final Condition nullCondition = (level, context) -> context.findNull("$.myNullField");
+    final Condition nullCondition = jsonPath((level, context) -> context.findNull("$.myNullField"));
 
     logger.info(nullCondition, "found null", fb -> fb.string("myNullField", "notnull"));
 
@@ -298,7 +303,7 @@ public class ContextTest extends TestBase {
   void testJsonPathMissingProperty() {
     var logger = getLogger();
     final Condition noFindException =
-        (level, ctx) -> ctx.findString("$.exception.message").isPresent();
+        jsonPath((level, ctx) -> ctx.findString("$.exception.message").isPresent());
 
     logger.info(noFindException, "no exception in this message");
 
@@ -309,7 +314,8 @@ public class ContextTest extends TestBase {
   @Test
   void testMismatchedString() {
     var logger = getLogger();
-    final Condition noFindException = (level, ctx) -> ctx.findString("$.notastring").isPresent();
+    final Condition noFindException =
+        jsonPath((level, ctx) -> ctx.findString("$.notastring").isPresent());
 
     // property is present but is boolean, not a string
     logger.info(noFindException, "this should not log", fb -> fb.bool("notastring", true));
@@ -321,7 +327,8 @@ public class ContextTest extends TestBase {
   @Test
   void testMismatchedObject() {
     var logger = getLogger();
-    final Condition noFindException = (level, ctx) -> ctx.findObject("$.notanobject").isPresent();
+    final Condition noFindException =
+        jsonPath((level, ctx) -> ctx.findObject("$.notanobject").isPresent());
 
     // property is present but is boolean, not a string
     logger.info(noFindException, "this should not log", fb -> fb.bool("notanobject", true));
@@ -333,7 +340,8 @@ public class ContextTest extends TestBase {
   @Test
   void testListOfElement() {
     var logger = getLogger();
-    final Condition nestedCondition = (level, ctx) -> !ctx.findList("$..notalist").isEmpty();
+    final Condition nestedCondition =
+        jsonPath((level, ctx) -> !ctx.findList("$..notalist").isEmpty());
 
     // property is present, but we need to return a list containing the single element.
     logger.info(nestedCondition, "log element", fb -> fb.bool("notalist", true));
@@ -348,10 +356,11 @@ public class ContextTest extends TestBase {
   void testElementAsSingletonList() {
     var logger = getLogger();
     final Condition findBooleanAsList =
-        (level, ctx) -> {
-          final Optional<?> first = ctx.findList("$.boolean").stream().findFirst();
-          return (Boolean) first.get();
-        };
+        jsonPath(
+            (level, ctx) -> {
+              final Optional<?> first = ctx.findList("$.boolean").stream().findFirst();
+              return (Boolean) first.get();
+            });
 
     // property is present, but we need to return a list containing the single element.
     logger.info(findBooleanAsList, "log boolean", fb -> fb.bool("boolean", true));
@@ -366,10 +375,11 @@ public class ContextTest extends TestBase {
   void testOptionalEmptyForNothingFound() {
     var logger = getLogger();
     final Condition noFindException =
-        (level, ctx) -> {
-          final Optional<?> first = ctx.findList("$.exception").stream().findFirst();
-          return first.isEmpty();
-        };
+        jsonPath(
+            (level, ctx) -> {
+              final Optional<?> first = ctx.findList("$.exception").stream().findFirst();
+              return first.isEmpty();
+            });
 
     // we didn't find any .exception at all, so good.
     logger.info(noFindException, "empty of exception", fb -> fb.bool("boolean", true));
@@ -384,10 +394,11 @@ public class ContextTest extends TestBase {
   void testFindException() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) ->
-            ctx.findThrowable("$.exception")
-                .filter(e -> "test message".equals(e.getMessage()))
-                .isPresent();
+        jsonPath(
+            (level, ctx) ->
+                ctx.findThrowable("$.exception")
+                    .filter(e -> "test message".equals(e.getMessage()))
+                    .isPresent());
     RuntimeException e = new RuntimeException("test message");
     logger.info(c, "Matches on exception", e);
 
@@ -401,10 +412,11 @@ public class ContextTest extends TestBase {
   void testFindExceptionStacktrace() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) -> {
-          List<?> trace = ctx.findList("$.exception.stackTrace");
-          return !trace.isEmpty();
-        };
+        jsonPath(
+            (level, ctx) -> {
+              List<?> trace = ctx.findList("$.exception.stackTrace");
+              return !trace.isEmpty();
+            });
     RuntimeException e = new RuntimeException("test message");
     logger.info(c, "Matches on exception", e);
 
@@ -418,10 +430,11 @@ public class ContextTest extends TestBase {
   void testFindExceptionStackTraceElement() {
     var logger = getLogger();
     Condition c =
-        (level, ctx) -> {
-          Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
-          return element.get("fileName").toString().endsWith("ContextTest.java");
-        };
+        jsonPath(
+            (level, ctx) -> {
+              Map<String, ?> element = ctx.findObject("$.exception.stackTrace[0]").get();
+              return element.get("fileName").toString().endsWith("ContextTest.java");
+            });
     RuntimeException e = new RuntimeException("test message");
     logger.info(c, "Matches on exception", e);
 
@@ -434,7 +447,7 @@ public class ContextTest extends TestBase {
   @Test
   void testNullMessageInException() {
     var logger = getLogger();
-    Condition c = (level, ctx) -> ctx.findNull("$.exception.message");
+    Condition c = jsonPath((level, ctx) -> ctx.findNull("$.exception.message"));
     RuntimeException e = new IllegalArgumentException((String) null);
     logger.info(c, "Matches on null message in exception", e);
 
@@ -447,7 +460,7 @@ public class ContextTest extends TestBase {
   @Test
   void testNullInNestedArray() {
     var logger = getLogger();
-    Condition c = (level, ctx) -> !ctx.findList("$..interests").isEmpty();
+    Condition c = jsonPath((level, ctx) -> !ctx.findList("$..interests").isEmpty());
     logger.info(
         c,
         "Can manage null in array",
@@ -462,7 +475,7 @@ public class ContextTest extends TestBase {
   @Test
   void testObjectArrayObject() {
     var logger = getLogger();
-    Condition c = (level, ctx) -> ctx.findBoolean("$.foo.array[2].one").get();
+    Condition c = jsonPath((level, ctx) -> ctx.findBoolean("$.foo.array[2].one").get());
     logger.info(
         c,
         "complex objects",
