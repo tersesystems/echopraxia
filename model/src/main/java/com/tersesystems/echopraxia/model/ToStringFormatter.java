@@ -1,6 +1,5 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.model;
 
-import com.tersesystems.echopraxia.spi.DefaultToStringFormatter;
 import org.jetbrains.annotations.NotNull;
 
 /**

@@ -1,4 +1,4 @@
-package com.tersesystems.echopraxia.api;
+package com.tersesystems.echopraxia.model;
 
 import org.jetbrains.annotations.NotNull;
 

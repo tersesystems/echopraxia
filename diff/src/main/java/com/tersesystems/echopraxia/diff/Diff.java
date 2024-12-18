@@ -3,7 +3,7 @@ package com.tersesystems.echopraxia.diff;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.flipkart.zjsonpatch.JsonDiff;
-import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.model.Value;
 
 public final class Diff {
 

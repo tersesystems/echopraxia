@@ -3,8 +3,8 @@ package com.tersesystems.echopraxia.logback;
 import static com.tersesystems.echopraxia.spi.Utilities.joinFields;
 import static com.tersesystems.echopraxia.spi.Utilities.memoize;
 
-import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.model.Field;
 import com.tersesystems.echopraxia.spi.AbstractJsonPathFinder;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import java.util.Collections;

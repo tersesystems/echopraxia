@@ -2,8 +2,8 @@ package com.tersesystems.echopraxia.jul;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.api.Field;
 import com.tersesystems.echopraxia.api.FieldBuilder;
+import com.tersesystems.echopraxia.model.Field;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

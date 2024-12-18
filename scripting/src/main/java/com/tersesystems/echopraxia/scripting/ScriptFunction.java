@@ -2,7 +2,7 @@ package com.tersesystems.echopraxia.scripting;
 
 import static com.twineworks.tweakflow.lang.values.Values.*;
 
-import com.tersesystems.echopraxia.api.Field;
+import com.tersesystems.echopraxia.model.Field;
 import com.twineworks.tweakflow.lang.types.Type;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
@@ -154,11 +154,12 @@ public final class ScriptFunction {
     return make(new DictValue(fieldMap));
   }
 
-  public static Value convertValue(com.tersesystems.echopraxia.api.Value<?> value) {
+  public static Value convertValue(com.tersesystems.echopraxia.model.Value<?> value) {
     switch (value.type()) {
       case ARRAY:
         return convertArray(
-            (com.tersesystems.echopraxia.api.Value<List<com.tersesystems.echopraxia.api.Value<?>>>)
+            (com.tersesystems.echopraxia.model.Value<
+                    List<com.tersesystems.echopraxia.model.Value<?>>>)
                 value);
       case OBJECT:
         //noinspection unchecked
@@ -181,7 +182,7 @@ public final class ScriptFunction {
     }
   }
 
-  public static Value convertNumber(com.tersesystems.echopraxia.api.Value<?> value) {
+  public static Value convertNumber(com.tersesystems.echopraxia.model.Value<?> value) {
     // Speed up conversion by using overloaded value directly
     Number o = (Number) value.raw();
     if (o instanceof Byte) return make(o.longValue());
@@ -199,10 +200,11 @@ public final class ScriptFunction {
   }
 
   private static Value convertArray(
-      com.tersesystems.echopraxia.api.Value<List<com.tersesystems.echopraxia.api.Value<?>>> value) {
-    List<com.tersesystems.echopraxia.api.Value<?>> values = value.raw();
+      com.tersesystems.echopraxia.model.Value<List<com.tersesystems.echopraxia.model.Value<?>>>
+          value) {
+    List<com.tersesystems.echopraxia.model.Value<?>> values = value.raw();
     List<Value> rawList = new ArrayList<>(values.size());
-    for (com.tersesystems.echopraxia.api.Value<?> v : values) {
+    for (com.tersesystems.echopraxia.model.Value<?> v : values) {
       Value v2 = convertValue(v);
       rawList.add(v2);
     }

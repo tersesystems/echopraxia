@@ -1,6 +1,6 @@
 package com.tersesystems.echopraxia.api;
 
-import com.tersesystems.echopraxia.spi.DefaultField;
+import com.tersesystems.echopraxia.model.*;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;

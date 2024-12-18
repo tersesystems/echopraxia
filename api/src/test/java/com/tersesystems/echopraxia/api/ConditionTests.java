@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.tersesystems.echopraxia.fake.FakeCoreLogger;
 import com.tersesystems.echopraxia.fake.FakeLoggingContext;
+import com.tersesystems.echopraxia.model.Field;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import org.junit.jupiter.api.Test;
 

@@ -3,6 +3,8 @@ package com.tersesystems.echopraxia.scripting;
 import com.tersesystems.echopraxia.api.*;
 import com.tersesystems.echopraxia.api.Level;
 import com.tersesystems.echopraxia.api.LoggingContext;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.Value;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;

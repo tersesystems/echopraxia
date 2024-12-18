@@ -5,8 +5,8 @@ import com.fasterxml.jackson.core.util.VersionUtil;
 import com.fasterxml.jackson.databind.Module;
 import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import com.fasterxml.jackson.databind.module.SimpleSerializers;
-import com.tersesystems.echopraxia.api.Field;
-import com.tersesystems.echopraxia.api.Value;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.Value;
 
 /** A Jackson module that is loaded in automatically by mapper.findAndRegisterModules() */
 public class EchopraxiaModule extends Module {

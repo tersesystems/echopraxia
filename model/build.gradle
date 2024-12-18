@@ -1,0 +1,8 @@
+plugins {
+    id 'java-library'
+    id 'java-test-fixtures'
+}
+
+dependencies {
+    implementation 'org.pcollections:pcollections:4.0.1'
+}

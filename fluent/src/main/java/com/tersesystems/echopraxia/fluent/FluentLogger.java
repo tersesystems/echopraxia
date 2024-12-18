@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.fluent;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import com.tersesystems.echopraxia.spi.AbstractLoggerSupport;
 import com.tersesystems.echopraxia.spi.CoreLogger;
 import com.tersesystems.echopraxia.spi.Utilities;

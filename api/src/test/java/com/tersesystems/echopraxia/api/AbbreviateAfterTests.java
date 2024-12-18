@@ -2,7 +2,10 @@ package com.tersesystems.echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.spi.PresentationHintAttributes;
+import com.tersesystems.echopraxia.model.Attribute;
+import com.tersesystems.echopraxia.model.Attributes;
+import com.tersesystems.echopraxia.model.PresentationHintAttributes;
+import com.tersesystems.echopraxia.model.Value;
 import org.junit.jupiter.api.Test;
 
 public class AbbreviateAfterTests {

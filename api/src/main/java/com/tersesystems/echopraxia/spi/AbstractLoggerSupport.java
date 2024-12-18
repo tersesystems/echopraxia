@@ -1,6 +1,7 @@
 package com.tersesystems.echopraxia.spi;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 

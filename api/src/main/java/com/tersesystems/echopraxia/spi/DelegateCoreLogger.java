@@ -1,6 +1,8 @@
 package com.tersesystems.echopraxia.spi;
 
 import com.tersesystems.echopraxia.api.*;
+import com.tersesystems.echopraxia.model.Field;
+import com.tersesystems.echopraxia.model.FieldBuilderResult;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
