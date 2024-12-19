@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api project(":api")
+    api project(":logging")
     api project(":jackson")
 
     // https://github.com/flipkart-incubator/zjsonpatch/

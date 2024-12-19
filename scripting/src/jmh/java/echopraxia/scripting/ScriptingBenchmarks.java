@@ -1,7 +1,9 @@
 package echopraxia.scripting;
 
 import echopraxia.api.*;
-import echopraxia.api.Level;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.api.LoggingContext;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;

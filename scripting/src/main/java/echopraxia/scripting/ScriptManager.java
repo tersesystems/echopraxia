@@ -8,8 +8,8 @@ import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
-import echopraxia.api.Level;
-import echopraxia.api.LoggingContext;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.api.LoggingContext;
 import java.util.*;
 import java.util.function.Function;
 

@@ -1,11 +1,10 @@
 package echopraxia.jul;
 
-import echopraxia.*;
-import echopraxia.Logger;
-import echopraxia.LoggerFactory;
 import echopraxia.api.PresentationFieldBuilder;
 import echopraxia.async.AsyncLogger;
 import echopraxia.async.AsyncLoggerFactory;
+import echopraxia.logger.Logger;
+import echopraxia.logger.LoggerFactory;
 import java.io.IOException;
 import java.util.logging.Handler;
 import java.util.logging.Level;

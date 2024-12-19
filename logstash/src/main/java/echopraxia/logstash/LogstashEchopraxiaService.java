@@ -1,8 +1,8 @@
 package echopraxia.logstash;
 
 import ch.qos.logback.classic.LoggerContext;
-import echopraxia.spi.AbstractEchopraxiaService;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.spi.AbstractEchopraxiaService;
+import echopraxia.logging.spi.CoreLogger;
 import java.util.ServiceConfigurationError;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.ILoggerFactory;

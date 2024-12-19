@@ -1,12 +1,13 @@
 package echopraxia;
 
-import echopraxia.api.*;
-import echopraxia.api.Condition;
-import echopraxia.api.Level;
 import echopraxia.api.PresentationFieldBuilder;
-import echopraxia.spi.AbstractLoggerSupport;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.CoreLoggerFactory;
+import echopraxia.logger.DefaultLoggerMethods;
+import echopraxia.logger.LoggerMethods;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.spi.AbstractLoggerSupport;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.CoreLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>

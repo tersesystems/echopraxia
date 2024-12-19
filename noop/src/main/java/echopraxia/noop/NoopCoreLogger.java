@@ -1,10 +1,13 @@
 package echopraxia.noop;
 
-import static echopraxia.spi.Utilities.joinFields;
+import static echopraxia.logging.spi.Utilities.joinFields;
 
 import echopraxia.api.*;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.LoggerContext;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.api.LoggerHandle;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.LoggerContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

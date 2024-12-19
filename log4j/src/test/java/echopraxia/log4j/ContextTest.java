@@ -3,12 +3,12 @@ package echopraxia.log4j;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import echopraxia.Logger;
-import echopraxia.LoggerFactory;
-import echopraxia.api.Condition;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilder;
-import echopraxia.spi.CoreLoggerFactory;
+import echopraxia.logger.Logger;
+import echopraxia.logger.LoggerFactory;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.spi.CoreLoggerFactory;
 import java.util.Map;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;

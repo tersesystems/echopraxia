@@ -1,14 +1,13 @@
 package echopraxia.semantic;
 
-import echopraxia.api.*;
-import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilderResult;
-import echopraxia.api.Level;
 import echopraxia.api.PresentationFieldBuilder;
-import echopraxia.spi.Caller;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.CoreLoggerFactory;
-import echopraxia.spi.Utilities;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.spi.Caller;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.CoreLoggerFactory;
+import echopraxia.logging.spi.Utilities;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 

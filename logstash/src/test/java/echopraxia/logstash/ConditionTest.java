@@ -7,11 +7,10 @@ import static org.awaitility.Awaitility.await;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import echopraxia.*;
-import echopraxia.api.Condition;
 import echopraxia.api.Field;
-import echopraxia.api.Level;
 import echopraxia.api.Value;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;

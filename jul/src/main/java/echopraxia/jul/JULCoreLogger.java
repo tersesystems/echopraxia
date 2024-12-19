@@ -1,9 +1,12 @@
 package echopraxia.jul;
 
 import echopraxia.api.*;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.EchopraxiaService;
-import echopraxia.spi.LoggerContext;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.api.LoggerHandle;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.EchopraxiaService;
+import echopraxia.logging.spi.LoggerContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

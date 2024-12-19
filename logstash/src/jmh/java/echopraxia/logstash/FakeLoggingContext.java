@@ -1,9 +1,9 @@
 package echopraxia.logstash;
 
 import echopraxia.api.Field;
-import echopraxia.api.LoggingContext;
-import echopraxia.spi.AbstractJsonPathFinder;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.api.LoggingContext;
+import echopraxia.logging.spi.AbstractJsonPathFinder;
+import echopraxia.logging.spi.CoreLogger;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;

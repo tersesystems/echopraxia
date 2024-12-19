@@ -1,7 +1,7 @@
 package echopraxia.log4j;
 
-import echopraxia.spi.AbstractEchopraxiaService;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.spi.AbstractEchopraxiaService;
+import echopraxia.logging.spi.CoreLogger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.spi.ExtendedLogger;
 import org.jetbrains.annotations.NotNull;

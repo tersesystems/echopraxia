@@ -6,7 +6,7 @@ dependencies {
     api project(":api")
 
     testImplementation 'net.javacrumbs.json-unit:json-unit-assertj:2.38.0'
-    testImplementation(testFixtures(project(':api')))
+    testImplementation(testFixtures(project(':logging')))
 
     // https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind
     api "com.fasterxml.jackson.core:jackson-databind:$jacksonDatabindVersion"

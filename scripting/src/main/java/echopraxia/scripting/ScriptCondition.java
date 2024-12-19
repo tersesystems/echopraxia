@@ -1,8 +1,8 @@
 package echopraxia.scripting;
 
-import echopraxia.api.Condition;
-import echopraxia.api.Level;
-import echopraxia.api.LoggingContext;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.api.LoggingContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

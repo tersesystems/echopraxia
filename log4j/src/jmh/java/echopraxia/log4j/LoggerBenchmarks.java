@@ -1,11 +1,10 @@
 package echopraxia.log4j;
 
-import echopraxia.*;
-import echopraxia.Logger;
-import echopraxia.LoggerFactory;
-import echopraxia.api.Condition;
-import echopraxia.api.Level;
 import echopraxia.api.PresentationFieldBuilder;
+import echopraxia.logger.Logger;
+import echopraxia.logger.LoggerFactory;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;

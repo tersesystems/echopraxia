@@ -1,9 +1,8 @@
 package echopraxia.semantic;
 
-import echopraxia.api.*;
-import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilderResult;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.spi.CoreLogger;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 

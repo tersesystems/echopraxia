@@ -1,7 +1,7 @@
 package echopraxia.logstash;
 
 import ch.qos.logback.classic.LoggerContext;
-import echopraxia.LoggerFactory;
+import echopraxia.logger.LoggerFactory;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import org.junit.jupiter.api.AfterEach;

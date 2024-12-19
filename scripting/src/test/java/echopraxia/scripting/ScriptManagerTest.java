@@ -4,8 +4,8 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
-import echopraxia.api.Level;
-import echopraxia.api.LoggingContext;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.api.LoggingContext;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

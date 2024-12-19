@@ -1,6 +1,5 @@
 package echopraxia.api;
 
-import echopraxia.spi.PresentationHintAttributes;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;

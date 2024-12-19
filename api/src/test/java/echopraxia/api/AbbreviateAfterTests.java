@@ -2,7 +2,6 @@ package echopraxia.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import echopraxia.spi.PresentationHintAttributes;
 import org.junit.jupiter.api.Test;
 
 public class AbbreviateAfterTests {

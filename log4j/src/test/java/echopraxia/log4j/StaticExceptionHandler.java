@@ -1,6 +1,6 @@
 package echopraxia.log4j;
 
-import echopraxia.spi.ExceptionHandler;
+import echopraxia.logging.spi.ExceptionHandler;
 import java.util.ArrayList;
 import java.util.List;
 

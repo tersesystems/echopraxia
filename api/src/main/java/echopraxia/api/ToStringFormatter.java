@@ -1,6 +1,5 @@
 package echopraxia.api;
 
-import echopraxia.spi.DefaultToStringFormatter;
 import org.jetbrains.annotations.NotNull;
 
 /**

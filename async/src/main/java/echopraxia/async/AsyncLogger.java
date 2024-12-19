@@ -1,11 +1,10 @@
 package echopraxia.async;
 
-import echopraxia.api.*;
-import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilderResult;
-import echopraxia.api.LoggerHandle;
-import echopraxia.spi.AbstractLoggerSupport;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.LoggerHandle;
+import echopraxia.logging.spi.AbstractLoggerSupport;
+import echopraxia.logging.spi.CoreLogger;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
