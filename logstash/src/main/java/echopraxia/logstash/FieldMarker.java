@@ -1,12 +1,11 @@
 package echopraxia.logstash;
 
-import com.tersesystems.echopraxia.api.*;
-import java.util.Collections;
-import java.util.List;
-
+import echopraxia.api.*;
 import echopraxia.api.Attributes;
 import echopraxia.api.Field;
 import echopraxia.api.Value;
+import java.util.Collections;
+import java.util.List;
 import net.logstash.logback.marker.ObjectAppendingMarker;
 import org.jetbrains.annotations.NotNull;
 

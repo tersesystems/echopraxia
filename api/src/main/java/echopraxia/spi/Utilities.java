@@ -1,6 +1,8 @@
 package echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
+import echopraxia.api.Field;
+import echopraxia.api.Value;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,9 +11,6 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import echopraxia.api.Field;
-import echopraxia.api.Value;
 import org.jetbrains.annotations.NotNull;
 
 /** Utilities for classes implementing a logger. */

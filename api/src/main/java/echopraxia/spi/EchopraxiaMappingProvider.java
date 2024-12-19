@@ -5,11 +5,10 @@ import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.TypeRef;
 import com.jayway.jsonpath.spi.mapper.MappingException;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
-import com.tersesystems.echopraxia.api.*;
-import java.util.*;
-
+import echopraxia.api.*;
 import echopraxia.api.Field;
 import echopraxia.api.Value;
+import java.util.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,10 +1,9 @@
 package echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
-import java.util.function.Function;
-
+import echopraxia.api.*;
 import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilderResult;
+import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;
 
 /**

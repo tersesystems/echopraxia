@@ -3,7 +3,7 @@ package echopraxia.log4j;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.tersesystems.echopraxia.*;
+import echopraxia.*;
 import echopraxia.LoggerFactory;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilder;
@@ -109,8 +109,7 @@ public class Log4JLoggerTest extends TestBase {
 
     JsonNode entry = getEntry();
     final JsonNode fields = entry.path("source");
-    assertThat(fields.path("class").asText())
-        .isEqualTo("com.tersesystems.echopraxia.log4j.Log4JLoggerTest");
+    assertThat(fields.path("class").asText()).isEqualTo("echopraxia.log4j.Log4JLoggerTest");
     assertThat(fields.path("method").asText()).isEqualTo("testLoggerLocation");
     assertThat(fields.path("file").asText()).isEqualTo("Log4JLoggerTest.java");
     // disable the line check as it keeps changing...
@@ -130,8 +129,7 @@ public class Log4JLoggerTest extends TestBase {
     JsonNode entry = getEntry();
 
     final JsonNode fields = entry.path("source");
-    assertThat(fields.path("class").asText())
-        .isEqualTo("com.tersesystems.echopraxia.log4j.Log4JLoggerTest");
+    assertThat(fields.path("class").asText()).isEqualTo("echopraxia.log4j.Log4JLoggerTest");
     assertThat(fields.path("method").asText()).isEqualTo("testLoggerLocationWithAsyncLogger");
     assertThat(fields.path("file").asText()).isEqualTo("Log4JLoggerTest.java");
   }

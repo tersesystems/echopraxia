@@ -2,10 +2,10 @@ package echopraxia.scripting;
 
 import static com.twineworks.tweakflow.lang.values.Values.*;
 
-import echopraxia.api.Field;
 import com.twineworks.tweakflow.lang.types.Type;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
+import echopraxia.api.Field;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
@@ -157,9 +157,7 @@ public final class ScriptFunction {
   public static Value convertValue(echopraxia.api.Value<?> value) {
     switch (value.type()) {
       case ARRAY:
-        return convertArray(
-            (echopraxia.api.Value<List<echopraxia.api.Value<?>>>)
-                value);
+        return convertArray((echopraxia.api.Value<List<echopraxia.api.Value<?>>>) value);
       case OBJECT:
         //noinspection unchecked
         List<Field> fields = (List<Field>) value.raw();
@@ -198,8 +196,7 @@ public final class ScriptFunction {
     throw new IllegalStateException("Unknown number type " + o.getClass().getName());
   }
 
-  private static Value convertArray(
-      echopraxia.api.Value<List<echopraxia.api.Value<?>>> value) {
+  private static Value convertArray(echopraxia.api.Value<List<echopraxia.api.Value<?>>> value) {
     List<echopraxia.api.Value<?>> values = value.raw();
     List<Value> rawList = new ArrayList<>(values.size());
     for (echopraxia.api.Value<?> v : values) {

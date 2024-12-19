@@ -8,7 +8,7 @@ import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.tersesystems.echopraxia.*;
+import echopraxia.*;
 import echopraxia.Logger;
 import echopraxia.LoggerFactory;
 import echopraxia.api.Condition;

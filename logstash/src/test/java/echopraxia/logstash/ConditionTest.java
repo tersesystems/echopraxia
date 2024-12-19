@@ -7,7 +7,7 @@ import static org.awaitility.Awaitility.await;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import com.tersesystems.echopraxia.*;
+import echopraxia.*;
 import echopraxia.api.Condition;
 import echopraxia.api.Field;
 import echopraxia.api.Level;

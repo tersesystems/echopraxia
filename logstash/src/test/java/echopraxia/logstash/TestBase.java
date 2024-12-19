@@ -7,7 +7,7 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.read.ListAppender;
-import com.tersesystems.echopraxia.*;
+import echopraxia.*;
 import echopraxia.Logger;
 import echopraxia.LoggerFactory;
 import echopraxia.api.FieldBuilder;

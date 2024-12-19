@@ -2,7 +2,6 @@ package echopraxia.noop;
 
 import static echopraxia.spi.Utilities.joinFields;
 
-import com.tersesystems.echopraxia.api.*;
 import echopraxia.api.*;
 import echopraxia.spi.CoreLogger;
 import echopraxia.spi.LoggerContext;
@@ -106,7 +105,7 @@ public class NoopCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull <FB> CoreLogger withFields(
-          @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     NoopLoggerContext ctx =
         new NoopLoggerContext(
             joinFields(() -> context.getLoggerFields(), () -> convert(f.apply(builder))));

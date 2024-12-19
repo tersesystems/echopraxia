@@ -1,6 +1,6 @@
 package echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import echopraxia.api.Attribute;
 import echopraxia.api.AttributeKey;
 import echopraxia.api.Attributes;

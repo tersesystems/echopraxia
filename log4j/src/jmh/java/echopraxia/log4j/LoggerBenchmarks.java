@@ -1,6 +1,6 @@
 package echopraxia.log4j;
 
-import com.tersesystems.echopraxia.*;
+import echopraxia.*;
 import echopraxia.Logger;
 import echopraxia.LoggerFactory;
 import echopraxia.api.Condition;

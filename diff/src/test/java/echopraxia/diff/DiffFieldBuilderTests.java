@@ -8,7 +8,7 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
 import echopraxia.Logger;
 import echopraxia.LoggerFactory;
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilder;
 import echopraxia.api.Value;

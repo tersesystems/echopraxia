@@ -1,12 +1,10 @@
 package echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import echopraxia.api.*;
 import org.jetbrains.annotations.NotNull;
 
 /**

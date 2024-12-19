@@ -4,7 +4,6 @@ import static echopraxia.spi.Utilities.joinFields;
 import static org.slf4j.event.EventConstants.*;
 
 import ch.qos.logback.classic.LoggerContext;
-import com.tersesystems.echopraxia.api.*;
 import echopraxia.api.*;
 import echopraxia.logback.CallerMarker;
 import echopraxia.logback.LogbackLoggerContext;

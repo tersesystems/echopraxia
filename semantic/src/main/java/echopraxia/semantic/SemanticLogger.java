@@ -1,6 +1,6 @@
 package echopraxia.semantic;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilderResult;
 import echopraxia.spi.CoreLogger;
@@ -187,7 +187,7 @@ public interface SemanticLogger<DataType> {
    */
   @NotNull
   <FB> SemanticLogger<DataType> withFields(
-          @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder);
+      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder);
 
   /**
    * Associates the logger with a message function.

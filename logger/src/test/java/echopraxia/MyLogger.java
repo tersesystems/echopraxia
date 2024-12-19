@@ -1,6 +1,6 @@
 package echopraxia;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import echopraxia.api.Condition;
 import echopraxia.api.Level;
 import echopraxia.api.PresentationFieldBuilder;

@@ -1,6 +1,6 @@
 package echopraxia;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import echopraxia.api.FieldBuilder;
 import echopraxia.api.PresentationFieldBuilder;
 import echopraxia.spi.Caller;

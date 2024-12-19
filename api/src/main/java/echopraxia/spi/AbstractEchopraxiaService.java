@@ -1,9 +1,8 @@
 package echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
-import java.util.Collections;
-
+import echopraxia.api.*;
 import echopraxia.api.ToStringFormatter;
+import java.util.Collections;
 import org.jetbrains.annotations.NotNull;
 
 /**

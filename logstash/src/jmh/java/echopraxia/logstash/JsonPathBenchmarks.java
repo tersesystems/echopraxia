@@ -1,11 +1,8 @@
 package echopraxia.logstash;
 
-import com.tersesystems.echopraxia.api.*;
 import echopraxia.api.*;
-
-import java.util.concurrent.TimeUnit;
-
 import echopraxia.api.Level;
+import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 

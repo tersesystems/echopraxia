@@ -1,13 +1,10 @@
 package echopraxia.scripting;
 
-import com.tersesystems.echopraxia.api.*;
 import echopraxia.api.*;
-
+import echopraxia.api.Level;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
-
-import echopraxia.api.Level;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;
 

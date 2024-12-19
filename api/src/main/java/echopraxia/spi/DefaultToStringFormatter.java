@@ -2,11 +2,9 @@ package echopraxia.spi;
 
 import static echopraxia.spi.PresentationHintAttributes.*;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import echopraxia.api.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -2,7 +2,6 @@ package echopraxia.log4j;
 
 import static echopraxia.spi.Utilities.joinFields;
 
-import com.tersesystems.echopraxia.api.*;
 import echopraxia.api.*;
 import echopraxia.log4j.layout.EchopraxiaFieldsMessage;
 import echopraxia.spi.CoreLogger;
@@ -89,7 +88,7 @@ public class Log4JCoreLogger implements CoreLogger {
   // attempt to cover all permutations of output.
   @Override
   public <FB> @NotNull Log4JCoreLogger withFields(
-          @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     Context newContext = context.withFields(() -> convertToFields(f.apply(builder)));
     return newLogger(newContext);
   }

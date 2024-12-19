@@ -1,14 +1,12 @@
 package echopraxia.spi;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
-
-import echopraxia.api.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,6 +1,5 @@
 package echopraxia.jul;
 
-import com.tersesystems.echopraxia.api.*;
 import echopraxia.api.*;
 import echopraxia.spi.CoreLogger;
 import echopraxia.spi.EchopraxiaService;
@@ -83,7 +82,7 @@ public class JULCoreLogger implements CoreLogger {
   // attempt to cover all permutations of output.
   @Override
   public <FB> @NotNull JULCoreLogger withFields(
-          @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
+      @NotNull Function<FB, FieldBuilderResult> f, @NotNull FB builder) {
     JULLoggerContext newContext = context.withFields(() -> convertToFields(f.apply(builder)));
     return newLogger(newContext);
   }

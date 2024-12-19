@@ -3,14 +3,13 @@ package echopraxia.spi;
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPathException;
 import com.jayway.jsonpath.spi.json.JsonProvider;
-import com.tersesystems.echopraxia.api.*;
-import java.io.InputStream;
-import java.util.*;
-import java.util.stream.Collectors;
-
+import echopraxia.api.*;
 import echopraxia.api.Field;
 import echopraxia.api.LoggingContext;
 import echopraxia.api.Value;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 
 public class EchopraxiaJsonProvider implements JsonProvider {

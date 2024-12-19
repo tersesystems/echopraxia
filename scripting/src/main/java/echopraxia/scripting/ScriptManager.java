@@ -2,14 +2,14 @@ package echopraxia.scripting;
 
 import static echopraxia.scripting.ScriptFunction.*;
 
-import echopraxia.api.Level;
-import echopraxia.api.LoggingContext;
 import com.twineworks.tweakflow.lang.TweakFlow;
 import com.twineworks.tweakflow.lang.load.loadpath.LoadPath;
 import com.twineworks.tweakflow.lang.load.loadpath.MemoryLocation;
 import com.twineworks.tweakflow.lang.runtime.Runtime;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
+import echopraxia.api.Level;
+import echopraxia.api.LoggingContext;
 import java.util.*;
 import java.util.function.Function;
 

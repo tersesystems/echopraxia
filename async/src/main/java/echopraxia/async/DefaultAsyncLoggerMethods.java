@@ -4,7 +4,7 @@ import static echopraxia.api.Level.*;
 import static echopraxia.api.Value.exception;
 import static echopraxia.spi.FieldConstants.EXCEPTION;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import echopraxia.api.Condition;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilderResult;

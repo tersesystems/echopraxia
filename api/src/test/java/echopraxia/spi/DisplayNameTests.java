@@ -3,7 +3,7 @@ package echopraxia.spi;
 import static echopraxia.spi.PresentationHintAttributes.withDisplayName;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.tersesystems.echopraxia.api.*;
+import echopraxia.api.*;
 import echopraxia.api.Attributes;
 import echopraxia.api.Field;
 import echopraxia.api.Value;
