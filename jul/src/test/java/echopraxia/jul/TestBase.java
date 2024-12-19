@@ -1,6 +1,6 @@
 package echopraxia.jul;
 
-import echopraxia.api.PresentationFieldBuilder;
+import echopraxia.api.FieldBuilder;
 import echopraxia.async.AsyncLogger;
 import echopraxia.async.AsyncLoggerFactory;
 import echopraxia.logger.Logger;
@@ -34,11 +34,11 @@ public class TestBase {
     EncodedListHandler.clear();
   }
 
-  Logger<PresentationFieldBuilder> getLogger() {
-    return LoggerFactory.getLogger(getCoreLogger(), PresentationFieldBuilder.instance());
+  Logger<FieldBuilder> getLogger() {
+    return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 
-  AsyncLogger<PresentationFieldBuilder> getAsyncLogger() {
+  AsyncLogger<FieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger();
   }
 

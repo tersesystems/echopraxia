@@ -63,7 +63,7 @@ For example, `SimpleDateFormat` is infamously not thread-safe, and so the follow
 private final static DateFormat df = new SimpleDateFormat("yyyyMMdd");
 
 // UNSAFE EXAMPLE
-private static final Logger<PresentationFieldBuilder> logger =
+private static final Logger<FieldBuilder> logger =
         LoggerFactory.getLogger()
         .withFields(fb -> fb.string("unsafe_date", df.format(new Date())));
 ```

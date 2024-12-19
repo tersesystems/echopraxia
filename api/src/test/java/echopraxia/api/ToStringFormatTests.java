@@ -58,12 +58,12 @@ public class ToStringFormatTests {
     assertThat(s).isEqualTo("durations=[1 day, 2 days]");
   }
 
-  static class MyFieldBuilder implements PresentationFieldBuilder {
+  static class MyFieldBuilder implements FieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder();
     }
 
-    public PresentationField duration(String name, Duration duration) {
+    public Field duration(String name, Duration duration) {
       return string(name, duration.toString())
           .withToStringFormat(
               new SimpleFieldVisitor() {

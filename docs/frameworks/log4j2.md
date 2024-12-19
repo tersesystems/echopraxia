@@ -31,7 +31,7 @@ Condition hasAnyMarkers = (level, context) -> {
 If you need to get the Log4j logger from a core logger, you can cast and call `core.logger()`:
 
 ```java
-Logger<PresentationFieldBuilder> baseLogger = LoggerFactory.getLogger();
+Logger<FieldBuilder> baseLogger = LoggerFactory.getLogger();
 Log4JCoreLogger core = (Log4JCoreLogger) baseLogger.core();
 org.apache.logging.log4j.Logger log4jLogger = core.logger();
 ```

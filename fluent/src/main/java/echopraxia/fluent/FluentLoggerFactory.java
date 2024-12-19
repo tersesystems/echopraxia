@@ -1,6 +1,6 @@
 package echopraxia.fluent;
 
-import echopraxia.api.PresentationFieldBuilder;
+import echopraxia.api.FieldBuilder;
 import echopraxia.logging.spi.Caller;
 import echopraxia.logging.spi.CoreLogger;
 import echopraxia.logging.spi.CoreLoggerFactory;
@@ -17,8 +17,8 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static FluentLogger<PresentationFieldBuilder> getLogger(Class<?> clazz) {
-    return getLogger(clazz, PresentationFieldBuilder.instance());
+  public static FluentLogger<FieldBuilder> getLogger(Class<?> clazz) {
+    return getLogger(clazz, FieldBuilder.instance());
   }
 
   /**
@@ -42,8 +42,8 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static FluentLogger<PresentationFieldBuilder> getLogger(String name) {
-    return getLogger(name, PresentationFieldBuilder.instance());
+  public static FluentLogger<FieldBuilder> getLogger(String name) {
+    return getLogger(name, FieldBuilder.instance());
   }
 
   /**
@@ -66,7 +66,7 @@ public class FluentLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static FluentLogger<PresentationFieldBuilder> getLogger() {
+  public static FluentLogger<FieldBuilder> getLogger() {
     return getLogger(Caller.resolveClassName());
   }
 

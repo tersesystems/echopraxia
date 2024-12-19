@@ -1,7 +1,6 @@
 package echopraxia.logger;
 
 import echopraxia.api.FieldBuilder;
-import echopraxia.api.PresentationFieldBuilder;
 import echopraxia.logging.spi.Caller;
 import echopraxia.logging.spi.CoreLogger;
 import echopraxia.logging.spi.CoreLoggerFactory;
@@ -10,8 +9,7 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The LoggerFactory class. This is used to create the appropriate `Logger`.
  *
- * <p>{@code private static final Logger<PresentationFieldBuilder> logger =
- * LoggerFactory.getLogger(); }
+ * <p>{@code private static final Logger<FieldBuilder> logger = LoggerFactory.getLogger(); }
  */
 public class LoggerFactory {
 
@@ -22,9 +20,9 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static Logger<PresentationFieldBuilder> getLogger(Class<?> clazz) {
+  public static Logger<FieldBuilder> getLogger(Class<?> clazz) {
     final CoreLogger core = CoreLoggerFactory.getLogger(echopraxia.logger.Logger.FQCN, clazz);
-    return getLogger(core, PresentationFieldBuilder.instance());
+    return getLogger(core, FieldBuilder.instance());
   }
 
   /**
@@ -48,9 +46,9 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static Logger<PresentationFieldBuilder> getLogger(@NotNull String name) {
+  public static Logger<FieldBuilder> getLogger(@NotNull String name) {
     final CoreLogger core = CoreLoggerFactory.getLogger(Logger.FQCN, name);
-    return getLogger(core, PresentationFieldBuilder.instance());
+    return getLogger(core, FieldBuilder.instance());
   }
 
   /**
@@ -73,9 +71,9 @@ public class LoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static Logger<PresentationFieldBuilder> getLogger() {
+  public static Logger<FieldBuilder> getLogger() {
     CoreLogger core = CoreLoggerFactory.getLogger(Logger.FQCN, Caller.resolveClassName());
-    return getLogger(core, PresentationFieldBuilder.instance());
+    return getLogger(core, FieldBuilder.instance());
   }
 
   /**
@@ -83,8 +81,8 @@ public class LoggerFactory {
    *
    * @return the logger.
    */
-  public static Logger<PresentationFieldBuilder> getLogger(CoreLogger core) {
-    return getLogger(core, PresentationFieldBuilder.instance());
+  public static Logger<FieldBuilder> getLogger(CoreLogger core) {
+    return getLogger(core, FieldBuilder.instance());
   }
 
   /**
