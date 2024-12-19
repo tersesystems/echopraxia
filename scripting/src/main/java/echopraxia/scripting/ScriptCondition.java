@@ -1,5 +1,6 @@
 package echopraxia.scripting;
 
+import echopraxia.jsonpath.LoggingContextWithFindPathMethods;
 import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import echopraxia.logging.api.LoggingContext;
@@ -135,6 +136,7 @@ public class ScriptCondition implements Condition {
 
   @Override
   public boolean test(Level level, LoggingContext context) {
-    return scriptManager.execute(defaultValue, level, context);
+    // XXX should be a better test here
+    return scriptManager.execute(defaultValue, level, (LoggingContextWithFindPathMethods) context);
   }
 }

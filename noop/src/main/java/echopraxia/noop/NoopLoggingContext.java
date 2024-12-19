@@ -2,7 +2,6 @@ package echopraxia.noop;
 
 import echopraxia.api.Field;
 import echopraxia.logging.api.LoggingContext;
-import echopraxia.logging.spi.AbstractJsonPathFinder;
 import echopraxia.logging.spi.CoreLogger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,7 +11,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.jetbrains.annotations.NotNull;
 
-public class NoopLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+public class NoopLoggingContext implements LoggingContext {
   protected final Supplier<List<Field>> loggerFields;
   protected final Supplier<List<Field>> argumentFields;
   private final CoreLogger core;

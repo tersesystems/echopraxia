@@ -4,8 +4,8 @@ import static echopraxia.logging.spi.Utilities.joinFields;
 import static echopraxia.logging.spi.Utilities.memoize;
 
 import echopraxia.api.Field;
+import echopraxia.jsonpath.AbstractJsonPathFinder;
 import echopraxia.logging.api.LoggingContext;
-import echopraxia.logging.spi.AbstractJsonPathFinder;
 import echopraxia.logging.spi.CoreLogger;
 import java.util.Collections;
 import java.util.List;

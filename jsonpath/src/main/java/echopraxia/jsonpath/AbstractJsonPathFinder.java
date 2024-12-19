@@ -1,12 +1,17 @@
-package echopraxia.logging.spi;
+package echopraxia.jsonpath;
 
-import static echopraxia.api.FieldConstants.*;
+import static echopraxia.api.FieldConstants.EXCEPTION;
 
-import com.jayway.jsonpath.*;
+import com.jayway.jsonpath.Configuration;
+import com.jayway.jsonpath.DocumentContext;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import echopraxia.api.Value;
-import echopraxia.api.Value.*;
+import echopraxia.api.Value.ArrayValue;
+import echopraxia.api.Value.ExceptionValue;
+import echopraxia.logging.spi.Utilities;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;

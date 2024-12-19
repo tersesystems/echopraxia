@@ -32,8 +32,8 @@ public class ExceptionHandlerTests extends TestBase {
   public void testConditionAndBadWithField() {
     var logger = getLogger();
     Integer number = null;
-    Condition condition =
-        (level, context) -> context.findNumber("$.testing").stream().anyMatch(p -> p.equals(5));
+
+    Condition condition = Condition.numberMatch("testing", p -> p.raw().intValue() == 5);
 
     var badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
     badLogger.debug(condition, "I have a bad logger field and a good condition");
@@ -46,9 +46,9 @@ public class ExceptionHandlerTests extends TestBase {
   public void testBadConditionWithCondition() {
     var logger = getLogger();
     Integer number = null;
+    // match on a null condition that will explode
     Condition badCondition =
-        (level, context) ->
-            context.findNumber("$.testing").stream().anyMatch(p -> p.equals(number.intValue()));
+        Condition.numberMatch("testing", p -> p.raw().intValue() == number.intValue());
 
     var badLogger = logger.withCondition(badCondition);
     badLogger.debug("I am passing in {}", fb -> fb.number("testing", 5));
@@ -73,9 +73,9 @@ public class ExceptionHandlerTests extends TestBase {
   public void testBadConditionAndArgument() {
     var logger = getLogger();
     Integer number = null;
+    // match on a null condition that will explode
     Condition badCondition =
-        (level, context) ->
-            context.findNumber("$.testing").stream().anyMatch(p -> p.equals(number.intValue()));
+        Condition.numberMatch("testing", p -> p.raw().intValue() == number.intValue());
 
     logger.debug(
         badCondition, "I am passing in {}", fb -> fb.number("nullNumber", number.intValue()));

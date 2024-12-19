@@ -5,7 +5,6 @@ import static echopraxia.logging.spi.Utilities.memoize;
 
 import echopraxia.api.Field;
 import echopraxia.logging.api.LoggingContext;
-import echopraxia.logging.spi.AbstractJsonPathFinder;
 import echopraxia.logging.spi.CoreLogger;
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +12,7 @@ import java.util.function.Supplier;
 import org.apache.logging.log4j.Marker;
 import org.jetbrains.annotations.NotNull;
 
-public class Log4JLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+public class Log4JLoggingContext implements LoggingContext {
   private final Supplier<List<Field>> argumentFields;
   private final Supplier<List<Field>> loggerFields;
   private final Supplier<List<Field>> joinedFields;

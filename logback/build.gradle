@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api project(":logging")
+    api project(":jsonpath")
 
     // We don't depend on SLF4J 2.x or Logback 1.3 features, but we don't want to bind
     // consumers to them either.
