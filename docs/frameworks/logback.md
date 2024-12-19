@@ -5,8 +5,7 @@ You can get access to the Logback and Logstash features by casting.
 First, import the `logstash` package.  This gets you access to the `CoreLoggerFactory` and  `CoreLogger`, which can be cast to `LogstashCoreLogger`:
 
 ```java
-import com.tersesystems.echopraxia.logstash.*;
-import com.tersesystems.echopraxia.api.*;
+
 
 LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
 ```
@@ -64,10 +63,14 @@ slf4jLogger.error("SLF4J exception {}", fb.exception(e), e);
 SLF4J has no direct support for conditions, but we can fake it with a `ConditionMarker`:
 
 ```java
-import com.tersesystems.echopraxia.logback.*;
+
 
 Marker marker = ConditionMarker.apply(condition);
-slf4jLogger.info(marker, "SLF4J message string {} number {}", fb.string("foo", "bar"), fb.number("count", 1));
+slf4jLogger.
+
+info(marker, "SLF4J message string {} number {}",fb.string("foo", "bar"),fb.
+
+number("count",1));
 ```
 
 You may want to represent session specific information as "logger context" field, which correspond to logstash markers.  If you want to use a context field, you can wrap a field in `FieldMarker` and then pass it in directly or use `Markers.aggregate` with a condition:

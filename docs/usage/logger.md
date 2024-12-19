@@ -26,34 +26,33 @@ implementation "com.tersesystems.echopraxia:api:<VERSION>"
 And then continuing on from the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), you can build a `PersonLogger`:
 
 ```java
-import com.tersesystems.echopraxia.api.*;
-import com.tersesystems.echopraxia.spi.*;
+
 
 public final class PersonLogger extends AbstractLoggerSupport<PersonLogger, PersonFieldBuilder>
-  implements DefaultLoggerMethods<PersonFieldBuilder> {
-  private static final String FQCN = PersonLogger.class.getName();
+        implements DefaultLoggerMethods<PersonFieldBuilder> {
+    private static final String FQCN = PersonLogger.class.getName();
 
-  protected PersonLogger(
-    @NotNull CoreLogger core, @NotNull PersonFieldBuilder fieldBuilder, Class<?> selfType) {
-    super(core, fieldBuilder, selfType);
-  }
+    protected PersonLogger(
+            @NotNull CoreLogger core, @NotNull PersonFieldBuilder fieldBuilder, Class<?> selfType) {
+        super(core, fieldBuilder, selfType);
+    }
 
-  public void info(@Nullable String message, Person person) {
-    // when using custom methods, you must specify the caller as the class it's defined in.
-    this.core().withFQCN(FQCN).log(Level.INFO, message,
-      fb -> fb.person("person", person), fieldBuilder);
-  }
+    public void info(@Nullable String message, Person person) {
+        // when using custom methods, you must specify the caller as the class it's defined in.
+        this.core().withFQCN(FQCN).log(Level.INFO, message,
+                fb -> fb.person("person", person), fieldBuilder);
+    }
 
-  @Override
-  protected @NotNull PersonLogger newLogger(CoreLogger core) {
-    return new PersonLogger(core, fieldBuilder(), PersonLogger.class);
-  }
+    @Override
+    protected @NotNull PersonLogger newLogger(CoreLogger core) {
+        return new PersonLogger(core, fieldBuilder(), PersonLogger.class);
+    }
 
-  @Override
-  protected @NotNull PersonLogger neverLogger() {
-    return new PersonLogger(
-      core.withCondition(Condition.never()), fieldBuilder(), PersonLogger.class);
-  }
+    @Override
+    protected @NotNull PersonLogger neverLogger() {
+        return new PersonLogger(
+                core.withCondition(Condition.never()), fieldBuilder(), PersonLogger.class);
+    }
 }
 ```
 

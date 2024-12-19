@@ -6,7 +6,7 @@ Echopraxia is simple and easy to use, and looks very similar to SLF4J.
 Add the import:
 
 ```java
-import com.tersesystems.echopraxia.*;
+
 ```
 
 Define a logger (usually in a controller or singleton -- `getClass()` is particularly useful for abstract controllers):
@@ -82,13 +82,15 @@ basicLogger.info("Message name {}", fb -> fb.list(
 You can also create the fields yourself and pass them in directly:
 
 ```java
-import com.tersesystems.echopraxia.api.*;
+
 
 var fb = PresentationFieldBuilder.instance;
 var nameField = fb.string("name", "value");
 var ageField = fb.number("age", 13);
 var exceptionField = fb.exception(e);
-logger.info(nameField, ageField, exceptionField);
+logger.
+
+info(nameField, ageField, exceptionField);
 ```
 
 Note that unlike SLF4J, you don't have to worry about including the exception as an argument "swallowing" the stacktrace.  If an exception is present, it's always applied to the underlying logger.

@@ -17,7 +17,7 @@
     <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
     </appender>
 
-    <appender name="STRINGLIST" class="com.tersesystems.echopraxia.logstash.EncodingListAppender">
+    <appender name="STRINGLIST" class="echopraxia.logstash.EncodingListAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
             <providers>
@@ -35,7 +35,7 @@
         </encoder>
     </appender>
 
-    <appender name="caller" class="com.tersesystems.echopraxia.logback.CallerDataAppender">
+    <appender name="caller" class="echopraxia.logback.CallerDataAppender">
         <appender-ref ref="LIST"/>
         <appender-ref ref="STRINGLIST"/>
     </appender>

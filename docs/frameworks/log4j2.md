@@ -3,8 +3,7 @@
 Similar to Logstash, you can get access to Log4J specific features by casting to the underlying `Log4JCoreLogger` class.
 
 ```java
-import com.tersesystems.echopraxia.log4j.*;
-import com.tersesystems.echopraxia.api.*;
+
 
 Log4JCoreLogger core = (Log4JCoreLogger) CoreLoggerFactory.getLogger();
 ```

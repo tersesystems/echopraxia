@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Configuration status="WARN" packages="com.tersesystems.echopraxia.log4j.layout,com.tersesystems.echopraxia.log4j.appender">
+<Configuration status="WARN" packages="echopraxia.log4j.layout,echopraxia.log4j.appender">
 
     <!-- always log a statement with a security marker. -->
     <MarkerFilter marker="SECURITY" onMatch="ACCEPT" onMismatch="NEUTRAL"/>

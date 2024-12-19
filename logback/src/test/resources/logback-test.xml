@@ -3,7 +3,7 @@
     </appender>
 
     <!-- handles conditions passed through ConditionMarker -->
-    <turboFilter class="com.tersesystems.echopraxia.logback.ConditionTurboFilter"/>
+    <turboFilter class="echopraxia.logback.ConditionTurboFilter"/>
 
     <root level="TRACE">
         <appender-ref ref="LIST"/>
