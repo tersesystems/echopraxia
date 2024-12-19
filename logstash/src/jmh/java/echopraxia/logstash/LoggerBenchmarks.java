@@ -1,6 +1,6 @@
 package echopraxia.logstash;
 
-import echopraxia.api.PresentationFieldBuilder;
+import echopraxia.api.FieldBuilder;
 import echopraxia.logger.Logger;
 import echopraxia.logger.LoggerFactory;
 import echopraxia.logging.api.Condition;
@@ -15,18 +15,16 @@ import org.openjdk.jmh.infra.Blackhole;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class LoggerBenchmarks {
-  private static final Logger<PresentationFieldBuilder> logger = LoggerFactory.getLogger();
+  private static final Logger<FieldBuilder> logger = LoggerFactory.getLogger();
   private static final Exception exception = new RuntimeException();
 
-  private static final Logger<PresentationFieldBuilder> neverLogger =
-      logger.withCondition(Condition.never());
-  private static final Logger<PresentationFieldBuilder> alwaysLogger =
-      logger.withCondition(Condition.always());
-  private static final Logger<PresentationFieldBuilder> conditionLogger =
+  private static final Logger<FieldBuilder> neverLogger = logger.withCondition(Condition.never());
+  private static final Logger<FieldBuilder> alwaysLogger = logger.withCondition(Condition.always());
+  private static final Logger<FieldBuilder> conditionLogger =
       logger.withCondition((level, context) -> level.equals(Level.ERROR));
-  private static final Logger<PresentationFieldBuilder> fieldBuilderLogger =
-      logger.withFieldBuilder(PresentationFieldBuilder.instance());
-  private static final Logger<PresentationFieldBuilder> contextLogger =
+  private static final Logger<FieldBuilder> fieldBuilderLogger =
+      logger.withFieldBuilder(FieldBuilder.instance());
+  private static final Logger<FieldBuilder> contextLogger =
       logger.withFields(fb -> fb.string("foo", "bar"));
 
   @Benchmark

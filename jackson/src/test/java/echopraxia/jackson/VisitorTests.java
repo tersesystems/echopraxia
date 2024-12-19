@@ -159,16 +159,16 @@ public class VisitorTests {
         .isEqualTo("http://www.w3.org/2001/XMLSchema#dateTime");
   }
 
-  static class MyFieldBuilder implements PresentationFieldBuilder {
+  static class MyFieldBuilder implements FieldBuilder {
     static MyFieldBuilder instance() {
       return new MyFieldBuilder();
     }
 
-    public PresentationField instant(String name, Instant instant) {
+    public Field instant(String name, Instant instant) {
       return string(name, instant.toString()).withStructuredFormat(new InstantFieldVisitor());
     }
 
-    public PresentationField typedInstant(String name, Value<String> v) {
+    public Field typedInstant(String name, Value<String> v) {
       return object(name, typedInstantValue(v));
     }
 
@@ -177,7 +177,7 @@ public class VisitorTests {
           string("@type", "http://www.w3.org/2001/XMLSchema#dateTime"), keyValue("@value", v));
     }
 
-    public PresentationField duration(String name, Duration duration) {
+    public Field duration(String name, Duration duration) {
       Field structuredField = string(name, duration.toString());
       return string(name, duration.toDays() + " day")
           .asValueOnly()

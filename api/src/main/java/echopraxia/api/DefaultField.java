@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
  *
  * @since 3.0
  */
-public class DefaultField implements PresentationField {
+public class DefaultField implements Field {
 
   protected final String name;
   protected final Value<?> value;

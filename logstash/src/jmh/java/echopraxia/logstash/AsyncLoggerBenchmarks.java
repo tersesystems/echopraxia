@@ -1,7 +1,6 @@
 package echopraxia.logstash;
 
 import echopraxia.api.FieldBuilder;
-import echopraxia.api.PresentationFieldBuilder;
 import echopraxia.async.AsyncLogger;
 import echopraxia.async.AsyncLoggerFactory;
 import echopraxia.logging.api.Condition;
@@ -17,7 +16,7 @@ import org.openjdk.jmh.annotations.*;
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Fork(1)
 public class AsyncLoggerBenchmarks {
-  private static final AsyncLogger<PresentationFieldBuilder> logger =
+  private static final AsyncLogger<FieldBuilder> logger =
       AsyncLoggerFactory.getLogger()
           .withExecutor(
               new Executor() {

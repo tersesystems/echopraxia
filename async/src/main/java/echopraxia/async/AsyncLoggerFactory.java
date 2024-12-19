@@ -1,6 +1,6 @@
 package echopraxia.async;
 
-import echopraxia.api.PresentationFieldBuilder;
+import echopraxia.api.FieldBuilder;
 import echopraxia.logging.spi.Caller;
 import echopraxia.logging.spi.CoreLogger;
 import echopraxia.logging.spi.CoreLoggerFactory;
@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * The AsyncLoggerFactory class. This is used to create the appropriate `Logger`.
  *
- * <p>{@code private static final AsyncLogger<PresentationFieldBuilder> logger =
- * AsyncLoggerFactory.getLogger(); }
+ * <p>{@code private static final AsyncLogger<FieldBuilder> logger = AsyncLoggerFactory.getLogger();
+ * }
  */
 public class AsyncLoggerFactory {
 
@@ -23,9 +23,9 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static AsyncLogger<PresentationFieldBuilder> getLogger(Class<?> clazz) {
+  public static AsyncLogger<FieldBuilder> getLogger(Class<?> clazz) {
     final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, clazz);
-    return new AsyncLogger<>(core, PresentationFieldBuilder.instance());
+    return new AsyncLogger<>(core, FieldBuilder.instance());
   }
 
   /**
@@ -49,9 +49,9 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static AsyncLogger<PresentationFieldBuilder> getLogger(@NotNull String name) {
+  public static AsyncLogger<FieldBuilder> getLogger(@NotNull String name) {
     final CoreLogger core = CoreLoggerFactory.getLogger(FQCN, name);
-    return new AsyncLogger<>(core, PresentationFieldBuilder.instance());
+    return new AsyncLogger<>(core, FieldBuilder.instance());
   }
 
   /**
@@ -74,9 +74,9 @@ public class AsyncLoggerFactory {
    * @return the logger.
    */
   @NotNull
-  public static AsyncLogger<PresentationFieldBuilder> getLogger() {
+  public static AsyncLogger<FieldBuilder> getLogger() {
     CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
-    return new AsyncLogger<>(core, PresentationFieldBuilder.instance());
+    return new AsyncLogger<>(core, FieldBuilder.instance());
   }
 
   /**

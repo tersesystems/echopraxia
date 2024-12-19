@@ -5,7 +5,7 @@ import static echopraxia.log4j.appender.ListAppender.getListAppender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import echopraxia.api.PresentationFieldBuilder;
+import echopraxia.api.FieldBuilder;
 import echopraxia.async.AsyncLogger;
 import echopraxia.async.AsyncLoggerFactory;
 import echopraxia.log4j.appender.ListAppender;
@@ -25,11 +25,11 @@ public class TestBase {
   }
 
   @NotNull
-  Logger<PresentationFieldBuilder> getLogger() {
+  Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger();
   }
 
-  AsyncLogger<PresentationFieldBuilder> getAsyncLogger() {
+  AsyncLogger<FieldBuilder> getAsyncLogger() {
     return AsyncLoggerFactory.getLogger();
   }
 

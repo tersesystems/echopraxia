@@ -23,7 +23,7 @@ It is useful in situations where arguments may need to be built up over time.
 ```java
 
 
-FluentLogger<PresentationFieldBuilder> logger = FluentLoggerFactory.getLogger(getClass());
+FluentLogger<FieldBuilder> logger = FluentLoggerFactory.getLogger(getClass());
 
 Person person = new Person("Eloise", 1);
 

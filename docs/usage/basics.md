@@ -12,7 +12,7 @@ Add the import:
 Define a logger (usually in a controller or singleton -- `getClass()` is particularly useful for abstract controllers):
 
 ```java
-final Logger<PresentationFieldBuilder> basicLogger = LoggerFactory.getLogger(getClass());
+final Logger<FieldBuilder> basicLogger = LoggerFactory.getLogger(getClass());
 ```
 
 Logging simple messages and exceptions are done as in SLF4J:
@@ -53,7 +53,7 @@ basicLogger.info("Message name {}", fb -> {
 The field builder is customizable, so you can (and should!) define your own methods to construct fields out of complex objects:
 
 ```java
-class OrderFieldBuilder extends PresentationFieldBuilder {
+class OrderFieldBuilder extends FieldBuilder {
     // Use apply to render order as a Field
     public Field apply(Order order) {
         return keyValue("order", Value.object(
@@ -84,7 +84,7 @@ You can also create the fields yourself and pass them in directly:
 ```java
 
 
-var fb = PresentationFieldBuilder.instance;
+var fb = FieldBuilder.instance;
 var nameField = fb.string("name", "value");
 var ageField = fb.number("age", 13);
 var exceptionField = fb.exception(e);

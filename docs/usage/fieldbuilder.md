@@ -4,7 +4,7 @@ To do most useful things in Echopraxia, you'll want to define field builders.  T
 
 ## Overview
 
-Conceptually, a field builder is a handle for creating structured data.  The `Logger` does not hardcode a field builder type, and you are free to create your own field builders from scratch.  A `PresentationFieldBuilder` interface is provided as the default, but it is not required.
+Conceptually, a field builder is a handle for creating structured data.  The `Logger` does not hardcode a field builder type, and you are free to create your own field builders from scratch.  A `FieldBuilder` interface is provided as the default, but it is not required.
 
 ## Imports
 
@@ -16,7 +16,7 @@ Start by importing the API package.  Everything relevant to field building will 
 
 ## Defining Field Builders
 
-The `PresentationFieldBuilder` interface provides some convenience methods around `Field` and `Value`.  We'll cover `Field` and `Value` in depth, but let's start with `PresentationFieldBuilder` and run thorugh
+The `FieldBuilder` interface provides some convenience methods around `Field` and `Value`.  We'll cover `Field` and `Value` in depth, but let's start with `FieldBuilder` and run thorugh
 
 * `keyValue`: renders a field with `name=value` when rendered in logfmt line oriented text.
 * `value`: renders a field with `value` when rendered in logfmt line oriented text.
@@ -37,15 +37,15 @@ You can then create custom methods on your field builder that will render your c
 
 import java.util.Date;
 
-public interface BuilderWithDate implements PresentationFieldBuilder {
+public interface BuilderWithDate implements FieldBuilder {
     static BuilderWithDate instance = new BuilderWithDate() {
     };
 
-    default PresentationField date(Date date) {
+    default Field date(Date date) {
         return value("date", dateValue(date)); // use a default name
     }
 
-    default PresentationField date(String name, Date date) {
+    default Field date(String name, Date date) {
         return value(name, dateValue(date));
     }
 
@@ -124,10 +124,10 @@ The value of a field builder compounds as you build up complex objects from simp
 In the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), the `Person` class is rendered using a custom field builder:
 
 ```java
-public interface PersonFieldBuilder extends PresentationFieldBuilder {
+public interface PersonFieldBuilder extends FieldBuilder {
 
   // Renders a `Person` as an object field.
-  default PresentationField person(String fieldName, Person p) {
+  default Field person(String fieldName, Person p) {
     return keyValue(fieldName, personValue(p));
   }
 
@@ -161,9 +161,9 @@ personLogger.info("Person {}", fb -> fb.person("user", user));
 
 There are times when the default field presentation is awkward, and you'd like to cut down on the amount of information displayed in the message.  You can do this by adding presentation hints to the field.
 
-The `PresentationField` interface implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
+The `Field` interface implements the `Field` interface and also provides some extra methods for customizing the presentation of the fields in a line oriented text format.  These presentation hints are provided by field attributes and are used by the `toString` formatter.
 
-For the examples, we'll assume that `PresentationFieldBuilder` is being used here and therefore `keyValue` returns `PresentationField`.
+For the examples, we'll assume that `FieldBuilder` is being used here and therefore `keyValue` returns `Field`.
 
 ### asValueOnly
 
@@ -211,11 +211,11 @@ Using the `withStructuredFormat` method with a field visitor will override and t
 Imagine you want to render a `java.lang.Instant` in JSON as having an explicit `@type` of `http://www.w3.org/2001/XMLSchema#dateTime` alongside the value, but don't want to needlessly complicate your output.  Using `withStructuredFormat` with a class extending `SimpleFieldVisitor`, you can intercept and override field processing in JSON:
 
 ```java
-public class InstantFieldBuilder implements PresentationFieldBuilder {
+public class InstantFieldBuilder implements FieldBuilder {
 
   private static final FieldVisitor instantVisitor = new InstantFieldVisitor();
 
-  public PresentationField instant(String name, Instant instant) {
+  public Field instant(String name, Instant instant) {
     return string(name, instant.toString()).withStructuredFormat(instantVisitor);
   }
 
@@ -225,7 +225,7 @@ public class InstantFieldBuilder implements PresentationFieldBuilder {
       return typedInstant(name, stringValue);
     }
 
-    PresentationField typedInstant(String name, Value<String> v) {
+    Field typedInstant(String name, Value<String> v) {
       return object(name, typedInstantValue(v));
     }
 
@@ -392,11 +392,11 @@ In addition, there is `Value.optional` which takes `Optional<Value<V>>` and retu
 The `Field` interface has some static methods that are the primary way to create fields:
 
 * `Field.keyValue(name, value)` returns a `Field` with the given name and value set, displaying as "name=value" in text.
-* `Field.keyValue(name, value, PresentationField.class)` returns a `PresentationField` that has more methods on it.
+* `Field.keyValue(name, value, Field.class)` returns a `Field` that has more methods on it.
 
 You can also define and extend `Field` with your own implementation, although that is outside the scope of this section.
 
-You can also create a field using `Field.value(name, value)` or `Field.value(name, value, PresentationField.class)`, which creates a `Field` with the presentation attribute `asValueOnly` set.
+You can also create a field using `Field.value(name, value)` or `Field.value(name, value, Field.class)`, which creates a `Field` with the presentation attribute `asValueOnly` set.
 
 ## Packages and Modules
 
@@ -416,10 +416,10 @@ So, define a field builder per package:
 package com.mystore.user;
 
 // field builder for the user package:
-interface UserFieldBuilder extends PresentationFieldBuilder {
+interface UserFieldBuilder extends FieldBuilder {
   UserFieldBuilder instance = new UserFieldBuilder() {};
   
-  default PresentationField user(User user) {
+  default Field user(User user) {
     // ...
   }
 }
@@ -445,11 +445,11 @@ package com.mystore.order;
 interface OrderFieldBuilder extends UserFieldBuilder {
   OrderFieldBuilder instance = new OrderFieldBuilder() {};
   
-  default PresentationField orderId(OrderId id) {
+  default Field orderId(OrderId id) {
     return (id == null) ? nullValue("order_id") : keyValue("order_id", id);
   }
   
-  default PresentationField order(Order order) {
+  default Field order(Order order) {
     if (order == null) 
       return nullField("order");
     else 

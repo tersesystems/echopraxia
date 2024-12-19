@@ -1,6 +1,6 @@
 package echopraxia;
 
-import echopraxia.api.PresentationFieldBuilder;
+import echopraxia.api.FieldBuilder;
 import echopraxia.logger.DefaultLoggerMethods;
 import echopraxia.logger.LoggerMethods;
 import echopraxia.logging.api.Condition;
@@ -34,7 +34,7 @@ public class MyLogger extends AbstractLoggerSupport<MyLogger, MyFieldBuilder>
   }
 }
 
-class MyFieldBuilder implements PresentationFieldBuilder {}
+class MyFieldBuilder implements FieldBuilder {}
 
 class MyLoggerFactory {
 

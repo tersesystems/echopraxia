@@ -1,7 +1,7 @@
 package echopraxia.semantic;
 
+import echopraxia.api.FieldBuilder;
 import echopraxia.api.FieldBuilderResult;
-import echopraxia.api.PresentationFieldBuilder;
 import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import echopraxia.logging.spi.Caller;
@@ -88,8 +88,8 @@ public class SemanticLoggerFactory {
       String name,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Function<PresentationFieldBuilder, FieldBuilderResult>> f) {
-    return getLogger(name, dataTypeClass, messageFunction, f, PresentationFieldBuilder.instance());
+      Function<DataType, Function<FieldBuilder, FieldBuilderResult>> f) {
+    return getLogger(name, dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
   /**
@@ -107,8 +107,8 @@ public class SemanticLoggerFactory {
       Class<?> clazz,
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Function<PresentationFieldBuilder, FieldBuilderResult>> f) {
-    return getLogger(clazz, dataTypeClass, messageFunction, f, PresentationFieldBuilder.instance());
+      Function<DataType, Function<FieldBuilder, FieldBuilderResult>> f) {
+    return getLogger(clazz, dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
   /**
@@ -124,13 +124,9 @@ public class SemanticLoggerFactory {
   public static <DataType> SemanticLogger<DataType> getLogger(
       Class<DataType> dataTypeClass,
       Function<DataType, String> messageFunction,
-      Function<DataType, Function<PresentationFieldBuilder, FieldBuilderResult>> f) {
+      Function<DataType, Function<FieldBuilder, FieldBuilderResult>> f) {
     return getLogger(
-        Caller.resolveClassName(),
-        dataTypeClass,
-        messageFunction,
-        f,
-        PresentationFieldBuilder.instance());
+        Caller.resolveClassName(), dataTypeClass, messageFunction, f, FieldBuilder.instance());
   }
 
   /**

@@ -17,7 +17,8 @@ import org.jetbrains.annotations.NotNull;
  * <p>The field builder interface and custom field builders go a long way to building up more
  * complex structures, please see documentation for how to use them.
  */
-public interface Field extends FieldBuilderResult {
+public interface Field
+    extends FieldBuilderResult, PresentationHints<Field>, AttributesAware<Field> {
 
   /**
    * The field name.

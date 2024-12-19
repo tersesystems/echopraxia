@@ -152,7 +152,7 @@ var loggerWithCondition = logger.withCondition(condition);
 You can also build up conditions:
 
 ```java
-Logger<PresentationFieldBuilder> loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
+Logger<FieldBuilder> loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
 ```
 
 Conditions are only evaluated once a level/marker check is passed, so something like
