@@ -1,7 +1,7 @@
 package echopraxia.jul;
 
-import echopraxia.spi.EchopraxiaService;
-import echopraxia.spi.EchopraxiaServiceProvider;
+import echopraxia.logging.spi.EchopraxiaService;
+import echopraxia.logging.spi.EchopraxiaServiceProvider;
 
 public class JULEchopraxiaServiceProvider implements EchopraxiaServiceProvider {
   @Override

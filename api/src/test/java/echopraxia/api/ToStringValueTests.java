@@ -1,6 +1,6 @@
 package echopraxia.api;
 
-import static echopraxia.spi.PresentationHintAttributes.withToStringValue;
+import static echopraxia.api.PresentationHintAttributes.withToStringValue;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;

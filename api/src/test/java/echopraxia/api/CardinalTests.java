@@ -1,10 +1,8 @@
 package echopraxia.api;
 
-import static echopraxia.spi.PresentationHintAttributes.asCardinal;
+import static echopraxia.api.PresentationHintAttributes.asCardinal;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import echopraxia.spi.DefaultField;
-import echopraxia.spi.PresentationHintAttributes;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 

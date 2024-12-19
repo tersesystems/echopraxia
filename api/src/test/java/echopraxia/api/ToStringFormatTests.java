@@ -4,7 +4,6 @@ import static echopraxia.api.Value.array;
 import static echopraxia.api.Value.string;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import echopraxia.spi.DefaultField;
 import java.time.Duration;
 import java.util.*;
 import org.jetbrains.annotations.NotNull;

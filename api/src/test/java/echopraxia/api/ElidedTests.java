@@ -4,8 +4,6 @@ import static echopraxia.api.Field.keyValue;
 import static echopraxia.api.Value.string;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import echopraxia.spi.DefaultField;
-import echopraxia.spi.PresentationHintAttributes;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

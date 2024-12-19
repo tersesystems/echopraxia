@@ -8,6 +8,7 @@ include('jackson')
 include('jul')
 include('noop')
 
+include('logging')
 include('logger')
 include('async')
 include('scripting')

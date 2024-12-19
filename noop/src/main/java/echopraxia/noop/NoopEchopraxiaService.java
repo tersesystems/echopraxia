@@ -1,7 +1,7 @@
 package echopraxia.noop;
 
-import echopraxia.spi.AbstractEchopraxiaService;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.spi.AbstractEchopraxiaService;
+import echopraxia.logging.spi.CoreLogger;
 import org.jetbrains.annotations.NotNull;
 
 public class NoopEchopraxiaService extends AbstractEchopraxiaService {

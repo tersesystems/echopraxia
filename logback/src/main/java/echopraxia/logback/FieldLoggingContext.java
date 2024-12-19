@@ -1,10 +1,10 @@
 package echopraxia.logback;
 
-import static echopraxia.spi.Utilities.memoize;
+import static echopraxia.logging.spi.Utilities.memoize;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import echopraxia.api.Field;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.spi.CoreLogger;
 import java.util.*;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;

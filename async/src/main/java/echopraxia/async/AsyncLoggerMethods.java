@@ -1,8 +1,8 @@
 package echopraxia.async;
 
-import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilderResult;
-import echopraxia.api.LoggerHandle;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.LoggerHandle;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;

@@ -3,12 +3,11 @@ package echopraxia.log4j;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import echopraxia.*;
-import echopraxia.LoggerFactory;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilder;
 import echopraxia.api.Value;
 import echopraxia.async.AsyncLoggerFactory;
+import echopraxia.logger.LoggerFactory;
 import org.junit.jupiter.api.Test;
 
 public class Log4JLoggerTest extends TestBase {

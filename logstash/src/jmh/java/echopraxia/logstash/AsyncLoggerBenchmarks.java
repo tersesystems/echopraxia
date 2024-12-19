@@ -1,11 +1,11 @@
 package echopraxia.logstash;
 
-import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilder;
-import echopraxia.api.Level;
 import echopraxia.api.PresentationFieldBuilder;
 import echopraxia.async.AsyncLogger;
 import echopraxia.async.AsyncLoggerFactory;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;

@@ -1,13 +1,12 @@
 package echopraxia.fluent;
 
-import echopraxia.api.*;
-import echopraxia.api.Condition;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilderResult;
-import echopraxia.api.Level;
-import echopraxia.spi.AbstractLoggerSupport;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.Utilities;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.spi.AbstractLoggerSupport;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.Utilities;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;

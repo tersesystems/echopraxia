@@ -1,10 +1,7 @@
 plugins {
     id 'java-library'
-    id 'java-test-fixtures'
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/com.jayway.jsonpath/json-path
-    implementation "com.jayway.jsonpath:json-path:$jsonPathVersion"
     implementation 'org.pcollections:pcollections:4.0.1'
 }

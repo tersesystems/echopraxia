@@ -1,6 +1,6 @@
 package echopraxia.logback;
 
-import echopraxia.api.Condition;
+import echopraxia.logging.api.Condition;
 import org.jetbrains.annotations.NotNull;
 
 public class ConditionMarker extends BaseMarker {

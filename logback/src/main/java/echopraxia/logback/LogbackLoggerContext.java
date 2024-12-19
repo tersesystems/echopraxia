@@ -1,6 +1,6 @@
 package echopraxia.logback;
 
-import echopraxia.spi.LoggerContext;
+import echopraxia.logging.spi.LoggerContext;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Marker;

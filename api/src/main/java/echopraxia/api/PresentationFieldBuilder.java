@@ -1,8 +1,7 @@
 package echopraxia.api;
 
-import static echopraxia.spi.FieldConstants.EXCEPTION;
+import static echopraxia.api.FieldConstants.EXCEPTION;
 
-import echopraxia.spi.DefaultField;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;

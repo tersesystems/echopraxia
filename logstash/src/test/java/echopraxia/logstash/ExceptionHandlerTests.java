@@ -4,7 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import echopraxia.api.Condition;
+import echopraxia.logging.api.Condition;
 import org.junit.jupiter.api.Test;
 
 public class ExceptionHandlerTests extends TestBase {

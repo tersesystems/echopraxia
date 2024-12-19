@@ -7,9 +7,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import echopraxia.api.Condition;
-import echopraxia.api.Level;
 import echopraxia.log4j.appender.ListAppender;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;

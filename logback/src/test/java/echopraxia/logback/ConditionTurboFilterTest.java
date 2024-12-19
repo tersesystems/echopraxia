@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import echopraxia.api.Condition;
 import echopraxia.api.FieldBuilder;
 import echopraxia.api.Value;
+import echopraxia.logging.api.Condition;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.Marker;

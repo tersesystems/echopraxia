@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api project(":api")
+    api project(":logging")
 
     jmhImplementation project(":logstash")
 

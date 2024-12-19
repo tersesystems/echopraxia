@@ -1,12 +1,12 @@
 package echopraxia.jul;
 
-import static echopraxia.spi.Utilities.joinFields;
-import static echopraxia.spi.Utilities.memoize;
+import static echopraxia.logging.spi.Utilities.joinFields;
+import static echopraxia.logging.spi.Utilities.memoize;
 
 import echopraxia.api.Field;
-import echopraxia.api.LoggingContext;
-import echopraxia.spi.AbstractJsonPathFinder;
-import echopraxia.spi.CoreLogger;
+import echopraxia.logging.api.LoggingContext;
+import echopraxia.logging.spi.AbstractJsonPathFinder;
+import echopraxia.logging.spi.CoreLogger;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;

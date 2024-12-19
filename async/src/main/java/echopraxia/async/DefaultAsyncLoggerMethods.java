@@ -1,15 +1,14 @@
 package echopraxia.async;
 
-import static echopraxia.api.Level.*;
+import static echopraxia.api.FieldConstants.EXCEPTION;
 import static echopraxia.api.Value.exception;
-import static echopraxia.spi.FieldConstants.EXCEPTION;
+import static echopraxia.logging.api.Level.*;
 
-import echopraxia.api.*;
-import echopraxia.api.Condition;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilderResult;
-import echopraxia.api.LoggerHandle;
-import echopraxia.spi.DefaultMethodsSupport;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.LoggerHandle;
+import echopraxia.logging.spi.DefaultMethodsSupport;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import org.jetbrains.annotations.NotNull;

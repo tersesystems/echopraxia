@@ -2,7 +2,7 @@ package echopraxia.jul;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import echopraxia.api.Condition;
+import echopraxia.logging.api.Condition;
 import org.junit.jupiter.api.Test;
 
 public class ExceptionHandlerTests extends TestBase {

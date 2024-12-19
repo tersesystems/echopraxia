@@ -1,11 +1,11 @@
 package echopraxia.scripting;
 
-import static echopraxia.api.Level.INFO;
+import static echopraxia.logging.api.Level.INFO;
 
-import echopraxia.api.Condition;
 import echopraxia.api.Field;
-import echopraxia.api.LoggingContext;
 import echopraxia.api.Value;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.LoggingContext;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

@@ -1,6 +1,6 @@
 package echopraxia.logstash;
 
-import static echopraxia.spi.Utilities.joinFields;
+import static echopraxia.logging.spi.Utilities.joinFields;
 import static org.slf4j.event.EventConstants.*;
 
 import ch.qos.logback.classic.LoggerContext;
@@ -8,9 +8,13 @@ import echopraxia.api.*;
 import echopraxia.logback.CallerMarker;
 import echopraxia.logback.LogbackLoggerContext;
 import echopraxia.logback.LogbackLoggingContext;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.EchopraxiaService;
-import echopraxia.spi.Utilities;
+import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.api.LoggerHandle;
+import echopraxia.logging.api.LoggingContext;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.EchopraxiaService;
+import echopraxia.logging.spi.Utilities;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -108,7 +112,7 @@ public class LogstashCoreLogger implements CoreLogger {
 
   @Override
   @NotNull
-  public echopraxia.spi.LoggerContext getLoggerContext() {
+  public echopraxia.logging.spi.LoggerContext getLoggerContext() {
     return context;
   }
 

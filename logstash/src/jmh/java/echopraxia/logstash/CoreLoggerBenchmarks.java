@@ -1,9 +1,9 @@
 package echopraxia.logstash;
 
 import echopraxia.api.FieldBuilder;
-import echopraxia.api.Level;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.CoreLoggerFactory;
+import echopraxia.logging.api.Level;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.CoreLoggerFactory;
 import java.util.concurrent.TimeUnit;
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.infra.Blackhole;

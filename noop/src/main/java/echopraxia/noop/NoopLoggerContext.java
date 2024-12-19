@@ -1,10 +1,10 @@
 package echopraxia.noop;
 
-import static echopraxia.spi.Utilities.joinFields;
-import static echopraxia.spi.Utilities.memoize;
+import static echopraxia.logging.spi.Utilities.joinFields;
+import static echopraxia.logging.spi.Utilities.memoize;
 
 import echopraxia.api.Field;
-import echopraxia.spi.LoggerContext;
+import echopraxia.logging.spi.LoggerContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Supplier;

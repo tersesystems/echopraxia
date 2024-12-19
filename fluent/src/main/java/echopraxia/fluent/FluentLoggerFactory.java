@@ -1,9 +1,9 @@
 package echopraxia.fluent;
 
 import echopraxia.api.PresentationFieldBuilder;
-import echopraxia.spi.Caller;
-import echopraxia.spi.CoreLogger;
-import echopraxia.spi.CoreLoggerFactory;
+import echopraxia.logging.spi.Caller;
+import echopraxia.logging.spi.CoreLogger;
+import echopraxia.logging.spi.CoreLoggerFactory;
 import org.jetbrains.annotations.NotNull;
 
 /** The factory for FluentLogger. */

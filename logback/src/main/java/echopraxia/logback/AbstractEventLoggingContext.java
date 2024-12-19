@@ -2,8 +2,8 @@ package echopraxia.logback;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import echopraxia.api.Field;
-import echopraxia.api.LoggingContext;
-import echopraxia.spi.AbstractJsonPathFinder;
+import echopraxia.logging.api.LoggingContext;
+import echopraxia.logging.spi.AbstractJsonPathFinder;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

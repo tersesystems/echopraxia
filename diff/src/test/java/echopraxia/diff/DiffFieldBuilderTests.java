@@ -6,13 +6,12 @@ import static org.slf4j.Logger.ROOT_LOGGER_NAME;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
-import echopraxia.Logger;
-import echopraxia.LoggerFactory;
-import echopraxia.api.*;
+import echopraxia.api.DefaultField;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilder;
 import echopraxia.api.Value;
-import echopraxia.spi.DefaultField;
+import echopraxia.logger.Logger;
+import echopraxia.logger.LoggerFactory;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,7 @@ public class DiffFieldBuilderTests {
 
   @Test
   public void testLogger() {
-    Logger<PersonFieldBuilder> logger =
-        LoggerFactory.getLogger().withFieldBuilder(PersonFieldBuilder.instance);
+    Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger(PersonFieldBuilder.instance);
 
     Person before = new Person("Eloise", 1);
     Person after = before.withName("Will");
@@ -31,6 +29,8 @@ public class DiffFieldBuilderTests {
 
     ListAppender<ILoggingEvent> listAppender = getListAppender();
     List<ILoggingEvent> list = listAppender.list;
+    assertThat(list).isNotEmpty();
+
     ILoggingEvent event = list.get(0);
     assertThat(event.getFormattedMessage())
         .isEqualTo("personDiff=[{op=replace, path=/name, value=Will}]");
