@@ -4,12 +4,12 @@
     <newRule pattern="*/appender/appender-ref"
              actionClass="ch.qos.logback.core.joran.action.AppenderRefAction"/>
 
-    <turboFilter class="com.tersesystems.echopraxia.logback.ConditionTurboFilter"/>
+    <turboFilter class="echopraxia.logback.ConditionTurboFilter"/>
 
     <appender name="LIST" class="ch.qos.logback.core.read.ListAppender">
     </appender>
 
-    <appender name="STRINGLIST" class="com.tersesystems.echopraxia.logstash.EncodingListAppender">
+    <appender name="STRINGLIST" class="echopraxia.logstash.EncodingListAppender">
         <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
             <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
             <providers>
@@ -26,7 +26,7 @@
         </encoder>
     </appender>
 
-    <appender name="LOGSTASHFIELD" class="com.tersesystems.echopraxia.logstash.LogstashFieldAppender">
+    <appender name="LOGSTASHFIELD" class="echopraxia.logstash.LogstashFieldAppender">
         <appender-ref ref="STRINGLIST"/>
     </appender>
 

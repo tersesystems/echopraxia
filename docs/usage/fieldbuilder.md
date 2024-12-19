@@ -11,7 +11,7 @@ Conceptually, a field builder is a handle for creating structured data.  The `Lo
 Start by importing the API package.  Everything relevant to field building will be in there.
 
 ```java
-import com.tersesystems.echopraxia.api.*;
+
 ```
 
 ## Defining Field Builders
@@ -34,24 +34,25 @@ The `PresentationFieldBuilder` interface provides some convenience methods aroun
 You can then create custom methods on your field builder that will render your class.  In this case, we'll create a field builder that can handle a `java.util.Date`, and create `date` and `dateValue` methods for it.
 
 ```java
-import com.tersesystems.echopraxia.api.*;
+
 import java.util.Date;
 
 public interface BuilderWithDate implements PresentationFieldBuilder {
-  static BuilderWithDate instance = new BuilderWithDate() {};
-  
-  default PresentationField date(Date date) {
-    return value("date", dateValue(date)); // use a default name
-  }
+    static BuilderWithDate instance = new BuilderWithDate() {
+    };
 
-  default PresentationField date(String name, Date date) {
-    return value(name, dateValue(date));
-  }
+    default PresentationField date(Date date) {
+        return value("date", dateValue(date)); // use a default name
+    }
 
-  // Renders a date as an ISO 8601 string.
-  default Value.StringValue dateValue(Date date) {
-    return Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
-  }
+    default PresentationField date(String name, Date date) {
+        return value(name, dateValue(date));
+    }
+
+    // Renders a date as an ISO 8601 string.
+    default Value.StringValue dateValue(Date date) {
+        return Value.string(DateTimeFormatter.ISO_INSTANT.format(date.toInstant()));
+    }
 }
 ```
 

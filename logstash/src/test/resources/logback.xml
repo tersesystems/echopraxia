@@ -39,7 +39,7 @@
     </appender>
 
     <root level="INFO">
-        <appender class="com.tersesystems.echopraxia.logback.CallerDataAppender">
+        <appender class="echopraxia.logback.CallerDataAppender">
             <appender-ref name="CONSOLE"/>
         </appender>
     </root>

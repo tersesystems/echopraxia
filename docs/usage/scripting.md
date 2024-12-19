@@ -109,21 +109,30 @@ library echopraxia {
 The simplest way to handle a script is to pass it in directly as a string:
 
 ```java
-import com.tersesystems.echopraxia.scripting.*;
+
 
 StringBuilder b = new StringBuilder("");
-b.append("library echopraxia {");
-b.append("  function evaluate: (string level, dict ctx) ->");
-b.append("    level == \"info\";");
-b.append("}");
-String scriptString = b.toString();  
+b.
+
+append("library echopraxia {");
+b.
+
+append("  function evaluate: (string level, dict ctx) ->");
+b.
+
+append("    level == \"info\";");
+b.
+
+append("}");
+
+String scriptString = b.toString();
 Condition c = ScriptCondition.create(false, scriptString, Throwable::printStackTrace);
 ```
 
 You can also use a `Path` for file based scripts:
 
 ```java
-import com.tersesystems.echopraxia.scripting.*;
+
 
 Path path = Paths.get("src/test/tweakflow/condition.tf");
 Condition condition = ScriptCondition.create(false, path, Throwable::printStackTrace);
@@ -155,27 +164,27 @@ You also have the option to store scripts in a key-value store or in a database.
 You have the option of passing in user defined functions into the script, in addition to the built-in scripts.
 
 ```java
-import com.tersesystems.echopraxia.scripting.*;
+
 import com.twineworks.tweakflow.lang.types.Type;
 import com.twineworks.tweakflow.lang.types.Types;
 import com.twineworks.tweakflow.lang.values.*;
 
 class NowFunction {
-  private UserFunctionValue nowFunction() {
-    return ScriptFunction.builder()
-            .supplier(() -> Values.make(Instant.now()))
-            .result(Types.DATETIME)
-            .build();
-  }
-  
-  public final List<ValueMapEntry> userFunctions = 
-      Collections.singletonList(new ValueMapEntry("now", Values.make(nowFunction())));
-  
-  public void logWithNow() {
-    Path path = Paths.get("src/test/tweakflow/condition.tf");
-    Condition condition = ScriptCondition.create(ctx -> userFunctions, false, path, Throwable::printStackTrace);
-    var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
-  }
+    private UserFunctionValue nowFunction() {
+        return ScriptFunction.builder()
+                .supplier(() -> Values.make(Instant.now()))
+                .result(Types.DATETIME)
+                .build();
+    }
+
+    public final List<ValueMapEntry> userFunctions =
+            Collections.singletonList(new ValueMapEntry("now", Values.make(nowFunction())));
+
+    public void logWithNow() {
+        Path path = Paths.get("src/test/tweakflow/condition.tf");
+        Condition condition = ScriptCondition.create(ctx -> userFunctions, false, path, Throwable::printStackTrace);
+        var logger = LoggerFactory.getLogger(getClass()).withCondition(condition);
+    }
 }
 ```
 

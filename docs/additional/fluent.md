@@ -21,16 +21,30 @@ implementation "com.tersesystems.echopraxia:fluent:<VERSION>"
 It is useful in situations where arguments may need to be built up over time.
 
 ```java
-import com.tersesystems.echopraxia.fluent.*;
+
 
 FluentLogger<PresentationFieldBuilder> logger = FluentLoggerFactory.getLogger(getClass());
 
 Person person = new Person("Eloise", 1);
 
 logger
-    .atInfo()
-    .message("name = {}, age = {}")
-    .argument(fb -> fb.string("name", person.name))
-    .argument(fb -> fb.number("age", person.age))
-    .log();
+        .
+
+atInfo()
+    .
+
+message("name = {}, age = {}")
+    .
+
+argument(fb ->fb.
+
+string("name",person.name))
+        .
+
+argument(fb ->fb.
+
+number("age",person.age))
+        .
+
+log();
 ```

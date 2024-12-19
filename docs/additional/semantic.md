@@ -28,17 +28,19 @@ implementation "com.tersesystems.echopraxia:semantic:<VERSION>"
 To set up a logger for a `Person` with `name` and `age` properties, you would do the following:
 
 ```java
-import com.tersesystems.echopraxia.semantic.*;
+
 
 SemanticLogger<Person> logger =
-    SemanticLoggerFactory.getLogger(
-        getClass(),
-        Person.class,
-        person -> "person.name = {}, person.age = {}",
-        p -> fb -> fb.list(fb.string("name", p.name), fb.number("age", p.age)));
+        SemanticLoggerFactory.getLogger(
+                getClass(),
+                Person.class,
+                person -> "person.name = {}, person.age = {}",
+                p -> fb -> fb.list(fb.string("name", p.name), fb.number("age", p.age)));
 
 Person person = new Person("Eloise", 1);
-logger.info(person);
+logger.
+
+info(person);
 ```
 
 ## Conditions

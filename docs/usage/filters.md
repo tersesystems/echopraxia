@@ -9,14 +9,12 @@ For example, to add a `uses_filter` field to every Echopraxia logger:
 ```java
 package example;
 
-import com.tersesystems.echopraxia.api.*;
-
 public class ExampleFilter implements CoreLoggerFilter {
-  @Override
-  public CoreLogger apply(CoreLogger coreLogger) {
-    return coreLogger
-        .withFields(fb -> fb.bool("uses_filter", true), FieldBuilder.instance());
-  }
+    @Override
+    public CoreLogger apply(CoreLogger coreLogger) {
+        return coreLogger
+                .withFields(fb -> fb.bool("uses_filter", true), FieldBuilder.instance());
+    }
 }
 ```
 
