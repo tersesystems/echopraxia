@@ -21,29 +21,6 @@ public interface PresentationHints<F extends Field> {
   F asValueOnly();
 
   /**
-   * Tells the formatter that the value should be represented as a cardinal number in text.
-   *
-   * @return field with cardinal attribute set
-   * @deprecated asCardinal attribute only applies to values, this will not set an attribute on the
-   *     field.
-   */
-  @Deprecated
-  @NotNull
-  F asCardinal();
-
-  /**
-   * Tells the formatter that the value should be abbreviated after the given number of elements.
-   *
-   * @deprecated abbreviateAfter attribute only applies to values, this will not set an attribute on
-   *     the field.
-   * @param after the maximum number of elements to render
-   * @return the field with the attribute applied
-   */
-  @Deprecated
-  @NotNull
-  F abbreviateAfter(int after);
-
-  /**
    * Tells the formatter that this field should be elided in text.
    *
    * @return field with elide attribute set

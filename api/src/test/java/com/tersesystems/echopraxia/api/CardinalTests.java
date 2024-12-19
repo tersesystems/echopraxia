@@ -20,15 +20,15 @@ public class CardinalTests {
 
   @Test
   public void testCardinalArrayWithExtended() {
-    Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-    Field field = Field.keyValue("longArray", value, DefaultField.class).asCardinal();
+    Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9).asCardinal();
+    Field field = Field.keyValue("longArray", value, DefaultField.class);
     assertThat(field).hasToString("longArray=|9|");
   }
 
   @Test
   public void testCardinalArrayWithValueOnly() {
-    Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9);
-    Field field = Field.value("longArray", value, DefaultField.class).withAttribute(asCardinal());
+    Value<?> value = Value.array(1, 2, 3, 4, 5, 6, 7, 8, 9).asCardinal();
+    Field field = Field.value("longArray", value);
     assertThat(field).hasToString("|9|");
   }
 
