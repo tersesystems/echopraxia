@@ -184,6 +184,12 @@ public interface Condition {
             .map(f -> (Value.ObjectValue) f.value())
             .anyMatch(predicate);
   }
+
+  static Condition nullMatch(String fieldName) {
+    return (level, ctx) ->
+        ctx.getFields().stream()
+            .anyMatch(f -> f.name().equals(fieldName) && (f.value().type() == Value.Type.NULL));
+  }
 }
 
 class Conditions {
