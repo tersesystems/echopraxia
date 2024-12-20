@@ -21,10 +21,27 @@ import java.util.Iterator;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.slf4j.helpers.BasicMDCAdapter;
 
 public class DirectTest {
 
   protected LoggerContext loggerContext;
+
+  @BeforeEach
+  public void before() {
+    try {
+      LoggerContext factory = new LoggerContext();
+      JoranConfigurator joran = new JoranConfigurator();
+      joran.setContext(factory);
+      factory.setMDCAdapter(new BasicMDCAdapter());
+      factory.reset();
+      joran.doConfigure(getClass().getResource("/logback-direct-test.xml").toURI().toURL());
+      this.loggerContext = factory;
+    } catch (JoranException | URISyntaxException | MalformedURLException je) {
+      je.printStackTrace();
+      fail(je);
+    }
+  }
 
   @Test
   void testMarker() {
@@ -182,21 +199,6 @@ public class DirectTest {
 
     final List<ILoggingEvent> eventList = getListAppender().list;
     assertThat(eventList).isEmpty();
-  }
-
-  @BeforeEach
-  public void before() {
-    try {
-      LoggerContext factory = new LoggerContext();
-      JoranConfigurator joran = new JoranConfigurator();
-      joran.setContext(factory);
-      factory.reset();
-      joran.doConfigure(getClass().getResource("/logback-direct-test.xml").toURI().toURL());
-      this.loggerContext = factory;
-    } catch (JoranException | URISyntaxException | MalformedURLException je) {
-      je.printStackTrace();
-      fail(je);
-    }
   }
 
   LoggerContext loggerContext() {
