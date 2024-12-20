@@ -1,5 +1,6 @@
 package echopraxia.logback;
 
+import static echopraxia.jsonpath.JsonPathCondition.pathCondition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -43,7 +44,7 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition successCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent();
+        pathCondition(ctx -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent());
     Marker successMarker = ConditionMarker.apply(successCondition);
     logger.info(successMarker, "Argument {}", fb.string("foo", "bar"));
 
@@ -57,7 +58,8 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition fooCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("quux")).isPresent();
+        pathCondition(ctx -> ctx.findString("$.foo").filter(s -> s.equals("quux")).isPresent());
+
     Marker marker = ConditionMarker.apply(fooCondition);
     logger.info(marker, "Argument {}", fb.string("foo", "bar"));
 
@@ -84,7 +86,9 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition fooCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent();
+        pathCondition(
+            (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent());
+
     Condition countCondition = Condition.numberMatch("count", c -> c.equals(Value.number(5)));
     Marker fooMarker = ConditionMarker.apply(fooCondition);
     Marker countMarker = ConditionMarker.apply(countCondition);
@@ -101,7 +105,8 @@ public class ConditionTurboFilterTest extends TestBase {
     FieldBuilder fb = FieldBuilder.instance();
 
     Condition fooCondition =
-        (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent();
+        pathCondition(
+            (level, ctx) -> ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent());
     Condition countCondition = Condition.numberMatch("count", c -> c.equals(Value.number(5)));
     Marker fooMarker = ConditionMarker.apply(fooCondition);
     Marker countMarker = ConditionMarker.apply(countCondition);

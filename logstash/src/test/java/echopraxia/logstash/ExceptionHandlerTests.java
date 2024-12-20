@@ -1,5 +1,6 @@
 package echopraxia.logstash;
 
+import static echopraxia.jsonpath.JsonPathCondition.pathCondition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -39,7 +40,9 @@ public class ExceptionHandlerTests extends TestBase {
     var logger = getLogger();
     Integer number = null;
     Condition condition =
-        (level, context) -> context.findNumber("$.testing").stream().anyMatch(p -> p.equals(5));
+        pathCondition(
+            (level, context) ->
+                context.findNumber("$.testing").stream().anyMatch(p -> p.equals(5)));
 
     var badLogger = logger.withFields(fb -> fb.number("nullNumber", number.intValue()));
     badLogger.debug(condition, "I have a bad logger field and a good condition");
@@ -55,8 +58,10 @@ public class ExceptionHandlerTests extends TestBase {
     var logger = getLogger();
     Integer number = null;
     Condition badCondition =
-        (level, context) ->
-            context.findNumber("$.testing").stream().anyMatch(p -> p.equals(number.intValue()));
+        pathCondition(
+            (level, context) ->
+                context.findNumber("$.testing").stream()
+                    .anyMatch(p -> p.equals(number.intValue())));
 
     var badLogger = logger.withCondition(badCondition);
     badLogger.debug("I am passing in {}", fb -> fb.number("testing", 5));
@@ -86,8 +91,10 @@ public class ExceptionHandlerTests extends TestBase {
     var logger = getLogger();
     Integer number = null;
     Condition badCondition =
-        (level, context) ->
-            context.findNumber("$.testing").stream().anyMatch(p -> p.equals(number.intValue()));
+        pathCondition(
+            (level, context) ->
+                context.findNumber("$.testing").stream()
+                    .anyMatch(p -> p.equals(number.intValue())));
 
     logger.debug(
         badCondition, "I am passing in {}", fb -> fb.number("nullNumber", number.intValue()));

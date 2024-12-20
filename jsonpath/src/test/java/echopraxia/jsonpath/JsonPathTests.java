@@ -1,4 +1,4 @@
-package echopraxia.logging.api;
+package echopraxia.jsonpath;
 
 import static com.jayway.jsonpath.Criteria.where;
 import static com.jayway.jsonpath.Filter.filter;
@@ -10,10 +10,9 @@ import com.jayway.jsonpath.spi.mapper.MappingProvider;
 import echopraxia.api.Field;
 import echopraxia.api.FieldBuilder;
 import echopraxia.api.Value;
+import echopraxia.logging.api.LoggingContext;
 import echopraxia.logging.fake.FakeCoreLogger;
 import echopraxia.logging.fake.FakeLoggingContext;
-import echopraxia.logging.spi.EchopraxiaJsonProvider;
-import echopraxia.logging.spi.EchopraxiaMappingProvider;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

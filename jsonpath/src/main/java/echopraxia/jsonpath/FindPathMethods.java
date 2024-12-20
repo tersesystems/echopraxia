@@ -1,4 +1,4 @@
-package echopraxia.logging.spi;
+package echopraxia.jsonpath;
 
 import java.util.List;
 import java.util.Map;

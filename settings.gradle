@@ -9,6 +9,7 @@ include('jul')
 include('noop')
 
 include('logging')
+include('jsonpath')
 include('logger')
 include('async')
 include('scripting')
