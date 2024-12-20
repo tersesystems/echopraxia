@@ -136,7 +136,12 @@ public class ScriptCondition implements Condition {
 
   @Override
   public boolean test(Level level, LoggingContext context) {
-    // XXX should be a better test here
-    return scriptManager.execute(defaultValue, level, (LoggingContextWithFindPathMethods) context);
+    if (context instanceof LoggingContextWithFindPathMethods) {
+      return scriptManager.execute(
+          defaultValue, level, (LoggingContextWithFindPathMethods) context);
+    } else {
+      throw new IllegalStateException(
+          "ScriptCondition requires a LoggingContextWithFindPathMethods instance!");
+    }
   }
 }

@@ -65,11 +65,13 @@ public class ConditionTurboFilter extends TurboFilter {
     return FilterReply.NEUTRAL;
   }
 
+  @NotNull
   private Level level(ch.qos.logback.classic.Level level) {
     return Level.valueOf(level.levelStr);
   }
 
-  private LoggingContext loggingContext(Marker marker, Object[] arguments) {
+  @NotNull
+  private LogbackLoggingContext loggingContext(Marker marker, Object[] arguments) {
     FilterMarkerContext markerContext = new FilterMarkerContext(marker);
     return new LogbackLoggingContext(null, markerContext, () -> getFields(arguments));
   }

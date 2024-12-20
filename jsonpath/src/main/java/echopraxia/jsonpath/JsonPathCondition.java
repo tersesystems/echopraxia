@@ -4,28 +4,33 @@ import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 public class JsonPathCondition {
 
-  public static Condition pathCondition(Function<LoggingContextWithFindPathMethods, Boolean> o) {
+  @Contract(pure = true)
+  public static @NotNull Condition pathCondition(
+      Function<LoggingContextWithFindPathMethods, Boolean> o) {
     return (level, context) -> {
       if (context instanceof LoggingContextWithFindPathMethods) {
         return o.apply((LoggingContextWithFindPathMethods) context);
       } else {
-        // XXX should log something here.
-        return false;
+        throw new IllegalStateException(
+            "pathCondition requires LoggingContextWithFindPathMethods instance!");
       }
     };
   }
 
-  public static Condition pathCondition(
+  @Contract(pure = true)
+  public static @NotNull Condition pathCondition(
       BiFunction<Level, LoggingContextWithFindPathMethods, Boolean> o) {
     return (level, context) -> {
       if (context instanceof LoggingContextWithFindPathMethods) {
         return o.apply(level, (LoggingContextWithFindPathMethods) context);
       } else {
-        // XXX should log something here.
-        return false;
+        throw new IllegalStateException(
+            "pathCondition requires LoggingContextWithFindPathMethods instance!");
       }
     };
   }
