@@ -2,7 +2,6 @@ package echopraxia.logging.api;
 
 import echopraxia.api.Field;
 import echopraxia.logging.spi.CoreLogger;
-import echopraxia.logging.spi.FindPathMethods;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * The logging context interface is exposed to conditions as the way to inspect the available fields
  * for evaluation.
  */
-public interface LoggingContext extends FindPathMethods {
+public interface LoggingContext {
 
   /**
    * A reference back to the core logger. This may be null if the context is constructed out of the

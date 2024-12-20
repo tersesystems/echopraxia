@@ -4,6 +4,7 @@ plugins {
 
 dependencies {
     api project(":logging")
+    api project(":jsonpath")
 
     implementation project(":filewatch")
     implementation "com.twineworks:tweakflow:$tweakflowVersion"

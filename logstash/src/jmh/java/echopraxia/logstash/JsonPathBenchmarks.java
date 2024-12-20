@@ -1,6 +1,7 @@
 package echopraxia.logstash;
 
 import echopraxia.api.*;
+import echopraxia.jsonpath.JsonPathCondition;
 import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import echopraxia.logging.api.LoggingContext;
@@ -18,12 +19,9 @@ public class JsonPathBenchmarks {
   private static final Condition streamCondition =
       Condition.valueMatch("some_field", f -> f.raw().equals("testing"));
   private static final Condition pathCondition =
-      new Condition() {
-        @Override
-        public boolean test(Level level, LoggingContext context) {
-          return context.findString("$.some_field").filter(f -> f.equals("testing")).isPresent();
-        }
-      };
+      JsonPathCondition.pathCondition(
+          context ->
+              context.findString("$.some_field").filter(f -> f.equals("testing")).isPresent());
 
   private static final LoggingContext passContext =
       new FakeLoggingContext(Field.value("some_field", Value.string("testing")));

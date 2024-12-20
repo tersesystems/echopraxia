@@ -1,4 +1,4 @@
-package echopraxia.logging.spi;
+package echopraxia.jsonpath;
 
 import com.jayway.jsonpath.InvalidJsonException;
 import com.jayway.jsonpath.JsonPathException;
@@ -217,7 +217,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     if (obj instanceof StackTraceElement) {
       return findStackTraceValue(key, (StackTraceElement) obj);
     }
-    return JsonProvider.UNDEFINED;
+    return UNDEFINED;
   }
 
   private Object findStackTraceValue(String key, StackTraceElement obj) {
@@ -233,7 +233,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     if (key.equals(FieldConstants.METHOD_NAME)) {
       return obj.getMethodName();
     }
-    return JsonProvider.UNDEFINED;
+    return UNDEFINED;
   }
 
   private Object findExceptionValue(String key, Throwable throwable) {
@@ -249,7 +249,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     if (key.equals(FieldConstants.CLASS_NAME)) {
       return throwable.getClass().getName();
     }
-    return JsonProvider.UNDEFINED;
+    return UNDEFINED;
   }
 
   @NotNull
@@ -257,7 +257,7 @@ public class EchopraxiaJsonProvider implements JsonProvider {
     // This is O(N), so it will be slower when there are large lists.
     final Optional<? extends Value<?>> first =
         fields.stream().filter(f -> f.name().equals(key)).map(Field::value).findFirst();
-    return first.isPresent() ? first.get() : JsonProvider.UNDEFINED;
+    return first.isPresent() ? first.get() : UNDEFINED;
   }
 
   @Override

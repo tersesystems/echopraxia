@@ -1,4 +1,4 @@
-package echopraxia.logging.spi;
+package echopraxia.jsonpath;
 
 import com.jayway.jsonpath.Configuration;
 import com.jayway.jsonpath.JsonPathException;
