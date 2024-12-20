@@ -52,7 +52,8 @@ public interface Field
    */
   @NotNull
   static Field value(@NotNull String name, @NotNull Value<?> value) {
-    return new DefaultField(name, value, PresentationHintAttributes.valueOnlyAttributes());
+    return create(
+        name, value, PresentationHintAttributes.valueOnlyAttributes(), DefaultField.class);
   }
 
   /**
@@ -64,21 +65,7 @@ public interface Field
   @NotNull
   static <F extends Field> F value(
       @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
-    if (fieldClass == DefaultField.class) {
-      return (F) value(name, value);
-    } else {
-      try {
-        Constructor<F> constructor =
-            fieldClass.getConstructor(String.class, Value.class, Attributes.class);
-        return constructor.newInstance(
-            name, value, PresentationHintAttributes.valueOnlyAttributes());
-      } catch (NoSuchMethodException
-          | InstantiationException
-          | IllegalAccessException
-          | InvocationTargetException e) {
-        throw new RuntimeException(e);
-      }
-    }
+    return create(name, value, PresentationHintAttributes.valueOnlyAttributes(), fieldClass);
   }
 
   /**
@@ -88,7 +75,7 @@ public interface Field
    */
   @NotNull
   static Field keyValue(@NotNull String name, @NotNull Value<?> value) {
-    return new DefaultField(name, value, Attributes.empty());
+    return create(name, value, Attributes.empty(), DefaultField.class);
   }
 
   /**
@@ -99,13 +86,29 @@ public interface Field
    */
   static <F extends Field> F keyValue(
       @NotNull String name, @NotNull Value<?> value, Class<F> fieldClass) {
+    return create(name, value, Attributes.empty(), fieldClass);
+  }
+
+  /**
+   * The base create method for fields.
+   *
+   * @param name the name of the field
+   * @param value the value of the field
+   * @param attributes the attributes of the field
+   * @param fieldClass the field's class.
+   * @return a new instance of the field.
+   * @param <F> field type.
+   */
+  static <F extends Field> @NotNull F create(
+      @NotNull String name, @NotNull Value<?> value, Attributes attributes, Class<F> fieldClass) {
     if (fieldClass == DefaultField.class) {
-      return (F) keyValue(name, value);
+      //noinspection unchecked
+      return (F) new DefaultField(name, value, attributes);
     } else {
       try {
         Constructor<F> constructor =
             fieldClass.getConstructor(String.class, Value.class, Attributes.class);
-        return constructor.newInstance(name, value, Attributes.empty());
+        return constructor.newInstance(name, value, attributes);
       } catch (NoSuchMethodException
           | InstantiationException
           | IllegalAccessException
