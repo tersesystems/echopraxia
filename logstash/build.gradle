@@ -17,8 +17,6 @@ dependencies {
     compileOnly "ch.qos.logback:logback-classic:$logbackVersion"
     compileOnly "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
 
-    testImplementation "ch.qos.logback:logback-classic:1.2.12"
-    // In 7.4, MdcJsonProvider uses getCopyOfContextMap() and mdcAdapter is null.
-    // We need a way to set the MDC adapter for Logback 1.2, 1.3, and 1.4 while having it be API compatible.
-    testImplementation "net.logstash.logback:logstash-logback-encoder:7.3"
+    testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
+    testImplementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
 }
