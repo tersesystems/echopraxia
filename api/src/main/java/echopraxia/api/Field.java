@@ -102,8 +102,8 @@ public interface Field
   static <F extends Field> @NotNull F create(
       @NotNull String name, @NotNull Value<?> value, Attributes attributes, Class<F> fieldClass) {
     if (fieldClass == DefaultField.class) {
-        //noinspection unchecked
-        return (F) new DefaultField(name, value, attributes);
+      //noinspection unchecked
+      return (F) new DefaultField(name, value, attributes);
     } else {
       try {
         Constructor<F> constructor =
