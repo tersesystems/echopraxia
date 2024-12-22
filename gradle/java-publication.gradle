@@ -49,8 +49,7 @@ publishing { //https://docs.gradle.org/current/userguide/publishing_maven.html
 }
 
 apply plugin: 'signing'
-signing { // https://docs.gradle.org/current/userguide/signing_plugin.html
-    // Give up on using PGP_KEY, leverage gpg-agent and release locally
-    useGpgCmd()
+signing {
+    // https://docs.gradle.org/current/userguide/signing_plugin.html
     sign publishing.publications.maven
 }
