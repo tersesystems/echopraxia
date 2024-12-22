@@ -2,7 +2,7 @@ package echopraxia.scripting;
 
 import echopraxia.api.Field;
 import echopraxia.jsonpath.AbstractJsonPathFinder;
-import echopraxia.jsonpath.LoggingContextWithFindPathMethods;
+import echopraxia.logging.api.LoggingContextWithFindPathMethods;
 import echopraxia.logging.spi.CoreLogger;
 import java.util.Arrays;
 import java.util.Collections;

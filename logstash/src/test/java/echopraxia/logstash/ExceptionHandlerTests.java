@@ -1,6 +1,6 @@
 package echopraxia.logstash;
 
-import static echopraxia.jsonpath.JsonPathCondition.pathCondition;
+import static echopraxia.logging.api.JsonPathCondition.pathCondition;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import ch.qos.logback.classic.spi.ILoggingEvent;

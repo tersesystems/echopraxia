@@ -1,13 +1,17 @@
-package echopraxia.jsonpath;
+package echopraxia.logging.api;
 
-import echopraxia.logging.api.Condition;
-import echopraxia.logging.api.Level;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
-public class JsonPathCondition {
+public interface JsonPathCondition extends Condition {
+
+  boolean jsonPathTest(Level level, LoggingContextWithFindPathMethods context);
+
+  default boolean test(Level level, LoggingContext context) {
+      return jsonPathTest(level, (LoggingContextWithFindPathMethods) context);
+  }
 
   @Contract(pure = true)
   public static @NotNull Condition pathCondition(
