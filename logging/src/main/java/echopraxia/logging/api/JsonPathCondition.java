@@ -10,7 +10,7 @@ public interface JsonPathCondition extends Condition {
   boolean jsonPathTest(Level level, LoggingContextWithFindPathMethods context);
 
   default boolean test(Level level, LoggingContext context) {
-      return jsonPathTest(level, (LoggingContextWithFindPathMethods) context);
+    return jsonPathTest(level, (LoggingContextWithFindPathMethods) context);
   }
 
   @Contract(pure = true)

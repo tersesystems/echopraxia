@@ -1,8 +1,8 @@
 package echopraxia.logstash;
 
 import echopraxia.api.*;
-import echopraxia.logging.api.JsonPathCondition;
 import echopraxia.logging.api.Condition;
+import echopraxia.logging.api.JsonPathCondition;
 import echopraxia.logging.api.Level;
 import echopraxia.logging.api.LoggingContext;
 import java.util.concurrent.TimeUnit;

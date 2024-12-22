@@ -4,13 +4,12 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import echopraxia.api.Field;
 import echopraxia.jsonpath.AbstractJsonPathFinder;
 import echopraxia.logging.api.LoggingContextWithFindPathMethods;
-import org.jetbrains.annotations.NotNull;
-import org.slf4j.Marker;
-
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+import org.jetbrains.annotations.NotNull;
+import org.slf4j.Marker;
 
 public abstract class AbstractEventLoggingContext extends AbstractJsonPathFinder
     implements LoggingContextWithFindPathMethods {
