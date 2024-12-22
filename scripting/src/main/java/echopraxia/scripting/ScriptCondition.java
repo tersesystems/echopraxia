@@ -1,9 +1,9 @@
 package echopraxia.scripting;
 
-import echopraxia.jsonpath.LoggingContextWithFindPathMethods;
 import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import echopraxia.logging.api.LoggingContext;
+import echopraxia.logging.api.LoggingContextWithFindPathMethods;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;

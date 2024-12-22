@@ -5,7 +5,7 @@ import static echopraxia.logging.spi.Utilities.memoize;
 
 import echopraxia.api.Field;
 import echopraxia.jsonpath.AbstractJsonPathFinder;
-import echopraxia.jsonpath.LoggingContextWithFindPathMethods;
+import echopraxia.logging.api.LoggingContextWithFindPathMethods;
 import echopraxia.logging.spi.CoreLogger;
 import java.util.Collections;
 import java.util.List;

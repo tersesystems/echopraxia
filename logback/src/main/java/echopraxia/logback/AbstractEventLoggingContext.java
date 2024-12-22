@@ -3,7 +3,7 @@ package echopraxia.logback;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import echopraxia.api.Field;
 import echopraxia.jsonpath.AbstractJsonPathFinder;
-import echopraxia.jsonpath.LoggingContextWithFindPathMethods;
+import echopraxia.logging.api.LoggingContextWithFindPathMethods;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;

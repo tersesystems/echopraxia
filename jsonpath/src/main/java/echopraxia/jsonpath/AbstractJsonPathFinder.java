@@ -8,6 +8,7 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.Option;
 import com.jayway.jsonpath.spi.json.JsonProvider;
 import com.jayway.jsonpath.spi.mapper.MappingProvider;
+import echopraxia.api.FindPathMethods;
 import echopraxia.api.Value;
 import echopraxia.api.Value.ArrayValue;
 import echopraxia.api.Value.ExceptionValue;
