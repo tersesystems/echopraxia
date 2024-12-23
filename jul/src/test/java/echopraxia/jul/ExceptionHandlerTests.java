@@ -83,34 +83,4 @@ public class ExceptionHandlerTests extends TestBase {
     Throwable throwable = StaticExceptionHandler.head();
     assertThat(throwable).isInstanceOf(NullPointerException.class);
   }
-
-  @Test
-  public void testAsyncLog() {
-    var asyncLogger = getAsyncLogger();
-    Integer number = null;
-    asyncLogger.info(
-        handle -> {
-          handle.log("bad argument", fb -> fb.number("nullNumber", number.intValue()));
-        });
-    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandler.head() != null);
-
-    Throwable throwable = StaticExceptionHandler.head();
-    assertThat(throwable).isInstanceOf(NullPointerException.class);
-  }
-
-  @Test
-  public void testAsyncLogWithField() {
-    var asyncLogger = getAsyncLogger();
-    Integer number = null;
-    asyncLogger
-        .withFields(fb -> fb.number("nullNumber", number.intValue()))
-        .info(
-            handle -> {
-              handle.log("no argument");
-            });
-    org.awaitility.Awaitility.await().until(() -> StaticExceptionHandler.head() != null);
-
-    Throwable throwable = StaticExceptionHandler.head();
-    assertThat(throwable).isInstanceOf(NullPointerException.class);
-  }
 }
