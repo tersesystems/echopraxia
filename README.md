@@ -129,16 +129,6 @@ class Main {
 }
 ```
 
-## Migration to 3.0
-
-There are some changes in 3.0.x which require migration:
-
-* `Logger<?>` is no longer valid -- you must now specify `Logger<SomeFieldBuilder>` as there is no lower bound on wildcards.
-* You must add Logback or Log4J2 library dependencies explicitly (Echopraxia no longer pulls in Logback 1.2 or Log4J2 for you).  Please see the installation page for details.
-* If you are extending or implementing a logger, the classes for abstract loggers and logger support have been moved to the `spi` package.
-* The default for all primitive (`string`, `number`, `boolean`) methods in `FieldBuilder` is now `keyValue`, you can override in your own field builder with `fb.value` as appropriate.
-* There is no `Field.ValueField` or `Field.KeyValueField` class any more, only `Field` interface.
-
 ## Documentation
 
 Please see the [online documentation](https://tersesystems.github.io/echopraxia).
