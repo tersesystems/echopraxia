@@ -7,12 +7,9 @@ import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import echopraxia.logging.spi.CoreLogger;
 import echopraxia.logging.spi.Utilities;
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.jetbrains.annotations.NotNull;
 
 public class Logger {
   @NotNull private final CoreLogger core;
@@ -144,7 +141,7 @@ public class Logger {
     }
     List<Field> list = new ArrayList<>();
     for (FieldBuilderResult result : results) {
-        list.addAll(result.fields());
+      list.addAll(result.fields());
     }
     return FieldBuilderResult.list(list);
   }
