@@ -1,6 +1,7 @@
 package echopraxia.api;
 
 import java.util.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -18,6 +19,15 @@ public interface FieldBuilderResult {
 
   static @NotNull FieldBuilderResult empty() {
     return Collections::emptyList;
+  }
+
+  static FieldBuilderResult apply(Supplier<FieldBuilderResult> supplier) {
+    return new FieldBuilderResult() {
+      @Override
+      public @NotNull List<Field> fields() {
+        return supplier.get().fields();
+      }
+    };
   }
 
   static @NotNull FieldBuilderResult only(@NotNull Field field) {
