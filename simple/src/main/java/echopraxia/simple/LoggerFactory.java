@@ -29,5 +29,4 @@ public class LoggerFactory {
     CoreLogger core = CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName());
     return new Logger(core);
   }
-
 }
