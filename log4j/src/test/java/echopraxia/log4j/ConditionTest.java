@@ -1,17 +1,13 @@
 package echopraxia.log4j;
 
 import static echopraxia.log4j.appender.ListAppender.getListAppender;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import echopraxia.log4j.appender.ListAppender;
 import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 import org.apache.logging.log4j.ThreadContext;
