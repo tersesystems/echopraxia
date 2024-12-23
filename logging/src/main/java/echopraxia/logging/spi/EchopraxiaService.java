@@ -19,7 +19,7 @@ public interface EchopraxiaService {
   ExceptionHandler getExceptionHandler();
 
   /**
-   * @return the exception handler used by the service.
+   * @return the filters used by the service.
    */
   @NotNull
   Filters getFilters();
