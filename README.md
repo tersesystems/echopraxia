@@ -55,6 +55,8 @@ And print out the internal state of the `Person` in both logfmt and JSON.
 INFO 13.223 abe={Abe, 1, father={Bert, 35, father=null, mother=null, interests=[keyboards]}, mother={Candace, 30, father=null, mother=null, interests=[iceskating]}, interests=[yodelling]}
 ```
 
+## Fields
+
 Echopraxia also has a "contextual" logging feature that renders fields in JSON:
 
 ```java
@@ -62,7 +64,9 @@ var fooLogger = logger.withFields(fb -> fb.string("foo", "bar"));
 fooLogger.info("This logs the 'foo' field automatically in JSON");
 ```
 
-And has conditional logging based on fields and exceptions using JSONPath:
+## Conditions
+
+And has conditional logging based on fields and exceptions, optionally using JSONPath:
 
 ```java
 Condition c = (level, ctx) ->
@@ -73,6 +77,57 @@ logger.error(c, "Only render this error if method name ends in Foo", e);
 ```
 
 There is also a feature to change logging conditions [dynamically using scripts](https://github.com/tersesystems/smallest-dynamic-logging-example).
+
+## Custom Loggers
+
+Extending the `Logger` class with your own methods is very straightforward.
+
+```java
+import echopraxia.api.FieldBuilder;
+import echopraxia.logging.api.*;
+import echopraxia.logging.spi.*;
+import echopraxia.simple.Logger;
+
+class MyLoggerFactory {
+  public static class MyFieldBuilder implements FieldBuilder {
+    // Add your own field builder methods in here
+  }
+
+  private static final MyFieldBuilder fieldBuilder = new MyFieldBuilder();
+
+  public static MyLogger getLogger(Class<?> clazz) {
+    final CoreLogger core = CoreLoggerFactory.getLogger(Logger.class.getName(), clazz);
+    return new MyLogger(core);
+  }
+
+  public static final class MyLogger extends Logger {
+    public static final String FQCN = MyLogger.class.getName();
+
+    public MyLogger(CoreLogger logger) {
+      super(logger);
+    }
+
+    @Override
+    public FieldBuilder fieldBuilder() {
+      return fieldBuilder;
+    }
+
+    public void notice(String message) {
+      // the caller is MyLogger specifically, so we need to let the logging framework know how to
+      // address it.
+      core().withFQCN(FQCN).log(Level.INFO, message, fb -> fb.bool("notice", true), fieldBuilder());
+    }
+  }
+}
+
+class Main {
+  private static final MyLoggerFactory.MyLogger logger = MyLoggerFactory.getLogger(Main.class);
+
+  public static void main(String[] args) {
+    logger.notice("this has a notice field added");
+  }
+}
+```
 
 ## Migration to 3.0
 
