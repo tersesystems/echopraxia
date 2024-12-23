@@ -9,6 +9,11 @@ import echopraxia.logging.spi.CoreLogger;
 import echopraxia.logging.spi.Utilities;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class Logger {
   @NotNull private final CoreLogger core;
 
@@ -33,8 +38,8 @@ public class Logger {
     this.core = logger;
   }
 
-  public void trace(String template, FieldBuilderResult result) {
-    core.log(Level.TRACE, template, fb -> result, FIELD_BUILDER);
+  public void trace(String template, FieldBuilderResult... results) {
+    core.log(Level.TRACE, template, fb -> collate(results), FIELD_BUILDER);
   }
 
   public void trace(String template, Field... fields) {
@@ -45,8 +50,8 @@ public class Logger {
     core.log(Level.TRACE, template, fb -> fb.exception(throwable), FIELD_BUILDER);
   }
 
-  public void debug(String template, FieldBuilderResult result) {
-    core.log(Level.DEBUG, template, fb -> result, FIELD_BUILDER);
+  public void debug(String template, FieldBuilderResult... results) {
+    core.log(Level.DEBUG, template, fb -> collate(results), FIELD_BUILDER);
   }
 
   public void debug(String template, Field... fields) {
@@ -57,8 +62,8 @@ public class Logger {
     core.log(Level.DEBUG, template, fb -> fb.exception(throwable), FIELD_BUILDER);
   }
 
-  public void info(String template, FieldBuilderResult result) {
-    core.log(Level.INFO, template, fb -> result, FIELD_BUILDER);
+  public void info(String template, FieldBuilderResult... results) {
+    core.log(Level.INFO, template, fb -> collate(results), FIELD_BUILDER);
   }
 
   public void info(String template, Field... fields) {
@@ -69,8 +74,8 @@ public class Logger {
     core.log(Level.INFO, template, fb -> fb.exception(throwable), FIELD_BUILDER);
   }
 
-  public void warn(String template, FieldBuilderResult result) {
-    core.log(Level.WARN, template, fb -> result, FIELD_BUILDER);
+  public void warn(String template, FieldBuilderResult... results) {
+    core.log(Level.WARN, template, fb -> collate(results), FIELD_BUILDER);
   }
 
   public void warn(String template, Field... fields) {
@@ -81,8 +86,8 @@ public class Logger {
     core.log(Level.WARN, template, fb -> fb.exception(throwable), FIELD_BUILDER);
   }
 
-  public void error(String template, FieldBuilderResult result) {
-    core.log(Level.ERROR, template, fb -> result, FIELD_BUILDER);
+  public void error(String template, FieldBuilderResult... results) {
+    core.log(Level.ERROR, template, fb -> collate(results), FIELD_BUILDER);
   }
 
   public void error(String template, Field... fields) {
@@ -121,8 +126,8 @@ public class Logger {
     return new Logger(core.withThreadContext(Utilities.threadContext()));
   }
 
-  public @NotNull Logger withFields(@NotNull FieldBuilderResult result) {
-    return new Logger(core.withFields(f -> result, fieldBuilder()));
+  public @NotNull Logger withFields(@NotNull FieldBuilderResult... results) {
+    return new Logger(core.withFields(fb -> collate(results), fieldBuilder()));
   }
 
   public @NotNull Logger withFields(@NotNull Field... fields) {
@@ -131,5 +136,16 @@ public class Logger {
 
   public @NotNull Logger withCondition(@NotNull Condition condition) {
     return new Logger(core.withCondition(condition));
+  }
+
+  protected FieldBuilderResult collate(@NotNull FieldBuilderResult[] results) {
+    if (results.length == 0) {
+      return FieldBuilderResult.empty();
+    }
+    List<Field> list = new ArrayList<>();
+    for (FieldBuilderResult result : results) {
+        list.addAll(result.fields());
+    }
+    return FieldBuilderResult.list(list);
   }
 }
