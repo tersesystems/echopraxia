@@ -41,12 +41,20 @@ public class Logger {
     core.log(Level.TRACE, template, fb -> FieldBuilderResult.list(fields), FIELD_BUILDER);
   }
 
+  public void trace(String template, Throwable throwable) {
+    core.log(Level.TRACE, template, fb -> fb.exception(throwable), FIELD_BUILDER);
+  }
+
   public void debug(String template, FieldBuilderResult result) {
     core.log(Level.DEBUG, template, fb -> result, FIELD_BUILDER);
   }
 
   public void debug(String template, Field... fields) {
     core.log(Level.DEBUG, template, fb -> FieldBuilderResult.list(fields), FIELD_BUILDER);
+  }
+
+  public void debug(String template, Throwable throwable) {
+    core.log(Level.DEBUG, template, fb -> fb.exception(throwable), FIELD_BUILDER);
   }
 
   public void info(String template, FieldBuilderResult result) {
@@ -57,6 +65,10 @@ public class Logger {
     core.log(Level.INFO, template, fb -> FieldBuilderResult.list(fields), FIELD_BUILDER);
   }
 
+  public void info(String template, Throwable throwable) {
+    core.log(Level.INFO, template, fb -> fb.exception(throwable), FIELD_BUILDER);
+  }
+
   public void warn(String template, FieldBuilderResult result) {
     core.log(Level.WARN, template, fb -> result, FIELD_BUILDER);
   }
@@ -65,12 +77,20 @@ public class Logger {
     core.log(Level.WARN, template, fb -> FieldBuilderResult.list(fields), FIELD_BUILDER);
   }
 
+  public void warn(String template, Throwable throwable) {
+    core.log(Level.WARN, template, fb -> fb.exception(throwable), FIELD_BUILDER);
+  }
+
   public void error(String template, FieldBuilderResult result) {
     core.log(Level.ERROR, template, fb -> result, FIELD_BUILDER);
   }
 
   public void error(String template, Field... fields) {
     core.log(Level.ERROR, template, fb -> FieldBuilderResult.list(fields), FIELD_BUILDER);
+  }
+
+  public void error(String template, Throwable throwable) {
+    core.log(Level.ERROR, template, fb -> fb.exception(throwable), FIELD_BUILDER);
   }
 
   public boolean isTraceEnabled() {
