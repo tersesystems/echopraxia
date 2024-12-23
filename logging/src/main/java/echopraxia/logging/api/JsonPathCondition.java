@@ -13,8 +13,7 @@ public interface JsonPathCondition extends Condition {
     if (context instanceof LoggingContextWithFindPathMethods) {
       return jsonPathTest(level, (LoggingContextWithFindPathMethods) context);
     } else {
-      throw new IllegalStateException(
-              "test requires LoggingContextWithFindPathMethods instance!");
+      throw new IllegalStateException("test requires LoggingContextWithFindPathMethods instance!");
     }
   }
 
