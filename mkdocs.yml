@@ -69,8 +69,4 @@ nav:
   - Frameworks:      
     - Logback Framework: frameworks/logback.md
     - Log4J2 Framework: frameworks/log4j2.md
-  - Additional Features:
-    - Diff Field Builder: additional/diff.md
-    - Fluent Logger: additional/fluent.md
-    - Semantic Logger: additional/semantic.md    
   - FAQ: faq.md
