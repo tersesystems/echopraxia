@@ -10,15 +10,19 @@ public interface JsonPathCondition extends Condition {
   boolean jsonPathTest(Level level, LoggingContextWithFindPathMethods context);
 
   default boolean test(Level level, LoggingContext context) {
-    return jsonPathTest(level, (LoggingContextWithFindPathMethods) context);
+    if (context instanceof LoggingContextWithFindPathMethods) {
+      return jsonPathTest(level, (LoggingContextWithFindPathMethods) context);
+    } else {
+      throw new IllegalStateException("test requires LoggingContextWithFindPathMethods instance!");
+    }
   }
 
   @Contract(pure = true)
-  public static @NotNull Condition pathCondition(
+  public static @NotNull JsonPathCondition pathCondition(
       Function<LoggingContextWithFindPathMethods, Boolean> o) {
     return (level, context) -> {
-      if (context instanceof LoggingContextWithFindPathMethods) {
-        return o.apply((LoggingContextWithFindPathMethods) context);
+      if (context != null) {
+        return o.apply(context);
       } else {
         throw new IllegalStateException(
             "pathCondition requires LoggingContextWithFindPathMethods instance!");
@@ -27,11 +31,11 @@ public interface JsonPathCondition extends Condition {
   }
 
   @Contract(pure = true)
-  public static @NotNull Condition pathCondition(
+  public static @NotNull JsonPathCondition pathCondition(
       BiFunction<Level, LoggingContextWithFindPathMethods, Boolean> o) {
     return (level, context) -> {
-      if (context instanceof LoggingContextWithFindPathMethods) {
-        return o.apply(level, (LoggingContextWithFindPathMethods) context);
+      if (context != null) {
+        return o.apply(level, context);
       } else {
         throw new IllegalStateException(
             "pathCondition requires LoggingContextWithFindPathMethods instance!");
