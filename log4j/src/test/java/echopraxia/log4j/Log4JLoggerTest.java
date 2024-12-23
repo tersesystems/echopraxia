@@ -4,9 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import echopraxia.api.Field;
-import echopraxia.api.FieldBuilder;
 import echopraxia.api.Value;
-import echopraxia.async.AsyncLoggerFactory;
 import echopraxia.logger.LoggerFactory;
 import org.junit.jupiter.api.Test;
 
@@ -114,23 +112,6 @@ public class Log4JLoggerTest extends TestBase {
     // disable the line check as it keeps changing...
     // assertThat(fields.getJsonNumber("line").intValue()).isEqualTo(109); // this is very
     // sensitive!
-  }
-
-  @Test
-  public void testLoggerLocationWithAsyncLogger() {
-    // note you must have includeLocation="true" in log4j2.xml to trigger the
-    // throwable / stacktrace in the core logger...
-    var asyncLogger = AsyncLoggerFactory.getLogger(getClass(), FieldBuilder.instance());
-    asyncLogger.info("Boring Message");
-
-    waitUntilMessages();
-
-    JsonNode entry = getEntry();
-
-    final JsonNode fields = entry.path("source");
-    assertThat(fields.path("class").asText()).isEqualTo("echopraxia.log4j.Log4JLoggerTest");
-    assertThat(fields.path("method").asText()).isEqualTo("testLoggerLocationWithAsyncLogger");
-    assertThat(fields.path("file").asText()).isEqualTo("Log4JLoggerTest.java");
   }
 
   @Test

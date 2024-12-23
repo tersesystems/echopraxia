@@ -1,17 +1,13 @@
 package echopraxia.log4j;
 
 import static echopraxia.log4j.appender.ListAppender.getListAppender;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import echopraxia.log4j.appender.ListAppender;
 import echopraxia.logging.api.Condition;
 import echopraxia.logging.api.Level;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 import org.apache.logging.log4j.ThreadContext;
@@ -109,93 +105,5 @@ public class ConditionTest extends TestBase {
     JsonNode entry = getEntry();
     final String message = entry.path("message").asText();
     assertThat(message).isEqualTo("has derp");
-  }
-
-  @Test
-  void testAsyncCondition() {
-    Condition c =
-        (level, ctx) -> {
-          try {
-            Thread.sleep(900L);
-          } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-          }
-          return true;
-        };
-
-    AtomicBoolean logged = new AtomicBoolean(false);
-    var loggerWithCondition = getAsyncLogger().withCondition(c);
-    loggerWithCondition.info(
-        handle -> {
-          handle.log("async logging test");
-          logged.set(true);
-        });
-
-    final ListAppender listAppender = getListAppender("ListAppender");
-    final List<String> messages = listAppender.getMessages();
-    assertThat(messages).isEmpty();
-
-    await().atMost(1, SECONDS).until(logged::get);
-
-    JsonNode entry = getEntry();
-    String message = entry.path("message").asText();
-    assertThat(message).isEqualTo("async logging test");
-  }
-
-  @Test
-  void testFailedAsyncCondition() {
-    AtomicBoolean logged = new AtomicBoolean(false);
-    Condition c =
-        (level, ctx) -> {
-          if (System.currentTimeMillis() > 0) {
-            logged.set(true);
-            throw new RuntimeException("oh noes!");
-          }
-          return true;
-        };
-    var loggerWithCondition = getAsyncLogger().withCondition(c);
-    loggerWithCondition.info(
-        handle -> {
-          handle.log("async logging test");
-          logged.set(true);
-        });
-
-    await().atLeast(100, MILLISECONDS).until(logged::get);
-
-    final ListAppender listAppender = getListAppender("ListAppender");
-    final List<String> messages = listAppender.getMessages();
-    assertThat(messages).isEmpty();
-
-    Throwable throwable = StaticExceptionHandler.head();
-    String exceptionMessage = throwable.getMessage();
-    assertThat(exceptionMessage).isEqualTo("oh noes!");
-  }
-
-  @Test
-  void testFailedAsyncLogging() {
-    AtomicBoolean logged = new AtomicBoolean(false);
-    var loggerWithCondition = getAsyncLogger();
-    loggerWithCondition.info(
-        handle -> {
-          handle.log(
-              "async logging test",
-              fb -> {
-                if (System.currentTimeMillis() > 0) {
-                  logged.set(true);
-                  throw new RuntimeException("oh noes!");
-                }
-                return fb.string("foo", "bar");
-              });
-        });
-
-    await().atLeast(100, MILLISECONDS).until(logged::get);
-
-    final ListAppender listAppender = getListAppender("ListAppender");
-    final List<String> messages = listAppender.getMessages();
-    assertThat(messages).isEmpty();
-
-    Throwable throwable = StaticExceptionHandler.head();
-    String exceptionMessage = throwable.getMessage();
-    assertThat(exceptionMessage).isEqualTo("oh noes!");
   }
 }

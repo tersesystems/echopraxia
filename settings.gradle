@@ -13,10 +13,5 @@ include('jsonpath')
 
 include('simple')
 include('logger')
-include('async')
 include('scripting')
-include('fluent')
-include('semantic')
 include('filewatch')
-
-include('diff')

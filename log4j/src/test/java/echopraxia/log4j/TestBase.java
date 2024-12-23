@@ -6,8 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import echopraxia.api.FieldBuilder;
-import echopraxia.async.AsyncLogger;
-import echopraxia.async.AsyncLoggerFactory;
 import echopraxia.log4j.appender.ListAppender;
 import echopraxia.logger.Logger;
 import echopraxia.logger.LoggerFactory;
@@ -27,10 +25,6 @@ public class TestBase {
   @NotNull
   Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger();
-  }
-
-  AsyncLogger<FieldBuilder> getAsyncLogger() {
-    return AsyncLoggerFactory.getLogger();
   }
 
   void waitUntilMessages() {

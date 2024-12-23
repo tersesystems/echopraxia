@@ -8,8 +8,6 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.read.ListAppender;
 import echopraxia.api.FieldBuilder;
-import echopraxia.async.AsyncLogger;
-import echopraxia.async.AsyncLoggerFactory;
 import echopraxia.logback.TransformingAppender;
 import echopraxia.logger.Logger;
 import echopraxia.logger.LoggerFactory;
@@ -50,10 +48,6 @@ public class TestBase {
 
   Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
-  }
-
-  AsyncLogger<FieldBuilder> getAsyncLogger() {
-    return AsyncLoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
   }
 
   ListAppender<ILoggingEvent> getListAppender() {

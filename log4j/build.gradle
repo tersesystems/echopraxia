@@ -12,7 +12,6 @@ dependencies {
 
     jmhImplementation project(":logger")
     testImplementation project(":logger")
-    testImplementation project(":async")
 
     jmhImplementation "org.apache.logging.log4j:log4j-core:$log4j2Version"
     jmhImplementation "org.apache.logging.log4j:log4j-api:$log4j2Version"

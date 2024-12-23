@@ -1,8 +1,6 @@
 package echopraxia.jul;
 
 import echopraxia.api.FieldBuilder;
-import echopraxia.async.AsyncLogger;
-import echopraxia.async.AsyncLoggerFactory;
 import echopraxia.logger.Logger;
 import echopraxia.logger.LoggerFactory;
 import java.io.IOException;
@@ -36,10 +34,6 @@ public class TestBase {
 
   Logger<FieldBuilder> getLogger() {
     return LoggerFactory.getLogger(getCoreLogger(), FieldBuilder.instance());
-  }
-
-  AsyncLogger<FieldBuilder> getAsyncLogger() {
-    return AsyncLoggerFactory.getLogger();
   }
 
   JULCoreLogger getCoreLogger() {

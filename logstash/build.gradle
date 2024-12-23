@@ -8,9 +8,7 @@ dependencies {
     implementation project(":jackson")
 
     testImplementation project(":logger")
-    testImplementation project(":async")
     jmhImplementation project(":logger")
-    jmhImplementation project(":async")
     jmhImplementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
 
     compileOnly "org.slf4j:slf4j-api:$slf4jApiVersion"
