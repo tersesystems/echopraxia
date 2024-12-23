@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+dependencies {
+    api project(":logging")
+
+    jmhImplementation project(":logstash")
+
+    testImplementation project(":logstash")
+    testImplementation project(":logger")
+
+    testImplementation "ch.qos.logback:logback-classic:$logbackVersion"
+    testImplementation "net.logstash.logback:logstash-logback-encoder:$logstashVersion"
+}

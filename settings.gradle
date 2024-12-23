@@ -10,6 +10,8 @@ include('noop')
 
 include('logging')
 include('jsonpath')
+
+include('simple')
 include('logger')
 include('async')
 include('scripting')
