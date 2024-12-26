@@ -27,9 +27,10 @@ class MyLoggerFactory {
     public void notice(String message) {
       // the caller is MyLogger specifically, so we need to let the logging framework know how to
       // address it.
-      core().withFQCN(FQCN)
-            .withFields(fb -> fb.bool("notice", true), FIELD_BUILDER)
-            .log(Level.INFO, message);
+      core()
+          .withFQCN(FQCN)
+          .withFields(fb -> fb.bool("notice", true), FIELD_BUILDER)
+          .log(Level.INFO, message);
     }
   }
 }
