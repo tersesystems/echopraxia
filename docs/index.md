@@ -5,7 +5,8 @@
 What this means is that all arguments in a logging statement have a name and a value, for example:
 
 ```java
-logger.info("arg1 is {} and arg2 is {}", fb -> fb.list(
+var fb = FieldBuilder.instance();
+logger.info("arg1 is {} and arg2 is {}", fb.list(
   fb.string("name", "value"),
   fb.number("age", 13)
 ));
@@ -30,13 +31,14 @@ and in a JSON format as:
 What makes Echopraxia effective -- especially for debugging -- is that you can define your own field builders to map between objects and fields, and then pass in your own objects and render complex objects.  For example, we can render a `Person` object:
 
 ```java
-Logger<PersonFieldBuilder> logger = LoggerFactory.getLogger(getClass(), PersonFieldBuilder.instance());
+var fb = PersonFieldBuilder.instance();
+Logger logger = LoggerFactory.getLogger(getClass());
 
 Person abe = new Person("Abe", 1, "yodelling");
 abe.setFather(new Person("Bert", 35, "keyboards"));
 abe.setMother(new Person("Candace", 30, "iceskating"));
 
-logger.info("{}", fb -> fb.person("abe", abe));
+logger.info("{}", fb.person("abe", abe));
 ```
 
 And print out the internal state of the `Person` in both logfmt and JSON.
@@ -48,18 +50,18 @@ INFO 13.223 abe={Abe, 1, father={Bert, 35, father=null, mother=null, interests=[
 Echopraxia also has a "contextual" logging feature that renders fields in JSON:
 
 ```java
-var fooLogger = logger.withFields(fb -> fb.string("foo", "bar"));
+var fooLogger = logger.withFields(fb.string("foo", "bar"));
 fooLogger.info("This logs the 'foo' field automatically in JSON");
 ```
 
 And has conditional logging based on fields and exceptions using JSONPath:
 
 ```java
-Condition c = (level, ctx) ->
+JsonPathCondition c = JsonPathCondition.findCondition((level, ctx) ->
     ctx.findString("$.exception.stackTrace[0].methodName")
         .filter(s -> s.endsWith("Foo"))
-        .isPresent();
-logger.error(c, "Only render this error if method name ends in Foo", e);
+        .isPresent());
+logger.withCondition(c).error("Only render this error if method name ends in Foo", e);
 ```
 
 And there is also a feature to change logging conditions [dynamically using scripts](https://github.com/tersesystems/smallest-dynamic-logging-example).

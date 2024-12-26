@@ -12,6 +12,7 @@ Start by importing the API package.  Everything relevant to field building will 
 
 ```java
 import echopraxia.api.*;
+import echopraxia.logging.api.*;
 ```
 
 ## Defining Field Builders
