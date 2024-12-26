@@ -10,7 +10,7 @@ class MyLoggerFactory {
     // Add your own field builder methods in here
   }
 
-  private static final MyFieldBuilder fieldBuilder = new MyFieldBuilder();
+  public static final MyFieldBuilder FIELD_BUILDER = new MyFieldBuilder();
 
   public static MyLogger getLogger(Class<?> clazz) {
     final CoreLogger core = CoreLoggerFactory.getLogger(Logger.class.getName(), clazz);
@@ -24,15 +24,10 @@ class MyLoggerFactory {
       super(logger);
     }
 
-    @Override
-    public FieldBuilder fieldBuilder() {
-      return fieldBuilder;
-    }
-
     public void notice(String message) {
       // the caller is MyLogger specifically, so we need to let the logging framework know how to
       // address it.
-      core().withFQCN(FQCN).log(Level.INFO, message, fb -> fb.bool("notice", true), fieldBuilder());
+      core().withFQCN(FQCN).log(Level.INFO, message, fb -> fb.bool("notice", true), FIELD_BUILDER);
     }
   }
 }

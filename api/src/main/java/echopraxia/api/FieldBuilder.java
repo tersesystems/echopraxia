@@ -26,6 +26,11 @@ public interface FieldBuilder {
     return FieldBuilderResult.list(fields);
   }
 
+  @NotNull
+  default FieldBuilderResult list(FieldBuilderResult... results) {
+    return FieldBuilderResult.list(results);
+  }
+
   /**
    * Creates a field that renders in message template as value.
    *
