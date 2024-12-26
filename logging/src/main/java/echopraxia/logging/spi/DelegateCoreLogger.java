@@ -6,8 +6,6 @@ import echopraxia.logging.api.Level;
 import echopraxia.logging.api.LoggerHandle;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
@@ -69,12 +67,6 @@ public class DelegateCoreLogger implements CoreLogger {
   @NotNull
   public CoreLogger withCondition(@NotNull Condition condition) {
     return core.withCondition(condition);
-  }
-
-  @Override
-  @NotNull
-  public CoreLogger withExecutor(@NotNull Executor executor) {
-    return core.withExecutor(executor);
   }
 
   @Override
@@ -175,39 +167,5 @@ public class DelegateCoreLogger implements CoreLogger {
   @NotNull
   public <FB> LoggerHandle<FB> logHandle(@NotNull Level level, @NotNull FB builder) {
     return core.logHandle(level, builder);
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    core.asyncLog(level, consumer, builder);
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    core.asyncLog(level, condition, consumer, builder);
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    core.asyncLog(level, extraFields, consumer, builder);
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    core.asyncLog(level, extraFields, condition, consumer, builder);
   }
 }

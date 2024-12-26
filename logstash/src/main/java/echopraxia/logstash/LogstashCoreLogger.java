@@ -5,7 +5,6 @@ import static org.slf4j.event.EventConstants.*;
 
 import ch.qos.logback.classic.LoggerContext;
 import echopraxia.api.*;
-import echopraxia.logback.CallerMarker;
 import echopraxia.logback.LogbackLoggerContext;
 import echopraxia.logback.LogbackLoggingContext;
 import echopraxia.logging.api.Condition;
@@ -16,10 +15,6 @@ import echopraxia.logging.spi.CoreLogger;
 import echopraxia.logging.spi.EchopraxiaService;
 import echopraxia.logging.spi.Utilities;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -39,7 +34,6 @@ public class LogstashCoreLogger implements CoreLogger {
   private final ch.qos.logback.classic.Logger logger;
   private final LogstashMarkerContext context;
   private final Condition condition;
-  private final Executor executor;
   private final String fqcn;
   private final Supplier<Runnable> threadContextFunction;
 
@@ -48,7 +42,6 @@ public class LogstashCoreLogger implements CoreLogger {
     this.logger = logger;
     this.context = LogstashMarkerContext.empty();
     this.condition = Condition.always();
-    this.executor = ForkJoinPool.commonPool();
     this.threadContextFunction = mdcContext();
   }
 
@@ -57,13 +50,11 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull ch.qos.logback.classic.Logger logger,
       @NotNull LogstashCoreLogger.LogstashMarkerContext context,
       @NotNull Condition condition,
-      @NotNull Executor executor,
       @NotNull Supplier<Runnable> threadContextSupplier) {
     this.fqcn = fqcn;
     this.logger = logger;
     this.context = context;
     this.condition = condition;
-    this.executor = executor;
     this.threadContextFunction = threadContextSupplier;
   }
 
@@ -121,7 +112,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final LogstashMarkerContext contextWithMarkers =
         this.context.withMarkers(() -> Arrays.asList(markers));
     return new LogstashCoreLogger(
-        fqcn, logger, contextWithMarkers, condition, executor, threadContextFunction);
+        fqcn, logger, contextWithMarkers, condition, threadContextFunction);
   }
 
   @Override
@@ -130,7 +121,7 @@ public class LogstashCoreLogger implements CoreLogger {
     final LogstashMarkerContext contextWithFields =
         this.context.withFields(() -> convertToFields(f.apply(builder)));
     return new LogstashCoreLogger(
-        fqcn, logger, contextWithFields, condition, executor, threadContextFunction);
+        fqcn, logger, contextWithFields, condition, threadContextFunction);
   }
 
   @Override
@@ -138,8 +129,7 @@ public class LogstashCoreLogger implements CoreLogger {
       @NotNull Function<Supplier<Map<String, String>>, Supplier<List<Field>>> mapTransform) {
     LogstashMarkerContext newContext =
         context.withFields(mapTransform.apply(MDC::getCopyOfContextMap));
-    return new LogstashCoreLogger(
-        fqcn, logger, newContext, condition, executor, threadContextFunction);
+    return new LogstashCoreLogger(fqcn, logger, newContext, condition, threadContextFunction);
   }
 
   @Override
@@ -157,8 +147,7 @@ public class LogstashCoreLogger implements CoreLogger {
             }
           };
         };
-    return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, joinedThreadContextFunction);
+    return new LogstashCoreLogger(fqcn, logger, context, condition, joinedThreadContextFunction);
   }
 
   @Override
@@ -170,23 +159,15 @@ public class LogstashCoreLogger implements CoreLogger {
       if (this.condition == Condition.never()) {
         return this;
       }
-      return new LogstashCoreLogger(
-          fqcn, logger, context, condition, executor, threadContextFunction);
+      return new LogstashCoreLogger(fqcn, logger, context, condition, threadContextFunction);
     }
     return new LogstashCoreLogger(
-        fqcn, logger, context, this.condition.and(condition), executor, threadContextFunction);
-  }
-
-  @Override
-  public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, threadContextFunction);
+        fqcn, logger, context, this.condition.and(condition), threadContextFunction);
   }
 
   @Override
   public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
-    return new LogstashCoreLogger(
-        fqcn, logger, context, condition, executor, threadContextFunction);
+    return new LogstashCoreLogger(fqcn, logger, context, condition, threadContextFunction);
   }
 
   @Override
@@ -495,104 +476,6 @@ public class LogstashCoreLogger implements CoreLogger {
     };
   }
 
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    try {
-      final Marker marker = context.resolveMarkers();
-      if (logger.isEnabledFor(marker, convertLogbackLevel(level))) {
-        Marker callerMarker =
-            isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
-        Runnable threadLocalRunnable = threadContextFunction.get();
-        runAsyncLog(
-            () -> {
-              try {
-                threadLocalRunnable.run();
-                LogstashCoreLogger callerLogger = newLogger(newContext(callerMarker));
-                consumer.accept(newHandle(level, builder, callerLogger));
-              } catch (Exception e) {
-                handleException(e);
-              }
-            });
-      }
-    } catch (Exception e) {
-      handleException(e);
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    try {
-      if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
-        CallerMarker result =
-            isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
-        Runnable threadLocalRunnable = threadContextFunction.get();
-        runAsyncLog(
-            () -> {
-              threadLocalRunnable.run();
-              LogstashCoreLogger callerLogger = newLogger(newContext(result));
-              final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, callerLogger);
-              consumer.accept(loggerHandle);
-            });
-      }
-    } catch (Exception e) {
-      handleException(e);
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    try {
-      if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
-        final Marker callerMarker =
-            isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
-        Runnable threadLocalRunnable = threadContextFunction.get();
-        runAsyncLog(
-            () -> {
-              threadLocalRunnable.run();
-              LogstashCoreLogger callerLogger = newLogger(newContext(extraFields, callerMarker));
-              final LoggerHandle<FB> loggerHandle = newHandle(level, builder, callerLogger);
-              consumer.accept(loggerHandle);
-            });
-      }
-    } catch (Exception e) {
-      handleException(e);
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    try {
-      if (logger.isEnabledFor(context.resolveMarkers(), convertLogbackLevel(level))) {
-        final Marker callerMarker =
-            isAsyncCallerEnabled() ? new CallerMarker(fqcn, new Throwable()) : null;
-        Runnable threadLocalRunnable = threadContextFunction.get();
-        runAsyncLog(
-            () -> {
-              threadLocalRunnable.run();
-              LogstashCoreLogger callerLogger = newLogger(newContext(extraFields, callerMarker));
-              final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, callerLogger);
-              consumer.accept(loggerHandle);
-            });
-      }
-    } catch (Exception e) {
-      handleException(e);
-    }
-  }
-
   /**
    * Returns true if the logback context property "echopraxia.async.caller" is "true", false
    * otherwise.
@@ -643,25 +526,6 @@ public class LogstashCoreLogger implements CoreLogger {
       arguments.add(throwable);
     }
     return arguments.toArray();
-  }
-
-  protected void runAsyncLog(Runnable runnable) {
-    // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
-    CompletableFuture.runAsync(runnable, executor)
-        .exceptionally(
-            e -> {
-              // Usually we get to this point when you have thread local dependent code in your
-              // logger.withContext() block, and your executor doesn't have those thread locals
-              // so you NPE.
-              //
-              // We need to log this error, but since it could be part of the logger context
-              // that is causing this error, we can't log the error with the same logger.
-              //
-              // Fallback to the underlying SLF4J logger to render it.
-              final Throwable cause = e.getCause(); // strip the CompletionException
-              logger.error("Uncaught exception when running asyncLog", cause);
-              return null;
-            });
   }
 
   protected ch.qos.logback.classic.Level convertLogbackLevel(Level level) {
@@ -724,8 +588,7 @@ public class LogstashCoreLogger implements CoreLogger {
   }
 
   protected LogstashCoreLogger newLogger(LogstashMarkerContext newContext) {
-    return new LogstashCoreLogger(
-        fqcn, logger, newContext, condition, executor, threadContextFunction);
+    return new LogstashCoreLogger(fqcn, logger, newContext, condition, threadContextFunction);
   }
 
   @NotNull
