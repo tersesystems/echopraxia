@@ -3,7 +3,7 @@
 You can also add fields directly to the logger using `logger.withFields` for contextual logging:
 
 ```java
-var loggerWithFoo = basicLogger.withFields(fb -> fb.string("foo", "bar"));
+var loggerWithFoo = basicLogger.withFields(fb.string("foo", "bar"));
 
 // will log "foo": "bar" field in a JSON appender.
 loggerWithFoo.info("JSON field will log automatically") 
@@ -20,10 +20,9 @@ public class PlayerData {
   private Date lastAccessedDate = new Date();
 
   // logger is not static because lastAccessedDate is an instance variable
-  private final Logger<BuilderWithDate> logger =
+  private final Logger logger =
       LoggerFactory.getLogger()
-          .withFieldBuilder(BuilderWithDate.class)
-          .withFields(fb -> fb.date("last_accessed_date", lastAccessedDate));
+          .withFields(fb.date("last_accessed_date", lastAccessedDate));
 
 }
 ```
@@ -63,7 +62,7 @@ For example, `SimpleDateFormat` is infamously not thread-safe, and so the follow
 private final static DateFormat df = new SimpleDateFormat("yyyyMMdd");
 
 // UNSAFE EXAMPLE
-private static final Logger<FieldBuilder> logger =
+private static final Logger logger =
         LoggerFactory.getLogger()
-        .withFields(fb -> fb.string("unsafe_date", df.format(new Date())));
+        .withFields(fb.string("unsafe_date", df.format(new Date())));
 ```

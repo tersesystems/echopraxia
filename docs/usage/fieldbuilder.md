@@ -11,7 +11,7 @@ Conceptually, a field builder is a handle for creating structured data.  The `Lo
 Start by importing the API package.  Everything relevant to field building will be in there.
 
 ```java
-
+import echopraxia.api.*;
 ```
 
 ## Defining Field Builders
@@ -56,36 +56,27 @@ public interface BuilderWithDate implements FieldBuilder {
 }
 ```
 
-And then create a `Logger<BuilderWithDate>`:
+And then create a `Logger`:
 
 ```java
-Logger<BuilderWithDate> dateLogger = LoggerFactory.getLogger(YourService.class, BuilderWithDate.instance);
+var fb = new BuilderWithDate();
+Logger dateLogger = LoggerFactory.getLogger(YourService.class);
 ```
 
 And now you can render a date automatically:
 
 ```java
-dateLogger.info("Date {}", fb -> fb.date("creation_date", new Date()));
+
+dateLogger.info("Date {}", fb.date("creation_date", new Date()));
 ```
 
 ### Exception Handling
-
-Avoid throwing exceptions in a field builder function. 
-
-```java
-logger.info("Message name {}", fb -> {
-  String name = methodThatThrowsException(); // BAD
-  return fb.string(name, "some-value");
-});
-```
 
 Instead, only call field builder methods inside the closure and keep any construction logic outside:
 
 ```java
 String name = methodThatThrowsException(); // GOOD
-logger.info("Message name {}", fb -> {
-  return fb.string(name, "some-value");
-});
+logger.info("Message name {}", fb.string(name, "some-value"));
 ```
 
 If an exception is thrown it will be caught by Echopraxia's default `ExceptionHandler` which writes the exception to `System.err` by default.  You can provide your own behavior for the `ExceptionHandler` using a service loader pattern.
@@ -112,9 +103,8 @@ public interface NullableFieldBuilder extends FieldBuilder {
 Field names are never allowed to be null.  If a field name is null, it will be replaced at runtime with `unknown-echopraxia-N` where N is an incrementing number.
 
 ```java
-logger.info("Message name {}", fb -> 
-  fb.string(null, "some-value") // null field names not allowed
-);
+// null field names not allowed
+logger.info("Message name {}",fb.string(null, "some-value"));
 ```
 
 ### Complex Objects
@@ -153,8 +143,8 @@ And then you can render a person:
 
 ```java
 Person user = ...
-Logger<PersonFieldBuilder> personLogger = basicLogger.withFieldBuilder(PersonFieldBuilder.instance);
-personLogger.info("Person {}", fb -> fb.person("user", user));
+var fb = PersonFieldBuilder.instance;
+basicLogger.info("Person {}", fb.person("user", user));
 ```
 
 ## Field Presentation
@@ -355,7 +345,7 @@ Even if you turn `ignore_malformed` on or have different mappings, a change in a
 Likewise, field names are not automatically scoped by context.  You may have collision cases where two different fields have the same name in the same statement:
 
 ```java
-logger.withFields(fb -> fb.keyValue("user_id", userId)).info("{}", fb -> fb.keyValue("user_id", otherUserId));
+logger.withFields(fb.keyValue("user_id", userId)).info("{}", fb.keyValue("user_id", otherUserId));
 ```
 
 This will produce a statement that has two `user_id` fields with two different values -- which is technically valid JSON, but may not be what centralized logging expects.  You can qualify your arguments by adding a [nested](https://github.com/logfellow/logstash-logback-encoder#nested-json-provider), or add logic that will validate/reject/clean invalid fields, but it may be simpler to explicitly pass in distinct names or namespace with `fb.object` or `Value.object`.
@@ -416,7 +406,7 @@ So, define a field builder per package:
 package com.mystore.user;
 
 // field builder for the user package:
-interface UserFieldBuilder extends FieldBuilder {
+public interface UserFieldBuilder extends FieldBuilder {
   UserFieldBuilder instance = new UserFieldBuilder() {};
   
   default Field user(User user) {
@@ -425,13 +415,13 @@ interface UserFieldBuilder extends FieldBuilder {
 }
 
 public abstract class LoggingBase {
-  protected static final Logger<UserFieldBuilder> logger =
-    LoggerFactory.getLogger(this.getClass(), UserFieldBuilder.instance);
+  protected static final Logger logger = LoggerFactory.getLogger(this.getClass());
+  protected UserFieldBuilder fb = fieldBuilder();
 }
 
 public class SomeUserService extends LoggingBase {
   public void someMethod(User user) {
-    logger.trace("someMethod: {}", fb -> fb.user(user));
+    logger.trace("someMethod: {}", fb.user(user));
   }
 }
 ```
@@ -458,10 +448,12 @@ interface OrderFieldBuilder extends UserFieldBuilder {
 }
 
 public class SomeOrderService {
-  private static final Logger<OrderFieldBuilder> logger = LoggerFactory.getLogger(SomeOrderService.class, OrderFieldBuilder.instance);
+  private static final Logger logger = LoggerFactory.getLogger(SomeOrderService.class);
 
+  private var fb = OrderFieldBuilder.instance;
+  
   public void someMethod(Order order) {
-    logger.trace("someMethod: {}", fb -> fb.order(order));
+    logger.trace("someMethod: {}", fb.order(order));
   }
 }
 ```

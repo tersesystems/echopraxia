@@ -20,7 +20,7 @@ Conditions are a great way to manage diagnostic logging in your application with
 For example, if you want to have logging that only activates during business hours, you can use the following:
 
 ```java
-import com.tersesystems.echopraxia.Condition;
+import echopraxia.logging.api.Condition;
 
 public class MyBusinessConditions {
   private static final Clock officeClock = Clock.system(ZoneId.of("America/Los_Angeles")) ;
@@ -63,7 +63,15 @@ This is only a part of the available functionality in conditions.  You can tie c
 
 ## JSON Path
 
-In situations where you're looking through fields for a condition, you can use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
+If you are using the Logstash implementation, you can use the `echopraxia.jsonpath.JsonPathCondition.pathCondition()` method to provide you with an extended context that has logging methods:
+
+This will give you a context that extends `FindPathMethods` that will let you use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
+
+```java
+Condition fooCondition = pathCondition((level, ctx) -> 
+    ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent()
+);
+```
 
 Tip: if you are using IntelliJ IDEA, you can add the [@Language("JSONPath")](https://www.jetbrains.com/help/idea/using-language-injections.html#language_annotation) annotation to [inject JSONPATH](https://www.jetbrains.com/idea/guide/tips/evaluate-json-path-expressions/).
 
@@ -128,7 +136,7 @@ The inline and filter predicates are not available for exceptions. Instead, you 
 ```java
 class FindException {
   void logException() {
-    Condition throwableCondition =
+    Condition throwableCondition = json
       (level, ctx) ->
         ctx.findThrowable()
           .filter(e -> "test message".equals(e.getMessage()))
@@ -152,7 +160,7 @@ var loggerWithCondition = logger.withCondition(condition);
 You can also build up conditions:
 
 ```java
-Logger<FieldBuilder> loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
+Logger loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
 ```
 
 Conditions are only evaluated once a level/marker check is passed, so something like
@@ -166,8 +174,10 @@ will short circuit on the level check before any condition is reached.
 Conditions look for fields, but those fields can come from *either* context or argument.  For example, the following condition will log because the condition finds an argument field:
 
 ```java
-Condition cond = (level, ctx) -> ctx.findString("somename").isPresent();
-logger.withCondition(cond).info("some message", fb -> fb.string("somename", "somevalue")); // matches argument
+import static echopraxia.jsonpath.JsonPathCondition.*;
+
+Condition cond = pathCondition((level, ctx) -> ctx.findString("somename").isPresent());
+logger.withCondition(cond).info("some message",  fb.string("somename", "somevalue")); // matches argument
 ```
 
 ## Statement
@@ -194,9 +204,9 @@ A condition may also evaluate context fields that are set in a logger:
 
 ```java
 // Conditions may evaluate context
-Condition cond = (level, ctx) -> ctx.findString("somename").isPresent();
+Condition cond = pathCondition((level, ctx) -> ctx.findString("somename").isPresent());
 boolean loggerEnabled = logger
-  .withFields(fb -> fb.string("somename", "somevalue"))
+  .withFields( fb.string("somename", "somevalue"))
   .withCondition(condition)
   .isInfoEnabled();
 ```
@@ -204,8 +214,8 @@ boolean loggerEnabled = logger
 Using a predicate with a condition does not trigger any logging, so it can be a nice way to "dry run" a condition.  Note that the context evaluation takes place every time a condition is run, so doing something like this is not good:
 
 ```java
-var loggerWithContextAndCondition =  logger
-  .withFields(fb -> fb.string("somename", "somevalue"))
+var loggerWithContextAndCondition = logger
+  .withFields( fb.string("somename", "somevalue"))
   .withCondition(condition);
 
 // check evaluates context
@@ -221,7 +231,7 @@ It is generally preferable to pass in a condition explicitly on the statement, a
 
 ```java
 var loggerWithContext = logger
-  .withFields(fb -> fb.string("somename", "somevalue"));
+  .withFields( fb.string("somename", "somevalue"));
 loggerWithContext.info(condition, "message");
 ```
 

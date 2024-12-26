@@ -12,8 +12,8 @@ package example;
 public class ExampleFilter implements CoreLoggerFilter {
     @Override
     public CoreLogger apply(CoreLogger coreLogger) {
-        return coreLogger
-                .withFields(fb -> fb.bool("uses_filter", true), FieldBuilder.instance());
+        var fb =  FieldBuilder.instance();
+        return coreLogger.withFields(fb.bool("uses_filter", true));
     }
 }
 ```
@@ -48,17 +48,17 @@ public class SystemInfoFilter implements CoreLoggerFilter {
 
     // Now you can add conditions based on these fields, and conditionally
     // enable logging based on your load and memory!
-    return coreLogger.withFields(fb -> {
-        Field loadField = fb.object("load_average", //
-                fb.number("1min", loadAverage[0]), //
-                fb.number("5min", loadAverage[1]), //
-                fb.number("15min", loadAverage[2]));
-        Field memField = fb.object("mem", //
-                fb.number("available", mem.getAvailable()), //
-                fb.number("total", mem.getTotal()));
-        Field sysinfoField = fb.object("sysinfo", loadField, memField);
-        return sysinfoField;
-      }, FieldBuilder.instance());
+
+    Field loadField = fb.object("load_average", //
+              fb.number("1min", loadAverage[0]), //
+              fb.number("5min", loadAverage[1]), //
+              fb.number("15min", loadAverage[2]));
+    Field memField = fb.object("mem", //
+              fb.number("available", mem.getAvailable()), //
+              fb.number("total", mem.getTotal()));
+    Field sysinfoField = fb.object("sysinfo", loadField, memField);
+      
+    return coreLogger.withFields(sysinfoField);
   }
 }
 ```

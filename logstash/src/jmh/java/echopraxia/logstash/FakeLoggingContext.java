@@ -2,7 +2,7 @@ package echopraxia.logstash;
 
 import echopraxia.api.Field;
 import echopraxia.jsonpath.AbstractJsonPathFinder;
-import echopraxia.logging.api.LoggingContext;
+import echopraxia.logging.api.LoggingContextWithFindPathMethods;
 import echopraxia.logging.spi.CoreLogger;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,7 +10,8 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class FakeLoggingContext extends AbstractJsonPathFinder implements LoggingContext {
+public class FakeLoggingContext extends AbstractJsonPathFinder
+    implements LoggingContextWithFindPathMethods {
   private final List<Field> loggerFields;
 
   public FakeLoggingContext(Field... loggerFields) {
