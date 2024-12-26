@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.Logger;
@@ -23,7 +22,6 @@ import org.apache.logging.log4j.ThreadContext;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.message.Message;
 import org.apache.logging.log4j.spi.ExtendedLogger;
-import org.apache.logging.log4j.util.StackLocatorUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -133,11 +131,6 @@ public class Log4JCoreLogger implements CoreLogger {
       return newLogger(condition);
     }
     return newLogger(this.condition.and(condition));
-  }
-
-  @Override
-  public @NotNull Log4JCoreLogger withExecutor(@NotNull Executor executor) {
-    return new Log4JCoreLogger(fqcn, logger, context, condition, executor, threadContextFunction);
   }
 
   @Override
@@ -433,95 +426,6 @@ public class Log4JCoreLogger implements CoreLogger {
         final Message message = createMessage(messageTemplate, ctx);
         logger.logMessage(fqcn, log4jLevel, marker, message, e);
       }
-    };
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
-      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      Runnable runnable =
-          createRunnable(
-              location, threadLocalRunnable, context, level, condition, consumer, builder);
-      runAsyncLog(runnable);
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
-      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      Runnable runnable =
-          createRunnable(
-              location, threadLocalRunnable, context, level, condition.and(c), consumer, builder);
-      runAsyncLog(runnable);
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
-      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      Runnable runnable =
-          createRunnable(
-              location,
-              threadLocalRunnable,
-              context.withFields(extraFields),
-              level,
-              condition,
-              consumer,
-              builder);
-      runAsyncLog(runnable);
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    if (logger.isEnabled(convertLevel(level), context.getMarker())) {
-      StackTraceElement location = includeLocation() ? StackLocatorUtil.calcLocation(fqcn) : null;
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      Runnable runnable =
-          createRunnable(
-              location,
-              threadLocalRunnable,
-              context.withFields(extraFields),
-              level,
-              condition.and(c),
-              consumer,
-              builder);
-      runAsyncLog(runnable);
-    }
-  }
-
-  private <FB> Runnable createRunnable(
-      @Nullable StackTraceElement location,
-      Runnable threadLocalRunnable,
-      Context extraContext,
-      Level level,
-      Condition c,
-      Consumer<LoggerHandle<FB>> consumer,
-      FB builder) {
-    return () -> {
-      threadLocalRunnable.run();
-      final LoggerHandle<FB> loggerHandle = newHandle(location, extraContext, level, c, builder);
-      consumer.accept(loggerHandle);
     };
   }
 

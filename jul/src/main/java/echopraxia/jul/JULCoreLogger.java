@@ -10,10 +10,8 @@ import echopraxia.logging.spi.LoggerContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.LogRecord;
@@ -123,11 +121,6 @@ public class JULCoreLogger implements CoreLogger {
       return newLogger(condition);
     }
     return newLogger(this.condition.and(condition));
-  }
-
-  @Override
-  public @NotNull JULCoreLogger withExecutor(@NotNull Executor executor) {
-    return newLogger(executor);
   }
 
   @Override
@@ -403,93 +396,6 @@ public class JULCoreLogger implements CoreLogger {
         }
       }
     };
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {
-    if (logger.isLoggable(convertLevel(level))) {
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      runAsyncLog(
-          () -> {
-            threadLocalRunnable.run();
-            consumer.accept(newHandle(level, builder, this));
-          });
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    if (logger.isLoggable(convertLevel(level))) {
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      runAsyncLog(
-          () -> {
-            threadLocalRunnable.run();
-            final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, this);
-            consumer.accept(loggerHandle);
-          });
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    if (logger.isLoggable(convertLevel(level))) {
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      runAsyncLog(
-          () -> {
-            threadLocalRunnable.run();
-            final LoggerHandle<FB> loggerHandle = newHandle(level, builder, this);
-            consumer.accept(loggerHandle);
-          });
-    }
-  }
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Condition c,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {
-    if (logger.isLoggable(convertLevel(level))) {
-      Runnable threadLocalRunnable = threadContextFunction.get();
-      runAsyncLog(
-          () -> {
-            threadLocalRunnable.run();
-            final LoggerHandle<FB> loggerHandle = newHandle(level, c, builder, this);
-            consumer.accept(loggerHandle);
-          });
-    }
-  }
-
-  protected void runAsyncLog(Runnable runnable) {
-    // exceptionally is available in JDK 1.8, we can't use exceptionallyAsync as it's 12 only
-    CompletableFuture.runAsync(runnable, executor)
-        .exceptionally(
-            e -> {
-              // Usually we get to this point when you have thread local dependent code in your
-              // logger.withContext() block, and your executor doesn't have those thread locals
-              // so you NPE.
-              //
-              // We need to log this error, but since it could be part of the logger context
-              // that is causing this error, we can't log the error with the same logger.
-              //
-              // Fallback to the underlying SLF4J logger to render it.
-              final Throwable cause = e.getCause(); // strip the CompletionException
-              logger.log(
-                  java.util.logging.Level.SEVERE,
-                  "Uncaught exception when running asyncLog",
-                  cause);
-              return null;
-            });
   }
 
   @NotNull

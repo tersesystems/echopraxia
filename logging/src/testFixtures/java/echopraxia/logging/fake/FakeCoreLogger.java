@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
@@ -133,11 +132,6 @@ public class FakeCoreLogger implements CoreLogger {
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
     return new FakeCoreLogger(fqcn, context, this.condition.and(condition), executor, tlsSupplier);
-  }
-
-  @Override
-  public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new FakeCoreLogger(fqcn, context, condition, executor, tlsSupplier);
   }
 
   @Override
@@ -297,32 +291,4 @@ public class FakeCoreLogger implements CoreLogger {
   private boolean isEnabledFor(Level level) {
     return true;
   }
-
-  // -----------------------------------------------------------------------
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {}
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {}
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {}
 }

@@ -11,9 +11,6 @@ import echopraxia.logging.spi.LoggerContext;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ForkJoinPool;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +20,6 @@ public class NoopCoreLogger implements CoreLogger {
 
   private final NoopLoggerContext context;
   private final Condition condition;
-  private final Executor executor;
   private final String fqcn;
 
   private final Supplier<Runnable> tlsSupplier;
@@ -32,20 +28,14 @@ public class NoopCoreLogger implements CoreLogger {
     this.fqcn = fqcn;
     this.context = NoopLoggerContext.empty();
     this.condition = Condition.always();
-    this.executor = ForkJoinPool.commonPool();
     this.tlsSupplier = () -> (Runnable) () -> {};
   }
 
   public NoopCoreLogger(
-      String fqcn,
-      NoopLoggerContext context,
-      Condition condition,
-      Executor executor,
-      Supplier<Runnable> tlsSupplier) {
+      String fqcn, NoopLoggerContext context, Condition condition, Supplier<Runnable> tlsSupplier) {
     this.fqcn = fqcn;
     this.context = context;
     this.condition = condition;
-    this.executor = executor;
     this.tlsSupplier = tlsSupplier;
   }
 
@@ -112,7 +102,7 @@ public class NoopCoreLogger implements CoreLogger {
     NoopLoggerContext ctx =
         new NoopLoggerContext(
             joinFields(() -> context.getLoggerFields(), () -> convert(f.apply(builder))));
-    return new NoopCoreLogger(fqcn, ctx, this.condition.and(condition), executor, tlsSupplier);
+    return new NoopCoreLogger(fqcn, ctx, this.condition.and(condition), tlsSupplier);
   }
 
   private List<Field> convert(FieldBuilderResult input) {
@@ -127,22 +117,17 @@ public class NoopCoreLogger implements CoreLogger {
 
   @Override
   public @NotNull CoreLogger withThreadLocal(Supplier<Runnable> newSupplier) {
-    return new NoopCoreLogger(fqcn, context, this.condition.and(condition), executor, newSupplier);
+    return new NoopCoreLogger(fqcn, context, this.condition.and(condition), newSupplier);
   }
 
   @Override
   public @NotNull CoreLogger withCondition(@NotNull Condition condition) {
-    return new NoopCoreLogger(fqcn, context, this.condition.and(condition), executor, tlsSupplier);
-  }
-
-  @Override
-  public @NotNull CoreLogger withExecutor(@NotNull Executor executor) {
-    return new NoopCoreLogger(fqcn, context, condition, executor, tlsSupplier);
+    return new NoopCoreLogger(fqcn, context, this.condition.and(condition), tlsSupplier);
   }
 
   @Override
   public @NotNull CoreLogger withFQCN(@NotNull String fqcn) {
-    return new NoopCoreLogger(fqcn, context, condition, executor, tlsSupplier);
+    return new NoopCoreLogger(fqcn, context, condition, tlsSupplier);
   }
 
   // -----------------------------------------------------------------------
@@ -297,32 +282,4 @@ public class NoopCoreLogger implements CoreLogger {
   private boolean isEnabledFor(Level level) {
     return true;
   }
-
-  // -----------------------------------------------------------------------
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level, @NotNull Consumer<LoggerHandle<FB>> consumer, @NotNull FB builder) {}
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {}
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {}
-
-  @Override
-  public <FB> void asyncLog(
-      @NotNull Level level,
-      @NotNull Supplier<List<Field>> extraFields,
-      @NotNull Condition condition,
-      @NotNull Consumer<LoggerHandle<FB>> consumer,
-      @NotNull FB builder) {}
 }
