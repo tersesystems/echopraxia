@@ -1,15 +1,15 @@
 # Installation
 
-Echopraxia is divided into two sections: the user logger APIs (`logger`, `fluent`, `semantic`) and an 
-underlying `CoreLogger` implementation which is tied to the logging framework.  
+Echopraxia is divided into two sections: the user logger APIs (`simple` and `logger`) and an 
+underlying `CoreLogger` implementation which is tied to the logging framework (JUL, Logback, or Log4J2).
 
-You will need to install both, although in 99% of cases you will want `logger`:
+You will need to install both, although in 99% of cases you will want `simple`:
 Maven:
 
 ```xml
 <dependency>
   <groupId>com.tersesystems.echopraxia</groupId>
-  <artifactId>logger</artifactId>
+  <artifactId>simple</artifactId>
   <version>VERSION</version>
 </dependency>
 ```
@@ -17,7 +17,7 @@ Maven:
 Gradle:
 
 ```gradle
-implementation "com.tersesystems.echopraxia:logger:<VERSION>" 
+implementation "com.tersesystems.echopraxia:simple:<VERSION>" 
 ```
 
 There are core loggers for Logback, Log4J2, and JUL.
@@ -42,20 +42,11 @@ Gradle:
 implementation "com.tersesystems.echopraxia:logstash:<VERSION>"
 ```
 
-Because Logback 1.2 is compiled with SLF4J 1.7.x and Logback 1.3 uses SLF4J 2.x, Echopraxia does not include the transitive dependencies.  Instead, you will need to select the appropriate Logback implementation:
-
-For SLF4J 1.7.x:
+For SLF4J 2.0.x and for `logstash-logback-encoder`, you will also want the following:
 
 ```gradle
-implementation "ch.qos.logback:logback-classic:1.2.12"
-implementation 'net.logstash.logback:logstash-logback-encoder:7.3'
-```
-
-For SLF4J 2.0.x and for `logstash-logback-encoder` from 7.4:
-
-```gradle
-implementation "ch.qos.logback:logback-classic:1.4.6"
-implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+implementation "ch.qos.logback:logback-classic:1.5.15"
+implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
 ```
 
 ## Log4J Core Logger

@@ -29,11 +29,11 @@ Conditions address the challenge of "whether-to-log", which concerns with dynami
 Conditions can leverage the data exposed by structured logging.  For example, here's a debug statement that only logs if the remote address is localhost:
 
 ```java
-Condition isLocalhost = (level, ctx) -> ctx
+JsonPathCondition isLocalhost = JsonPathCondition.pathCondition((level, ctx) -> ctx
     .findString("$.request_remote_addr")
     .map(s -> Objects.equals(s, "127.0.0.1"))
-    .orElse(false);
-logger.debug(isLocalhost, "address is {}", fb -> fb.string("request_remote_addr", addr));
+    .orElse(false));
+logger.withCondition(isLocalhost).debug("address is {}", fb -> fb.string("request_remote_addr", addr));
 ```
 
 This makes targeted logging far more powerful, because diagnostic logging is no longer an "all or nothing" proposition -- conditions can dynamically filter what is logged, creating a "control plane" for logging.  A proof of concept of dynamic debug logging using Echopraxia is [here](https://github.com/tersesystems/dynamic-debug-logging) .
