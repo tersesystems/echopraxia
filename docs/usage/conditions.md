@@ -160,7 +160,7 @@ var loggerWithCondition = logger.withCondition(condition);
 You can also build up conditions:
 
 ```java
-Logger<FieldBuilder> loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
+Logger loggerWithAandB = logger.withCondition(conditionA).withCondition(conditionB);
 ```
 
 Conditions are only evaluated once a level/marker check is passed, so something like
@@ -174,8 +174,10 @@ will short circuit on the level check before any condition is reached.
 Conditions look for fields, but those fields can come from *either* context or argument.  For example, the following condition will log because the condition finds an argument field:
 
 ```java
+import static echopraxia.jsonpath.JsonPathCondition.*;
+
 Condition cond = pathCondition((level, ctx) -> ctx.findString("somename").isPresent());
-logger.withCondition(cond).info("some message", fb -> fb.string("somename", "somevalue")); // matches argument
+logger.withCondition(cond).info("some message",  fb.string("somename", "somevalue")); // matches argument
 ```
 
 ## Statement
@@ -204,7 +206,7 @@ A condition may also evaluate context fields that are set in a logger:
 // Conditions may evaluate context
 Condition cond = pathCondition((level, ctx) -> ctx.findString("somename").isPresent());
 boolean loggerEnabled = logger
-  .withFields(fb -> fb.string("somename", "somevalue"))
+  .withFields( fb.string("somename", "somevalue"))
   .withCondition(condition)
   .isInfoEnabled();
 ```
@@ -212,8 +214,8 @@ boolean loggerEnabled = logger
 Using a predicate with a condition does not trigger any logging, so it can be a nice way to "dry run" a condition.  Note that the context evaluation takes place every time a condition is run, so doing something like this is not good:
 
 ```java
-var loggerWithContextAndCondition =  logger
-  .withFields(fb -> fb.string("somename", "somevalue"))
+var loggerWithContextAndCondition = logger
+  .withFields( fb.string("somename", "somevalue"))
   .withCondition(condition);
 
 // check evaluates context
@@ -229,7 +231,7 @@ It is generally preferable to pass in a condition explicitly on the statement, a
 
 ```java
 var loggerWithContext = logger
-  .withFields(fb -> fb.string("somename", "somevalue"));
+  .withFields( fb.string("somename", "somevalue"));
 loggerWithContext.info(condition, "message");
 ```
 
