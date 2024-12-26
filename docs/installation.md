@@ -4,6 +4,7 @@ Echopraxia is divided into two sections: the user logger APIs (`simple` and `log
 underlying `CoreLogger` implementation which is tied to the logging framework (JUL, Logback, or Log4J2).
 
 You will need to install both, although in 99% of cases you will want `simple`:
+
 Maven:
 
 ```xml
@@ -47,6 +48,32 @@ For SLF4J 2.0.x and for `logstash-logback-encoder`, you will also want the follo
 ```gradle
 implementation "ch.qos.logback:logback-classic:1.5.15"
 implementation 'net.logstash.logback:logstash-logback-encoder:8.0'
+```
+
+and an appropriate appender:
+
+```xml
+<configuration>
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <jsonGeneratorDecorator class="net.logstash.logback.decorate.PrettyPrintingJsonGeneratorDecorator"/>
+            <providers>
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <message/>
+                <loggerName/>
+                <threadName/>
+                <logLevel/>
+                <stackHash/>
+                <mdc/>
+                <logstashMarkers/>
+                <arguments/>
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+</configuration>
 ```
 
 ## Log4J Core Logger
