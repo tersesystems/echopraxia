@@ -63,11 +63,13 @@ This is only a part of the available functionality in conditions.  You can tie c
 
 ## JSON Path
 
-If you are using the Logstash implementation, you can use the `echopraxia.jsonpath.JsonPathCondition.pathCondition()` method to provide you with an extended context that has logging methods:
+If you are using the Logstash implementation or have explicitly added the `jsonpath` module, you can use the `echopraxia.jsonpath.JsonPathCondition.pathCondition()` method to provide you with an extended context that has logging methods:
 
 This will give you a context that extends `FindPathMethods` that will let you use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
 
 ```java
+import static echopraxia.jsonpath.JsonPathCondition.*;
+
 Condition fooCondition = pathCondition((level, ctx) -> 
     ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent()
 );
@@ -127,20 +129,22 @@ List<String> interests = context.findList("$.person.mother.interests");
 You can use [inline predicates](https://github.com/json-path/JsonPath#inline-predicates), which will return a `List` of the results:
 
 ```java
-final Condition cheapBookCondition =
-  (level, context) -> ! context.findList("$.store.book[?(@.price < 10)]").isEmpty();
+final Condition cheapBookCondition = pathCondition(
+  (level, context) -> ! context.findList("$.store.book[?(@.price < 10)]").isEmpty());
 ```
 
 The inline and filter predicates are not available for exceptions. Instead, you must use `filter`:
 
 ```java
+import static echopraxia.jsonpath.JsonPathCondition.*;
+
 class FindException {
   void logException() {
-    Condition throwableCondition = json
+    Condition throwableCondition = pathCondition(
       (level, ctx) ->
         ctx.findThrowable()
           .filter(e -> "test message".equals(e.getMessage()))
-          .isPresent();
+          .isPresent());
     
     logger.error(throwableCondition, "Error message", new RuntimeException("test message"));
   }
