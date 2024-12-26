@@ -11,7 +11,7 @@ loggerWithFoo.info("JSON field will log automatically")
 
 This works very well for HTTP session and request data such as correlation ids.
 
-One thing to be aware of that the popular idiom of using `public static final Logger<MyFieldBuilder> logger` can be limiting in cases where you want to include context data.  For example, if you have a number of objects with their own internal state, it may be more appropriate to create a logger field on the object.
+One thing to be aware of that the popular idiom of using `public static final Logger logger` can be limiting in cases where you want to include context data.  For example, if you have a number of objects with their own internal state, it may be more appropriate to create a logger field on the object.
 
 ```java
 public class PlayerData {

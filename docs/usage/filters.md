@@ -1,6 +1,6 @@
 # Filters
 
-There are times when you want to add a field or a condition to all loggers.  Although you can wrap individual loggers or create your own wrapper around `LoggerFactory`, this can be a labor-intensive process that requires lots of code modification, and must be handled for fluent, semantic, async, and regular loggers.
+There are times when you want to add a field or a condition to all loggers. 
 
 Echopraxia includes filters that wrap around the `CoreLogger` returned by `CoreLoggerFactory` that provides the ability to modify the core logger from a single pipeline in the code.
 
@@ -12,8 +12,7 @@ package example;
 public class ExampleFilter implements CoreLoggerFilter {
     @Override
     public CoreLogger apply(CoreLogger coreLogger) {
-        var fb =  FieldBuilder.instance();
-        return coreLogger.withFields(fb.bool("uses_filter", true));
+        return coreLogger.withFields(fb -> fb.bool("uses_filter", true), FieldBuilder.instance());
     }
 }
 ```
@@ -48,7 +47,7 @@ public class SystemInfoFilter implements CoreLoggerFilter {
 
     // Now you can add conditions based on these fields, and conditionally
     // enable logging based on your load and memory!
-
+    var fb = FieldBuilder.instance();
     Field loadField = fb.object("load_average", //
               fb.number("1min", loadAverage[0]), //
               fb.number("5min", loadAverage[1]), //

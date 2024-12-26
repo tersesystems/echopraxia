@@ -15,7 +15,7 @@ LogstashCoreLogger core = (LogstashCoreLogger) CoreLoggerFactory.getLogger();
 The `LogstashCoreLogger` has a `withMarkers` method that takes an SLF4J marker:
 
 ```java
-Logger<FieldBuilder> logger = LoggerFactory.getLogger(
+Logger logger = LoggerFactory.getLogger(
       core.withMarkers(MarkerFactory.getMarker("SECURITY")), FieldBuilder.instance);
 ```
 
