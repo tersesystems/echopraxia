@@ -1,11 +1,8 @@
-
 # Custom Logger
 
-If you are using a particular set of field builders for your domain and want them available by default, it's easy to create your own logger with your own field builder, using the support classes and interfaces.  
+If you want to create a custom `Logger` class that has its own methods, you can do so easily.
 
-Creating your own logger will also remove the type parameter from your code, so you don't have to type `Logger<PersonFieldBuilder>` everywhere, and allow you to create custom methods that leverage field builders.
-
-If you want to make sure your logger is the only one available, you should import only the API:
+First add the `simple` module:
 
 Maven:
 
@@ -23,46 +20,51 @@ Gradle:
 implementation "com.tersesystems.echopraxia:simple:<VERSION>" 
 ```
 
-And then continuing on from the [custom field builder example](https://github.com/tersesystems/echopraxia-examples/blob/main/custom-field-builder/README.md), you can build a `PersonLogger`:
-
-```
-
-```
-
-and a custom logger factory:
+And then add a custom logger factory:
 
 ```java
-public final class PersonLoggerFactory {
 
-  private static final PersonFieldBuilder myFieldBuilder = PersonFieldBuilder.instance;
+class MyLoggerFactory {
+    public static class MyFieldBuilder implements FieldBuilder {
+        // Add your own field builder methods in here
+    }
 
-  // the class containing the error/warn/info/debug/trace methods
-  private static final String FQCN = DefaultLoggerMethods.class.getName();
+    public static final MyFieldBuilder FIELD_BUILDER = new MyFieldBuilder();
 
-  public static PersonLogger getLogger(Class<?> clazz) {
-    return getLogger(CoreLoggerFactory.getLogger(FQCN, clazz.getName()));
-  }
+    public static MyLogger getLogger(Class<?> clazz) {
+        final CoreLogger core = CoreLoggerFactory.getLogger(Logger.class.getName(), clazz);
+        return new MyLogger(core);
+    }
 
-  public static PersonLogger getLogger(String name) {
-    return getLogger(CoreLoggerFactory.getLogger(FQCN, name));
-  }
+    public static final class MyLogger extends Logger {
+        public static final String FQCN = MyLogger.class.getName();
 
-  public static PersonLogger getLogger() {
-    return getLogger(CoreLoggerFactory.getLogger(FQCN, Caller.resolveClassName()));
-  }
+        public MyLogger(CoreLogger logger) {
+            super(logger);
+        }
 
-  public static PersonLogger getLogger(@NotNull CoreLogger core) {
-    return new PersonLogger(core, myFieldBuilder, PersonLogger.class);
-  }
+        public void notice(String message) {
+            // the caller is MyLogger specifically, so we need to let the logging framework know how to
+            // address it.
+            core().withFQCN(FQCN)
+                    .withFields(fb -> fb.bool("notice", true), FIELD_BUILDER)
+                    .log(Level.INFO, message);
+        }
+    }
+}
+
+```
+
+and then you can log with a `notice` method:
+
+```java
+class Main {
+    private static final MyLoggerFactory.MyLogger logger = MyLoggerFactory.getLogger(Main.class);
+
+    public static void main(String[] args) {
+        logger.notice("this has a notice field added");
+    }
 }
 ```
 
-and then you can log a person as a raw parameter:
-
-```java
-PersonLogger logger = PersonLoggerFactory.getLogger();
-Person abe = ...
-logger.info("Best person: {}", abe);
-```
-
-Generally loggers should be final, and any common functionality should be moved out to interfaces you can share.  This is because subclassing can have an impact on JVM optimizations, and can make returning specific types from `with*` methods more complicated. 
+There is no cache associated with logging, but adding a cache with `ConcurrentHashMap.computeIfAbsent` is straightforward.

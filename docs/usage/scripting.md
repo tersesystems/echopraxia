@@ -30,8 +30,7 @@ implementation "com.tersesystems.echopraxia:scripting:<VERSION>"
 
 ## Script Syntax
 
-The call site for a script is the function `evaluate` inside a library called `echopraxia`.  The level and context are
-passed through as `(string level, dict ctx)`, where `ctx` is a dictionary of functions that connect back to the logging context.
+The call site for a script is the function `evaluate` inside a library called `echopraxia`.  The level and context are passed through as `(string level, dict ctx)`, where `ctx` is a dictionary of functions that connect back to the logging context.
 
 Methods in the context are snake case, separated by underscores. For example, to call the equivalent of `ctx.findString("$.person.name")`, you would call `ctx[:find_string]("$.person.name")`.  
 
