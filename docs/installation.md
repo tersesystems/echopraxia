@@ -3,7 +3,15 @@
 Echopraxia is divided into two sections: the user logger APIs (`simple` and `logger`) and an 
 underlying `CoreLogger` implementation which is tied to the logging framework (JUL, Logback, or Log4J2).
 
-You will need to install both, although in 99% of cases you will want `simple`:
+You will need to install both a logger module (usually `simple`) and a framework module (usually `logstash` or `logback`).
+
+## User API Loggers
+
+The user API loggers provide slightly different wrappers around the core loggers.  They are both oriented around structured logging, and so will take `Field` arguments, although they do so in slightly different ways.
+
+### Simple
+
+The `simple` module provides an `echopraxia.simple.LoggerFactory` and `echopraxia.simple.Logger`.
 
 Maven:
 
@@ -21,9 +29,39 @@ Gradle:
 implementation "com.tersesystems.echopraxia:simple:<VERSION>" 
 ```
 
+### Logger
+
+The `logger` module provides `echopraxia.logger.LoggerFactory` and `echopraxia.logger.Logger`.
+
+The `Logger` makes use of field builder functions, which means that a fieldbuilder does not have to be in scope.  Practically speaking, it means you can do this:
+
+```java
+logger.debug("Create a field with no fieldbuilder in scope {}", fb -> fb.string("argname", "argvalue"));
+```
+
+Where `fb` is a fieldbuilder attached to the logger.  This means that the field is only created if the function is called, which is handy for expensive debug and trace statements, and it's neater because the fieldbuilder is automatically in scope.
+
+Maven:
+
+```xml
+<dependency>
+  <groupId>com.tersesystems.echopraxia</groupId>
+  <artifactId>logger</artifactId>
+  <version>VERSION</version>
+</dependency>
+```
+
+Gradle:
+
+```gradle
+implementation "com.tersesystems.echopraxia:logger:<VERSION>" 
+```
+
+## Core Loggers
+
 There are core loggers for Logback, Log4J2, and JUL.
 
-## Logstash Core Logger
+### Logstash Core Logger
 
 There is a Logback implementation based around [logstash-logback-encoder](https://github.com/logfellow/logstash-logback-encoder).  This library does not provide a front end logger API, so you must pick (or create) one yourself, i.e. normal, async, fluent, or semantic.  
 
@@ -76,7 +114,7 @@ and an appropriate appender:
 </configuration>
 ```
 
-## Log4J Core Logger
+### Log4J Core Logger
 
 There is a Log4J implementation that works with the [JSON Template Layout](https://logging.apache.org/log4j/2.x/manual/json-template-layout.html).  This provides a core logger implementation but does not provide a user visible logging API.
 
@@ -144,7 +182,7 @@ If you want to separate the context fields from the argument fields, you can def
 
 Unfortunately, I don't know of a way to "flatten" fields so that they show up on the root object instead of under an additional field.  If you know how to do this, let me know!
 
-## JUL (java.util.logging) Core Logger
+### JUL (java.util.logging) Core Logger
 
 There is a JUL implementation.
 
