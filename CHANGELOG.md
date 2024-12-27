@@ -3,8 +3,9 @@
 ## 4.0.0
 
 * Change package from `com.tersesystems.echopraxia` to `echopraxia`.
-* Move logging specific API (Conditions, LoggingContext) to `echopraxia.logging.api` so that only fields, values, attributes are core `echopraxia.api`. * Break out JSONPath dependency (requires SLF4J 2.x, awkward for Log4J2 and JUL frameworks)
-* Add `JSONPathCondition.pathCondition` so that JSON path functionality is still available.
+* Move logging specific API (Conditions, LoggingContext) to `echopraxia.logging.api` so that only fields, values, attributes are core `echopraxia.api`.
+* Break out JSONPath dependency (requires SLF4J 2.x, awkward for Log4J2 and JUL frameworks)
+* Add `JsonPathCondition.pathCondition` so that JSON path functionality is still available.
 * Add a `simple` logger that does not use field builder functions or conditions.
 * Remove `async`, `fluent`, and `semantic` modules from codebase (they are best done at user level)
 * Remove `asyncLog` methods from core loggers (this is better done at a user level).

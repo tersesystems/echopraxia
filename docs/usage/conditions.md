@@ -63,12 +63,12 @@ This is only a part of the available functionality in conditions.  You can tie c
 
 ## JSON Path
 
-If you are using the Logstash implementation or have explicitly added the `jsonpath` module, you can use the `echopraxia.jsonpath.JsonPathCondition.pathCondition()` method to provide you with an extended context that has logging methods:
+If you are using the Logstash implementation or have explicitly added the `jsonpath` module, you can use the `JsonPathCondition.pathCondition` method to provide you with an extended context that has logging methods:
 
 This will give you a context that extends `FindPathMethods` that will let you use [JSONPath](https://github.com/json-path/JsonPath#jayway-jsonpath) to find values from the logging context in a condition.
 
 ```java
-import static echopraxia.jsonpath.JsonPathCondition.*;
+import static echopraxia.logging.api.JsonPathCondition.pathCondition;
 
 Condition fooCondition = pathCondition((level, ctx) -> 
     ctx.findString("$.foo").filter(s -> s.equals("bar")).isPresent()
@@ -136,8 +136,6 @@ final Condition cheapBookCondition = pathCondition(
 The inline and filter predicates are not available for exceptions. Instead, you must use `filter`:
 
 ```java
-import static echopraxia.jsonpath.JsonPathCondition.*;
-
 class FindException {
   void logException() {
     Condition throwableCondition = pathCondition(
@@ -178,8 +176,6 @@ will short circuit on the level check before any condition is reached.
 Conditions look for fields, but those fields can come from *either* context or argument.  For example, the following condition will log because the condition finds an argument field:
 
 ```java
-import static echopraxia.jsonpath.JsonPathCondition.*;
-
 Condition cond = pathCondition((level, ctx) -> ctx.findString("somename").isPresent());
 logger.withCondition(cond).info("some message",  fb.string("somename", "somevalue")); // matches argument
 ```
@@ -219,7 +215,7 @@ Using a predicate with a condition does not trigger any logging, so it can be a 
 
 ```java
 var loggerWithContextAndCondition = logger
-  .withFields( fb.string("somename", "somevalue"))
+  .withFields(fb.string("somename", "somevalue"))
   .withCondition(condition);
 
 // check evaluates context
@@ -234,8 +230,7 @@ This results in the context being evaluated both in the block and in the info st
 It is generally preferable to pass in a condition explicitly on the statement, as it will only evaluate once.
 
 ```java
-var loggerWithContext = logger
-  .withFields( fb.string("somename", "somevalue"));
+var loggerWithContext = logger.withFields(fb.string("somename", "somevalue"));
 loggerWithContext.info(condition, "message");
 ```
 

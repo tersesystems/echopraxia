@@ -29,7 +29,9 @@ Conditions address the challenge of "whether-to-log", which concerns with dynami
 Conditions can leverage the data exposed by structured logging.  For example, here's a debug statement that only logs if the remote address is localhost:
 
 ```java
-JsonPathCondition isLocalhost = JsonPathCondition.pathCondition((level, ctx) -> ctx
+import static echopraxia.logging.api.JsonPathCondition.pathCondition;
+
+JsonPathCondition isLocalhost = pathCondition((level, ctx) -> ctx
     .findString("$.request_remote_addr")
     .map(s -> Objects.equals(s, "127.0.0.1"))
     .orElse(false));
