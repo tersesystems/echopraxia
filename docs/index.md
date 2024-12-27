@@ -57,6 +57,8 @@ fooLogger.info("This logs the 'foo' field automatically in JSON");
 And has conditional logging based on fields and exceptions using JSONPath:
 
 ```java
+import static echopraxia.logging.api.*;
+
 JsonPathCondition c = JsonPathCondition.findCondition((level, ctx) ->
     ctx.findString("$.exception.stackTrace[0].methodName")
         .filter(s -> s.endsWith("Foo"))
